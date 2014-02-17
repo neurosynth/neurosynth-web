@@ -8,15 +8,15 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
 
-config = ConfigParser.ConfigParser()
-config.read(os.path.dirname(os.path.realpath(__file__)) + '../../config.cfg')
-SQLALCHEMY_DATABASE_URI = config.get('Database', 'SQLALCHEMY_DATABASE_URI')
+#config = ConfigParser.ConfigParser()
+#config.read(os.path.dirname(os.path.realpath(__file__)) + '../../config.cfg')
+#SQLALCHEMY_DATABASE_URI = config.get('Database', 'SQLALCHEMY_DATABASE_URI')
 
 app = Flask(__name__)
-if SQLALCHEMY_DATABASE_URI == '' :
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
-else:
-    app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
+#if SQLALCHEMY_DATABASE_URI == '' :
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
+#else:
+#    app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
 db = SQLAlchemy(app)
 
 
@@ -27,7 +27,7 @@ class Study(db.Model):
     journal = db.Column(db.String(200))
     authors = db.Column(db.String(1000))
     year = db.Column(db.Integer)
-#    peaks = deferred(db.Column(db.Blob,))
+#    peaks = deferred(db.Column(db.Blob,)) #try pickletype instead?
     peak_id = db.Column(db.Integer)
     space = db.Column(db.String(10))
 

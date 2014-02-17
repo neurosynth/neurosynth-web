@@ -25,9 +25,5 @@ manager.create_api(TOREMOVEmodels.Study,
                    results_per_page=20,
                    max_results_per_page=100,
 #                   preprocessors={'GET_SINGLE':[get_single_preprocessor]}
-                   includes = ['pmid',
-                               'title',
-                               'journal',
-                               'authors',
-                               'year'])
+)
 app.run()
