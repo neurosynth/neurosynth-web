@@ -9,7 +9,7 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
 db = SQLAlchemy(app)
 
-class Study(db.Model):
+class Studies(db.Model):
     pmid = db.Column(db.Integer, primary_key=True)
     doi = db.Column(db.String(200))
     title = db.Column(db.String(1000))
@@ -43,13 +43,13 @@ featuresTxt.close()
 db.create_all()
 
 for x in dataset:
-    db.session.add(Study(
-                                        pmid=x.get('id'),
-                                        doi=x.get('doi'),
-                                        title=x.get('title'),
-                                        journal=x.get('journal'),
-                                        authors=x.get('authors'),
-                                        year=x.get('year'),
-                                        peak_id=x.get('peak_id'),
-                                        space=x.get('space')))
+    db.session.add(Studies(
+                        pmid=x.get('id'),
+                        doi=x.get('doi'),
+                        title=x.get('title'),
+                        journal=x.get('journal'),
+                        authors=x.get('authors'),
+                        year=x.get('year'),
+                        peak_id=x.get('peak_id'),
+                        space=x.get('space')))
     db.session.commit()

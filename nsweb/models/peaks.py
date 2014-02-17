@@ -1,0 +1,2 @@
+class Peaks(object):
+    

@@ -19,11 +19,16 @@ manager = flask_restless.APIManager(app,flask_sqlalchemy_db=db)
 #    instance of the model to get.
 #
 #    """
-#    pass
+#    Pass
+
 manager.create_api(TOREMOVEmodels.Study,
                    methods=['GET'],
                    results_per_page=20,
                    max_results_per_page=100,
 #                   preprocessors={'GET_SINGLE':[get_single_preprocessor]}
-)
+                   includes = ['pmid',
+                               'title',
+                               'journal',
+                               'authors',
+                               'year'])
 app.run()
