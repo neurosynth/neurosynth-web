@@ -7,3 +7,8 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = nsweb.settings.SQLALCHEMY_DATABASE_URI
 db = SQLAlchemy(app)
 manager = APIManager(app,flask_sqlalchemy_db=db)
+
+from flask import Flask
+from flask_restful import Api
+
+api = Api(app)

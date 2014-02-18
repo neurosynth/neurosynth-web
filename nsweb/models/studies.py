@@ -1,4 +1,6 @@
 from nsweb.core import db
+import json
+import this
 
 class Study(db.Model):
     pmid = db.Column(db.Integer, primary_key=True)
@@ -11,6 +13,9 @@ class Study(db.Model):
     table_num = db.Column(db.Integer)
     peaks = db.relationship('Peak', backref=db.backref('study', lazy='joined'), lazy='dynamic')
     #features = 
+    
+    def to_json(self):
+        return json.dumps(self.journal)
     
 #     def __init__(self, pmid, doi, title, journal, authors, year, peak_id, space):
 #         self.pmid=pmid
@@ -31,4 +36,4 @@ class Peak(db.Model):
     study_id = db.Column(db.Integer,db.ForeignKey('study.pmid'))
     x = db.Column(db.Float)
     y = db.Column(db.Float)
-    coordinate = db.Column(db.Float)
+    z = db.Column(db.Float)

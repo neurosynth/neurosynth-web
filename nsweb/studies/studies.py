@@ -11,11 +11,13 @@ from nsweb.models import studies
 
 manager.create_api(studies.Study,
                    methods=['GET'],
+                   collection_name='study',
                    results_per_page=20,
                    max_results_per_page=100,
-                   include_columns = ['pmid',
-                               'title',
-                               'journal',
-                               'authors',
-                               'year'])
+#                   url_prefix='/study')
+#                    include_columns = ['pmid',
+#                                'title',
+#                                'journal',
+#                                'authors',
+#                                'year']
 app.run()

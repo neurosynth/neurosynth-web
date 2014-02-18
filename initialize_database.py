@@ -34,7 +34,7 @@ for x in dataset:
                           year=x.get('year'))
     peaks = [map(float, y) for y in x.get('peaks')]
     for coordinate in peaks:
-        peak=studies.Peak(x=coordinate[0],y=coordinate[1],coordinate=coordinate[2])
+        peak=studies.Peak(x=coordinate[0],y=coordinate[1],z=coordinate[2])
         study.peaks.append(peak)
         db.session.add(peak)
     
