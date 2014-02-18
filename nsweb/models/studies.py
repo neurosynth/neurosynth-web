@@ -31,4 +31,4 @@ class Peak(db.Model):
     study_id = db.Column(db.Integer,db.ForeignKey('study.pmid'))
     x = db.Column(db.Float)
     y = db.Column(db.Float)
-    z = db.Column(db.Float)
+    coordinate = db.Column(db.Float)
