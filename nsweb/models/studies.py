@@ -10,21 +10,21 @@ class Study(db.Model):
     year = db.Column(db.Integer)
     table_num = db.Column(db.Integer)
     peaks = db.relationship('Peak', backref=db.backref('study', lazy='joined'), lazy='dynamic')
-    features = 
+    #features = 
     
-    def __init__(self, pmid, doi, title, journal, authors, year, peak_id, space):
-        self.pmid=pmid
-        self.doi=doi
-        self.title=title
-        self.journal=journal
-        self.space=space
-        self.authors=authors
-        self.year=year
-        self.table_num
+#     def __init__(self, pmid, doi, title, journal, authors, year, peak_id, space):
+#         self.pmid=pmid
+#         self.doi=doi
+#         self.title=title
+#         self.journal=journal
+#         self.space=space
+#         self.authors=authors
+#         self.year=year
+#         self.table_num
 #        self.peaks=peaksToPickle(peaks)
 
-    def __repr__(self):
-        return '<Study %r>' % self.title
+#     def __repr__(self):
+#         return '<Study %r>' % self.title
     
 class Peak(db.Model):
     id = db.Column(db.Integer, primary_key=True)

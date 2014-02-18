@@ -2,7 +2,7 @@ import os
 import cPickle
 from nsweb.core import db
 from nsweb.models import studies
-from nsweb.models import features
+#from nsweb.models import features
 
 PWD = os.path.dirname(os.path.realpath(__file__))
 

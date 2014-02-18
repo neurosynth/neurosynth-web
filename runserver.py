@@ -1,3 +1,4 @@
+from flask import Flask
 
 if __name__ == "__main__":
     # To allow aptana to receive errors, set use_debugger=False
