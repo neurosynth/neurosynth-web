@@ -11,4 +11,4 @@ manager.create_api(features.Feature,
                                     'feature',
                                     'num_studies',
                                     'num_activations'])
-app.run()
+#app.run()

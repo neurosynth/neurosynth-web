@@ -7,4 +7,4 @@ manager.create_api(studies.Study,
                    collection_name='study',
                    results_per_page=20,
                    max_results_per_page=100,)
-app.run()
+#app.run()
