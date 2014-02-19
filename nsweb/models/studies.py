@@ -14,9 +14,6 @@ class Study(db.Model):
     table_num = db.Column(db.Integer)
     peaks = db.relationship('Peak', backref=db.backref('study', lazy='joined'), lazy='dynamic')
     
-    def to_json(self):
-        return json.dumps(self.journal)
-    
 #     def __init__(self, pmid, doi, title, journal, authors, year, peak_id, space):
 #         self.pmid=pmid
 #         self.doi=doi

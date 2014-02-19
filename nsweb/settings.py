@@ -1,2 +1,9 @@
-import 
+import os
+
 SQLALCHEMY_DATABASE_URI = 'sqlite:////tmp/test.db'
+PICKLED_DATA = ''
+FEATURE_DATA = ''
+LOGGING_PATH = ''
+LOGGING_LEVEL = ''
+DEBUG = True
+DEBUG_WITH_APTANA = True
