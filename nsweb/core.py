@@ -4,6 +4,7 @@ from flask_restless import APIManager
 import nsweb.settings
 
 app = Flask(__name__)
+app.config['DEBUG'] = True
 app.config['SQLALCHEMY_DATABASE_URI'] = nsweb.settings.SQLALCHEMY_DATABASE_URI
 db = SQLAlchemy(app)
 manager = APIManager(app,flask_sqlalchemy_db=db)

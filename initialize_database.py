@@ -51,6 +51,8 @@ for x in dataset:
     for y in range(len(feature_list)):
         if pmid_frequencies[y] > 0.0:
             db.session.add(features.Frequency(study=study,feature=feature_dict[feature_list[y]],frequency=pmid_frequencies[y]))
+            feature_dict[feature_list[y]].num_studies+=1
+            feature_dict[feature_list[y]].num_activations+=len(peaks)
                 
 db.session.commit()
 
