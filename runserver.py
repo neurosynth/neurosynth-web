@@ -1,8 +1,9 @@
 from flask import Flask
+from flask_script import Manager
 
 if __name__ == "__main__":
     # To allow aptana to receive errors, set use_debugger=False
-    app = create_app(config="config.cfg")
+    app = create_app()
 
     if app.debug: use_debugger = False
     try:

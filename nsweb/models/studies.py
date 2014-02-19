@@ -3,6 +3,7 @@ import json
 import this
 
 class Study(db.Model):
+    __tablename__ = 'study'
     pmid = db.Column(db.Integer, primary_key=True)
     doi = db.Column(db.String(200))
     title = db.Column(db.String(1000))
@@ -12,7 +13,6 @@ class Study(db.Model):
     year = db.Column(db.Integer)
     table_num = db.Column(db.Integer)
     peaks = db.relationship('Peak', backref=db.backref('study', lazy='joined'), lazy='dynamic')
-    #features = 
     
     def to_json(self):
         return json.dumps(self.journal)
@@ -32,6 +32,7 @@ class Study(db.Model):
 #         return '<Study %r>' % self.title
     
 class Peak(db.Model):
+    __tablename__ = 'peak'
     id = db.Column(db.Integer, primary_key=True)
     study_id = db.Column(db.Integer,db.ForeignKey('study.pmid'))
     x = db.Column(db.Float)

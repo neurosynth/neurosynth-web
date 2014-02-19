@@ -1,14 +1,30 @@
 from nsweb.core import db
-import studies
-from sqlalchemy.ext.associationproxy import AssociationProxy
+from sqlalchemy.ext.associationproxy import association_proxy
+from sqlalchemy.orm import relationship, backref
 
-class Features(db.Model):
-    feature_id = db.Column(db.Integer, db.ForeignKey('feature.id')),
-    study_id = db.Column(db.Integer, db.ForeignKey('study.pmid')),
-    frequency = db.Column(db.Float)
-                    
 class Feature(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    num_of_studies=db.Column(db.Integer)
-    num_of_activations=db.Column(db.Integer)
-    frequencies = AssociationProxy
+    __tablename__ = 'feature'
+    id=db.Column(db.Integer, primary_key=True)
+    feature=db.Column(db.String(100),unique=True)
+    num_studies=db.Column(db.Integer)
+    num_activations=db.Column(db.Integer)
+    frequencies = association_proxy('frequencies','frequency')
+    
+    def __init__(self, feature, num_studies=0, num_activations=0):
+        self.feature=feature
+        self.num_studies=num_studies
+        self.num_activations=num_activations
+
+class Frequency(db.Model):
+    __tablename__ = 'frequency'
+    feature_id = db.Column(db.Integer, db.ForeignKey('feature.id'), primary_key=True)
+    pmid = db.Column(db.Integer, db.ForeignKey('study.pmid'), primary_key=True)
+    frequency = db.Column(db.Float)
+    feature = relationship(Feature, backref=backref('frequencies',cascade='all, delete-orphan'))
+    study = relationship('Study')
+    
+    def __init__(self, study, feature, frequency):
+        self.study=study
+        self.feature=feature
+        self.frequency=frequency
+    
