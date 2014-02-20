@@ -4,8 +4,10 @@ from nsweb.core import db
 from nsweb.models import studies, features
 
 #from nsweb.models import features
+def custom_int(s):
+    return int(s) if s.strip()!='' else 0
 
-PWD = os.path.dirname(os.path.realpath(__file__))
+PWD = os.path.dirname(os.path.realpath(__file__)) + '/Data'
 
 db.drop_all()
 db.create_all()
@@ -31,6 +33,7 @@ features_text.close()
 #feature_data=zip(*feature_data)
 
 for x in dataset:
+    table_num=x.get('table_num')#workaround for empty table_num field
     study = studies.Study(
                           pmid=int(x.get('id')),
                           doi=x.get('doi'),
@@ -38,8 +41,7 @@ for x in dataset:
                           journal=x.get('journal'),
                           space=x.get('space'),
                           authors=x.get('authors'),
-                          year=x.get('year'),
-                          num_table=int(x.get('table_num')))
+                          year=x.get('year'))
     peaks = [map(float, y) for y in x.get('peaks')]
     db.session.add(study)
 
@@ -57,3 +59,4 @@ for x in dataset:
                 
 db.session.commit()
 
+#empty string and spaces defaults to zero

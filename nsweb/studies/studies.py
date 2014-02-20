@@ -4,7 +4,7 @@ from nsweb.models import studies
 
 manager.create_api(studies.Study,
                    methods=['GET'],
-                   collection_name='study',
+                   collection_name='studies',
                    results_per_page=20,
                    max_results_per_page=100,)
 #app.run()

@@ -5,7 +5,7 @@ from nsweb.models import studies
 
 class Study(Resource):
     def get(self):
-        return studies.Study.query.all()
+        return studies.Study.query.all() #use paginate() plz
 
 api.add_resource(Study,'/')
 

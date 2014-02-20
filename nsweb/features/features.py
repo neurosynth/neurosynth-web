@@ -4,7 +4,7 @@ from nsweb.models import features
 
 manager.create_api(features.Feature,
                    methods=['GET'],
-                   collection_name='feature',
+                   collection_name='features',
                    results_per_page=20,
                    max_results_per_page=100,
                    include_columns=['id',
