@@ -1,22 +1,16 @@
-import os
 import cPickle
+from nsweb.settings import DATA, PICKLE_DATABASE, FEATURE_DATABASE
 from nsweb.core import db
 from nsweb.models import studies, features
-
-#from nsweb.models import features
-def custom_int(s):
-    return int(s) if s.strip()!='' else 0
-
-PWD = os.path.dirname(os.path.realpath(__file__)) + '/Data'
 
 db.drop_all()
 db.create_all()
 
-pickleData = open( PWD + '/pickled.txt','rb')
+pickleData = open( DATA + PICKLE_DATABASE,'rb')
 dataset = cPickle.load(pickleData)
 pickleData.close()
 
-features_text=open(PWD + '/abstract_features.txt')
+features_text=open(DATA + FEATURE_DATABASE)
 feature_dict={}
 feature_list = features_text.readline().split()[1:]
 for x in feature_list:
