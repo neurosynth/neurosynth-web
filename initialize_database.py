@@ -1,10 +1,10 @@
 import cPickle
 from nsweb.settings import SQLALCHEMY_DATABASE_URI, DATA_DIR, PICKLE_DATABASE, FEATURE_DATABASE, DEBUG
-import nsweb 
 from nsweb.core import create_app
 create_app(SQLALCHEMY_DATABASE_URI, debug=DEBUG)
 from nsweb.core import db
 from nsweb.models import studies, features
+
 
 # Re-initialize database
 db.drop_all()
