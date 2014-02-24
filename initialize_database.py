@@ -1,5 +1,8 @@
 import cPickle
-from nsweb.settings import DATA, PICKLE_DATABASE, FEATURE_DATABASE
+from nsweb.settings import SQLALCHEMY_DATABASE_URI, DATA_DIR, PICKLE_DATABASE, FEATURE_DATABASE, DEBUG
+import nsweb 
+from nsweb.core import create_app
+create_app(SQLALCHEMY_DATABASE_URI, debug=DEBUG)
 from nsweb.core import db
 from nsweb.models import studies, features
 
@@ -8,12 +11,12 @@ db.drop_all()
 db.create_all()
 
 # Read in the study data (contains pickled data originally in the database.txt file)
-pickleData = open( DATA + PICKLE_DATABASE,'rb')
+pickleData = open( DATA_DIR + PICKLE_DATABASE,'rb')
 dataset = cPickle.load(pickleData)
 pickleData.close()
 
 # Create Feature records--just the features themselves, not mapping onto Studies yet
-features_text=open(DATA + FEATURE_DATABASE)
+features_text=open(DATA_DIR + FEATURE_DATABASE)
 feature_dict={}
 feature_list = features_text.readline().split()[1:]  # Feature names
 for x in feature_list:
@@ -33,8 +36,7 @@ features_text.close()
 # Create Study records
 n_studies = len(dataset)
 for i,x in enumerate(dataset):
-    # print "STUDY: ", x.get('id'), "(%d/%d)" % (i+1, n_studies)
-    table_num=x.get('table_num')#workaround for empty table_num field
+#    print "STUDY: ", x.get('id'), "(%d/%d)" % (i+1, n_studies)
     study = studies.Study(
                           pmid=int(x.get('id')),
                           doi=x.get('doi'),
@@ -44,10 +46,10 @@ for i,x in enumerate(dataset):
                           authors=x.get('authors'),
                           year=x.get('year'),
                           table_num=x.get('table_num'))
-    peaks = [map(float, y) for y in x.get('peaks')]
     db.session.add(study)
 
     # Create Peaks and attach to Studies
+    peaks = [map(float, y) for y in x.get('peaks')]
     for coordinate in peaks:
         peak=studies.Peak(x=coordinate[0],y=coordinate[1],z=coordinate[2])
         study.peaks.append(peak)
