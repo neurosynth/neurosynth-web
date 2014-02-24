@@ -32,4 +32,4 @@ def create_app(database_uri, debug=True):
     import features.features
 #     api = Api(app)
 
-    return app
+    return (app, db, manager)

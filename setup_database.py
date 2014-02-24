@@ -12,28 +12,25 @@ def init_database(self):
     db.create_all()
 
 # Read in the study data (contains pickled data originally in the database.txt file)
-
 def read_pickle_database(self):
     pickle_data = open( DATA_DIR + PICKLE_DATABASE,'rb')
     dataset = cPickle.load(pickle_data)
     pickle_data.close()
     return dataset
 
-# Create Feature records--just the features themselves, not mapping onto Studies yet
+# Reads features into memory. returns a list of features and a dictionary of those features with pmid as a key
 def read_features_text(self):
     features_text=open(DATA_DIR + FEATURE_DATABASE)
-    feature_list = features_text.readline().split()[1:]  # Feature names
+    feature_list = features_text.readline().split()[1:] # List of feature names
     
-    # Store mapping of studies --> features, where values are frequencies
-    #features_text=map(str.split,features_text.readlines())
-    feature_data = {}#map( lambda r: map(float,str.split(r)), features_text.readlines())
+    feature_data = {} # Store mapping of studies --> features, where key is pmid and values are frequencies
     for x in features_text:
         x=x.split()
         feature_data[int(x[0])] = map(float,x[1:])
     features_text.close()
-    #feature_data=zip(*feature_data)
     return (feature_list,feature_data)
 
+#commits features to database
 def add_features(self, feature_list):
         feature_dict={}
         for x in feature_list:
@@ -45,9 +42,7 @@ def add_features(self, feature_list):
 
 def add_studies(self, dataset, (feature_list, feature_data), feature_dict):
     # Create Study records
-    n_studies = len(dataset)
     for i,x in enumerate(dataset):
-    #    print "STUDY: ", x.get('id'), "(%d/%d)" % (i+1, n_studies)
         study = studies.Study(
                               pmid=int(x.get('id')),
                               doi=x.get('doi'),
