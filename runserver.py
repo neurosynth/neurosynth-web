@@ -17,6 +17,8 @@ from nsweb.core import create_app
 from nsweb import settings
 
 (app,_,_) = create_app(database_uri=settings.SQLALCHEMY_DATABASE_URI,debug=settings.DEBUG)
+import nsweb.studies.studies
+import nsweb.features.features
 
 app.run()
 
