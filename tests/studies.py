@@ -4,16 +4,10 @@ from tests.settings import SQLALCHEMY_DATABASE_URI
 from nsweb.settings import DEBUG
 from flask.json import jsonify
 from mock import patch, Mock, MagickMock
+import unittest
 
 
 class StudiesTest():
-        
-    class TestStudiesModel(TestCase):
-        
-        #TODO: try using MagicMock to Mock db for models instead of building stubs from scratch
-        @patch('nsweb.core.db')
-        def create_db(self):
-            MagickMock()
             
     class TestStudiesApi(TestCase):
         def create_app(self):
