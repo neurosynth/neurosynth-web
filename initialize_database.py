@@ -42,7 +42,8 @@ for i,x in enumerate(dataset):
                           journal=x.get('journal'),
                           space=x.get('space'),
                           authors=x.get('authors'),
-                          year=x.get('year'))
+                          year=x.get('year'),
+                          table_num=x.get('table_num'))
     peaks = [map(float, y) for y in x.get('peaks')]
     db.session.add(study)
 

@@ -1,8 +1,9 @@
-from flask import Flask
 import flask_testing
+import nsweb.models.studies
+import nsweb.studies
+import settings
 
 class Test(flask_testing.TestCase):
-
 
     def create_app(self):
         app = Flask(__name__)
@@ -10,15 +11,17 @@ class Test(flask_testing.TestCase):
         return app
 
 
+    def create_app(self):
+        # pass in test configuration
+        return create_app(self)
+
+    def setUp(self):
+        db.create_all()
+
     def tearDown(self):
-        pass
 
-
-    def isJSON(self):
-        pass
-    
-    def isPaging(self):
-        pass
+        db.session.remove()
+        db.drop_all()
     
 
 if __name__ == "__main__":

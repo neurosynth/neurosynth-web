@@ -1,4 +1,5 @@
 from nsweb.core import db
+from initialize_database import table_num
 
 class Study(db.Model):
     __tablename__ = 'study'
@@ -9,6 +10,7 @@ class Study(db.Model):
     journal = db.Column(db.String(200))
     year = db.Column(db.Integer)
     space = db.Column(db.String(10))
+    table_num = db.Column(db.String(50))
     peaks = db.relationship('Peak', backref=db.backref('study', lazy='joined'), lazy='dynamic')
     
     def __init__(self, pmid, doi, title, journal, authors, year, space):
