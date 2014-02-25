@@ -20,7 +20,7 @@ def setup_logging(self,logging_path,level):
     for logger in loggers:
         logger.addHandler(file_handler)
 
-def create_app(self, database_uri, debug=True, aptana=True):
+def create_app( database_uri, debug=True, aptana=True):
     global app, db, manager
     app = Flask(__name__)
 #    app.debug = debug
@@ -28,7 +28,6 @@ def create_app(self, database_uri, debug=True, aptana=True):
     app.config['DEBUG_WITH_APTANA'] = aptana
 
     # set up your database
-#    app.engine = create_engine(database_uri)
     app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
     db = SQLAlchemy(app)
     # add your modules

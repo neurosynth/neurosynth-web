@@ -8,14 +8,11 @@ import unittest
 
 
 class StudiesTest():
-            
-    class TestStudiesApi(TestCase):
+   class TestStudiesApi(TestCase):
         def create_app(self):
-            global app
-            app = create_app(SQLALCHEMY_DATABASE_URI, DEBUG)
+            (app,db,manager) = create_app(SQLALCHEMY_DATABASE_URI, DEBUG)
             app.config['TESTING'] = True
-            return app(self)
-            pass
+            return (app,db,manager)
 
 # TODO: Create a seeder with initialize database to both pull random data and test initialize database
         def setUp(self):
