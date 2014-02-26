@@ -1,5 +1,6 @@
 from nsweb.core import db
-        
+db=db()
+
 class Study(db.Model):
     __tablename__ = 'study'
     pmid = db.Column(db.Integer, primary_key=True)

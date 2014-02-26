@@ -6,6 +6,7 @@ from logging.handlers import RotatingFileHandler
 from logging import getLogger
 from nsweb import core
 
+
 #Placeholder for possible need for restful
 # from flask_restful import Api
 # global api
@@ -36,6 +37,4 @@ def create_app( database_uri, debug=True, aptana=True):
 #     api = Api(app)
 
 #    return (app, db, manager)
-    core.db=db
-    core.app=app
-    core.manager=manager
+    core.set(app, db, manager)

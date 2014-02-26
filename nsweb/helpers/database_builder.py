@@ -1,9 +1,5 @@
-from nsweb.core import db
-from nsweb.models.studies import Study, Peak
-from nsweb.models.features import Feature, Frequency
-
 # Re-initialize database
-def init_database():
+def init_database(db):
     db.drop_all()
     db.create_all()
 
@@ -28,17 +24,21 @@ def read_features_text(data_dir, feature_database):
     return (feature_list,feature_data)
 
 #commits features to database
-def add_features(feature_list):
+def add_features(db,feature_list):
+    from nsweb.models.features import Feature
+
     feature_dict={}
 
-    for x in feature_list:
-        feature_dict[x] = Feature(feature=x)
-        db.session.add(feature_dict[x])
+    for name in feature_list:
+        feature_dict[name] = Feature(feature=name)
+        db.session.add(feature_dict[name])
         db.session.commit()
     return feature_dict
 
 
-def add_studies(dataset, feature_list, feature_data, feature_dict):
+def add_studies(db, dataset, feature_list, feature_data, feature_dict):
+    from nsweb.models.studies import Study, Peak
+    from nsweb.models.features import Frequency
 
     # Create Study records
     for i,x in enumerate(dataset):

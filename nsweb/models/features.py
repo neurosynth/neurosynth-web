@@ -1,7 +1,8 @@
-from nsweb.core import db
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import relationship, backref
 from nsweb.models.studies import Study
+from nsweb.core import db
+db=db()
 
 class Feature(db.Model):
     __tablename__ = 'feature'
@@ -22,7 +23,7 @@ class Frequency(db.Model):
     pmid = db.Column(db.Integer, db.ForeignKey('study.pmid'), primary_key=True)
     frequency = db.Column(db.Float)
     feature = relationship(Feature, backref=backref('frequencies',cascade='all, delete-orphan'))
-    study = relationship('study')
+    study = relationship('Study')
     
     def __init__(self, study, feature, frequency):
         self.study=study
