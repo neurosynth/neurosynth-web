@@ -1,11 +1,11 @@
-import nsweb.core
 from nsweb import settings
-from nsweb.core import setup_logging, create_app
+from nsweb.helpers.app_start import setup_logging, create_app
 
 (app,db,manager) = create_app(database_uri = settings.SQLALCHEMY_DATABASE_URI, debug=True)#,debug=settings.DEBUG, aptana=True)
-import nsweb.studies.studies
-import nsweb.features.features
-setup_logging(logging_path=settings.LOGGING_PATH,level=settings.LOGGING_LEVEL)
+
+from nsweb.models import studies, features # registers models
+
+setup_logging(app=app,logging_path=settings.LOGGING_PATH,level=settings.LOGGING_LEVEL)
 app.run()
 
 if __name__ == "__main__":

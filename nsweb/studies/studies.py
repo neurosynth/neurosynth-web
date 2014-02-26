@@ -1,4 +1,3 @@
-from nsweb.core import app
 from nsweb.core import manager
 from nsweb.models import studies
 

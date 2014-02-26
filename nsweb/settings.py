@@ -1,7 +1,7 @@
 import os
 
-SQLALCHEMY_DATABASE_URI = 'sqlite:////tmp/test.db'
 DATA_DIR=os.path.dirname(os.path.realpath(__file__)) + '/../Data/'
+SQLALCHEMY_DATABASE_URI = 'sqlite:///' + DATA_DIR + 'test.db'
 PICKLE_DATABASE = 'pickled.pkl'
 FEATURE_DATABASE = 'abstract_features.txt'
 LOGGING_PATH = ''

@@ -1,14 +1,15 @@
-import cPickle
-from nsweb.models.studies import Studies
-from nsweb.models.features import Features
+from nsweb.core import db
+from nsweb.models.studies import Study, Peak
+from nsweb.models.features import Feature, Frequency
 
 # Re-initialize database
-def init_database(db):
+def init_database():
     db.drop_all()
     db.create_all()
 
 # Read in the study data (contains pickled data originally in the database.txt file)
 def read_pickle_database(data_dir, pickle_database):
+    import cPickle
     pickle_data = open( data_dir + pickle_database,'rb')
     dataset = cPickle.load(pickle_data)
     pickle_data.close()
@@ -27,22 +28,21 @@ def read_features_text(data_dir, feature_database):
     return (feature_list,feature_data)
 
 #commits features to database
-def add_features(db, feature_list):
-        features=Features(db)
-        feature_dict={}
+def add_features(feature_list):
+    feature_dict={}
 
-        for x in feature_list:
-            feature_dict[x] = features.Feature(feature=x)
-            db.session.add(feature_dict[x])
-            db.session.commit()
-        return feature_dict
+    for x in feature_list:
+        feature_dict[x] = Feature(feature=x)
+        db.session.add(feature_dict[x])
+        db.session.commit()
+    return feature_dict
 
 
-def add_studies(db, dataset, feature_list, feature_data, feature_dict):
+def add_studies(dataset, feature_list, feature_data, feature_dict):
+
     # Create Study records
-    studies = Studies(db)
     for i,x in enumerate(dataset):
-        study = studies.Study(
+        study = Study(
                               pmid=int(x.get('id')),
                               doi=x.get('doi'),
                               title=x.get('title'),
@@ -56,16 +56,15 @@ def add_studies(db, dataset, feature_list, feature_data, feature_dict):
         # Create Peaks and attach to Studies
         peaks = [map(float, y) for y in x.get('peaks')]
         for coordinate in peaks:
-            peak=studies.Peak(x=coordinate[0],y=coordinate[1],z=coordinate[2])
+            peak=Peak(x=coordinate[0],y=coordinate[1],z=coordinate[2])
             study.peaks.append(peak)
             db.session.add(peak)
         
         # Map features onto studies via a Frequency join table that also stores frequency info
-        features=Features(db)
         pmid_frequencies=feature_data[study.pmid]
         for y in range(len(feature_list)):
             if pmid_frequencies[y] > 0.0:
-                db.session.add(features.Frequency(study=study,feature=feature_dict[feature_list[y]],frequency=pmid_frequencies[y]))
+                db.session.add(Frequency(study=study,feature=feature_dict[feature_list[y]],frequency=pmid_frequencies[y]))
                 feature_dict[feature_list[y]].num_studies+=1
                 feature_dict[feature_list[y]].num_activations+=len(peaks)
                   
