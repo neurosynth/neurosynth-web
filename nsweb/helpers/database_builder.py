@@ -58,7 +58,7 @@ def add_studies(db, dataset, feature_list, feature_data, feature_dict):
         for coordinate in peaks:
             peak=Peak(x=coordinate[0],y=coordinate[1],z=coordinate[2])
             study.peaks.append(peak)
-            db.session.add(peak)
+#            db.session.add(peak)# TODO:is this needed???
         
         # Map features onto studies via a Frequency join table that also stores frequency info
         pmid_frequencies=feature_data[study.pmid]
