@@ -1,13 +1,21 @@
 from nsweb import settings
 from nsweb.helpers.app_start import setup_logging, create_app
+from nsweb.core import app
 
-(app,db,manager) = create_app(database_uri = settings.SQLALCHEMY_DATABASE_URI, debug=True)#,debug=settings.DEBUG, aptana=True)
+create_app(database_uri = settings.SQLALCHEMY_DATABASE_URI, debug=True)#,debug=settings.DEBUG, aptana=True)
 
-from nsweb.models import studies, features # registers models
+# register models
+from nsweb.models import studies, features
 
-setup_logging(app=app,logging_path=settings.LOGGING_PATH,level=settings.LOGGING_LEVEL)
+#register APIs
+import nsweb.studies.studies
+import nsweb.features.features
+
+setup_logging(logging_path=settings.LOGGING_PATH,level=settings.LOGGING_LEVEL)
+
+app=app()
+
 app.run()
-
 if __name__ == "__main__":
     # To allow aptana to receive errors, set use_debugger=False
     if app.debug: use_debugger = False

@@ -1,3 +1,5 @@
+# Singleton provides access to the application(app), database(db), and rest manager(manager)
+
 _app=None
 _db=None
 _manager=None
@@ -12,7 +14,9 @@ def set(app,db,manager):
 
 def db():
     return _db
+
 def app():
     return _app
+
 def manager():
     return _manager

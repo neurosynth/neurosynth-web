@@ -1,7 +1,7 @@
 from nsweb.core import manager
 from nsweb.models import features
 
-manager.create_api(features.Feature,
+manager().create_api(features.Feature,
                    methods=['GET'],
                    collection_name='features',
                    results_per_page=20,
@@ -9,5 +9,4 @@ manager.create_api(features.Feature,
                    include_columns=['id',
                                     'feature',
                                     'num_studies',
-                                    'num_activations'])
-#app.run()
+                                    'num_activations'])#app.run()

@@ -1,5 +1,6 @@
-from flask_testing import TestCase, unittest
-
+import unittest
+import nose
+from flask_testing import TestCase
 from nsweb.helpers.app_start import create_app
 from tests.settings import SQLALCHEMY_DATABASE_URI, DEBUG, DATA_DIR, PICKLE_DATABASE
 

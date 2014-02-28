@@ -11,8 +11,8 @@ from nsweb import core
 # from flask_restful import Api
 # global api
 
-def setup_logging(self,app,logging_path,level):
-
+def setup_logging(logging_path,level):
+    app=core.app()
     file_handler = RotatingFileHandler(logging_path)
     file_handler.setLevel(logging.getLevelName(level))
     loggers = [app.logger, getLogger('sqlalchemy')]
@@ -38,3 +38,4 @@ def create_app( database_uri, debug=True, aptana=True):
 
 #    return (app, db, manager)
     core.set(app, db, manager)
+    return app
