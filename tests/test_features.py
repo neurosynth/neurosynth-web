@@ -11,9 +11,6 @@ create_app(SQLALCHEMY_DATABASE_URI, DEBUG)
 from nsweb.core import app, db, apimanager
 from nsweb.helpers import database_builder
 from nsweb.models import features
-app=app()
-db=db()
-apimanager=apimanager()
 
 class FeaturesTest(TestCase):
 

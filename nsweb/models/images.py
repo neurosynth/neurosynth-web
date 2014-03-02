@@ -1,5 +1,4 @@
 from nsweb.core import db
-db=db()
 
 ##unable to create image file. I *think* its one to many for feature to images placeholder code. DO NOT RUN plz and thnk u
 
