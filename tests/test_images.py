@@ -6,12 +6,12 @@ from nsweb.helpers.app_start import create_app
 from tests.settings import SQLALCHEMY_DATABASE_URI, DEBUG, DATA_DIR, PICKLE_DATABASE
 
 create_app(SQLALCHEMY_DATABASE_URI, DEBUG)
-from nsweb.core import app, db, manager
+from nsweb.core import app, db, apimanager
 from nsweb.helpers import database_builder
 from nsweb.models import images
 app=app()
 db=db()
-manager=manager()
+apimanager=apimanager()
 
 class ImagesTest(TestCase):
 

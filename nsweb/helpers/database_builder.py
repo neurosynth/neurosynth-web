@@ -70,3 +70,6 @@ def add_studies(db, dataset, feature_list, feature_data, feature_dict):
                   
         # Commit each study record separately. A bit slower, but conserves memory.
         db.session.commit()
+
+def add_images(db,feature_list,feature_dict):
+    pass

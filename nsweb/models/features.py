@@ -2,7 +2,6 @@ from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import relationship, backref
 from nsweb.models.studies import Study
 from nsweb.core import db
-db=db()
 
 class Feature(db.Model):
     __tablename__ = 'feature'
@@ -11,6 +10,8 @@ class Feature(db.Model):
     num_studies=db.Column(db.Integer)
     num_activations=db.Column(db.Integer)
     frequencies = association_proxy('frequencies','frequency')
+    images = db.relationship('Image', backref=db.backref('feature', lazy='joined'), lazy='dynamic')
+
     
     def __init__(self, feature, num_studies=0, num_activations=0):
         self.feature=feature

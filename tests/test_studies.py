@@ -4,16 +4,11 @@ import nose
 from mock import MagicMock, Mock, patch
 from flask_testing import TestCase
 
-from nsweb.helpers.app_start import create_app
+from nsweb.core import create_app, app, db, apimanager
 from tests.settings import SQLALCHEMY_DATABASE_URI, DEBUG, DEBUG_WITH_APTANA, DATA_DIR, PICKLE_DATABASE
 
-create_app(SQLALCHEMY_DATABASE_URI, DEBUG)
-from nsweb.core import app, db, manager
 from nsweb.helpers import database_builder
 from nsweb.models import studies
-app=app()
-db=db()
-manager=manager()
 
 class StudiesTest(TestCase):
 
@@ -28,7 +23,7 @@ class StudiesTest(TestCase):
         pass
     
     def setup_module(self):
-        pass
+        create_app(SQLALCHEMY_DATABASE_URI, DEBUG)
     
     def teardown_module(self):
         pass

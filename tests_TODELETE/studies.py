@@ -7,17 +7,17 @@ from tests.settings import SQLALCHEMY_DATABASE_URI, DEBUG, DATA_DIR, PICKLE_DATA
 from json_model_wrapper import restless_json
 
 create_app(SQLALCHEMY_DATABASE_URI, DEBUG)
-from nsweb.core import app, db, manager
+from nsweb.core import app, db, apimanager
 from nsweb.helpers import database_builder
 from nsweb.models import studies
 app=app()
 db=db()
-manager=manager()
+apimanager=apimanager()
 
 class StudiesTest():
 #     app=None
 #     db=None
-#     manager=None
+#     apimanager=None
     dataset={}
 
     def create_app(self):

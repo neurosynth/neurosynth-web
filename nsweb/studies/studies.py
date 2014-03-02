@@ -1,7 +1,7 @@
-from nsweb.core import manager
+from nsweb.core import apimanager
 from nsweb.models import studies
 
-manager().create_api(studies.Study,
+apimanager().create_api(studies.Study,
                    methods=['GET'],
                    collection_name='studies',
                    results_per_page=20,
