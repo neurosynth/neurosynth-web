@@ -6,6 +6,8 @@ from flask_testing import TestCase as Base
 from nsweb.core import create_app, db
 from nsweb.models import Study, Peak, Feature, Frequency, Image
 
+
+
 #this is here for now. Needs to be replaced with the factory later!
 from nsweb.helpers import database_builder
 from tests.settings import DATA_DIR, PICKLE_DATABASE, FEATURE_DATABASE, PROD_PICKLE_DATABASE
@@ -13,7 +15,10 @@ from tests.settings import DATA_DIR, PICKLE_DATABASE, FEATURE_DATABASE, PROD_PIC
 class TestCase(Base):
     def create_app(self):
         '''creates the app and a sqlite database in memory'''
-        return create_app('sqlite://', debug=True, aptana=True)
+        app = create_app('sqlite://', debug=True, aptana=True)
+        #import nsweb.studies.studies
+        #import nsweb.features.features
+        return app
 
     def setUp(self):
         '''creates tables'''
