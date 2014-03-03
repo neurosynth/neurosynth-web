@@ -9,4 +9,4 @@ apimanager().create_api(features.Feature,
                    include_columns=['id',
                                     'feature',
                                     'num_studies',
-                                    'num_activations'])#app.run()
+                                    'num_activations'])

@@ -1,9 +1,6 @@
-from nsweb.core import db
+from nsweb.models import *
 
-##unable to create image file. I *think* its one to many for feature to images placeholder code. DO NOT RUN plz and thnk u
-
-class Images(db.Model):
-    __tablename__ = 'image'
+class Image(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     feature_id = db.Column(db.Integer,db.ForeignKey('feature.id'))
     name=db.Column(db.String(200))
@@ -15,7 +12,7 @@ class Images(db.Model):
     display=db.Column(db.Boolean)
     download=db.Column(db.Boolean)
    
-    def __init__(self,name,label,kind,comments='',stat='',image_file,display=True,download=True):
+    def __init__(self,name,label,kind,comments,stat,image_file,display=True,download=True):
         self.name=name
         self.label=label
         self.kind=kind

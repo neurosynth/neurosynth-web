@@ -1,10 +1,6 @@
-from sqlalchemy.ext.associationproxy import association_proxy
-from sqlalchemy.orm import relationship, backref
-from nsweb.models.studies import Study
-from nsweb.core import db
+from nsweb.models import *
 
 class Feature(db.Model):
-    __tablename__ = 'feature'
     id=db.Column(db.Integer, primary_key=True)
     feature=db.Column(db.String(100),unique=True)
     num_studies=db.Column(db.Integer)
@@ -19,12 +15,11 @@ class Feature(db.Model):
         self.num_activations=num_activations
 
 class Frequency(db.Model):
-    __tablename__ = 'frequency'
     feature_id = db.Column(db.Integer, db.ForeignKey('feature.id'), primary_key=True)
     pmid = db.Column(db.Integer, db.ForeignKey('study.pmid'), primary_key=True)
     frequency = db.Column(db.Float)
-    feature = relationship(Feature, backref=backref('frequencies',cascade='all, delete-orphan'))
-    study = relationship('Study')
+    feature = db.relationship(Feature, backref=db.backref('frequencies',cascade='all, delete-orphan'))
+    study = db.relationship('Study')
     
     def __init__(self, study, feature, frequency):
         self.study=study

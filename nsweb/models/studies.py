@@ -1,6 +1,6 @@
-from nsweb.core import db
+from nsweb.models import *
+
 class Study(db.Model):
-    __tablename__ = 'study'
     pmid = db.Column(db.Integer, primary_key=True)
     doi = db.Column(db.String(200))
     title = db.Column(db.String(1000))
@@ -22,7 +22,6 @@ class Study(db.Model):
         self.table_num=table_num
 
 class Peak(db.Model):
-    __tablename__ = 'peak'
     id = db.Column(db.Integer, primary_key=True)
     pmid = db.Column(db.Integer,db.ForeignKey('study.pmid'))
     x = db.Column(db.Float)

@@ -1,40 +1,39 @@
-#testing modules
-import unittest
-#import nose #we use nose, but we don't need 
-from mock import MagicMock, Mock, patch
-from flask_testing import TestCase
+from tests import *
 
-from nsweb.helpers.app_start import create_app
-from tests.settings import SQLALCHEMY_DATABASE_URI, DEBUG, DEBUG_WITH_APTANA, DATA_DIR, PICKLE_DATABASE
-
-
-create_app(SQLALCHEMY_DATABASE_URI, DEBUG)
-from nsweb.core import app, db, apimanager
-from nsweb.helpers import database_builder
-from nsweb.models import studies
-
+#TODO: Put some thought into testing core
 
 class Test(unittest.TestCase):
 
 
-    def setUp(self):
-        pass
-
-
-    def tearDown(self):
-        pass
-
-    def setup_module(self):
+    def test_create_app_creates_app(self):
+        '''
+        Create_app needs to create a flask 'app' instance, the 'db' instance, and a flask-restless 'apimanager' instance
+        hmmm...I don't think this can be part of regular test suite...
+        '''
         pass
     
-    def teardown_module(self):
+    def test_create_app_creates_db(self):
+        '''
+        Create_app needs to create a flask 'app' instance, the 'db' instance, and a flask-restless 'apimanager' instance
+        hmmm...I don't think this can be part of regular test suite...
+        '''
         pass
 
-    def test_create_app_creates_app(self):
-        '''Create_app needs to create a flask 'app' instance, the 'db' instance, and a flask-restless 'apimanager' instance'''
-        
+    def test_create_app_creates_apimanager(self):
+        '''
+        Create_app needs to create a flask 'app' instance, the 'db' instance, and a flask-restless 'apimanager' instance
+        hmmm...I don't think this can be part of regular test suite...
+        '''
+        pass
+    
+    def test_logger_level(self):
+        '''
+        tests to see if logging level is correct
+        '''
+        pass
 
-
-if __name__ == "__main__":
-    #import sys;sys.argv = ['', 'Test.testName']
-    unittest.main()
+    def test_logger_path(self):
+        '''
+        tests to see if logging path is correct
+        '''
+        pass

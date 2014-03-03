@@ -4,7 +4,7 @@ from nsweb.helpers import database_builder
 
 def main():
     create_app(database_uri=SQLALCHEMY_DATABASE_URI, debug=DEBUG, aptana=DEBUG_WITH_APTANA)
-    from nsweb.models import studies, features, images #registers models
+    import nsweb.models #registers models
     database_builder.init_database(db)
     dataset = database_builder.read_pickle_database(data_dir=DATA_DIR, pickle_database=PICKLE_DATABASE)
     (feature_list,feature_data) = database_builder.read_features_text(data_dir=DATA_DIR,feature_database=FEATURE_DATABASE)

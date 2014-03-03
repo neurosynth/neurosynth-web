@@ -1,15 +1,14 @@
 from nsweb import settings
-from nsweb.helpers.app_start import setup_logging, create_app
+from nsweb.core import setup_logging, create_app
 from nsweb.core import app
 
-if __name__ == "__main__":
-
+def main():
     create_app(database_uri = settings.SQLALCHEMY_DATABASE_URI)
     
     
     # register is ugly but recommended by flask. Blueprints made things more complex, without any real benefit. http://flask.pocoo.org/docs/patterns/packages/
     # register models
-    from nsweb.models import studies, features
+    import nsweb.models #registers models
     
     #register APIs
     import nsweb.studies.studies
@@ -29,3 +28,5 @@ if __name__ == "__main__":
         pass
     app.run(use_debugger=use_debugger, debug=app.debug,
             use_reloader=use_debugger)
+if __name__ == "__main__":
+        main()
