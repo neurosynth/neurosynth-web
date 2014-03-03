@@ -6,6 +6,7 @@ from flask_restless import APIManager
 
 
 # We aren't using getters anymore b/c @property wasn't working outside of classes -_-. We can create a proper singleton if we really wanted...
+global app, db, apimanager
 app=Flask('NSWeb')
 db=SQLAlchemy()
 apimanager=APIManager()
@@ -26,6 +27,7 @@ def create_app( database_uri, debug=True, aptana=True):
     app.config['DEBUG'] = debug
     app.config['DEBUG_WITH_APTANA'] = aptana
     app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
+    app.test_request_context().push() #have to create a request context for flask-salalchemy
     db.init_app(app)
     apimanager.init_app(app, flask_sqlalchemy_db=db)
     return app

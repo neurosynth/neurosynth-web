@@ -1,4 +1,6 @@
 from tests import *
+import factory
+#TODO: This isn't really tested without fixture =( ... will I ever use anything db specific??? prob not. Factory boy should work. Don't forget about factory logger
 
 class Test(TestCase):
 
