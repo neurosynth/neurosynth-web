@@ -3,10 +3,8 @@ import re
 import inspect
 
 from flask_testing import TestCase as Base
-from nsweb.core import create_app, db
+from nsweb.core import create_app, register_blueprints, db
 from nsweb.models import Study, Peak, Feature, Frequency, Image
-
-
 
 #this is here for now. Needs to be replaced with the factory later!
 from nsweb.helpers import database_builder
@@ -16,8 +14,14 @@ class TestCase(Base):
     def create_app(self):
         '''creates the app and a sqlite database in memory'''
         app = create_app('sqlite://', debug=True, aptana=True)
-        #import nsweb.studies.studies
-        #import nsweb.features.features
+        
+        #creates and registers blueprints in nsweb.blueprints
+        import nsweb.blueprints.studies
+        import nsweb.blueprints.features
+        import nsweb.blueprints.images
+        #loads blueprints
+        register_blueprints()
+
         return app
 
     def setUp(self):

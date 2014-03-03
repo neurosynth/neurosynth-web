@@ -1,24 +1,24 @@
 from nsweb import settings
-from nsweb.core import setup_logging, create_app
-from nsweb.core import app
+from nsweb.core import app, setup_logging, create_app, register_blueprints
+#registers models
+import nsweb.models
+
+
 
 def main():
+    #sets up the flask app
     create_app(database_uri = settings.SQLALCHEMY_DATABASE_URI)
     
+    #creates and registers blueprints in nsweb.blueprints
+    import nsweb.blueprints.studies
+    import nsweb.blueprints.features
+    import nsweb.blueprints.images
+    #loads blueprints
+    register_blueprints()
     
-    # register is ugly but recommended by flask. Blueprints made things more complex, without any real benefit. http://flask.pocoo.org/docs/patterns/packages/
-    # register models
-    import nsweb.models #registers models
-    
-    #register APIs
-    import nsweb.studies.studies
-    import nsweb.features.features
-    
-    
+    #sets up logging
     setup_logging(logging_path=settings.LOGGING_PATH,level=settings.LOGGING_LEVEL)
-    
-    app=app()
-    
+        
     # To allow aptana to receive errors, set use_debugger=False
     if app.debug: use_debugger = True
     try:
@@ -28,5 +28,6 @@ def main():
         pass
     app.run(use_debugger=use_debugger, debug=app.debug,
             use_reloader=use_debugger)
+
 if __name__ == "__main__":
         main()
