@@ -45,7 +45,3 @@ class FeaturesTest(TestCase):
     def test_no_extra_fields(self):
         '''We don't want to send useless extra information that should stay in database. Such as all information for features related to very feature'''
         pass
-    
-if __name__ == "__main__":
-    #import sys;sys.argv = ['', 'Test.testName']
-    unittest.main()

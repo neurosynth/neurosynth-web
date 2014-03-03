@@ -11,7 +11,7 @@ class Study(db.Model):
     table_num = db.Column(db.String(50))
     peaks = db.relationship('Peak', backref=db.backref('study', lazy='joined'), lazy='dynamic')
     
-    def __init__(self, pmid, doi, title, journal, authors, year, space, table_num=''):
+    def __init__(self, pmid, space, doi='', title='', journal='', authors='', year=0, table_num=''):
         self.pmid=pmid
         self.doi=doi
         self.title=title
