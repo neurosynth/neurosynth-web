@@ -7,7 +7,7 @@ from nsweb.core import create_app, db
 from nsweb.helpers import database_builder
 from nsweb.models import Study, Peak, Feature, Frequency, Image
 
-#TODO: use fixture python module to unit test without db !!!
+import factory
 
 class TestCase(Base):
     def create_app(self):
@@ -23,11 +23,13 @@ class TestCase(Base):
 
     def setup(self):
         '''creates a clean empty database'''
-        database_builder.init_database(self.db)
+        database_builder.init_database(db)
 
     def teardown(self):
         '''does nothing'''
         pass
+    
+    
 
 if __name__ == "__main__":
     import nose

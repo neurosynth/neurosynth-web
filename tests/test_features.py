@@ -1,33 +1,7 @@
-import unittest
-import nose
+from tests import *
 
-from mock import MagicMock, Mock, patch
-from flask_testing import TestCase
-
-from nsweb.helpers.app_start import create_app
-from tests.settings import SQLALCHEMY_DATABASE_URI, DEBUG, DATA_DIR, PICKLE_DATABASE
-
-create_app(SQLALCHEMY_DATABASE_URI, DEBUG)
-from nsweb.core import app, db, apimanager
-from nsweb.helpers import database_builder
-from nsweb.models import features
 
 class FeaturesTest(TestCase):
-
-
-    def setUp(self):
-        database_builder.init_database(db)
-
-    def tearDown(self):
-        pass
-    
-    def setup_module(self):
-        pass
-    
-    def teardown_module(self):
-        pass
-
-
 
     def test_model_features_has_core_fields(self):
         '''Changing the Model can break things. features must have peaks, pmid, and space with all other fields being optional.'''

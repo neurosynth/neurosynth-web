@@ -1,33 +1,7 @@
-import unittest
-import nose
+from tests import *
 
-from mock import MagicMock, Mock, patch
-from flask_testing import TestCase
-
-from nsweb.core import create_app, app, db, apimanager
-from tests.settings import SQLALCHEMY_DATABASE_URI, DEBUG, DEBUG_WITH_APTANA, DATA_DIR, PICKLE_DATABASE
-
-from nsweb.helpers import database_builder
-from nsweb.models import studies
 
 class StudiesTest(TestCase):
-
-    def createApp(self):
-        return app
-
-
-    def setup(self):
-        database_builder.init_database(db)
-
-    def teardown(self):
-        pass
-    
-    def setup_module(self):
-        create_app(SQLALCHEMY_DATABASE_URI, DEBUG)
-    
-    def teardown_module(self):
-        pass
-
 
     def test_model_studies_has_core_fields(self):
         '''Changing the Model can break things. Studies must have peaks, pmid, and space with all other fields being optional.'''
@@ -71,7 +45,3 @@ class StudiesTest(TestCase):
     def test_no_extra_fields(self):
         '''We don't want to send useless extra information that should stay in database. Such as all information for features related to very study'''
         pass
-    
-if __name__ == "__main__":
-    #import sys;sys.argv = ['', 'Test.testName']
-    unittest.main()

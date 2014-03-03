@@ -2,7 +2,7 @@ from tests import *
 
 #TODO: Put some thought into testing core
 
-class Test(unittest.TestCase):
+class CoreTest(TestCase):
 
 
     def test_create_app_creates_app(self):
