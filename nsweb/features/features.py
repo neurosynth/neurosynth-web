@@ -1,7 +1,7 @@
 from nsweb.core import apimanager
-from nsweb.models import features
+from nsweb.models import Feature
 
-apimanager().create_api(features.Feature,
+apimanager().create_api(Feature,
                    methods=['GET'],
                    collection_name='features',
                    results_per_page=20,

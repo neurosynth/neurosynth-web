@@ -1,8 +1,8 @@
-from nose.tools import ok_, eq_, raises
-from mock import MagicMock, Mock, patch, self
+from mock import MagicMock, Mock, patch
+import re
+import inspect
 
 from flask_testing import TestCase as Base
-
 from nsweb.core import create_app, db
 from nsweb.models import Study, Peak, Feature, Frequency, Image
 
@@ -15,19 +15,13 @@ class TestCase(Base):
         '''creates the app and a sqlite database in memory'''
         return create_app('sqlite://', debug=True, aptana=True)
 
-    def setup_module(self):
-        '''does nothing'''
-
-    def teardown_module(self):
-        '''does nothing'''
-        pass
-
-    def setup(self):
+    def setUp(self):
         '''creates tables'''
         db.create_all()
 
-    def teardown(self):
+    def tearDown(self):
         '''drops tables'''
+        db.session.remove()
         db.drop_all()
     
     def populate_db(self):
@@ -38,9 +32,24 @@ class TestCase(Base):
         database_builder.add_images(db, feature_list, feature_dict)
         
     def get_prod_data_fields(self):
-        return database_builder.read_pickle_database(DATA_DIR, PROD_PICKLE_DATABASE)[0].keys()
+        fields = database_builder.read_pickle_database(DATA_DIR, PROD_PICKLE_DATABASE)[0].keys()
+        fields = [x for x in fields if not re.search(r'_id', x) and x !='id']
+        return fields
+    
+    def assert_model_equality(self,models, query_models, additional_fields=[]):
+        '''This gets the model parameters from init then iterates over the list comparing the models. This may not be the best way, but it works. Also this was supposed to be a test generator, but this is an extension of unittest.TestCase so those aren't allowed'''
+        assert len(models)==len(query_models)
+        assert len(models) > 0
+        fields = inspect.getargspec(models[0].__init__)
+        fields.extend(additional_fields)
+        for x in range(len(models)):
+            for y in fields:
+                if isinstance(x, list):
+                    self.assert_model_equality(getattr(models, y), getattr(query_models, y))
+                else:
+                    assert getattr(models[x], y) == getattr(query_models[x], y)
 
-
-if __name__ == "__main__":
-    import nose
-    nose.run()
+    def assert_model_contains_fields(self,model, fields):
+        attributes = dir(model.__init__)
+        for x in fields:
+            assert x in attributes

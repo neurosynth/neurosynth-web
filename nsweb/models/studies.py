@@ -20,7 +20,7 @@ class Study(db.Model):
         self.year=year
         self.space=space
         self.table_num=table_num
-
+        
 class Peak(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     pmid = db.Column(db.Integer,db.ForeignKey('study.pmid'))
