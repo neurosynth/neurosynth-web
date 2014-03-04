@@ -7,6 +7,15 @@ class Feature(db.Model):
     num_activations=db.Column(db.Integer)
     frequencies = association_proxy('frequencies','frequency')
     images = db.relationship('Image', backref=db.backref('feature', lazy='joined'), lazy='dynamic')
+    
+    image_forward_inference=db.Column(db.String(1000),unique=True)
+    image_reverse_inference=db.Column(db.String(1000),unique=True)
+    image_display=db.Column(db.Boolean)
+    image_download=db.Column(db.Boolean)
+    image_name=db.Column(db.String(200))
+    image_label=db.Column(db.String(200))
+    image_kind=db.Column(db.String(200))
+    image_comments=db.Column(db.String(200))
 
     
     def __init__(self, feature, num_studies=0, num_activations=0):

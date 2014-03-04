@@ -9,6 +9,7 @@ from nsweb.models import Study, Peak, Feature, Frequency, Image
 #this is here for now. Needs to be replaced with the factory later!
 from nsweb.helpers import database_builder
 from tests.settings import DATA_DIR, PICKLE_DATABASE, FEATURE_DATABASE, PROD_PICKLE_DATABASE
+from flask_sqlalchemy import BaseQuery
 
 class TestCase(Base):
     def create_app(self):
@@ -46,19 +47,34 @@ class TestCase(Base):
         return fields
     
     def assert_model_equality(self,models, query_models, additional_fields=[]):
-        '''This gets the model parameters from init then iterates over the list comparing the models. This may not be the best way, but it works. Also this was supposed to be a test generator, but this is an extension of unittest.TestCase so those aren't allowed'''
+        '''This gets the model parameters from init then iterates over the list comparing the models. This may not be the best way, but it works. Also this was supposed to be a test generator, but this is an extension of unittest.TestCase so those aren't allowed. Protip: It's recursive'''
         assert len(models)==len(query_models)
         assert len(models) > 0
-        fields = inspect.getargspec(models[0].__init__)
+        fields = self.get_attributes(models[0])
         fields.extend(additional_fields)
         for x in range(len(models)):
             for y in fields:
-                if isinstance(x, list):
-                    self.assert_model_equality(getattr(models, y), getattr(query_models, y))
+                attr1=getattr(models[x], y)
+                attr2=getattr(query_models[x], y)
+                if isinstance(attr1, BaseQuery):
+                    attr1=attr1.all()
+                if isinstance(attr2, BaseQuery):
+                    attr2=attr2.all()
+                if isinstance(attr1, list):
+                    self.assert_model_equality(attr1, attr2)
                 else:
-                    assert getattr(models[x], y) == getattr(query_models[x], y)
+                    assert attr1 == attr2
 
     def assert_model_contains_fields(self,model, fields):
-        attributes = dir(model.__init__)
+        attributes = self.get_attributes(model)
         for x in fields:
-            assert x in attributes
+            if x not in attributes:
+                assert getattr(model, x) is not None
+            else:
+                assert True
+            
+            
+    def get_attributes(self, model):
+        fields = vars(model).keys()
+        fields = [a for a in fields if a[0] !='_' and a != 'id']
+        return fields

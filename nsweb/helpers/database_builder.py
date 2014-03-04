@@ -23,14 +23,22 @@ def read_features_text(data_dir, feature_database):
     features_text.close()
     return (feature_list,feature_data)
 
+def add_images(feature,image_dir):
+    feature.image_forward_inference=image_dir+'_'+feature.feature+'_pAgF_z_FDR_0.05.nii.gz'
+    feature.image_reverse_inference=image_dir+'_'+feature.feature+'_pFgA_z_FDR_0.05.nii.gz'
+
 #commits features to database
-def add_features(db,feature_list):
+def add_features(db,feature_list, image_dir=''):
+    '''Feature list is a list of features to be created and committed. To add images specify a image directory. This returns a dictionary of the feature objects with the name as the key'''
     from nsweb.models.features import Feature
 
     feature_dict={}
 
     for name in feature_list:
-        feature_dict[name] = Feature(feature=name)
+        feature=Feature(feature=name)
+        feature_dict[name] = feature
+        if image_dir !='':
+            add_images(feature,image_dir)
         db.session.add(feature_dict[name])
         db.session.commit()
     return feature_dict
@@ -70,6 +78,3 @@ def add_studies(db, dataset, feature_list, feature_data, feature_dict):
                   
         # Commit each study record separately. A bit slower, but conserves memory.
         db.session.commit()
-
-def add_images(db,feature_list,feature_dict):
-    pass
