@@ -1,23 +1,23 @@
 from tests import *
-from mock import self
 
 class StudiesTest(TestCase):
 
     def test_core_fields(self):
         '''Changing the Model can break things. Studies must have peaks, pmid, and space with all other fields being optional.'''
         peak = Peak(x=1,y=2,z=3)
-        study = Study(pmid=1, space='NotASpace', peaks=[peak])
-        #study.peaks.append(peak)
+        study = Study(pmid=1, space='NotASpace')
+        study.peaks.append(peak)
 
         db.session.add(study)
         db.session.commit()
 
         studies = Study.query.all()
-        #TODO: peaks should be added, but it brings about mildly unwanted behavior
+        #TODO: peaks should be added, but it brings about unwanted behavior when in init
         self.assert_model_contains_fields(study, ['pmid','space'])#,'peaks'])
         self.assert_model_equality(studies, [study], ['peaks'])
+
         self.assert_model_contains_fields(peak, ['x','y','z'])
-        self.assert_model_equality(studies[0].peaks.all(), [peak])
+        self.assert_model_equality( [peak],studies[0].peaks.all())
                 
     def test_fields_from_production_dataset(self):
         '''Changing the model can break things, but we don't want to lose any data from production database.'''
@@ -48,3 +48,11 @@ class StudiesTest(TestCase):
             
             studies = Study.query.all()
             self.assert_model_equality([study], studies, ['peaks'])
+            
+    def test_empty_api_studies_returns_200(self):
+        '''Check to make sure the api is active. Also need to define behavior when we're actually pulling data'''
+
+        response = self.client.get('/api/studies')
+
+        self.assert200(response)
+

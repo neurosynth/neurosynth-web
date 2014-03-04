@@ -13,7 +13,7 @@ class Study(db.Model):
     frequencies = association_proxy('frequencies','frequency')
 
     
-    def __init__(self, pmid, space, doi='', title='', journal='', authors='', year=0, table_num='', peaks=[]):
+    def __init__(self, pmid, space, doi='', title='', journal='', authors='', year=0, table_num=''):
         self.pmid=pmid
         self.doi=doi
         self.title=title
@@ -22,11 +22,10 @@ class Study(db.Model):
         self.year=year
         self.space=space
         self.table_num=table_num
-        self.peaks=peaks
         
 class Peak(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    pmid = db.Column(db.Integer,db.ForeignKey('study.pmid'))
+    pmid = db.Column(db.Integer,db.ForeignKey(Study.pmid))
     x = db.Column(db.Float)
     y = db.Column(db.Float)
     z = db.Column(db.Float)

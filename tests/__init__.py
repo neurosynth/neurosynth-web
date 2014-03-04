@@ -2,19 +2,20 @@ from mock import MagicMock, Mock, patch
 import re
 import inspect
 
+
 from flask_testing import TestCase as Base
 from nsweb.core import create_app, register_blueprints, db
 from nsweb.models import Study, Peak, Feature, Frequency
 
 #this is here for now. Needs to be replaced with the factory later!
 from nsweb.helpers import database_builder
-from tests.settings import DATA_DIR, PICKLE_DATABASE, FEATURE_DATABASE, PROD_PICKLE_DATABASE, IMAGE_DIR
+from tests.settings import DATA_DIR, PICKLE_DATABASE, FEATURE_DATABASE, PROD_PICKLE_DATABASE, IMAGE_DIR, SQLALCHEMY_DATABASE_URI, DEBUG, DEBUG_WITH_APTANA
 from flask_sqlalchemy import BaseQuery
 
 class TestCase(Base):
     def create_app(self):
         '''creates the app and a sqlite database in memory'''
-        app = create_app('sqlite://', debug=True, aptana=True)
+        app = create_app(database_uri=SQLALCHEMY_DATABASE_URI, debug=DEBUG, aptana=DEBUG_WITH_APTANA)
         
         #creates and registers blueprints in nsweb.blueprints
         import nsweb.blueprints.studies
@@ -23,6 +24,7 @@ class TestCase(Base):
         #loads blueprints
         register_blueprints()
 
+        self.client=app.test_client()
         return app
 
     def setUp(self):

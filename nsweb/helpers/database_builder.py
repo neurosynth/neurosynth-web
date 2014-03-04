@@ -50,25 +50,29 @@ def add_studies(db, dataset, feature_list, feature_data, feature_dict):
     from nsweb.models.features import Frequency
 
     # Create Study records
-    for i,x in enumerate(dataset):
+    for _,data in enumerate(dataset):
+        peaks = [Peak(x=float(coordinate[0]),
+                      y=float(coordinate[1]),
+                      z=float(coordinate[2])) for coordinate in data.get('peaks')]
         study = Study(
-                              pmid=int(x.get('id')),
-                              doi=x.get('doi'),
-                              title=x.get('title'),
-                              journal=x.get('journal'),
-                              space=x.get('space'),
-                              authors=x.get('authors'),
-                              year=x.get('year'),
-                              table_num=x.get('table_num'))
+                              pmid=int(data.get('id')),
+                              doi=data.get('doi'),
+                              title=data.get('title'),
+                              journal=data.get('journal'),
+                              space=data.get('space'),
+                              authors=data.get('authors'),
+                              year=data.get('year'),
+                              table_num=data.get('table_num'))
+        study.peaks.extend(peaks)
         db.session.add(study)
     
         # Create Peaks and attach to Studies
-        peaks = [map(float, y) for y in x.get('peaks')]
-        for coordinate in peaks:
-            peak=Peak(x=coordinate[0],y=coordinate[1],z=coordinate[2])
-            study.peaks.append(peak)
-#            db.session.add(peak)# TODO:is this needed???
-        
+#         peaks = [map(float, y) for y in x.get('peaks')]
+#         study.peaks = [Peak(x=coordinate[0],y=coordinate[1],z=coordinate[2]) for coordinate in [map(float, y) for y in x.get('peaks')]]
+#         for coordinate in peaks:
+#             peak=Peak(x=coordinate[0],y=coordinate[1],z=coordinate[2])
+#             study.peaks.append(peak)
+         
         # Map features onto studies via a Frequency join table that also stores frequency info
         pmid_frequencies=feature_data[study.pmid]
         for y in range(len(feature_list)):
