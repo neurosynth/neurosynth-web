@@ -10,7 +10,6 @@ def main():
     (feature_list,feature_data) = database_builder.read_features_text(data_dir=DATA_DIR,feature_database=FEATURE_DATABASE)
     feature_dict = database_builder.add_features(db,feature_list,image_dir=IMAGE_DIR)
     database_builder.add_studies(db, dataset, feature_list, feature_data, feature_dict)
-    database_builder.add_images(db, feature_list, feature_dict)
 
 if __name__ == '__main__':
     main()

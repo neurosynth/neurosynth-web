@@ -4,7 +4,7 @@ import inspect
 
 from flask_testing import TestCase as Base
 from nsweb.core import create_app, register_blueprints, db
-from nsweb.models import Study, Peak, Feature, Frequency, Image
+from nsweb.models import Study, Peak, Feature, Frequency
 
 #this is here for now. Needs to be replaced with the factory later!
 from nsweb.helpers import database_builder
