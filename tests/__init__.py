@@ -8,7 +8,7 @@ from nsweb.models import Study, Peak, Feature, Frequency, Image
 
 #this is here for now. Needs to be replaced with the factory later!
 from nsweb.helpers import database_builder
-from tests.settings import DATA_DIR, PICKLE_DATABASE, FEATURE_DATABASE, PROD_PICKLE_DATABASE
+from tests.settings import DATA_DIR, PICKLE_DATABASE, FEATURE_DATABASE, PROD_PICKLE_DATABASE, IMAGE_DIR
 from flask_sqlalchemy import BaseQuery
 
 class TestCase(Base):
@@ -34,12 +34,15 @@ class TestCase(Base):
         db.session.remove()
         db.drop_all()
     
-    def populate_db(self):
+    def populate_db(self,images=True):
+        '''populates the database with Studies, Peaks, Features, and Frequencies. Image location as well if images is True'''
         dataset = database_builder.read_pickle_database(data_dir=DATA_DIR, pickle_database=PICKLE_DATABASE)
         (feature_list,feature_data) = database_builder.read_features_text(data_dir=DATA_DIR,feature_database=FEATURE_DATABASE)
-        feature_dict = database_builder.add_features(db,feature_list)
+        if images:
+            feature_dict = database_builder.add_features(db,feature_list,IMAGE_DIR)
+        else:
+            feature_dict = database_builder.add_features(db,feature_list)
         database_builder.add_studies(db, dataset, feature_list, feature_data, feature_dict)
-        database_builder.add_images(db, feature_list, feature_dict)
         
     def get_prod_data_fields(self):
         fields = database_builder.read_pickle_database(DATA_DIR, PROD_PICKLE_DATABASE)[0].keys()

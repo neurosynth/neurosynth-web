@@ -28,7 +28,7 @@ class Frequency(db.Model):
     pmid = db.Column(db.Integer, db.ForeignKey('study.pmid'), primary_key=True)
     frequency = db.Column(db.Float)
     feature = db.relationship(Feature, backref=db.backref('frequencies',cascade='all, delete-orphan'))
-    study = db.relationship('Study')
+    study = db.relationship(Study, backref=db.backref('frequencies',cascade='all, delete-orphan'))
     
     def __init__(self, study, feature, frequency):
         self.study=study

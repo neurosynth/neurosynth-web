@@ -26,10 +26,11 @@ def read_features_text(data_dir, feature_database):
 def add_images(feature,image_dir):
     feature.image_forward_inference=image_dir+'_'+feature.feature+'_pAgF_z_FDR_0.05.nii.gz'
     feature.image_reverse_inference=image_dir+'_'+feature.feature+'_pFgA_z_FDR_0.05.nii.gz'
-
-#commits features to database
+    feature.image_display=True
+    feature.image_download=True
+    
 def add_features(db,feature_list, image_dir=''):
-    '''Feature list is a list of features to be created and committed. To add images specify a image directory. This returns a dictionary of the feature objects with the name as the key'''
+    '''Creates and commits features to db .feature list is a list of features to be created and committed. To add images specify a image directory. This returns a dictionary of the feature objects with the name as the key'''
     from nsweb.models.features import Feature
 
     feature_dict={}
