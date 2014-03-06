@@ -28,7 +28,6 @@ def create_app( database_uri, debug=True, aptana=True):
     app.test_request_context().push() #have to create a request context for flask-salalchemy
     db.init_app(app)
     apimanager.init_app(app, flask_sqlalchemy_db=db)
-    return app
 
 def register_blueprints():
     from nsweb.blueprints import blueprints

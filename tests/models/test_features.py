@@ -16,16 +16,15 @@ class FeaturesTest(TestCase):
     def test_image_fields(self):
         '''Changing the Model can break things. Images need forward and reverse inference, and specify if they should be displayed and downloaded'''
         self.populate_db()
-        features = Feature.query.all()
-        for feature in features:
-            self.assert_model_contains_fields(feature, ['feature','num_studies','num_activations'])
-            self.assert_model_equality([feature], [Feature(feature='f1',
-                                                           num_studies=5,
-                                                           num_activations=21,
-                                                           image_forward_inference=IMAGE_DIR+'_'+feature.feature+'_pAgF_z_FDR_0.05.nii.gz',
-                                                           image_reverse_inference=IMAGE_DIR+'_'+feature.feature+'_pFgA_z_FDR_0.05.nii.gz',
-                                                           image_download=True,
-                                                           image_display=True)])
+        feature = Feature.query.filter_by(feature='f1').first()
+        self.assert_model_contains_fields(feature, ['feature','num_studies','num_activations'])
+        self.assert_model_equality([feature], [Feature(feature='f1',
+                                                       num_studies=5,
+                                                       num_activations=21,
+                                                       image_forward_inference=IMAGE_DIR+'_'+feature.feature+'_pAgF_z_FDR_0.05.nii.gz',
+                                                       image_reverse_inference=IMAGE_DIR+'_'+feature.feature+'_pFgA_z_FDR_0.05.nii.gz',
+                                                       image_download=True,
+                                                       image_display=True)])
         
     def test_image_files_path(self):
         self.populate_db()

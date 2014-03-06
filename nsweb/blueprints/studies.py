@@ -6,4 +6,9 @@ add_blueprint(apimanager.create_api_blueprint(Study,
                                               methods=['GET'],
                                               collection_name='studies',
                                               results_per_page=20,
-                                              max_results_per_page=100,))
+                                              max_results_per_page=100,
+                                              include_columns=['pmid',
+                                                               'title',
+                                                               'authors',
+                                                               'journal',
+                                                               'year']))

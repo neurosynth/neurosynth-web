@@ -1,10 +1,12 @@
 from mock import MagicMock, Mock, patch
 import re
 import inspect
+from flask.json import jsonify
 
 
-from flask_testing import TestCase as Base
-from nsweb.core import create_app, register_blueprints, db
+from unittest import TestCase as Base
+#from flask_testing import TestCase as Base
+from nsweb.core import create_app, register_blueprints, db, app
 from nsweb.models import Study, Peak, Feature, Frequency
 
 #this is here for now. Needs to be replaced with the factory later!
@@ -14,22 +16,24 @@ from flask_sqlalchemy import BaseQuery
 
 class TestCase(Base):
     def create_app(self):
-        '''creates the app and a sqlite database in memory'''
-        app = create_app(database_uri=SQLALCHEMY_DATABASE_URI, debug=DEBUG, aptana=DEBUG_WITH_APTANA)
-        
-        #creates and registers blueprints in nsweb.blueprints
-        import nsweb.blueprints.studies
-        import nsweb.blueprints.features
-        import nsweb.blueprints.images
-        #loads blueprints
-        register_blueprints()
-
-        self.client=app.test_client()
-        return app
+        if app.config.get('DEBUG_WITH_APTANA') == None:
+            '''creates the app and a sqlite database in memory'''
+            create_app(database_uri=SQLALCHEMY_DATABASE_URI, debug=DEBUG, aptana=DEBUG_WITH_APTANA)
+            
+            #creates and registers blueprints in nsweb.blueprints
+            import nsweb.blueprints.studies
+            import nsweb.blueprints.features
+            import nsweb.blueprints.images
+            #loads blueprints
+            register_blueprints()
+            #return app
 
     def setUp(self):
         '''creates tables'''
+        self.create_app()
         db.create_all()
+        self.client=app.test_client()
+
 
     def tearDown(self):
         '''drops tables'''
@@ -83,3 +87,12 @@ class TestCase(Base):
         fields = vars(model).keys()
         fields = [a for a in fields if a[0] !='_' and a != 'id']
         return fields
+    
+    def serialize(self,cereal,fields):
+        '''helper to helper to create a serialized object from a model. fields is a list of strings of fields to be gotten from the cereal object'''
+        return { key:getattr(cereal, key) for key in fields}
+
+    def restless_json(self,fields,page_num=1,objects=[],total_pages=0,):
+        '''helper to create a serialized object from a model. fields is a list of strings of fields to be gotten'''
+        num_results=len(objects)
+        return jsonify(dict(page=page_num, objects=[self.serialize(x,fields) for x in objects], total_pages=total_pages, num_results=num_results)).data

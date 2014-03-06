@@ -48,11 +48,3 @@ class StudiesTest(TestCase):
             
             studies = Study.query.all()
             self.assert_model_equality([study], studies, ['peaks'])
-            
-    def test_empty_api_studies_returns_200(self):
-        '''Check to make sure the api is active. Also need to define behavior when we're actually pulling data'''
-
-        response = self.client.get('/api/studies')
-
-        self.assert200(response)
-
