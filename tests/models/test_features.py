@@ -11,7 +11,6 @@ class FeaturesTest(TestCase):
         features =Feature.query.all()
         self.assert_model_contains_fields(feature, ['feature','num_studies','num_activations'])
         self.assert_model_equality([feature], features)
-
         
     def test_image_fields(self):
         '''Changing the Model can break things. Images need forward and reverse inference, and specify if they should be displayed and downloaded'''

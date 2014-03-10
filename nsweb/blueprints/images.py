@@ -9,6 +9,4 @@ add_blueprint(apimanager.create_api_blueprint(Feature,
                                               max_results_per_page=100,
                                               include_columns=['id',
                                                                'feature',
-                                                                'image_forward_inference',
-                                                                'image_reverse_inference',
-                                                                'image_download']))
+                                                                'images']))
