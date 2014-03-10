@@ -30,10 +30,12 @@ class Image(db.Model):
         
 class FeatureImage(Image):
     __mapper_args__={'polymorphic_identity':'Feature'}
-    id = db.Column(db.Integer, db.ForeignKey(Feature.id), primary_key=True)
-
+    foreign_id = db.Column(db.Integer, db.ForeignKey(Feature.id))
+    db.ForeignKeyConstraint(['foreign','foreign_id'])
+# is constraint needed since we already have type? issue is what will the query pull back?
 
 class LocationImage(Image):
     __mapper_args__={'polymorphic_identity':'Location'}
-    id = db.Column(db.Integer, db.ForeignKey(Location.id), primary_key=True)
-
+    foreign_id = db.Column(db.Integer, db.ForeignKey(Location.id))
+    db.ForeignKeyConstraint(['foreign','foreign_id'])
+# is constraint needed since we already have type? issue is what will the query pull back?
