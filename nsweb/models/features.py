@@ -6,7 +6,7 @@ class Feature(db.Model):
     num_studies=db.Column(db.Integer)
     num_activations=db.Column(db.Integer)
     frequencies = association_proxy('frequencies','frequency')
-    images = 
+    images = association_proxy('images', 'FeatureImage')
     
 #     image_forward_inference=db.Column(db.String(1000),unique=True)
 #     image_reverse_inference=db.Column(db.String(1000),unique=True)
