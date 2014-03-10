@@ -1,5 +1,4 @@
 from nsweb.models import *
-from flask_restless.helpers import primary_key_name
 
 class Image(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -13,8 +12,8 @@ class Image(db.Model):
     display=db.Column(db.Boolean)
     download=db.Column(db.Boolean)
     
-    foreign=db.Column('type', db.String(50), foreign_key=True)
-#     foreign_id=db.Column(db.Integer, foreign_key=True)
+    foreign=db.Column('type', db.String(50))
+    foreign_id=db.Column(db.Integer)
 #     db.ForeignKeyConstraint(['foreign','foreign_id'])
     __mapper_args__ = {'polymorphic_on': foreign}
    
@@ -30,12 +29,9 @@ class Image(db.Model):
         
 class FeatureImage(Image):
     __mapper_args__={'polymorphic_identity':'Feature'}
-    foreign_id = db.Column(db.Integer, db.ForeignKey(Feature.id))
-    db.ForeignKeyConstraint(['foreign','foreign_id'])
-# is constraint needed since we already have type? issue is what will the query pull back?
+    db.ForeignKeyConstraint(['foreign_id'],['Feature.id]'])
 
 class LocationImage(Image):
     __mapper_args__={'polymorphic_identity':'Location'}
-    foreign_id = db.Column(db.Integer, db.ForeignKey(Location.id))
-    db.ForeignKeyConstraint(['foreign','foreign_id'])
-# is constraint needed since we already have type? issue is what will the query pull back?
+    db.ForeignKeyConstraint(['foreign_id'],['Location.id]'])
+## is constraint needed since we already have type? issue is what will the query pull back?
