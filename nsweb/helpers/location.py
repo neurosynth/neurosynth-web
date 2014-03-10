@@ -1,10 +1,13 @@
 from math import pi, sqrt, radians, sin, cos
 from nsweb.models.studies import Peak
+from sqlalchemy import func
 
 '''
 This file is currently the placeholder for me to play with euclidean distance calculations and optimize it for DB. precalculating isn't faster.
 I'm wondering if boxing prior and running a second select would be faster since we'd get results into memory that way!
 '''
+
+# YEa func can't do that....What's sqlalchemy's math functions?!?!
 
 Peak = classmethod(lambda s: (s.x, s.y, s.z))
 

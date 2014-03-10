@@ -29,9 +29,9 @@ class Image(db.Model):
         self.download=download
         
 class FeatureImage(Image):
-    __mapper_args__={'polymorphic_identity':'FeatureImage'}
-        
+    __mapper_args__={'polymorphic_identity':'Feature'}
+    feature =  db.relationship(Feature, backref=db.backref('images',cascade='all, delete-orphan'))
 
 class LocationImage(Image):
-    __mapper_args__={'polymorphic_identity':'LocationImage'}
+    __mapper_args__={'polymorphic_identity':'Location'}
         

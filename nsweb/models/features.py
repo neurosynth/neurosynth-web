@@ -6,7 +6,8 @@ class Feature(db.Model):
     num_studies=db.Column(db.Integer)
     num_activations=db.Column(db.Integer)
     frequencies = association_proxy('frequencies','frequency')
-    images = association_proxy('images', 'FeatureImage')
+#     images = association_proxy('images', 'FeatureImage')
+    images = db.relationship('FeatureImage', backref=db.backref('feature', lazy='joined'), lazy='dynamic')
     
 #     image_forward_inference=db.Column(db.String(1000),unique=True)
 #     image_reverse_inference=db.Column(db.String(1000),unique=True)
