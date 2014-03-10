@@ -3,7 +3,7 @@ from flask_restless.helpers import primary_key_name
 
 class Image(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    table = db.Column(db.Integer, primary_key=True)
+#    table = db.Column(db.Integer, primary_key=True)
     name=db.Column(db.String(200))
     label=db.Column(db.String(200))
     kind=db.Column(db.String(200))
@@ -15,6 +15,7 @@ class Image(db.Model):
     
     foreign=db.Column('type', db.String(50), foreign_key=True)
     foreign_id=db.Column(db.Integer, foreign_key=True)
+    db.ForeignKeyConstraint(['foreign','foreign_id'])
     __mapper_args__ = {'polymorphic_on': foreign}
    
     def __init__(self,name,label,kind,comments,stat,image_file,display=True,download=True):

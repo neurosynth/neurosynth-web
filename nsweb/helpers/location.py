@@ -8,13 +8,11 @@ I'm wondering if boxing prior and running a second select would be faster since 
 
 Peak = classmethod(lambda s: (s.x, s.y, s.z))
 
-def calc_distance(xyz1, xyz2):
+def distance(xyz1, xyz2):
     return func.sqrt(func.pow((xyz1[0] - xyz2[0]),2)
                    + func.pow((xyz1[1] - xyz2[2]),2)
                    + func.pow((xyz1[2] - xyz2[2]),2))
 
-def distance():
-    pass
 
 def closeSphere(radius, (x,y,z)):
     pass
