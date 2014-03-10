@@ -14,8 +14,8 @@ class Image(db.Model):
     download=db.Column(db.Boolean)
     
     foreign=db.Column('type', db.String(50), foreign_key=True)
-    foreign_id=db.Column(db.Integer, foreign_key=True)
-    db.ForeignKeyConstraint(['foreign','foreign_id'])
+#     foreign_id=db.Column(db.Integer, foreign_key=True)
+#     db.ForeignKeyConstraint(['foreign','foreign_id'])
     __mapper_args__ = {'polymorphic_on': foreign}
    
     def __init__(self,name,label,kind,comments,stat,image_file,display=True,download=True):
@@ -30,8 +30,10 @@ class Image(db.Model):
         
 class FeatureImage(Image):
     __mapper_args__={'polymorphic_identity':'Feature'}
-    feature =  db.relationship(Feature, backref=db.backref('images',cascade='all, delete-orphan'))
+    id = db.Column(db.Integer, db.ForeignKey(Feature.id), primary_key=True)
+
 
 class LocationImage(Image):
     __mapper_args__={'polymorphic_identity':'Location'}
-        
+    id = db.Column(db.Integer, db.ForeignKey(Location.id), primary_key=True)
+
