@@ -26,8 +26,8 @@ def read_features_text(data_dir, feature_database):
 
 def add_images(feature,image_dir):
     feature.images.extend([
-                          FeatureImage(name=image_dir+'_'+feature.feature+'_pAgF_z_FDR_0.05.nii.gz'),
-                          FeatureImage(name=image_dir+'_'+feature.feature+'_pFgA_z_FDR_0.05.nii.gz')
+                          FeatureImage(image_file=image_dir+'_'+feature.feature+'_pAgF_z_FDR_0.05.nii.gz', label='Forward Inference'),
+                          FeatureImage(image_file=image_dir+'_'+feature.feature+'_pFgA_z_FDR_0.05.nii.gz', label='Reverse Inference')
                           ])
     
 def add_features(db,feature_list, image_dir=''):
@@ -41,12 +41,12 @@ def add_features(db,feature_list, image_dir=''):
         feature_dict[name] = feature
         if image_dir !='':
             add_images(feature,image_dir)
-        db.session.add(feature_dict[name])
+        db.session.add(feature)
         db.session.commit()
     return feature_dict
 
 
-def add_studies(db, dataset, feature_list, feature_data, feature_dict):
+def add_studies(db, dataset, feature_list, feature_data, feature_dict, threshold=0):
     from nsweb.models.studies import Study, Peak
     from nsweb.models.features import Frequency
 
@@ -77,7 +77,7 @@ def add_studies(db, dataset, feature_list, feature_data, feature_dict):
         # Map features onto studies via a Frequency join table that also stores frequency info
         pmid_frequencies=feature_data[study.pmid]
         for y in range(len(feature_list)):
-            if pmid_frequencies[y] > 0.0:
+            if pmid_frequencies[y] >= threshold:
                 db.session.add(Frequency(study=study,feature=feature_dict[feature_list[y]],frequency=pmid_frequencies[y]))
                 feature_dict[feature_list[y]].num_studies+=1
                 feature_dict[feature_list[y]].num_activations+=len(peaks)

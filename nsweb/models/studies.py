@@ -35,4 +35,4 @@ class Peak(db.Model):
         self.y=y
         self.z=z
         
-    def closest(self):
+#     def closest(self):

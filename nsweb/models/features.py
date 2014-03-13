@@ -7,7 +7,7 @@ class Feature(db.Model):
     num_activations=db.Column(db.Integer)
     frequencies = association_proxy('frequencies','frequency')
 #     images = association_proxy('images', 'FeatureImage')
-    images = db.relationship('FeatureImage', primaryjoin=id==FeatureImage.foreign_id,foreign_keys=[id], backref=db.backref('feature', lazy='joined')) #lazy='dynamic')
+    images = db.relationship('FeatureImage', primaryjoin=id==FeatureImage.foreign_id, uselist=True,foreign_keys=[id], backref=db.backref('feature', lazy='joined')) #lazy='dynamic')
     feature_affects = association_proxy('feature_affects', 'FeatureAffects')
 
 #     image_forward_inference=db.Column(db.String(1000),unique=True)
@@ -20,14 +20,13 @@ class Feature(db.Model):
 #     image_comments=db.Column(db.String(200))
 
     
-    def __init__(self, feature, num_studies=0, num_activations=0, image_forward_inference='', image_reverse_inference='', image_display=True,image_download=True):
+    def __init__(self, feature, num_studies=0, num_activations=0, images=[], image_display=True,image_download=True):
         self.feature=feature
         self.num_studies=num_studies
         self.num_activations=num_activations
-#         self.image_forward_inference=image_forward_inference
-#         self.image_reverse_inference=image_reverse_inference
-#         self.image_display=image_display
-#         self.image_download=image_download
+        self.images=images
+        self.image_display=image_display
+        self.image_download=image_download
 
 class Frequency(db.Model):
     feature_id = db.Column(db.Integer, db.ForeignKey(Feature.id), primary_key=True)

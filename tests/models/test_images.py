@@ -1,7 +1,7 @@
 from tests import *
 
 class ImagesTest(TestCase):
-    #TODO: tests are breaking, but what will proper API look like?
+    #TODO: tests are breaking, but what should proper API look like? Shouldn't we just send all relevant since that's easier?
     def test_image_fields(self):
         '''Changing the Model can break things. Images need forward and reverse inference, and specify if they should be displayed and downloaded'''
         self.populate_db()

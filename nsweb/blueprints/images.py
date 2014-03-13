@@ -7,8 +7,8 @@ add_blueprint(apimanager.create_api_blueprint(Image,
                                               collection_name='images',
                                               results_per_page=20,
                                               max_results_per_page=100,
-#                                               include_columns=['id',
-#                                                                'feature',
-#                                                                 'images']
+                                              include_columns=['id',
+                                                               'image_file',
+                                                               'label']
                                               ))
 

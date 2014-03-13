@@ -7,5 +7,6 @@ def upload_file():
         f.save('/var/www/uploads/uploaded_file.txt')
 
 '''
-forget this. I'm re-implementing flask-uploads. Let's use that instead. 
+forget this. Re-implementing flask-uploads. I looked at code and its doing exactly
+ what I am now and they have testing harness and safety stuff! Let's use that instead. 
 '''
