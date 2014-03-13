@@ -34,5 +34,7 @@ class Peak(db.Model):
         self.x=x
         self.y=y
         self.z=z
-        
-#     def closest(self):
+
+    def closest(self,edge_length,x,y,z):
+        '''Finds closest peaks approximated to a cube. Because its SO Fast and Easy!'''
+        return self.query.filter(x < x+edge_length and x>x-edge_length and y< y+edge_length and y>y-edge_length and z< z+edge_length and z>z-edge_length).all()
