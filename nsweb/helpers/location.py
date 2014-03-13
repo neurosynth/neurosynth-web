@@ -9,8 +9,6 @@ I'm wondering if boxing prior and running a second select would be faster since 
 
 # YEa func can't do that....What's sqlalchemy's math functions?!?!
 
-Peak = classmethod(lambda s: (s.x, s.y, s.z))
-
 def distance(xyz1, xyz2):
     return func.sqrt(func.pow((xyz1[0] - xyz2[0]),2)
                    + func.pow((xyz1[1] - xyz2[2]),2)
