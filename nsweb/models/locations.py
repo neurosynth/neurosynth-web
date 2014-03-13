@@ -6,7 +6,7 @@ class Location(db.Model):
     y = db.Column(db.Float)
     z = db.Column(db.Float)
     feature_affects = association_proxy('feature_affects', 'FeatureAffects')
-    images=db.relationship('LocationImage', primaryjoin=id==FeatureImage.foreign_id,foreign_keys=[id], backref=db.backref('feature', lazy='joined'))
+    images=db.relationship('LocationImage', primaryjoin=id==LocationImage.foreign_id,foreign_keys=[id], backref=db.backref('location', lazy='joined'))
     
     def __init__(self,x,y,z):
         self.x=x
@@ -18,7 +18,7 @@ class FeatureAffects(db.Model):
     location_id = db.Column(db.Integer, db.ForeignKey(Location.id), primary_key=True)
     value = db.Column(db.Float)
     feature = db.relationship(Feature, backref=db.backref('feature_affects',cascade='all, delete-orphan'))
-    location = db.relationship(Study, backref=db.backref('feature_affects',cascade='all, delete-orphan'))
+    location = db.relationship(Location, backref=db.backref('feature_affects',cascade='all, delete-orphan'))
      
     def __init__(self, location, feature, value):
         self.location=location

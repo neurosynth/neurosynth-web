@@ -1,6 +1,6 @@
 from tests import *
 
-class ImagesTest(TestCase):
+class FrequenciesTest(TestCase):
 
     def test_frequency_field(self):
         '''Frequency has fields pmid, feature_id, and frequency'''

@@ -7,7 +7,7 @@ from flask.json import jsonify
 from unittest import TestCase as Base
 #from flask_testing import TestCase as Base
 from nsweb.core import create_app, register_blueprints, db, app
-from nsweb.models import Study, Peak, Feature, Frequency
+from nsweb.models import Study, Peak, Feature, Frequency, Image, FeatureImage, Location, LocationImage, FeatureAffects
 
 #this is here for now. Needs to be replaced with the factory later!
 from nsweb.helpers import database_builder
