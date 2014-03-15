@@ -5,3 +5,5 @@ from studies import *
 from images import *
 from features import *
 from locations import *
+from peaks import *
+from frequencies import *
