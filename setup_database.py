@@ -5,11 +5,17 @@ from nsweb.helpers import database_builder
 def main():
     create_app(database_uri=SQLALCHEMY_DATABASE_URI, debug=DEBUG, aptana=DEBUG_WITH_APTANA)
     import nsweb.models #registers models
-    database_builder.init_database(db)
-    dataset = database_builder.read_pickle_database(data_dir=DATA_DIR, pickle_database=PICKLE_DATABASE)
-    (feature_list,feature_data) = database_builder.read_features_text(data_dir=DATA_DIR,feature_database=FEATURE_DATABASE)
-    feature_dict = database_builder.add_features(db,feature_list,image_dir=IMAGE_DIR)
-    database_builder.add_studies(db, dataset, feature_list, feature_data, feature_dict, FREQUENCY_THRESHOLD)
+
+    ### Uncomment the following lines to initialize the Dataset instance from .txt files the first time
+    # builder = database_builder.DatabaseBuilder(db, 
+    # 	studies='/Users/tal/Downloads/full_database_revised.txt',
+    # 	features=DATA_DIR+ 'abstract_features.txt')
+    # builder.dataset.save('/Users/tal/Downloads/neurosynth_dataset.pkl', keep_mappables=True)
+
+    # Create a new builder from a pickled Dataset instance and populate the DB
+    builder = database_builder.DatabaseBuilder(db, dataset='/Users/tal/Downloads/neurosynth_dataset.pkl')
+    builder.add_features()
+    builder.add_studies(threshold=0.001)
 
 if __name__ == '__main__':
     main()
