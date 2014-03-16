@@ -2,6 +2,22 @@ from nsweb.core import apimanager
 from nsweb.models import Study
 from nsweb.blueprints import add_blueprint
 
+studies = Blueprint('studies', __name__, 
+	url_prefix='/studies',
+	template_folder='../templates/studies')
+
+@studies.route('/')
+def index():
+	return render_template('index.html', studies=Study.query.all())
+
+@studies.route('/<id>')
+def show(id):
+	return render_template('show.html', study=Study.query.get_or_404(id))
+
+add_blueprint(studies)
+
+
+# Begin API stuff
 def update_result(result, **kwargs):
 	""" Rename frequency to feature in JSON. 
 	Note: this makes the JSON look nice when requests come in at

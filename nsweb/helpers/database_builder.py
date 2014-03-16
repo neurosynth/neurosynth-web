@@ -126,3 +126,7 @@ class DatabaseBuilder:
             for s in [freq.study for freq in f.frequencies]:
                 f.num_activations += len(s.peaks)
         self.db.session.commit()
+
+
+
+
