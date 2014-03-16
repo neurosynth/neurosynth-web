@@ -48,7 +48,9 @@ add_blueprint(apimanager.create_api_blueprint(Study,
                                                                'peaks.z',
                                                                # 'frequencies',
                                                                # 'frequencies.frequency',
-                                                               # 'frequencies.feature_id'
+                                                               # 'frequencies.feature_id',
+                                                               'features',
+                                                               'features.feature'
                                                                ],
                                               postprocessors={
                                               	'GET_SINGLE': [update_result]

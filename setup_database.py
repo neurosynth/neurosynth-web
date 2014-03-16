@@ -15,13 +15,20 @@ def main():
     # Create a new builder from a pickled Dataset instance and populate the DB
     print "Initializing DatabaseBuilder..."
     builder = database_builder.DatabaseBuilder(db, 
-        dataset='/Users/tal/Downloads/neurosynth_dataset.pkl', reset_db=False)
-    # print "Adding features..."
-    # builder.add_features(feature_list=['pain','emotion','language','memory','amygdala'])
-    # print "Adding studies..."
-    # builder.add_studies(feature_list=['pain','emotion','language','memory','amygdala'], threshold=0.001)
+        dataset='/Users/tal/Downloads/neurosynth_dataset.pkl', reset_db=True)
+    
+    print "Adding features..."
+    
+    # Use this for rapid testing... set to None to initialize full DB
+    feature_list = ['pain','emotion','language','memory','amygdala']
+
+    builder.add_features(feature_list=feature_list)
+
+    print "Adding studies..."
+    builder.add_studies(feature_list=feature_list)
+    
     print "Adding meta-analysis images..."
-    builder.generate_feature_images(feature_list=['pain','emotion','language','memory','amygdala'])
+    builder.generate_feature_images(feature_list=feature_list)
 
 if __name__ == '__main__':
     main()

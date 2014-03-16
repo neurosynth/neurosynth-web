@@ -54,7 +54,13 @@ add_blueprint(apimanager.create_api_blueprint(Feature,
                                                                # 'frequencies',
                                                                # 'frequencies.pmid',
                                                                # 'frequencies.frequency'
-                                                               'images'
+                                                               'images',
+                                                               'images.stat',
+                                                               'images.feature_id',
+                                                               'images.image_file',
+                                                               'images.label',
+                                                               'studies',
+                                                               'studies.pmid'
                                                                ],
                                               preprocessors={
                                               	'GET_SINGLE': [find_feature]

@@ -74,14 +74,16 @@ class DatabaseBuilder:
         if reset:
             feature.images = []
 
+        name = feature.feature
+
         feature.images.extend([
-            FeatureImage(image_file=image_dir+'_'+feature.feature+'_pAgF_z_FDR_0.05.nii.gz',
-                label='%s: forward inference' % feature,
+            FeatureImage(image_file=image_dir+'_'+name+'_pAgF_z_FDR_0.05.nii.gz',
+                label='%s: forward inference' % name,
                 stat='z-score',
                 display=1,
                 download=1),
-            FeatureImage(image_file=image_dir+feature.feature+'_pFgA_z_FDR_0.05.nii.gz',
-                label='%s: reverse inference' % feature,
+            FeatureImage(image_file=image_dir+name+'_pFgA_z_FDR_0.05.nii.gz',
+                label='%s: reverse inference' % name,
                 stat='z-score',
                 display=1,
                 download=1)
