@@ -1,13 +1,16 @@
 # Re-initialize database
 from nsweb.models.features import Feature
 from nsweb.models.studies import Study
+from nsweb.models.peaks import Peak
+from nsweb.models.frequencies import Frequency
 from nsweb.models.images import FeatureImage
+from nsweb import settings
 from neurosynth.base.dataset import Dataset
 
 
 class DatabaseBuilder:
 
-    def __init__(self, db, dataset=None, studies=None, features=None):
+    def __init__(self, db, dataset=None, studies=None, features=None, reset_db=False):
         """ Initialize instance from either a pickled Neurosynth Dataset instance or a 
         pair of study and feature .txt files. Either dataset or (studies AND features)
         must be passed. Note that if a pickled Dataset is passed, it must contain 
@@ -26,14 +29,15 @@ class DatabaseBuilder:
                 dataset.add_features(features)
 
         self.dataset = dataset
-
-        self.reset_database(db)
-
-
-    def reset_database(self, db):
-        db.drop_all()
-        db.create_all()
         self.db = db
+
+        if reset_db:
+            self.reset_database()
+
+
+    def reset_database(self):
+        self.db.drop_all()
+        self.db.create_all()
 
 
     def add_features(self, feature_list=None, image_dir=None):
@@ -53,22 +57,44 @@ class DatabaseBuilder:
         self.db.session.commit()
 
 
-    def _add_feature_images(self, feature, image_dir):
-        """ Create DB records for the reverse and forward meta-analysis images for the given feature. """
+    def _add_feature_images(self, feature, image_dir, reset=True):
+        """ Create DB records for the reverse and forward meta-analysis images for the given feature. 
+        Args:
+            feature: Either a Feature instance or the (string) name of a feature to update. If a 
+                string, first check self.features, and only retrieve from DB if not found. 
+            image_dir: Location to find images in
+            reset: If True, deletes any existing FeatureImages before adding new ones
+        """
+        if isinstance(feature, basestring):
+            if hasattr(self, 'features') and feature in self.features:
+                feature = self.features[feature]
+            else:
+                feature = Feature.query.filter_by(feature=feature).first()
+
+        if reset:
+            feature.images = []
+
         feature.images.extend([
-                              FeatureImage(image_file=image_dir+'_'+feature.feature+'_pAgF_z_FDR_0.05.nii.gz', label='Forward Inference'),
-                              FeatureImage(image_file=image_dir+'_'+feature.feature+'_pFgA_z_FDR_0.05.nii.gz', label='Reverse Inference')
-                              ])
+            FeatureImage(image_file=image_dir+'_'+feature.feature+'_pAgF_z_FDR_0.05.nii.gz',
+                label='%s: forward inference' % feature,
+                stat='z-score',
+                display=1,
+                download=1),
+            FeatureImage(image_file=image_dir+feature.feature+'_pFgA_z_FDR_0.05.nii.gz',
+                label='%s: reverse inference' % feature,
+                stat='z-score',
+                display=1,
+                download=1)
+        ])
+
+        # self.db.session.add(feature)
 
 
-    def add_studies(self, threshold=0.001):
+    def add_studies(self, feature_list=None, threshold=0.001):
         """ Add studies to the DB.
         Args:
             threshold: Float or integer; minimum value in FeatureTable data array for inclusion.
         """
-
-        from nsweb.models.studies import Study, Peak
-        from nsweb.models.features import Frequency
 
         # For efficiency, get all feature data up front, so we only need to densify array once
         feature_data = self.dataset.get_feature_data()
@@ -95,13 +121,19 @@ class DatabaseBuilder:
              
             # Map features onto studies via a Frequency join table that also stores frequency info
             pmid_frequencies = list(feature_data[i,:])
-            for (y, freq) in enumerate(pmid_frequencies):
+
+            # Determine which features to check (or check all if feature_list is None)
+            features_to_check = range(feature_data.shape[1])
+            if feature_list is not None:
+                features_to_check = [j for j in features_to_check if feature_names[j] in feature_list]
+
+            for y in features_to_check:
+                freq = pmid_frequencies[y]
                 feature_name = feature_names[y]
                 if pmid_frequencies[y] >= threshold:
                     freq_inst = Frequency(study=study, feature=self.features[feature_name], frequency=freq)
                     self.db.session.add(freq_inst)
-
-                      
+         
         # Commit records in batches of 1000 to conserve memory.
         # This is very slow because we're relying on the declarative base. Ideally should replace 
         # this with use of SQLAlchemy core, but probably not worth the trouble considering we 
@@ -127,6 +159,32 @@ class DatabaseBuilder:
                 f.num_activations += len(s.peaks)
         self.db.session.commit()
 
+
+    def generate_feature_images(self, image_dir=None, feature_list=None, **kwargs):
+        """ Create a full set of feature meta-analysis images via Neurosynth. 
+        Args:
+            image_dir: Folder in which to store images. If None, uses default 
+                location specified in SETTINGS.
+            feature_list: Optional list of features to limit meta-analysis to.
+                If None, all available features are processed.
+        """
+        from neurosynth.analysis import meta
+
+        # Set up defaults
+        if image_dir is None:
+            image_dir = settings.IMAGE_DIR
+
+        if feature_list is None:
+            feature_list = self.dataset.get_feature_names()
+
+        # Meta-analyze all images
+        meta.analyze_features(self.dataset, feature_list, save=image_dir + '/', **kwargs)
+
+        # Create FeatureImage records
+        for f in feature_list:
+            self._add_feature_images(f, image_dir)
+
+        self.db.session.commit()
 
 
 

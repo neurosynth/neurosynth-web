@@ -13,9 +13,16 @@ def main():
     # builder.dataset.save('/Users/tal/Downloads/neurosynth_dataset.pkl', keep_mappables=True)
 
     # Create a new builder from a pickled Dataset instance and populate the DB
-    builder = database_builder.DatabaseBuilder(db, dataset='/Users/tal/Downloads/neurosynth_dataset.pkl')
-    builder.add_features()
-    builder.add_studies(threshold=0.001)
+    print "Initializing DatabaseBuilder..."
+    builder = database_builder.DatabaseBuilder(db, 
+        dataset='/Users/tal/Downloads/neurosynth_dataset.pkl', reset_db=False)
+    # print "Adding features..."
+    # builder.add_features(feature_list=['pain','emotion','language','memory','amygdala'])
+    # print "Adding studies..."
+    # builder.add_studies(feature_list=['pain','emotion','language','memory','amygdala'], threshold=0.001)
+    print "Adding meta-analysis images..."
+    builder.generate_feature_images(feature_list=['pain','emotion','language','memory','amygdala'])
 
 if __name__ == '__main__':
     main()
+

@@ -18,12 +18,12 @@ class Image(db.Model):
 #     db.ForeignKeyConstraint(['foreign','foreign_id'])
     __mapper_args__ = {'polymorphic_on': foreign}
    
-    def __init__(self,image_file, label,display=True,download=True):#name,kind,comments,stat,
+    def __init__(self,image_file, label=None, display=True, download=True, stat=None):#name,kind,comments,stat,
 #         self.name=name
         self.label=label
 #         self.kind=kind
 #         self.comments=comments
-#         self.stat=stat
+        self.stat=stat
         self.image_file=image_file
         self.display=display
         self.download=download

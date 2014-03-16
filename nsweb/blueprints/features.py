@@ -36,9 +36,10 @@ def find_feature(instance_id, **kwargs):
 
 def update_result(result, **kwargs):
 	""" Rename frequency to study in JSON. """
-	result['studies'] = result.pop('frequencies')
-	for s in result['studies']:
-		s['frequency'] = round(s['frequency'], 3)
+	if 'frequencies' in result:
+		result['studies'] = result.pop('frequencies')
+		for s in result['studies']:
+			s['frequency'] = round(s['frequency'], 3)
 
 
 add_blueprint(apimanager.create_api_blueprint(Feature,
@@ -50,9 +51,11 @@ add_blueprint(apimanager.create_api_blueprint(Feature,
                                                                'feature',
                                                                'num_studies',
                                                                'num_activations',
-                                                               'frequencies',
-                                                               'frequencies.pmid',
-                                                               'frequencies.frequency'],
+                                                               # 'frequencies',
+                                                               # 'frequencies.pmid',
+                                                               # 'frequencies.frequency'
+                                                               'images'
+                                                               ],
                                               preprocessors={
                                               	'GET_SINGLE': [find_feature]
                                               },

@@ -1,6 +1,7 @@
 from nsweb.core import apimanager
 from nsweb.models import Study
 from nsweb.blueprints import add_blueprint
+from flask import Blueprint, render_template
 
 studies = Blueprint('studies', __name__, 
 	url_prefix='/studies',
@@ -24,10 +25,11 @@ def update_result(result, **kwargs):
 	/studies/3000, but breaks the native functionality when requests 
 	come in at /studies/3000/frequencies.
 	"""
-	result['features'] = result.pop('frequencies')
-	for f in result['features']:
-		f['frequency'] = round(f['frequency'], 3)
-	pass
+	if 'frequencies' in result:
+		result['features'] = result.pop('frequencies')
+		for f in result['features']:
+			f['frequency'] = round(f['frequency'], 3)
+		pass
 
 
 add_blueprint(apimanager.create_api_blueprint(Study,
@@ -44,9 +46,9 @@ add_blueprint(apimanager.create_api_blueprint(Study,
                                                                'peaks.x',
                                                                'peaks.y',
                                                                'peaks.z',
-                                                               'frequencies',
-                                                               'frequencies.frequency',
-                                                               'frequencies.feature_id'
+                                                               # 'frequencies',
+                                                               # 'frequencies.frequency',
+                                                               # 'frequencies.feature_id'
                                                                ],
                                               postprocessors={
                                               	'GET_SINGLE': [update_result]
