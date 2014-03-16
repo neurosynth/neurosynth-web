@@ -1,0 +1,8 @@
+{% block content %}
+<h2>All features</h2>
+<ul>
+{% for f in features %}
+	<li><a href="/features/{{f.feature}}">{{f.feature}}</a></li>
+{% endfor %}
+</ul>
+{% endblock content %}

@@ -1,8 +1,31 @@
 from nsweb.core import apimanager
 from nsweb.models import Feature
 from nsweb.blueprints import add_blueprint
+from flask import Blueprint, render_template
 import re
 
+
+features = Blueprint('features', __name__, 
+	url_prefix='/features',
+	template_folder='../templates/features')
+
+@features.route('/')
+def index():
+	return render_template('index.html', features=Feature.query.all())
+
+@features.route('/<id>')
+def show(id):
+	# return features.root_path
+	if re.match('\d+$', id):
+		feature = Feature.query.get_or_404(id)
+	else:
+		feature = Feature.query.filter_by(feature=id).first_or_404()
+	return render_template('show.html', feature=feature)
+
+add_blueprint(features)
+
+
+# Begin API stuff
 def find_feature(instance_id, **kwargs):
 	""" If the passed ID isn't numeric, assume it's a feature name,
 	and retrieve the corresponding numeric ID. 
@@ -30,6 +53,9 @@ add_blueprint(apimanager.create_api_blueprint(Feature,
                                                                'frequencies',
                                                                'frequencies.pmid',
                                                                'frequencies.frequency'],
+                                              preprocessors={
+                                              	'GET_SINGLE': [find_feature]
+                                              },
                                               postprocessors={
                                               	'GET_SINGLE': [update_result]
                                               }))

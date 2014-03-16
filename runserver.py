@@ -18,7 +18,9 @@ def main():
     
     #sets up logging
     setup_logging(logging_path=settings.LOGGING_PATH,level=settings.LOGGING_LEVEL)
-        
+    
+    # print app.url_map   # Display all routes--for debugging
+
     # To allow aptana to receive errors, set use_debugger=False
     if app.debug: use_debugger = True
     try:
@@ -28,6 +30,7 @@ def main():
         pass
     app.run(use_debugger=use_debugger, debug=app.debug,
             use_reloader=use_debugger)
+
 
 if __name__ == "__main__":
         main()
