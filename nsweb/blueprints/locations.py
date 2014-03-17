@@ -6,12 +6,11 @@ import re
 
 
 locations = Blueprint('locations', __name__, 
-	url_prefix='/locations',
-	template_folder='../templates/locations')
+	url_prefix='/locations')
 
 @locations.route('/')
 def index():
-	return render_template('index.html')
+	return render_template('locations/index.html')
 
 @locations.route('/<id>')
 def show(id):
@@ -20,7 +19,7 @@ def show(id):
 		location = Location.query.filter_by(x=x, y=y, z=z).first()
 	else:
 		location = Location.query.get_or_404(id)
-	return render_template('show.html', location=location)
+	return render_template('locations/show.html', location=location)
 
 add_blueprint(locations)
 

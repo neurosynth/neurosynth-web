@@ -162,7 +162,7 @@ class DatabaseBuilder:
         self.db.session.commit()
 
 
-    def generate_feature_images(self, image_dir=None, feature_list=None, **kwargs):
+    def generate_feature_images(self, image_dir=None, feature_list=None, add_to_db=True, **kwargs):
         """ Create a full set of feature meta-analysis images via Neurosynth. 
         Args:
             image_dir: Folder in which to store images. If None, uses default 
@@ -183,10 +183,15 @@ class DatabaseBuilder:
         meta.analyze_features(self.dataset, feature_list, save=image_dir + '/', **kwargs)
 
         # Create FeatureImage records
-        for f in feature_list:
-            self._add_feature_images(f, image_dir)
+        if add_to_db:
+            for f in feature_list:
+                self._add_feature_images(f, image_dir)
 
-        self.db.session.commit()
+            self.db.session.commit()
+
+
+    def generate_location_images(self, image_dir=None, add_to_db=True, **kwargs):
+        """ Create a full set of location-based coactivation images via Neurosynth. """
 
 
 

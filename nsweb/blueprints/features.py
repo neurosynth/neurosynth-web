@@ -6,12 +6,11 @@ import re
 
 
 features = Blueprint('features', __name__, 
-	url_prefix='/features',
-	template_folder='../templates/features')
+	url_prefix='/features')
 
 @features.route('/')
 def index():
-	return render_template('index.html', features=Feature.query.all())
+	return render_template('features/index.html', features=Feature.query.all())
 
 @features.route('/<id>')
 def show(id):
@@ -20,7 +19,7 @@ def show(id):
 		feature = Feature.query.get_or_404(id)
 	else:
 		feature = Feature.query.filter_by(feature=id).first_or_404()
-	return render_template('show.html', feature=feature)
+	return render_template('features/show.html', feature=feature)
 
 add_blueprint(features)
 
@@ -43,28 +42,28 @@ def update_result(result, **kwargs):
 
 
 add_blueprint(apimanager.create_api_blueprint(Feature,
-                                              methods=['GET'],
-                                              collection_name='features',
-                                              results_per_page=20,
-                                              max_results_per_page=100,
-                                              include_columns=['id',
-                                                               'feature',
-                                                               'num_studies',
-                                                               'num_activations',
-                                                               # 'frequencies',
-                                                               # 'frequencies.pmid',
-                                                               # 'frequencies.frequency'
-                                                               'images',
-                                                               'images.stat',
-                                                               'images.feature_id',
-                                                               'images.image_file',
-                                                               'images.label',
-                                                               'studies',
-                                                               'studies.pmid'
-                                                               ],
-                                              preprocessors={
-                                              	'GET_SINGLE': [find_feature]
-                                              },
-                                              postprocessors={
-                                              	'GET_SINGLE': [update_result]
-                                              }))
+																							methods=['GET'],
+																							collection_name='features',
+																							results_per_page=20,
+																							max_results_per_page=100,
+																							include_columns=['id',
+																															 'feature',
+																															 'num_studies',
+																															 'num_activations',
+																															 # 'frequencies',
+																															 # 'frequencies.pmid',
+																															 # 'frequencies.frequency'
+																															 'images',
+																															 'images.stat',
+																															 'images.feature_id',
+																															 'images.image_file',
+																															 'images.label',
+																															 'studies',
+																															 'studies.pmid'
+																															 ],
+																							preprocessors={
+																								'GET_SINGLE': [find_feature]
+																							},
+																							postprocessors={
+																								'GET_SINGLE': [update_result]
+																							}))
