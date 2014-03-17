@@ -29,8 +29,11 @@ def main():
     print "Adding studies..."
     builder.add_studies(feature_list=feature_list)
     
-    print "Adding meta-analysis images..."
+    print "Adding feature-based meta-analysis images..."
     builder.generate_feature_images(feature_list=feature_list)
+
+    print "Adding location-based coactivation images..."
+    builder.generate_location_images(min_studies=500, add_to_db=True)
 
 if __name__ == '__main__':
     main()
