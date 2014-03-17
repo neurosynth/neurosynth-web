@@ -41,29 +41,28 @@ def update_result(result, **kwargs):
 			s['frequency'] = round(s['frequency'], 3)
 
 
+#db columns
+includes=['id',
+		'feature',
+		'num_studies',
+		'num_activations',
+		'images',
+		'images.stat',
+		'images.feature_id',
+		'images.image_file',
+		'images.label',
+		'studies',
+		'studies.pmid'
+]
 add_blueprint(apimanager.create_api_blueprint(Feature,
-																							methods=['GET'],
-																							collection_name='features',
-																							results_per_page=20,
-																							max_results_per_page=100,
-																							include_columns=['id',
-																															 'feature',
-																															 'num_studies',
-																															 'num_activations',
-																															 # 'frequencies',
-																															 # 'frequencies.pmid',
-																															 # 'frequencies.frequency'
-																															 'images',
-																															 'images.stat',
-																															 'images.feature_id',
-																															 'images.image_file',
-																															 'images.label',
-																															 'studies',
-																															 'studies.pmid'
-																															 ],
-																							preprocessors={
-																								'GET_SINGLE': [find_feature]
-																							},
-																							postprocessors={
-																								'GET_SINGLE': [update_result]
-																							}))
+											methods=['GET'],
+											collection_name='features',
+											results_per_page=20,
+											max_results_per_page=100,
+											include_columns=includes,
+											preprocessors={
+												'GET_SINGLE': [find_feature]
+											},
+											postprocessors={
+												'GET_SINGLE': [update_result]
+											}))

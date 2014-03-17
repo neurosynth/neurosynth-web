@@ -30,27 +30,27 @@ def update_result(result, **kwargs):
 			f['frequency'] = round(f['frequency'], 3)
 		pass
 
-
+includes=['pmid',
+		'title',
+		'authors',
+		'journal',
+		'year',
+		'peaks',
+		'peaks.x',
+		'peaks.y',
+		'peaks.z',
+		# 'frequencies',
+		# 'frequencies.frequency',
+		# 'frequencies.feature_id',
+		'features',
+		'features.feature'
+		]
 add_blueprint(apimanager.create_api_blueprint(Study,
                                               methods=['GET'],
                                               collection_name='studies',
                                               results_per_page=20,
                                               max_results_per_page=100,
-                                              include_columns=['pmid',
-                                                               'title',
-                                                               'authors',
-                                                               'journal',
-                                                               'year',
-                                                               'peaks',
-                                                               'peaks.x',
-                                                               'peaks.y',
-                                                               'peaks.z',
-                                                               # 'frequencies',
-                                                               # 'frequencies.frequency',
-                                                               # 'frequencies.feature_id',
-                                                               'features',
-                                                               'features.feature'
-                                                               ],
+                                              include_columns=includes,
                                               postprocessors={
                                               	'GET_SINGLE': [update_result]
                                               }))

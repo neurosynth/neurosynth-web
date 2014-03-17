@@ -6,7 +6,7 @@ class Feature(db.Model):
     num_studies=db.Column(db.Integer, default=0)
     num_activations=db.Column(db.Integer, default=0)
     studies = association_proxy('frequencies', 'study')
-    feature_affects = association_proxy('feature_affects', 'FeatureAffects')
+    location_feature = association_proxy('feature_affects', 'FeatureAffects')
 
     
     def __init__(self, feature, num_studies=0, num_activations=0, images=[], image_display=True,image_download=True):

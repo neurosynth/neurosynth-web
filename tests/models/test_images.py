@@ -5,7 +5,7 @@ class ImagesTest(TestCase):
     def test_image_fields(self):
         '''Changing the Model can break things. Images need forward and reverse inference, and specify if they should be displayed and downloaded'''
         self.populate_db()
-        feature = Feature.query.filter_by(feature='f1').first()
+        images = Image.query.all()
         self.assert_model_contains_fields(feature, ['feature','num_studies','num_activations'])
         self.assert_model_equality([feature], [Feature(feature='f1',
                                                        num_studies=5,

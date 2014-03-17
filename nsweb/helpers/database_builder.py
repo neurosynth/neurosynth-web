@@ -7,7 +7,6 @@ from nsweb.models.images import FeatureImage
 from nsweb import settings
 from neurosynth.base.dataset import Dataset
 
-
 class DatabaseBuilder:
 
     def __init__(self, db, dataset=None, studies=None, features=None, reset_db=False):
@@ -34,11 +33,9 @@ class DatabaseBuilder:
         if reset_db:
             self.reset_database()
 
-
     def reset_database(self):
         self.db.drop_all()
         self.db.create_all()
-
 
     def add_features(self, feature_list=None, image_dir=None):
         """ Add Feature records to the DB. If feature_list is None, use all features found 
@@ -49,7 +46,7 @@ class DatabaseBuilder:
         self.features = {}
         for name in feature_list:
             feature = Feature(feature=name)
-            self.features[name] = feature
+            self.features[name] = [feature,0,0]#num_studies, num_activations)
             if image_dir is not None:
                 self._add_feature_images(feature, image_dir)
 
@@ -67,7 +64,7 @@ class DatabaseBuilder:
         """
         if isinstance(feature, basestring):
             if hasattr(self, 'features') and feature in self.features:
-                feature = self.features[feature]
+                feature = self.features[feature][0]
             else:
                 feature = Feature.query.filter_by(feature=feature).first()
 
@@ -88,9 +85,6 @@ class DatabaseBuilder:
                 display=1,
                 download=1)
         ])
-
-        # self.db.session.add(feature)
-
 
     def add_studies(self, feature_list=None, threshold=0.001):
         """ Add studies to the DB.
@@ -133,8 +127,11 @@ class DatabaseBuilder:
                 freq = pmid_frequencies[y]
                 feature_name = feature_names[y]
                 if pmid_frequencies[y] >= threshold:
-                    freq_inst = Frequency(study=study, feature=self.features[feature_name], frequency=freq)
+                    freq_inst = Frequency(study=study, feature=self.features[feature_name][0], frequency=freq)
                     self.db.session.add(freq_inst)
+                    self.features[feature_name][1]+=1
+                    self.features[feature_name][2]+=len(peaks)
+
          
         # Commit records in batches of 1000 to conserve memory.
         # This is very slow because we're relying on the declarative base. Ideally should replace 
@@ -155,12 +152,16 @@ class DatabaseBuilder:
         # studies/features once than to repeatedly update Feature instances on the fly.
         # Perhaps SQLAlchemy has some SUM()-like method for summing fields of an
         # associated model?
-        for (name, f) in self.features.items():
-            f.num_studies = len(f.frequencies)
-            for s in [freq.study for freq in f.frequencies]:
-                f.num_activations += len(s.peaks)
+        
+        #TODO: I need a bit of help here. feature_data contains what I need with bincount or more likely count_nonzero. should go in neurosynth
+        #This is my suggestion
+        #removed numpy and whatnot. I had an idea. Do what we were doing before.
+        #new idea. Keep features in memory. Commit later. just update num_studies ad num_activations as we go.
+        for f in self.features.values():
+            f[0].num_studies = f[1]
+            f[0].num_activations = f[2]
+#            self.db.session.update(f) # did this work before I added this?? Session should have been flushed... if it did work, I have no idea if the list was useless or what's going on with the features since they're tracked. This is prob best...yea.
         self.db.session.commit()
-
 
     def generate_feature_images(self, image_dir=None, feature_list=None, add_to_db=True, **kwargs):
         """ Create a full set of feature meta-analysis images via Neurosynth. 

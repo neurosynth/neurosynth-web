@@ -30,7 +30,7 @@ class Image(db.Model):
 #         self.image_file=image_file
 #         self.display=display
 #         self.download=download
-        
+
 class FeatureImage(Image):
     __mapper_args__={'polymorphic_identity': 'feature'}
     feature = db.relationship(Feature, backref=db.backref('images',cascade='all, delete-orphan'))

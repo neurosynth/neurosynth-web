@@ -20,10 +20,19 @@ class FeaturesTest(TestCase):
         response = self.client.get('/api/features')
         assert response.status_code == 200
 
-    def test_populated_api_features_data(self):
+    def test_populated_api_features_tests_updated(self):
         '''Check json format for populated db'''
         self.populate_db()
         response = self.client.get('/api/features')
         features = Feature.query.all()
         json = self.restless_json(fields=['id','feature','num_studies','num_activations'],page_num=1,objects=features,total_pages=1)
+        assert response.data == json
+
+    def test_populated_api_features_data(self):
+        '''Check json format for populated db'''
+        self.populate_db()
+        response = self.client.get('/api/features')
+        features = Feature.query.all()
+        from nsweb.blueprints.features import includes
+        json = self.restless_json(fields=includes,page_num=1,objects=features,total_pages=1)
         assert response.data == json

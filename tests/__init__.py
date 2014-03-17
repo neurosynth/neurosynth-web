@@ -2,12 +2,12 @@ from mock import MagicMock, Mock, patch
 import re
 import inspect
 from flask.json import jsonify
-
+import os
 
 from unittest import TestCase as Base
 #from flask_testing import TestCase as Base
 from nsweb.core import create_app, register_blueprints, db, app
-from nsweb.models import Study, Peak, Feature, Frequency, Image, FeatureImage, Location, LocationImage, FeatureAffects
+from nsweb.models import Study, Peak, Feature, Frequency, Image, FeatureImage, Location, LocationImage, LocationFeature
 
 #this is here for now. Needs to be replaced with the factory later!
 from nsweb.helpers import database_builder
@@ -42,13 +42,17 @@ class TestCase(Base):
     
     def populate_db(self,images=True):
         '''populates the database with Studies, Peaks, Features, and Frequencies. Image location as well if images is True'''
-        dataset = database_builder.read_pickle_database(data_dir=DATA_DIR, pickle_database=PICKLE_DATABASE)
-        (feature_list,feature_data) = database_builder.read_features_text(data_dir=DATA_DIR,feature_database=FEATURE_DATABASE)
-        if images:
-            feature_dict = database_builder.add_features(db,feature_list,IMAGE_DIR)
-        else:
-            feature_dict = database_builder.add_features(db,feature_list)
-        database_builder.add_studies(db, dataset, feature_list, feature_data, feature_dict)
+        if not os.path.isfile(PICKLE_DATABASE):
+            builder = database_builder.DatabaseBuilder(db, 
+                                                       studies=DATA_DIR+'test_dataset.txt',
+                                                       features=DATA_DIR+ 'test_features.txt')
+            builder.dataset.save(PICKLE_DATABASE)
+
+        builder = database_builder.DatabaseBuilder(db, 
+        dataset=PICKLE_DATABASE, reset_db=True)
+        builder.add_features()
+        builder.add_studies()
+        builder.generate_feature_images()                     
         
     def get_prod_data_fields(self):
         fields = database_builder.read_pickle_database(DATA_DIR, PROD_PICKLE_DATABASE)[0].keys()
