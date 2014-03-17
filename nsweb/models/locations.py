@@ -30,4 +30,3 @@ class LocationFeature(db.Model):
         self.location=location
         self.feature=feature
         self.value=value
-
