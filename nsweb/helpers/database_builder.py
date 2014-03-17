@@ -1,11 +1,14 @@
 # Re-initialize database
 from nsweb.models.features import Feature
+from nsweb.models.locations import Location
 from nsweb.models.studies import Study
 from nsweb.models.peaks import Peak
 from nsweb.models.frequencies import Frequency
-from nsweb.models.images import FeatureImage
+from nsweb.models.images import FeatureImage, LocationImage
 from nsweb import settings
+import os
 from neurosynth.base.dataset import Dataset
+import numpy as np
 
 
 class DatabaseBuilder:
@@ -103,7 +106,7 @@ class DatabaseBuilder:
         feature_names = self.dataset.get_feature_names()  # Will be in same order as data
 
         # Create Study records
-        for (i, m) in enumerate(self.dataset.mappables):
+        for (i, m) in enumerate(self.dataset.mappables[:500]):
 
             data = m.data
             peaks = [Peak(x=float(coordinate[0]),
@@ -174,7 +177,9 @@ class DatabaseBuilder:
 
         # Set up defaults
         if image_dir is None:
-            image_dir = settings.IMAGE_DIR
+            image_dir = settings.IMAGE_DIR + 'features/'
+            if not os.path.exists(image_dir):
+                os.makedirs(image_dir)
 
         if feature_list is None:
             feature_list = self.dataset.get_feature_names()
@@ -190,8 +195,77 @@ class DatabaseBuilder:
             self.db.session.commit()
 
 
-    def generate_location_images(self, image_dir=None, add_to_db=True, **kwargs):
-        """ Create a full set of location-based coactivation images via Neurosynth. """
+    def generate_location_images(self, image_dir=None, add_to_db=True, min_studies=50, **kwargs):
+        """ Create a full set of location-based coactivation images via Neurosynth. 
+        Right now this isn't parallelized and will take a couple of days to run. 
+        Args:
+            min_studies: minimum number of active studies for a voxel to be processed
+        """
 
+        from neurosynth.base import transformations
+        from neurosynth.analysis import meta
 
+        if image_dir is None:
+            image_dir = settings.IMAGE_DIR + 'locations/'
+            if not os.path.exists(image_dir):
+                os.makedirs(image_dir)
 
+        study_ids = self.dataset.image_table.ids
+
+        # Identify all voxels we want to generate images for
+        # imgs = np.array(self.dataset.image_table.data.todense())   # Make array dense
+        imgs = self.dataset.image_table.data
+        p_active = imgs.sum(1)   # Compute number of studies active at each voxel
+
+        # Get array indices of all valid voxels--we'll need this later
+        ijk_reduced = np.array(np.where(p_active >= min_studies)[0]).squeeze()
+
+        # Project the voxel counts back into the original MNI space so we can look up coordinates
+        p_active = self.dataset.volume.unmask(p_active).squeeze()
+
+        # Keep only voxels with enough studies, and save coordinates as list of (i,j,k) tuples
+        ijk = zip(*np.where(p_active >= min_studies))
+
+        # Transform image-space coordinates into world-space coordinates
+        xyz = transformations.mat_to_xyz(np.array(ijk))[:,::-1]
+
+        num_vox = len(xyz)
+
+        # Loop over valid voxels and generate coactivation images
+        for i, seed in enumerate(xyz):
+
+            voxel_index = ijk[i]
+            num_active = p_active[voxel_index]
+
+            # Get the right row by looking up index in the array we vectorized earlier
+            vi = ijk_reduced[i]
+            row = imgs[vi,:]
+
+            # Get the ids of the studies that activate at this voxel
+            study_inds = np.where(row.toarray())[1]
+            studies = [study_ids[s] for s in study_inds]
+
+            # Filename based on (x,y,z) joined by underscore
+            seed = seed.tolist()
+            name = '_'.join(str(x) for x in seed)
+            outroot = os.path.join(image_dir, name)
+
+            # Call Neurosynth to do the heavy lifting
+            # network.coactivation(self.dataset, [seed], threshold=0.1, outroot=outroot)
+            ma = meta.MetaAnalysis(self.dataset, studies, **kwargs)
+            imgs_to_keep = ['pFgA_z_FDR_0.05']  # Just the reverse inference
+            ma.save_results(outroot, image_list=imgs_to_keep)
+
+            # Create a new Location record and add LocationImage
+            if add_to_db:
+                location = Location(x=seed[0], y=seed[1], z=seed[2])
+                location.images = [LocationImage(
+                    image_file=outroot + '_' + imgs_to_keep[0] + '.nii.gz',
+                    label='coactivation: (%d, %d, %d)' % tuple(seed),
+                    stat='z-score',
+                    display=1,
+                    download=1)
+                ]
+                self.db.session.add(location)
+
+        self.db.session.commit()

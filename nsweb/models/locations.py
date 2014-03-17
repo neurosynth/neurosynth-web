@@ -6,11 +6,7 @@ class Location(db.Model):
     y = db.Column(db.Float)
     z = db.Column(db.Float)
     feature_affects = association_proxy('feature_affects', 'FeatureAffects')
-   
-    def __init__(self,x,y,z):
-        self.x=x
-        self.y=y
-        self.z=z
+
         
 class FeatureAffects(db.Model):
     feature_id = db.Column(db.Integer, db.ForeignKey(Feature.id), primary_key=True)
