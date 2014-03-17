@@ -132,6 +132,8 @@ class DatabaseBuilder:
                 if pmid_frequencies[y] >= threshold:
                     freq_inst = Frequency(study=study, feature=self.features[feature_name][0], frequency=freq)
                     self.db.session.add(freq_inst)
+                    # Track number of studies and peaks so we can update Feature table more
+                    # efficiently later
                     self.features[feature_name][1]+=1
                     self.features[feature_name][2]+=len(peaks)
 
