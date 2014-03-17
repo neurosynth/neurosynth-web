@@ -17,7 +17,7 @@ class StudiesTest(TestCase):
         self.assert_model_equality(studies, [study], ['peaks'])
 
         self.assert_model_contains_fields(peak, ['x','y','z'])
-        self.assert_model_equality( [peak],studies[0].peaks.all())
+        self.assert_model_equality( [peak],studies[0].peaks)
                 
     def test_fields_from_production_dataset(self):
         '''Changing the model can break things, but we don't want to lose any data from production database.'''

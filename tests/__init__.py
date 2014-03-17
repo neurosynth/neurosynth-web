@@ -48,8 +48,7 @@ class TestCase(Base):
                                                        features=DATA_DIR+ 'test_features.txt')
             builder.dataset.save(PICKLE_DATABASE)
 
-        builder = database_builder.DatabaseBuilder(db, 
-        dataset=PICKLE_DATABASE, reset_db=True)
+        builder = database_builder.DatabaseBuilder(db, dataset=PICKLE_DATABASE, reset_db=True)
         builder.add_features()
         builder.add_studies()
         builder.generate_feature_images()                     
@@ -90,6 +89,8 @@ class TestCase(Base):
     def get_attributes(self, model):
         fields = vars(model).keys()
         fields = [a for a in fields if a[0] !='_' and a != 'id']
+#         
+#         
         return fields
     
     def serialize(self,cereal,fields):
