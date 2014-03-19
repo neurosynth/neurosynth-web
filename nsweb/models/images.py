@@ -13,8 +13,6 @@ class Image(db.Model):
     display=db.Column(db.Boolean)
     download=db.Column(db.Boolean)
     type = db.Column(db.String(20))
-    feature_id = db.Column(db.Integer, db.ForeignKey(Feature.id), nullable=True)
-    location_id = db.Column(db.Integer, db.ForeignKey(Location.id), nullable=True)
 
     __mapper_args__ = {
         'polymorphic_on': type,
@@ -33,9 +31,11 @@ class Image(db.Model):
 
 class FeatureImage(Image):
     __mapper_args__={'polymorphic_identity': 'feature'}
-    feature = db.relationship(Feature, backref=db.backref('images',cascade='all, delete-orphan'))
-
+    feature_id = db.Column(db.Integer, db.ForeignKey(Feature.id), nullable=True)
+    ## this works but its not the sqlalchemy way. I'm nt sure why.
+#     feature = db.relationship(Feature, backref=db.backref('images',cascade='all, delete-orphan')) 
 
 class LocationImage(Image):
     __mapper_args__={'polymorphic_identity': 'location'}
-    location = db.relationship(Location, backref=db.backref('images',cascade='all, delete-orphan'))
+    location_id = db.Column(db.Integer, db.ForeignKey(Location.id), nullable=True)
+#     location = db.relationship(Location, backref=db.backref('images',cascade='all, delete-orphan'))

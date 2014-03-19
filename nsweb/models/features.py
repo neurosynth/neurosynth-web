@@ -7,6 +7,7 @@ class Feature(db.Model):
     num_activations=db.Column(db.Integer, default=0)
     studies = association_proxy('frequencies', 'study')
     location_feature = association_proxy('feature_affects', 'FeatureAffects')
+    images = db.relationship('FeatureImage', backref=db.backref('feature', lazy='joined'))
 
     
     # def __init__(self, feature, num_studies=0, num_activations=0, images=[], image_display=True,image_download=True):

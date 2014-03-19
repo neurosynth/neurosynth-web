@@ -6,7 +6,8 @@ class Location(db.Model):
     y = db.Column(db.Float)
     z = db.Column(db.Float)
     location_feature = association_proxy('location_feature', 'LocationFeature')
-   
+    images = db.relationship('LocationImage', backref=db.backref('location', lazy='joined'))
+
     def __init__(self,x,y,z):
         self.x=x
         self.y=y
