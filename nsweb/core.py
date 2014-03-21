@@ -3,6 +3,8 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_restless import APIManager
+from slimish_jinja import SlimishExtension
+from flask_assets import Environment, Bundle
 
 # We aren't using getters anymore b/c @property wasn't working outside of classes -_-. We can create a proper singleton if we really wanted...
 app=Flask('NSWeb', static_folder='nsweb/frontend/static', template_folder='nsweb/frontend/templates')
@@ -28,6 +30,11 @@ def create_app( database_uri, debug=True, aptana=True):
     app.test_request_context().push() #have to create a request context for flask-salalchemy
     db.init_app(app)
     apimanager.init_app(app, flask_sqlalchemy_db=db)
+    Flask.jinja_options['extensions'].append(SlimishExtension)
+        
+    js=Bundle(filters='coffeescript,scss', output='Data/testjs/unpacked.js') #pleaaase work this time!
+    Environment(app).register('js_all',js)
+
 
 def register_blueprints():
     from nsweb.blueprints import blueprints
