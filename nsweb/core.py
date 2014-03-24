@@ -14,6 +14,8 @@ app=Flask('NSWeb', static_folder='/frontend/static', template_folder='/frontend/
 db=SQLAlchemy()
 apimanager=APIManager()
 security = Security()
+_blueprints = []
+
 
 def setup_logging(logging_path,level):
     '''Setups logging in app'''
@@ -37,7 +39,10 @@ def create_app( database_uri, debug=True, aptana=True):
     init_assets(app)
     apimanager.init_app(app, flask_sqlalchemy_db=db)
 
+def add_blueprint(blueprint):
+    _blueprints.append(blueprint)
+
 def register_blueprints():
-    from nsweb.blueprints import blueprints
-    for blueprint in blueprints:
+    for blueprint in _blueprints:
         app.register_blueprint(blueprint)
+        
