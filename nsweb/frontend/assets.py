@@ -4,12 +4,12 @@ from flask_assets import Environment, Bundle
 
 # application css bundle
 css_nsweb = Bundle('scss/nsweb.scss',
-                       filters='pyscss', output='css/nsweb.css')
+                       filters='pyscss', output='css/main.css')
 
 # consolidated css bundle
 css_all = Bundle('css/bootstrap.min.css', css_nsweb,
                  'css/bootstrap-responsive.min.css',
-                 filters='cssmin', output='css/nsweb.min.css')
+                 filters='cssmin', output='css/main.min.css')
 
 # vendor js bundle
 js_vendor = Bundle('js/vendor/jquery-1.10.1.min.js',
