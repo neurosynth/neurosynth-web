@@ -1,0 +1,10 @@
+= javascript_include_tag 'decode'
+h3 Decode images
+
+.lead Decode your own images using the Neurosynth database.
+
+p To start, please specify an image in #{link_to 'NeuroVault', 'http://neurovault.org'} to decode. If you haven't uploaded your image to NeuroVault, please #{ link_to 'add it now', 'http://neurovault.org/collections/new'}.
+p You can either enter the numerical ID of the image (e.g., 10) or the entire URL (e.g., http://neurovault.org/images/10).
+= form_tag '', :id => 'decode_form'
+= text_field_tag 'neurovault_id', '', {:class => 'input-xlarge', :style => 'height: 32px; margin-top: 10px' }
+= submit_tag 'Decode!', :class => 'btn btn-primary btn-large', :style => 'margin-left: 10px'

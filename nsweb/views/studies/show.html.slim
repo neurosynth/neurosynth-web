@@ -1,0 +1,60 @@
+= javascript_include_tag 'studies'
+.row
+	.span11
+		- if @study
+			h3= @study.title.gsub(/\.$/, '')
+			#show-study
+				.row
+					.span11
+						table.table-striped.table-hover.table.table-condensed
+							tbody
+								tr
+									td.row_label Authors:
+									td = @study.authors
+								tr
+									td.row_label Journal:
+									td = @study.journal
+								tr
+									td.row_label Year:
+									td = @study.year
+								tr
+									td.row_label PMID:
+									td = link_to @study.pmid, "http://www.ncbi.nlm.nih.gov/pubmed/#{@study.pmid}"
+
+				.row
+					.span6
+						- options = { panzoomEnabled: false }
+						= render :partial => 'shared/study_viewer', :locals => { :scale => 0.75, :images => [ { 'name' => 'activations', 'data' => { 'dims' => [91, 109, 91], 'peaks' => @study.peaks }, 'colorPalette' => 'red' } ], :options => options }
+					.span5
+						ul#study-menu.nav.nav-tabs
+							li= link_to 'Activations', '#activations', {'data-toggle' => "tab"}
+							li= link_to 'Features', '#features', {'data-toggle' => "tab"}
+						#study-tab-content.tab-content
+							#activations.tab-pane.active
+								table#study-peaks.table-striped.table-hover.table.table-condensed.small-datatable
+									thead
+										tr
+											th x
+											th y
+											th z
+									tbody
+										- for p in @study.peaks
+											tr
+												td = p.x
+												td = p.y
+												td = p.z
+							#features.tab-pane
+								table#study-features.table-striped.table-hover.table.table-condensed.small-datatable
+									thead
+										tr
+											th Feature
+											th Loading
+									tbody
+										- @study.feature_tags.each do |t|
+											- f = t.feature
+											tr
+												td= link_to f.name, feature_path(f.id)
+												td= t.freq
+		- else
+			h3 Woops...
+			.lead Sorry, we couldn't find that study.

@@ -1,0 +1,26 @@
+= javascript_include_tag 'viewer'
+javascript:
+	var options = #{options.to_json.html_safe}
+	var settings = ['no-zoom', 'layers','nav','checkboxes']
+	var images = #{images.to_json.html_safe}
+		
+- scale ||= 1
+.row
+	.span11
+		.viewer[style="height: 270px"]
+			#view-axial.view[style="width: #{270*scale}px"]
+				canvas(height="#{264*scale}" width="#{220*scale}")
+				#nav-zaxis.slider.nav-slider-vertical
+
+			#view-coronal.view[style="width: #{270*scale}px"]
+				canvas(height="#{220*scale}" width="#{220*scale}")
+				#nav-yaxis.slider.nav-slider-vertical
+
+			#view-sagittal.view[style="width: #{270*scale}px"]
+				canvas(height="#{220*scale}" width="#{264*scale}")
+				#nav-xaxis.slider.nav-slider-horizontal
+
+
+
+				
+			

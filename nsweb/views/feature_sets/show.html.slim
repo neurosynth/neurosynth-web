@@ -1,0 +1,18 @@
+= javascript_include_tag 'feature_sets'
+h3= @set.name
+
+.lead= @set.description
+
+h4 Features
+table.table-striped.table-hover.table.default-datatable
+	thead
+		tr
+			th Feature name
+			th Num. studies
+			th Num. activations
+	tbody
+		- @set.features.each do |f|
+			tr
+				td= link_to f.name, feature_path(f.name)
+				td= f.n_studies
+				td= f.n_peaks

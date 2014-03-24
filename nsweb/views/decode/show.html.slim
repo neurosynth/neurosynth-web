@@ -1,0 +1,28 @@
+= javascript_include_tag 'decode'
+h3 Decoding results
+- if @classification.nil?
+	.lead We were unable to locate that image. Are you sure it #{link_to 'exists', "http://neurovault.org/images/#{params[:id]}"} in NeuroVault?
+- elsif !File.exist?(@classification.results)
+	.lead Sorry! We had some trouble decoding that NeuroVault image. At the moment, the Neurosynth decoder only handles images in MNI152 2mm space (i.e., with dimensions [91, 109, 91]). If the image you're trying to decode is in a different space, consider resampling it. We'll do our best to address this issue soon.
+- else
+	- results = File.new(@classification.results).readlines.map { |l| l.split() }
+
+	.lead Decoding results for NeuroVault image "#{link_to @classification.image_name, "http://neurovault.org/images/#{@classification.vault_id}" }"
+	ul#decode-tab-menu.nav.nav-tabs
+			li= link_to 'Results', '#results', {'data-toggle' => "tab"}
+			li= link_to 'Help', '#help', {'data-toggle' => "tab"}
+
+	#decode-tab-content.tab-content
+			#results.tab-pane.active
+				table#decoding_table.table-striped.table-hover.table.table-condensed.decode-datatable
+					thead
+						tr
+							th Term
+							th Correlation (r)
+					tbody
+						- results.each do |r|
+							tr
+								td = link_to r[0], feature_path(r[0])
+								td = r[1]
+			#help.tab-pane
+				p Each row in the table represents the Pearson correlation across all voxels in the brain between the NeuroVault image you selected and the reverse inference meta-analysis map for a single term. Note that the decoding software uses unthresholded maps rather than the thresholded maps displayed on the website.

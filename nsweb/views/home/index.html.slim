@@ -1,0 +1,20 @@
+= javascript_include_tag 'viewer'
+= javascript_include_tag 'home'
+.page-header
+	.massive neurosynth.org
+h3 What is this?
+p.big = ("NeuroSynth is a platform for large-scale, automated synthesis of functional magnetic resonance imaging (fMRI) data extracted from published articles. It's a website wrapped around a set of open-source Python and JavaScript packages. Neurosynth lets you run crude but useful analyses of fMRI data on a very large scale. For example, here's an " + link_to("automated meta-analysis of #{@image.n_studies} #{@image.name}-related studies", feature_path(@image.name)) + ", visualized interactively:").html_safe
+.row
+	.span11.top-space20
+		- options = { panzoomEnabled: false }
+		= render :partial => 'shared/row_viewer', :locals => { :options => options, :images => [{'name' => @image.name, 'id' => @image.id, 'colorPalette' => 'intense red-blue', 'sign' => 'both'}] }
+p.big 
+hr
+h3 = link_to 'News', news_index_path
+.row-fluid
+	.span8
+		= render :partial => 'news/news', :locals => { :news_items => @news_items }
+	.span2.offset1
+		a.twitter-timeline[href="https://twitter.com/neurosynth" data-widget-id="335214024004349953"] Tweets by @neurosynth
+		javascript:
+			!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");

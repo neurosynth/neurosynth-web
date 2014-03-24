@@ -1,0 +1,37 @@
+h2 Code
+
+p The Neurosynth website is essentially just a glorified wrapper around a set of open-source Python and JavaScript packages. In practice, this means you can use the tools we've made available to easily reproduce just about any images or data you find on this website. Most of the tools are hosted in our #{link_to 'GitHub repository', 'http://github.com/neurosynth' }. There are several key components:
+
+.row
+	.span11
+		.code-section-header
+			h4 Core Neurosynth Tools
+			.github-buttons <iframe src="http://ghbtns.com/github-btn.html?user=neurosynth&repo=neurosynth&type=fork&count=true" allowtransparency="true" frameborder="0" scrolling="0" width="90" height="20"></iframe><iframe src="http://ghbtns.com/github-btn.html?user=neurosynth&repo=neurosynth&type=watch&count=true" allowtransparency="true" frameborder="0" scrolling="0" width="90" height="20"></iframe>
+
+		p The #{ link_to 'core Neurosynth package', 'http://github.com/neurosynth/neurosynth'} is a lightweight set of Python modules that support large-scale automated synthesis and manipulation of functional MRI activations. The emphasis is on ease of use and utility rather than computational sophistication or efficiency. Virtually all of the images found on this website were generated using the core package and just a few lines of code. But the code also allows you to do things that aren't yet available through the web interface. For example, you can conduct dynamic meta-analyses based on structured queries (e.g., an automated meta-analysis of all studies that include the features EPISODIC and MEMORY but do NOT include the features SEMANTIC or RETRIEVAL); retrieve all studies that report activation within a certain brain mask; and 'decode' your own images by assessing their similarity to the various meta-analyses produced by Neurosynth.
+
+.row
+	.span11
+		.code-section-header
+			h4 Neurosynth Viewer
+			.github-buttons <iframe src="http://ghbtns.com/github-btn.html?user=neurosynth&repo=nsviewer&type=fork&count=true" allowtransparency="true" frameborder="0" scrolling="0" width="90" height="20"></iframe><iframe src="http://ghbtns.com/github-btn.html?user=neurosynth&repo=nsviewer&type=watch&count=true" allowtransparency="true" frameborder="0" scrolling="0" width="90" height="20"></iframe>
+
+		p The #{ link_to 'Neurosynth Viewer', 'http://github.com/neurosynth/nsviewer'} (NSViewer) is a modular JavaScript/CoffeeScript library for 2D in-browser visualization of MRI volumes. The viewers you see on the various parts of this site all invoke the same underlying NSViewer code with minor variations. The NSViewer package makes it relatively easy for users to drop an interactive viewer into their own web pages, without requiring extensive coding. A brief quick start guide is available in the #{ link_to 'repository README', 'http://github.com/neurosynth/nsviewer'}.
+
+.row
+	.span11
+		.code-section-header
+			h4 Automated Coordinate Extraction (ACE)
+			.github-buttons <iframe src="http://ghbtns.com/github-btn.html?user=neurosynth&repo=ace&type=fork&count=true" allowtransparency="true" frameborder="0" scrolling="0" width="90" height="20"></iframe><iframe src="http://ghbtns.com/github-btn.html?user=neurosynth&repo=ace&type=watch&count=true" allowtransparency="true" frameborder="0" scrolling="0" width="90" height="20"></iframe>
+
+		p #{ link_to 'ACE', 'http://github.com/neurosynth/ace'} is a Python package for automatic extraction of activation coordinates from neuroimaging articles. It's what we use to generate the Neurosynth dataset. Documentation is pretty sparse at the moment, but there are provided examples that illustrate how the package works. In general, ACE is unlikely to be very useful to most people, as we make the dataset we extract using these tools available on this website at regular intervals (see below). But if you'd like to write a filter to handle a publisher or journal we don't currently support, please contribute.
+
+.row
+	.span11
+		.code-section-header
+			h4 Data
+
+		p Virtually every image visible on this website can be downloaded directly via the interactive viewer (click the download icon; it looks like this: <i class='icon-download icon-large'></i>. However, due to bandwidth limitations, the web interface is not intended to support mass downloading of hundreds or thousands of images, and attempts to scrape content in an automated way will result in permanent IP bans. Instead, we offer much more compact downloads of the activation and study data used to generate the images on the site. The core activation data (reflecting nearly 200,000 activations from almost 6,000 studies) are available from the #{ link_to 'github repo', 'http://github.com/neurosynth/neurosynth'} (follow the README instructions), or can be downloaded directly from #{ link_to 'here', 'http://old.neurosynth.org/data/current_data.tar.gz'}. The same file also includes a 'features.txt' file containing feature loading for a set of basic terms. Other feature sets are (or soon will be) available from the #{ link_to 'Sets', sets_path} page. The #{ link_to 'core tools README', 'http://github.com/neurosynth/neurosynth'} and the scripts in the examples/ folder illustrate how one can go about turning these data files into the thousands of images available on this website.
+
+
+

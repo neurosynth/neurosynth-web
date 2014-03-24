@@ -1,0 +1,72 @@
+= javascript_include_tag 'images', 'init', 'explore'
+h2 Image Explorer
+.lead Explore the entire Neurosynth image library
+- options = { panzoomEnabled: false }
+= render :partial => 'shared/explore_viewer', :locals => { :images => [], :options => options }
+
+.row
+	.span7
+		hr
+		h3 Add images
+		/ ul#explore-tab-menu.nav.nav-tabs
+		/ 	li= link_to 'from Neurosynth', '#neurosynth', {'data-toggle' => "tab"}
+		/ 	/ li= link_to 'from Neurovault', '#neurovault', {'data-toggle' => "tab"}
+		/ 	/ li= link_to 'from the web', '#web', {'data-toggle' => 'tab'}
+		#explore-tab-content.tab-content
+			#neurosynth.tab-pane.active
+			/ h4 Load a Neurosynth image
+			#image-library
+				table.table-striped.table-hover.table.images-datatable.table-condensed
+					thead
+						tr
+							th ID
+							th Name
+							th Feature
+							th Add
+							tbody
+			/ #neurovault.tab-pane
+			/ 	h4 Load an image from NeuroVault
+			/ 	p You can load any image uploaded to NeuroVault (including your own) into the viewer by entering the image ID or URL below (e.g., 3 and http://neurovault.org/images/3 will both work):
+			/ 	.source
+			/ 		.source-label NeuroVault ID:
+			/ 		= text_field_tag 'neurovault_image_id', ''
+			/ 		button#load-neurovault-image.btn.btn-primary Load
+			/ #web.tab-pane
+			/ 	h4 Load an image from the web
+			/ 	.source
+			/ 		.source-label From the web (paste the URL):
+			/ 		= text_field_tag 'image_url', ''
+			/ 		button#load-url-image.btn.btn-primary Load
+	.span4
+		#explore-data-panel
+			#coordinates.explore-data-box
+				.data-label Coordinates:
+				#data-current-coords.data-value
+
+			#value.explore-data-box
+				#image-intent.data-label Value:
+				#data-current-value.data-value
+		#layer-panel.top-space20
+			| Layers
+			#layer-list-panel
+				#layer_visible_list
+				ul#layer-list.layer-settings
+			#layer-settings-panel
+				.layer-container-half-width
+					| Color palette:
+					select#select-color.layer-settings
+					| Positive/Negative:
+					select#select-sign.layer-settings
+				#checkbox-list
+				.layer-container-full-width
+					.layer-settings-row
+						label Thresholds:
+						input#neg-threshold-text.slider-text
+						#neg-threshold.slider.layer-settings.layer-settings-slider
+						#threshold-zero -/+
+						#pos-threshold.slider.layer-settings.layer-settings-slider
+						input#pos-threshold-text.slider-text
+					.layer-settings-row
+						label Opacity:
+						input#opacity-text.slider-text
+						#opacity.slider.layer-settings.layer-settings-slider

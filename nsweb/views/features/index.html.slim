@@ -1,0 +1,30 @@
+= javascript_include_tag 'features'
+.feature_search.lead
+
+    .row.top-space40
+        .span10
+            h3 To start, enter a feature name:
+            = form_tag search_features_path do |f|
+                = autocomplete_field_tag 'name', '', autocomplete_feature_name_features_path, :class => 'search-features'
+
+    .row.top-space40
+        .span10
+            h3 ...or try a #{ link_to 'random feature', random_features_path }
+
+    .row.top-space40
+        .span10
+            h3 ...or pick your favorite letter:
+            .alphabet
+              - ('a'..'z').to_a.each do |lett|
+                = link_to "#{lett} ", '', {:class => 'feature_letter', :id => lett }
+
+.row
+    .span9
+        table.table-striped.table-hover.table.table-condensed#feature_letter_table
+            thead
+                tr
+                    th(style='width: 220px;') Name
+                    th(style='width: 200px;') Set(s)
+                    th(style='width: 60px;') Num. studies
+                    th(style='width: 80px;') Num. activations
+            tbody

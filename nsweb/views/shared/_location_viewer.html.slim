@@ -1,0 +1,11 @@
+- scale ||= 0.75
+.viewer.loc-viewer[style='padding-left: 0px']
+	#loc-view-sagittal.view[style="width: #{270*scale}px"]
+		canvas(height="#{220*scale}" width="#{264*scale}")
+		#loc-nav-xaxis.slider.nav-slider-horizontal(style="width: #{264*scale}px")
+	#loc-view-axial.view[style="width: #{250*scale}px"]
+		canvas(height="#{264*scale}" width="#{220*scale}")
+		#loc-nav-zaxis.slider.nav-slider-vertical(style="height: #{264*scale}px")
+	#loc-view-coronal.view[style="width: #{250*scale}px"]
+		canvas(height="#{220*scale}" width="#{220*scale}")
+		#loc-nav-yaxis.slider.nav-slider-vertical(style="height: #{220*scale}px")
