@@ -3,16 +3,17 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_restless import APIManager
-from slimish_jinja import SlimishExtension
 from flask_security import Security
+
+from slimish_jinja import SlimishExtension
 from nsweb.frontend.assets import init_assets
+from backports import __path__
 
 # We aren't using getters anymore b/c @property wasn't working outside of classes -_-. We can create a proper singleton if we really wanted...
-app=Flask('NSWeb', static_folder='nsweb/views/static', template_folder='nsweb/views/templates')
+app=Flask('NSWeb', static_folder=__path__+'/frontend/static', template_folder=__path__+'/frontend/templates')
 db=SQLAlchemy()
 apimanager=APIManager()
 security = Security()
-
 
 def setup_logging(logging_path,level):
     '''Setups logging in app'''
