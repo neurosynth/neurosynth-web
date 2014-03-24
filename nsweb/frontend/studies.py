@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template
 from . import route
 from nsweb.models import Study
+from ..blueprints import add_blueprint
 
 bp = Blueprint('home', __name__)
 
@@ -13,6 +14,8 @@ def index():
 @route(bp, '/studies/<id>')
 def show(id):
     return render_template('studies/show.html.slim', study=Study.query.get_or_404(id))
+
+add_blueprint(bp)
 
 #     def index
 #         # @studies = Study.all

@@ -10,10 +10,11 @@ def main():
     create_app(database_uri = settings.SQLALCHEMY_DATABASE_URI)
     
     #creates and registers blueprints in nsweb.blueprints
-    import nsweb.blueprints.studies
-    import nsweb.blueprints.features
-    import nsweb.blueprints.images
-    import nsweb.blueprints.locations
+    import nsweb.frontend.home
+    import nsweb.frontend.studies
+#     import nsweb.blueprints.features
+#     import nsweb.blueprints.images
+#     import nsweb.blueprints.locations
     #loads blueprints
     register_blueprints()
     

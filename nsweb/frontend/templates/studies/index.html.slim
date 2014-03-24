@@ -1,4 +1,6 @@
 = javascript_include_tag 'studies'
+<script src="{{ url_for('static', filename='js/studies.js') }}"></script>
+
 h3 Studies
 
 .lead There are currently #{ @data[:iTotalRecords] } studies in the Neurosynth database.

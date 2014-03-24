@@ -10,7 +10,7 @@ from nsweb.frontend.assets import init_assets
 from backports import __path__
 
 # We aren't using getters anymore b/c @property wasn't working outside of classes -_-. We can create a proper singleton if we really wanted...
-app=Flask('NSWeb', static_folder=__path__+'/frontend/static', template_folder=__path__+'/frontend/templates')
+app=Flask('NSWeb', static_folder='/frontend/static', template_folder='/frontend/templates')
 db=SQLAlchemy()
 apimanager=APIManager()
 security = Security()
