@@ -4,13 +4,13 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_restless import APIManager
 from flask_security import Security
-
 from slimish_jinja import SlimishExtension
-from nsweb.frontend.assets import init_assets
-from backports import __path__
+
+from nsweb.initializers.settings import ROOT_DIR
+from nsweb.initializers.assets import init_assets
 
 # We aren't using getters anymore b/c @property wasn't working outside of classes -_-. We can create a proper singleton if we really wanted...
-app=Flask('NSWeb', static_folder='/frontend/static', template_folder='/frontend/templates')
+app=Flask('NSWeb', static_folder=ROOT_DIR+'/nsweb/frontend/static', template_folder=ROOT_DIR+'/nsweb/frontend/templates')
 db=SQLAlchemy()
 apimanager=APIManager()
 security = Security()

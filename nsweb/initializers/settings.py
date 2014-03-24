@@ -1,6 +1,6 @@
 import os
-
-DATA_DIR=os.path.dirname(os.path.realpath(__file__)) + '/../Data/'
+ROOT_DIR=os.path.realpath(os.path.join(os.path.join(os.path.dirname(__file__), os.path.pardir), os.path.pardir))
+DATA_DIR=ROOT_DIR + '/Data/'
 IMAGE_DIR=DATA_DIR + 'Images/'
 SQLALCHEMY_DATABASE_URI = 'sqlite:///' + DATA_DIR + 'prod.db'
 PICKLE_DATABASE = DATA_DIR + 'neurosynth_dataset.pkl'

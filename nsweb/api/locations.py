@@ -1,6 +1,5 @@
-from nsweb.core import apimanager
+from nsweb.core import apimanager, add_blueprint
 from nsweb.models import Location
-from nsweb.blueprints import add_blueprint
 from flask import Blueprint, render_template
 import re
 

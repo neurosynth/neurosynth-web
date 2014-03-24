@@ -1,6 +1,5 @@
-from nsweb.core import apimanager
+from nsweb.core import apimanager, add_blueprint
 from nsweb.models import Image
-from nsweb.blueprints import add_blueprint
 
 add_blueprint(apimanager.create_api_blueprint(Image,
                                               methods=['GET'],

@@ -1,6 +1,5 @@
-from nsweb.core import apimanager
+from nsweb.core import apimanager, add_blueprint
 from nsweb.models import Study
-from nsweb.blueprints import add_blueprint
 from flask import Blueprint, render_template
 
 studies = Blueprint('studies', __name__, 

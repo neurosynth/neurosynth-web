@@ -1,4 +1,4 @@
-from nsweb import settings
+from nsweb.initializers import settings
 from nsweb.core import app, setup_logging, create_app, register_blueprints
 #registers models
 import nsweb.models
@@ -10,11 +10,13 @@ def main():
     create_app(database_uri = settings.SQLALCHEMY_DATABASE_URI)
     
     #creates and registers blueprints in nsweb.blueprints
-    import nsweb.frontend.home
+    
+#    import nsweb.frontend.home
+    import nsweb.api.studies
+    import nsweb.api.features
+    import nsweb.api.images
+    import nsweb.api.locations
     import nsweb.frontend.studies
-#     import nsweb.blueprints.features
-#     import nsweb.blueprints.images
-#     import nsweb.blueprints.locations
     #loads blueprints
     register_blueprints()
     

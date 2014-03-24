@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template
 from . import route
 from nsweb.models import Study
-from ..blueprints import add_blueprint
+from nsweb.core import add_blueprint
 
 bp = Blueprint('home', __name__)
 
