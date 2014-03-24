@@ -6,15 +6,13 @@ bp = Blueprint('home', __name__)
 
 @route(bp, '/studies')
 def index():
-    """Returns the homepage."""
-    img = random.choice(['emotion', 'pain', 'language', 'attention', 'memory', 'motor', 'reward', 'sensation'])
-    image = Image.where(:name => "feature_#{img}_reverse").joins(:feature).select(['images.id', 'images.name', 'features.name', 'features.n_studies']).first
-    news_items = [] #NewsItem.paginate(:page => params[:page], :per_page => 3).order('created_at DESC')
-    return render_template('index.html.slim',studies=Study.query.all())
+    """Returns the studies page."""
+    studies=Study.query.all()
+    return render_template('studies/index.html.slim',studies=studies)
 
 @route(bp, '/studies/<id>')
 def show(id):
-    return render_template('studies/show.html', study=Study.query.get_or_404(id))
+    return render_template('studies/show.html.slim', study=Study.query.get_or_404(id))
 
 #     def index
 #         # @studies = Study.all
