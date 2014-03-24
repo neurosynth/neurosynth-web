@@ -3,8 +3,6 @@ from nsweb.core import app, setup_logging, create_app, register_blueprints
 #registers models
 import nsweb.models
 
-
-
 def main():
     #sets up the flask app
     create_app(database_uri = settings.SQLALCHEMY_DATABASE_URI)

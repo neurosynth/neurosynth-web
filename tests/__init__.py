@@ -10,7 +10,7 @@ from nsweb.core import create_app, register_blueprints, db, app
 from nsweb.models import Study, Peak, Feature, Frequency, Image, FeatureImage, Location, LocationImage, LocationFeature
 
 #this is here for now. Needs to be replaced with the factory later!
-from nsweb.helpers import database_builder
+from nsweb.initializers import database_builder
 from tests.settings import DATA_DIR, PICKLE_DATABASE, FEATURE_DATABASE, PROD_PICKLE_DATABASE, IMAGE_DIR, SQLALCHEMY_DATABASE_URI, DEBUG, DEBUG_WITH_APTANA
 from flask_sqlalchemy import BaseQuery
 
@@ -21,9 +21,10 @@ class TestCase(Base):
             create_app(database_uri=SQLALCHEMY_DATABASE_URI, debug=DEBUG, aptana=DEBUG_WITH_APTANA)
             
             #creates and registers blueprints in nsweb.blueprints
-            import nsweb.blueprints.studies
-            import nsweb.blueprints.features
-            import nsweb.blueprints.images
+            import nsweb.api.studies
+            import nsweb.api.features
+            import nsweb.api.images
+            import nsweb.api.locations
             #loads blueprints
             register_blueprints()
             #return app
