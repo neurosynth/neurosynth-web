@@ -51,6 +51,4 @@ coverage.xml
 
 # Sphinx documentation
 docs/_build/
-Data/test.db
-Data/images
-Data
+Data/
