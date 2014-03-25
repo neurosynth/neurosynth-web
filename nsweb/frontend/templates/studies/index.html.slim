@@ -1,4 +1,4 @@
-- extends "layout/base.html"
+/- extends "layout/base.html"
 
 / <script src="{{ url_for('static', filename='js/studies.js') }}"></script>
 
@@ -7,11 +7,10 @@ h3 Studies
 .lead There are currently {{ studies|count }} studies in the Neurosynth database.
 
 table.table-striped.table-hover.table.studies-datatable
-  thead
+  tbody
     tr
       th Title
       th Authors
       th Journal
       th Year
       th PMID
-tbody
