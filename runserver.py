@@ -11,11 +11,11 @@ def main():
     #creates and registers blueprints in nsweb.blueprints
     
 #    import nsweb.frontend.home
-    import nsweb.api.studies
-    import nsweb.api.features
-    import nsweb.api.images
-    import nsweb.api.locations
-    import nsweb.frontend.studies
+#     import nsweb.api.studies
+#     import nsweb.api.features
+#     import nsweb.api.images
+#     import nsweb.api.locations
+    import nsweb.frontend.controllers.studies
     #loads blueprints
     register_blueprints()
     
@@ -33,7 +33,6 @@ def main():
         pass
     app.run(use_debugger=use_debugger, debug=app.debug,
             use_reloader=use_debugger)
-
 
 if __name__ == "__main__":
         main()

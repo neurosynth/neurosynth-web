@@ -1,5 +1,7 @@
 import os
 ROOT_DIR=os.path.realpath(os.path.join(os.path.join(os.path.dirname(__file__), os.path.pardir), os.path.pardir))
+STATIC_FOLDER=ROOT_DIR+'/nsweb/frontend/static'
+TEMPLATE_FOLDER=ROOT_DIR+'/nsweb/frontend/templates'
 DATA_DIR=ROOT_DIR + '/Data/'
 IMAGE_DIR=DATA_DIR + 'Images/'
 SQLALCHEMY_DATABASE_URI = 'sqlite:///' + DATA_DIR + 'prod.db'

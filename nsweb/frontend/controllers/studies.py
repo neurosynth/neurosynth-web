@@ -1,17 +1,16 @@
 from flask import Blueprint, render_template
-from . import route
 from nsweb.models import Study
 from nsweb.core import add_blueprint
 
-bp = Blueprint('home', __name__)
+bp = Blueprint('home',__name__)
 
-@route(bp, '/studies')
+@bp.route('/studies/')
 def index():
     """Returns the studies page."""
     studies=Study.query.all()
     return render_template('studies/index.html.slim',studies=studies)
 
-@route(bp, '/studies/<id>')
+@bp.route('/studies/<int:id>')
 def show(id):
     return render_template('studies/show.html.slim', study=Study.query.get_or_404(id))
 

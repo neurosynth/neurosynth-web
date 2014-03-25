@@ -6,7 +6,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>{% block title %}{{ page_title|default(_('NSWeb')) }}{% endblock %}</title>
+    <title>{% block title %}{{ page_title|default(('NSWeb')) }}{% endblock %}</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     {% assets "css_all" -%}
@@ -16,15 +16,15 @@
     {% endblock %}
 </head>
 <body>
-	<!--[if lt IE 7]>
-	    <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
-	<![endif]-->
+    <!--[if lt IE 7]>
+        <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
+    <![endif]-->
     <div id='wrap'>
         {% block topbar %}
         <div class="navbar">
             <div class="navbar-inner">
                 <div class="container">
-                    <a class='brand' href='{{ url_for('frontend.index') }}'><img src="{{ url_for('static', filename='img/logo.png') }}" /></a>
+                    {#<a class='brand' href='{{ url_for('frontend.index') }}'><img src="{{ url_for('static', filename='img/logo.png') }}" /></a> need neurosynth image#}
 
                     {% if false %} {#current_user.is_authenticated() %}#}
                     <form class="navbar-search pull-left" action="{{ url_for('frontend.search') }}">
@@ -39,8 +39,8 @@
                     {% else %}
                     <div class="nav-collapse collapse pull-right">
                         <ul class="nav">
-                            <li><span><a class="btn btn-success" href="{{ url_for('frontend.signup') }}"><strong>Sign up</strong></a></span></li>
-                            <li><a href="{{ url_for('frontend.login') }}">Sign in</a></li>
+                            {#<li><span><a class="btn btn-success" href="{{ url_for('frontend.signup') }}"><strong>Sign up</strong></a></span></li>
+                            <li><a href="{{ url_for('frontend.login') }}">Sign in</a></li>#}
                         </ul>
                     </div>
                     {% endif %}
@@ -55,7 +55,7 @@
                     <div id='flash_message_container'>
                         {% for category, msg in messages %}
                             <div class="alert alert-{{ category }}">
-                                <button type="button" class="close" data-dismiss="alert">‚àö√≥</button>
+                                <button type="button" class="close" data-dismiss="alert">‚Äö√†√∂‚àö‚â•</button>
                                 {{ msg }}
                             </div>
                         {% endfor %}
@@ -91,23 +91,22 @@
     
     <footer id="footer">
         <ul class="footer-links">
-            <li>© 2014</li>
-            <li><a href='https://github.com/imwilsonxu/fbone'>About</a></li>
+            <li>¬© 2014</li>
+            <li><a href='https://github.com/pilabcu/nsweb'>About</a></li>
             <li class="muted">&middot;</li>
-            <li><a href='{{ url_for('layout.help') }}'>Help</a></li>
         </ul>
     </footer>
-	{% assets "js_vendor" -%}
-	  <script src="{{ ASSET_URL }}"></script>
-	{% endassets %}
-	{% assets "js_main" -%}
-	  <script src="{{ ASSET_URL }}"></script>
-	{% endassets %}
-	<script>
-	    var _gaq=[['_setAccount','UA-39492382-1'],['_trackPageview']];
-	    (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
-	    g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
-	    s.parentNode.insertBefore(g,s)}(document,'script'));
-	</script>
+    {% assets "js_vendor" -%}
+      <script src="{{ ASSET_URL }}"></script>
+    {% endassets %}
+    {% assets "js_main" -%}
+      <script src="{{ ASSET_URL }}"></script>
+    {% endassets %}
+    <script>
+        var _gaq=[['_setAccount','UA-39492382-1'],['_trackPageview']];
+        (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
+        g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
+        s.parentNode.insertBefore(g,s)}(document,'script'));
+    </script>
 </body>
 </html>
