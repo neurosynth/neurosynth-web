@@ -1,8 +1,9 @@
 from nsweb.initializers import settings
 from nsweb.core import app, setup_logging, create_app, register_blueprints
+from flask_script import Manager
 #registers models
 import nsweb.models
-
+manager = Manager(app)
 def main():
     #sets up the flask app
     create_app(database_uri = settings.SQLALCHEMY_DATABASE_URI)
