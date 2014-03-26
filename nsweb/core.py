@@ -9,6 +9,7 @@ from slimish_jinja import SlimishExtension
 from nsweb.initializers.settings import STATIC_FOLDER, TEMPLATE_FOLDER
 from nsweb.initializers.assets import init_assets
 
+
 # We aren't using getters anymore b/c @property wasn't working outside of classes -_-. We can create a proper singleton if we really wanted...
 app=Flask('NSWeb', static_folder=STATIC_FOLDER, template_folder=TEMPLATE_FOLDER)
 db=SQLAlchemy()
@@ -43,6 +44,11 @@ def add_blueprint(blueprint):
     _blueprints.append(blueprint)
 
 def register_blueprints():
+
+    from nsweb.api import studies
+    from nsweb.api import features
+    from nsweb.api import locations
+
     for blueprint in _blueprints:
         app.register_blueprint(blueprint)
         

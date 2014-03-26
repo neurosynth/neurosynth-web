@@ -19,7 +19,8 @@ js_vendor = Bundle('js/vendor/jquery-1.11.0.min.js',
                    filters='jsmin', output='js/vendor.min.js')
 
 # application js bundle
-js_main = Bundle('coffee/*.coffee', filters='coffeescript', output='js/main.js')
+# js_main = Bundle('coffee/*.coffee', filters='coffeescript', output='js/main.js')
+js_main = Bundle('coffee/studies.js.coffee', filters='coffeescript', output='js/main.js')
 
 
 def init_assets(app):
