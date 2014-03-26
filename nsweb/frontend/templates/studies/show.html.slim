@@ -2,8 +2,7 @@
 - extends "layout/base.html"
 .row
 	.span11
-		- if {{study}}
-			h3 = @study.title.gsub(/\.$/, '')
+			h3 = {{study.title}}
 			#show-study
 				.row
 					.span11
@@ -11,17 +10,16 @@
 							tbody
 								tr
 									td.row_label Authors:
-									td = @study.authors
+									td = {{study.authors}}
 								tr
 									td.row_label Journal:
-									td = @study.journal
+									td = {{study.journal}}
 								tr
 									td.row_label Year:
-									td = @study.year
+									td = {{study.year}}
 								tr
 									td.row_label PMID:
-									td = link_to @study.pmid, "http://www.ncbi.nlm.nih.gov/pubmed/#{@study.pmid}"
-
+									td = <a href={{ "http://www.ncbi.nlm.nih.gov/pubmed/%s"|format(study.pmid) }}>study.pmid</a>
 				.row
 					.span6
 						- options = { panzoomEnabled: false }
@@ -56,6 +54,3 @@
 											tr
 												td= link_to f.name, feature_path(f.id)
 												td= t.freq
-		- else
-			h3 Woops...
-			.lead Sorry, we couldn't find that study.

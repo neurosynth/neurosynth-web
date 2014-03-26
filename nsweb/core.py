@@ -5,6 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_restless import APIManager
 from flask_security import Security
 from slimish_jinja import SlimishExtension
+from jinja2.ext import autoescape
 
 from nsweb.initializers.settings import STATIC_FOLDER, TEMPLATE_FOLDER
 from nsweb.initializers.assets import init_assets
@@ -36,6 +37,8 @@ def create_app( database_uri, debug=True, aptana=True):
     app.test_request_context().push() #have to create a request context for flask-salalchemy
     db.init_app(app)
     Flask.jinja_options['extensions'].append(SlimishExtension)
+#     Flask.jinja_options['']
+#     autoescape = True
     init_assets(app)
     apimanager.init_app(app, flask_sqlalchemy_db=db)
 
