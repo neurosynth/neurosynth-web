@@ -14,86 +14,89 @@
     {%- endassets %}
     {% block css_style %}
     {% endblock %}
+    <script>
+	    var _gaq=[['_setAccount','UA-39492382-1'],['_trackPageview']];
+	    (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
+	    g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
+	    s.parentNode.insertBefore(g,s)}(document,'script'));
+    </script>
 </head>
-<body>
+<body class="bs-docs-home">
     <!--[if lt IE 7]>
         <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
     <![endif]-->
-    <div id="main">
-        <div class="container">
-            <div class="navbar navbar-static-top navbar-inverse">
-                <div class="navbar-inner">
-                    <div class="brand">neurosynth.org (beta)
-                        <ul class="nav nav-pills">
-                            <li class=""><a href="">Home</a></li>
-                            <li class=""><a href="/features/">Features</a></li>
-                            <li class=""><a href="/studies/">Studies</a></li>
-                            <li class=""><a href="/locations/">Locations</a></li>
-                        </ul>
-                    </div>
+    <a class="sr-only" href="#content">Skip to main content</a>
+
+	<!-- Docs master nav -->    
+	<header class="navbar navbar-static-top navbar-inverse bs-docs-nav" id="top" role="banner">
+	    <div class="container">
+	        <div class="navbar-header">
+	            <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".bs-navbar-collapse">
+			        <span class="sr-only">Toggle navigation</span>
+			        <span class="icon-bar"></span>
+			        <span class="icon-bar"></span>
+			        <span class="icon-bar"></span>
+	            </button>
+	            <a href="../" class="navbar-brand">Neurosynth.org (beta)</a>
+	        </div>
+	        <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
+		        <ul class="nav navbar-nav">
+					<li class=""><a href="">Home</a></li>
+					<li class=""><a href="/features/">Features</a></li>
+					<li class=""><a href="/studies/">Studies</a></li>
+			        <li class=""><a href="/locations/">Locations</a></li>
+		        </ul>
+		        <ul class="nav navbar-nav navbar-right">
+		        </ul>
+	        </nav>
+	    </div>
+	</header>
+    
+    {% block flash_message %}
+        {% with messages = get_flashed_messages(with_categories=True) %}
+            {% if messages %}
+            <div class="container">
+                <div id='flash_message_container'>
+                    {% for category, msg in messages %}
+                        <div class="alert alert-{{ category }}">
+                            <button type="button" class="close" data-dismiss="alert">x</button>
+                            {{ msg }}
+                        </div>
+                    {% endfor %}
                 </div>
             </div>
-        </div>
-    
-        {% block flash_message %}
-            {% with messages = get_flashed_messages(with_categories=True) %}
-                {% if messages %}
-                <div class="container">
-                    <div id='flash_message_container'>
-                        {% for category, msg in messages %}
-                            <div class="alert alert-{{ category }}">
-                                <button type="button" class="close" data-dismiss="alert">x</button>
-                                {{ msg }}
-                            </div>
-                        {% endfor %}
-                    </div>
-                </div>
-                {% endif %}
-            {% endwith %}
+            {% endif %}
+        {% endwith %}
+    {% endblock %}
+
+    {% block container %}
+    <div class="container">
+        {% block top %}
+            {% if tabs %}
+	            <div>
+	                <ul class="nav nav-tabs">
+	                    {% for tab, link in tabs %}
+							<li class="active"><a href="#">Home</a></li>
+							<li><a href="#">Profile</a></li>
+			                <li><a href="#">Messages</a></li>
+                            <li class="{% if active == tab %}active{% endif %}"><a href="{{ link }}">{{ tab|capitalize }}</a></li>	
+	                    {% endfor %}
+	                </ul>
+	            </div>
+            {% endif %}
         {% endblock %}
-
-        {% block container %}
-        <div class="container">
-            {% block top %}
-                {% if tabs %}
-                <div>
-                    <ul class="nav nav-tabs">
-                        {% for tab, link in tabs %}
-                        <li class="{% if active == tab %}active{% endif %}">
-                            <a href="{{ link }}">{{ tab|capitalize }}</a>
-                        </li>
-                        {% endfor %}
-                    </ul>
-                </div>
-                {% endif %}
-            {% endblock %}
-
-	        <div id="content">
-	          {% block content %}{% endblock %}
-	        </div>
-
+        <div id="content">
+            {% block content %}{% endblock %}
         </div>
-        {% endblock %}
-        <div id="push"></div>
     </div>
+    {% endblock %}
     
-    <footer id="footer">
-        <ul class="footer-links">
-            <li>¬¨¬© 2014</li>
-            <li><a href='https://github.com/pilabcu/nsweb'>About</a></li>
-        </ul>
-    </footer>
     {% assets "js_vendor" -%}
       <script src="{{ ASSET_URL }}"></script>
     {% endassets %}
     {% assets "js_main" -%}
       <script src="{{ ASSET_URL }}"></script>
     {% endassets %}
-    <script>
-        var _gaq=[['_setAccount','UA-39492382-1'],['_trackPageview']];
-        (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
-        g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
-        s.parentNode.insertBefore(g,s)}(document,'script'));
-    </script>
+
 </body>
 </html>

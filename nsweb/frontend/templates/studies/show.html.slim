@@ -1,8 +1,9 @@
-= javascript_include_tag 'studies'
+- set page_title = 'Neurosynth|Study'
+- extends "layout/base.html"
 .row
 	.span11
-		- if @study
-			h3= @study.title.gsub(/\.$/, '')
+		- if {{study}}
+			h3 = @study.title.gsub(/\.$/, '')
 			#show-study
 				.row
 					.span11
