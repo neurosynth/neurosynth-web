@@ -3,57 +3,55 @@
 - block content
   - import "macros/viewers.html.slim" as viewers
   .row
-  	.span11
-  			h3 = {{study.title}}
-  			#show-study
-  				.row
-  					.span11
-  						table.table-striped.table-hover.table.table-condensed
-  							tbody
-  								tr
-  									td.row_label Authors:
-  									td = {{study.authors}}
-  								tr
-  									td.row_label Journal:
-  									td = {{study.journal}}
-  								tr
-  									td.row_label Year:
-  									td = {{study.year}}
-  								tr
-  									td.row_label PMID:
-  									td = <a href={{ "http://www.ncbi.nlm.nih.gov/pubmed/%s"|format(study.pmid) }}>study.pmid</a>
-  				.row
-  					.span6
-  						- options = { panzoomEnabled: false }
-              - viewers.study(scale = 0.75, images = [ { 'name' => 'activations', 'data' = { 'dims' = [91, 109, 91], 'peaks' = study.peaks }, 'colorPalette' = 'red' } ], optins = options)
-  					.span5
-  						ul#study-menu.nav.nav-tabs
-  							li= link_to 'Activations', '#activations', {'data-toggle' => "tab"}
-  							li= link_to 'Features', '#features', {'data-toggle' => "tab"}
-
-  						#study-tab-content.tab-content
-							#activations.tab-pane.active
-								table#study-peaks.table-striped.table-hover.table.table-condensed.small-datatable
-									thead
-										tr
-											th x
-											th y
-											th z
-									tbody
-										- for p in study.peaks
-											tr
-												td = {{p.x}}
-												td = {{p.y}}
-												td = {{p.z}}
-							#features.tab-pane
-								table#study-features.table-striped.table-hover.table.table-condensed.small-datatable
-									thead
-										tr
-											th Feature
-											th Loading
-									tbody
-										- @study.feature_tags.each do |t|
-											- f = t.feature
-											tr
-												td= link_to f.name, feature_path(f.id)
-												td= t.freq
+    .span11
+        h3 = {{study.title}}
+        #show-study
+          .row
+            .span11
+              table.table-striped.table-hover.table.table-condensed
+                tbody
+                  tr
+                    td.row_label Authors:
+                    td = {{study.authors}}
+                  tr
+                    td.row_label Journal:
+                    td = {{study.journal}}
+                  tr
+                    td.row_label Year:
+                    td = {{study.year}}
+                  tr
+                    td.row_label PMID:
+                    td = <a href={{ "http://www.ncbi.nlm.nih.gov/pubmed/%s"|format(study.pmid) }}>study.pmid</a>
+          .row
+            .span5
+              ul#study-menu.nav.nav-tabs
+                li= link_to 'Activations', '#activations', {'data-toggle' => "tab"}
+                li= link_to 'Features', '#features', {'data-toggle' => "tab"}
+            .span6
+              = viewers.study(viewer_settings)
+              #study-tab-content.tab-content
+                #activations.tab-pane.active
+                  table#study-peaks.table-striped.table-hover.table.table-condensed.small-datatable
+                    thead
+                      tr
+                        th x
+                        th y
+                        th z
+                    tbody
+                      - for p in study.peaks
+                        tr
+                          td = {{p.x}}
+                          td = {{p.y}}
+                          td = {{p.z}}
+                #features.tab-pane
+                  table#study-features.table-striped.table-hover.table.table-condensed.small-datatable
+                    thead
+                      tr
+                        th Feature
+                        th Loading
+                    tbody
+                      - @study.feature_tags.each do |t|
+                        - set f = t.feature
+                        tr
+                          td= link_to f.name, feature_path(f.id)
+                          td= t.freq

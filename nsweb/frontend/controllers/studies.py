@@ -11,6 +11,19 @@ def index():
 
 @bp.route('/studies/<int:id>')
 def show(id):
-    return render_template('studies/show.html.slim', study=Study.query.get_or_404(id))
+    study = Study.query.get_or_404(id)
+    viewer_settings = {
+        'scale': 0.75,
+        'images': [ { 
+            'name': 'activations',
+            'data': {
+                'dims': [91, 109, 91],
+                'peaks': study.peaks 
+            },
+            'colorPalette': 'red'
+        }],
+        'options': { 'panzoomEnabled': False }
+    }
+    return render_template('studies/show.html.slim', study=study, viewer_settings=viewer_settings)
 
 add_blueprint(bp)
