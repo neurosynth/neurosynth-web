@@ -8,7 +8,7 @@ $(document).ready ->
         "iDisplayLength": 10
         "bProcessing": true
         "bServerSide": true
-        "sAjaxSource": '/api/studies?datatables'
+        "sAjaxSource": '/api/studies'
         aoColumns: [ { sWidth: '45%'}, { sWidth: '25%' }, { sWidth: '15%'}, null, null]
 
     tbl.fnSetFilteringDelay(500)

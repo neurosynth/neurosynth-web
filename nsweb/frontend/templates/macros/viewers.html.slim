@@ -48,15 +48,16 @@
             input#pos-threshold-text.slider-text
           .layer-settings-row
 
-- macro study(scale|default(1),options, settings, images)
-
-  .viewer.top-space20
-  	#view-axial.view[style="width: #{270*scale}px; height: #{264*scale}px"]
-  		canvas(height="#{264*scale}" width="#{220*scale}")
-  		#nav-zaxis.slider.nav-slider-vertical
-  	#view-sagittal.view[style="width: #{264*scale}px; height: #{300*scale}px"]
-  		canvas(height="#{220*scale}" width="#{264*scale}")
-  		#nav-xaxis.slider.nav-slider-horizontal
-  	#view-coronal.view[style="width: #{270*scale}px; height: #{220*scale}px;"]
-  		canvas(height="#{220*scale}" width="#{220*scale}")
-  		#nav-yaxis.slider.nav-slider-vertical
+- # macro study(scale|default(1),options, settings, images)
+- macro study(**kwargs)
+  {{ kwargs }}
+  / .viewer.top-space20
+  /   #view-axial.view[style="width: #{270*scale}px; height: #{264*scale}px"]
+  /     canvas(height="#{264*scale}" width="#{220*scale}")
+  /     #nav-zaxis.slider.nav-slider-vertical
+  /   #view-sagittal.view[style="width: #{264*scale}px; height: #{300*scale}px"]
+  /     canvas(height="#{220*scale}" width="#{264*scale}")
+  /     #nav-xaxis.slider.nav-slider-horizontal
+  /   #view-coronal.view[style="width: #{270*scale}px; height: #{220*scale}px;"]
+  /     canvas(height="#{220*scale}" width="#{220*scale}")
+  /     #nav-yaxis.slider.nav-slider-vertical

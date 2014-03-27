@@ -34,8 +34,8 @@ def datatables_postprocessor(result, **kwargs):
 	returned and adds the fields DataTables is expecting. This should probably be 
 	made a universal postprocessor and applied to all API requests that have a 
 	'datatables' key in the request arguments list. """
-	if 'datatables' in request.args:
-		result['iTotalRecords'] = 9999  # Get the number of total records from DB
+	if 'sEcho' in request.args:
+		result['iTotalRecords'] = Study.query.count()  # Get the number of total records from DB
 		result['iTotalDisplayRecords'] = result.pop('num_results')
 		result['aaData'] = result.pop('objects')
 		result['sEcho'] = int(request.args['sEcho'])  # for security
@@ -44,14 +44,15 @@ def datatables_postprocessor(result, **kwargs):
 def datatables_preprocessor(search_params=None, **kwargs):
 	""" For DataTables AJAX requests, we may need to change the search params. 
 	"""
-	print search_params
-	# if 'datatables' in request.args:
+	# if 'sEcho' in request.args:
 	# 	# Add any filters we need...
 	# 	search_params = {
-	# 		'filters': {}
+	# 		'filters': {
+	# 			'offset': request.args['iDisplayStart']
+	# 		}
 	# 	}
-	# 	# Convert the DataTables query parameters into what flask-restless wants
-	# 	if 'iDisplayStart' in request.args:
+		# Convert the DataTables query parameters into what flask-restless wants
+		# if 'iDisplayStart' in request.args:
 
 		
 
