@@ -69,27 +69,12 @@
         {% endwith %}
     {% endblock %}
 
-    {% block container %}
     <div class="container">
-        {% block top %}
-            {% if tabs %}
-	            <div>
-	                <ul class="nav nav-tabs">
-	                    {% for tab, link in tabs %}
-							<li class="active"><a href="#">Home</a></li>
-							<li><a href="#">Profile</a></li>
-			                <li><a href="#">Messages</a></li>
-                            <li class="{% if active == tab %}active{% endif %}"><a href="{{ link }}">{{ tab|capitalize }}</a></li>	
-	                    {% endfor %}
-	                </ul>
-	            </div>
-            {% endif %}
-        {% endblock %}
         <div id="content">
             {% block content %}{% endblock %}
         </div>
     </div>
-    {% endblock %}
+
     
     {% assets "js_vendor" -%}
       <script src="{{ ASSET_URL }}"></script>

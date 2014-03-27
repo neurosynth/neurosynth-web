@@ -1,0 +1,62 @@
+- macro viewer(options, settings, images)
+  script
+    var options = {{options|tojson}}
+    var settings = ['no-zoom', 'layers','nav','checkboxes']
+    var images = {{images|tojson}}
+
+  .viewer
+    #viewer-left
+      #view-coronal.view
+        canvas(height=220 width=220)
+        #nav-yaxis.slider.nav-slider-vertical
+      #view-axial.view
+        canvas(height=264 width=220)
+        #nav-zaxis.slider.nav-slider-vertical
+    #viewer-right
+      #view-sagittal.view
+        canvas(height=220 width=264)
+        #nav-xaxis.slider.nav-slider-horizontal
+      #data-panel
+        #coordinates.data-row
+          .data-label Coordinates:
+          #data-current-coords.data-value
+        #value.data-row
+          #image-intent.data-label Value:
+          #data-current-value.data-value
+        #description.data-row
+          .data-label Description:
+          #image-description
+    #layer-panel
+      | Layers
+      #layer-list-panel
+        #layer_visible_list
+        ul#layer-list.layer-settings
+      #layer-settings-panel
+        .layer-container-half-width
+          | Color palette:
+          select#select-color.layer-settings
+          | Positive/Negative:
+          select#select-sign.layer-settings
+        #checkbox-list
+        .layer-container-full-width
+          .layer-settings-row
+            label Thresholds:
+            input#neg-threshold-text.slider-text
+            #neg-threshold.slider.layer-settings.layer-settings-slider
+            #threshold-zero -/+
+            #pos-threshold.slider.layer-settings.layer-settings-slider
+            input#pos-threshold-text.slider-text
+          .layer-settings-row
+
+- macro study(scale|default(1),options, settings, images)
+
+  .viewer.top-space20
+  	#view-axial.view[style="width: #{270*scale}px; height: #{264*scale}px"]
+  		canvas(height="#{264*scale}" width="#{220*scale}")
+  		#nav-zaxis.slider.nav-slider-vertical
+  	#view-sagittal.view[style="width: #{264*scale}px; height: #{300*scale}px"]
+  		canvas(height="#{220*scale}" width="#{264*scale}")
+  		#nav-xaxis.slider.nav-slider-horizontal
+  	#view-coronal.view[style="width: #{270*scale}px; height: #{220*scale}px;"]
+  		canvas(height="#{220*scale}" width="#{220*scale}")
+  		#nav-yaxis.slider.nav-slider-vertical

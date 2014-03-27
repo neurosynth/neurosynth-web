@@ -16,11 +16,12 @@ js_vendor = Bundle('js/vendor/jquery-1.11.0.min.js',
                    'js/vendor/bootstrap.min.js',
                    'js/vendor/jquery.dataTables.js',
                    'js/vendor/modernizr-2.6.2-respond-1.1.0.min.js',
+                   'js/nsviewer/*.js',
                    filters='jsmin', output='js/vendor.min.js')
 
 # application js bundle
 # js_main = Bundle('coffee/*.coffee', filters='coffeescript', output='js/main.js')
-js_main = Bundle('coffee/studies.js.coffee', filters='coffeescript', output='js/main.js')
+js_main = Bundle('coffee/studies.js.coffee','coffee/viewer.js.coffee', filters='coffeescript', output='js/main.js')
 
 
 def init_assets(app):
