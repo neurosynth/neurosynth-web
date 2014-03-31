@@ -22,7 +22,7 @@ def show(id):
             },
             'colorPalette': 'red'
         }],
-        'settings': { 'panzoomEnabled': 'false' },
+        'options': { 'panzoomEnabled': 'false' },
     }
     return render_template('studies/show.html.slim', study=study, viewer_settings=viewer_settings)
 
