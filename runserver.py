@@ -11,10 +11,10 @@ def main():
     #creates and registers blueprints in nsweb.blueprints
     
 #    import nsweb.frontend.home
-#     import nsweb.api.studies
-#     import nsweb.api.features
-#     import nsweb.api.images
-#     import nsweb.api.locations
+#    import nsweb.api.studies
+#    import nsweb.api.features
+#    import nsweb.api.images
+#    import nsweb.api.locations
     import nsweb.frontend.controllers.studies
     #loads blueprints
     register_blueprints()

@@ -25,10 +25,10 @@
           .row
             .span5
               ul#study-menu.nav.nav-tabs
-                li= link_to 'Activations', '#activations', {'data-toggle' => "tab"}
-                li= link_to 'Features', '#features', {'data-toggle' => "tab"}
+                li 'Activations'
+                li 'Features'
             .span6
-              = viewers.study(viewer_settings)
+              p {{viewers.viewer(viewer_settings)|safe}}
               #study-tab-content.tab-content
                 #activations.tab-pane.active
                   table#study-peaks.table-striped.table-hover.table.table-condensed.small-datatable
@@ -40,9 +40,9 @@
                     tbody
                       - for p in study.peaks
                         tr
-                          td = {{p.x}}
-                          td = {{p.y}}
-                          td = {{p.z}}
+                          td= {{p.x}}
+                          td= {{p.y}}
+                          td= {{p.z}}
                 #features.tab-pane
                   table#study-features.table-striped.table-hover.table.table-condensed.small-datatable
                     thead
@@ -50,8 +50,7 @@
                         th Feature
                         th Loading
                     tbody
-                      - @study.feature_tags.each do |t|
-                        - set f = t.feature
+                      - for f in study.features
                         tr
-                          td= link_to f.name, feature_path(f.id)
-                          td= t.freq
+                          td= f.name
+                          td= f

@@ -1,0 +1,5 @@
+{% macro viewer(options, settings, images) %}
+  <script>var options = {{options}}, settings = ['no-zoom', 'layers','nav','checkboxes'], images = {{images}}</script>
+  <div class="viewer">
+    <div id="viewer-left">
+      <div id="view-coronal" class="view">canvas(height=220 width=220)</div>
