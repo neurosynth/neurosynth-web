@@ -79,9 +79,10 @@
     {% assets "js_vendor" -%}
       <script src="{{ ASSET_URL }}"></script>
     {% endassets %}
-    {% assets "js_main" -%}
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    
+    {#{% assets "js_main" -%}
       <script src="{{ ASSET_URL }}"></script>
-    {% endassets %}
-
+    {% endassets %}#}
 </body>
 </html>
