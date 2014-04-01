@@ -49,21 +49,20 @@ def update_result(result, **kwargs):
             f['frequency'] = round(f['frequency'], 3)
         pass
 
-def datatables_preprocessor(search_params=None, **kwargs):
+def datatables_preprocessor(search_params={}, **kwargs):
     """ For DataTables AJAX requests, we may need to change the search params. 
     """
-    # if 'sEcho' in request.args:
-    #     # Add any filters we need...
-    #     search_params = {
-    #         'filters': {
-    #             'offset': request.args['iDisplayStart']
-    #         }
-    #     }
+
+    if 'sEcho' in request.args:
+        # Add any filters we need...
+        search_params['limit'] = int(request.args['iDisplayLength'])
+        search_params['offset'] = int(request.args['iDisplayStart'])
+                #'order_by': request.args['']
+#                 'filters' : 
         # Convert the DataTables query parameters into what flask-restless wants
         # if 'iDisplayStart' in request.args:
 
 def datatables_postprocessor(result, **kwargs):
-    from itertools import islice
     """ A wrapper for DataTables requests. Just takes the JSON object to be 
     returned and adds the fields DataTables is expecting. This should probably be 
     made a universal postprocessor and applied to all API requests that have a 
@@ -79,35 +78,6 @@ def datatables_postprocessor(result, **kwargs):
         result['aaData'] = data
         
         # ...and so on for anything else we need
-
-#     def index
-#         # @studies = Study.all
-#         # @num_studies = Study.count
-#         cols = ['title', 'authors', 'journal', 'year', 'pmid']
-#         param_sort_col = params[:iSortCol_0].nil? ? (params[:sort] || 'pmid') : cols[params[:iSortCol_0].to_i]
-#         param_sort_ord = (params[:sSortDir_0] || params[:order] || 'ASC')
-#         param_search = (params[:sSearch] || params[:q] || '')
-#         param_start = (params[:iDisplayStart] || params[:start] || 0).to_i
-#         param_per = (params[:iDisplayLength] || params[:perPage] || 20).to_i
-#         param_per = [param_per, 100].min   # Display max 100 records
-#         order = "#{param_sort_col} #{param_sort_ord}"
-#         count = Study.count
-#         studies = Study.scoped
-#         if !param_search.empty?
-#             studies = studies.where("MATCH(title, authors, journal) AGAINST ('*#{param_search}*' IN BOOLEAN MODE)")
-#             itdr = studies.size
-#         else
-#             itdr = count
-#         end
-#         studies = studies.order(order).limit(param_per).offset(param_start).select(['id'] + cols)
-#         @data = {
-#             :studies => studies,
-#             :iTotalRecords => count,
-#             :iTotalDisplayRecords => itdr,
-#             :sEcho => params[:sEcho]
-#         }
-#         respond_with(@data)
-#     end
 
 includes=['pmid',
         'title',

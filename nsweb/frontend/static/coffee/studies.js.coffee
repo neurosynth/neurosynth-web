@@ -11,13 +11,13 @@ $(document).ready ->
         "sAjaxSource": '/api/studies'
         aoColumns: [ { sWidth: '45%'}, { sWidth: '25%' }, { sWidth: '15%'}, null, null]
 
-    tbl.fnSetFilteringDelay(500)
+    # tbl.fnSetFilteringDelay(500)
 
-    # $('#study-peaks').on('click', 'tr', (e) =>
-    #     row = $(e.target).closest('tr')[0]
-    #     data = $('#study-peaks').dataTable().fnGetData(row)
-    #     data = (parseInt(i) for i in data)
-    #     viewer.moveToAtlasCoords(data)
-    # )
+    $('#study-peaks').on('click', 'tr', (e) =>
+        row = $(e.target).closest('tr')[0]
+        data = $('#study-peaks').dataTable().fnGetData(row)
+        data = (parseInt(i) for i in data)
+        viewer.moveToAtlasCoords(data)
+    )
 
-    # $('#study-menu a:first').tab('show')
+    $('#study-menu a:first').tab('show')

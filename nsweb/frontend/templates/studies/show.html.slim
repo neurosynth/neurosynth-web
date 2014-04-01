@@ -12,26 +12,26 @@
                 tbody
                   tr
                     td.row_label Authors:
-                    td = {{study.authors}}
+                    td {{study.authors}}
                   tr
                     td.row_label Journal:
-                    td = {{study.journal}}
+                    td {{study.journal}}
                   tr
                     td.row_label Year:
-                    td = {{study.year}}
+                    td {{study.year}}
                   tr
                     td.row_label PMID:
-                    td = <a href={{ "http://www.ncbi.nlm.nih.gov/pubmed/%s"|format(study.pmid) }}>study.pmid</a>
+                    td <a href={{ "http://www.ncbi.nlm.nih.gov/pubmed/%s"|format(study.pmid) }}>study.pmid</a>
           .row
             .span5
               ul#study-menu.nav.nav-tabs
-                li 'Activations'
-                li 'Features'
+                li a href="#activations" 'Activations'
+                li a href="#features" 'Features'
             .span6
-              p {{viewers.viewer(viewer_settings)|safe}}
+              /p {{viewers.viewer(viewer_settings)|safe}}
               #study-tab-content.tab-content
                 #activations.tab-pane.active
-                  table#study-peaks.table-striped.table-hover.table.table-condensed.small-datatable
+                  table#study-peaks.table.table-striped.table-hover.table-condensed.small-datatable
                     thead
                       tr
                         th x
@@ -40,11 +40,11 @@
                     tbody
                       - for p in study.peaks
                         tr
-                          td= {{p.x}}
-                          td= {{p.y}}
-                          td= {{p.z}}
+                          td {{p.x}}
+                          td {{p.y}}
+                          td {{p.z}}
                 #features.tab-pane
-                  table#study-features.table-striped.table-hover.table.table-condensed.small-datatable
+                  table#study-features.table.table-striped.table-hover.table-condensed.small-datatable
                     thead
                       tr
                         th Feature
@@ -52,5 +52,5 @@
                     tbody
                       - for f in study.features
                         tr
-                          td= f.name
-                          td= f
+                          td f.name
+                          td f
