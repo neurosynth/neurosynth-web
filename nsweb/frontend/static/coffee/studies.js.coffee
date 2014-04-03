@@ -4,11 +4,14 @@
 $(document).ready ->
     tbl = $('table[class*=studies-datatable]').dataTable
         "sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
-        # "sPaginationType": "bootstrap"
+        "sPaginationType": "full_numbers"
         "iDisplayLength": 10
         "bProcessing": true
         "bServerSide": true
         "sAjaxSource": '/api/studies'
+        "bDeferRender": true
+        "bStateSave": true
+
         aoColumns: [ { sWidth: '45%'}, { sWidth: '25%' }, { sWidth: '15%'}, null, null]
 
     # tbl.fnSetFilteringDelay(500)
@@ -17,7 +20,7 @@ $(document).ready ->
         row = $(e.target).closest('tr')[0]
         data = $('#study-peaks').dataTable().fnGetData(row)
         data = (parseInt(i) for i in data)
-        viewer.moveToAtlasCoords(data)
+        # viewer.moveToAtlasCoords(data)
     )
 
     $('#study-menu a:first').tab('show')

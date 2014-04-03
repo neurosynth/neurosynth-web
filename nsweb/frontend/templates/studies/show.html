@@ -38,10 +38,9 @@
               </ul>
             </div>
             <div class="span6">
-              <p>{{viewers.viewer(viewer_settings)|safe}}</p>
               <div id="study-tab-content" class="tab-content">
                 <div id="activations" class="tab-pane active">
-                  <table id="study-peaks" class="table-striped table-hover table table-condensed small-datatable">
+                  <table id="study-peaks" class="table table-striped table-hover table-condensed small-datatable">
                     <thead>
                       <tr>
                         <th>x</th>
@@ -52,9 +51,9 @@
                     <tbody>
                       {% for p in study.peaks %}
                         <tr>
-                          <td=>{{p.x}}</td=>
-                          <td=>{{p.y}}</td=>
-                          <td=>{{p.z}}</td=>
+                          <td>={{p.x}}</td>
+                          <td>={{p.y}}</td>
+                          <td>={{p.z}}</td>
                         </tr>
                       {% endfor %}
                     </tbody>

@@ -55,10 +55,28 @@ def datatables_preprocessor(search_params={}, **kwargs):
 
     if 'sEcho' in request.args:
         # Add any filters we need...
-        search_params['limit'] = int(request.args['iDisplayLength'])
+        search_params['limit']  = int(request.args['iDisplayLength'])
         search_params['offset'] = int(request.args['iDisplayStart'])
-                #'order_by': request.args['']
-#                 'filters' : 
+        
+        #Yea... these are list of dictionary... Flask-restless has an undocumented python 2.5 workaround hack that breaks documented functionality. This is the workaround for the workaround. -_-
+        search_params['order_by'] = [{
+                                      'field': ['title','authors','journal','year','pmid'][int(request.args['iSortCol_0'])] ,
+                                      'direction': str(request.args['sSortDir_0'])
+                                      }]
+        search_params['filters'] = [
+                                    {'name': 'title', 'op': 'like', 'val': '%'+str(request.args['sSearch'])+'%'},
+                                    {'name': 'authors', 'op': 'like', 'val': '%'+str(request.args['sSearch'])+'%'},
+                                    {'name': 'journal', 'op': 'like', 'val': '%'+str(request.args['sSearch'])+'%'},
+                                    {'name': 'year', 'op': 'eq', 'val': str(request.args['sSearch'])+'%'},
+                                    {'name': 'pmid', 'op': 'eq', 'val': str(request.args['sSearch'])+'%'},
+                                   ]
+        search_params['disjunction'] = True
+
+#         field = ['title','authors','journal','year','pmid'][int(request.args['iSortCol_0'])]
+#         search_params['order_by'] = '{{"field":{0},"direction":{1} }}'.format(field,request.args['sSortDir_0']),
+
+
+
         # Convert the DataTables query parameters into what flask-restless wants
         # if 'iDisplayStart' in request.args:
 
@@ -70,12 +88,11 @@ def datatables_postprocessor(result, **kwargs):
     if 'sEcho' in request.args:
         result['sEcho'] = int(request.args['sEcho']) # for security
         result['iTotalRecords'] = Study.query.count()  # Get the number of total records from DB
-        result['iTotalDisplayRecords'] = result.pop('num_results')
+        result['iTotalDisplayRecords'] = Study.query.count()
+        result.pop('num_results')
         result.pop('total_pages')
         result.pop('page')
-        data = result.pop('objects')
-        data = [ [d['title'], d['authors'], d['journal'], d['year'], d['pmid']] for d in data ]
-        result['aaData'] = data
+        result['aaData'] = [ [d['title'], d['authors'], d['journal'], d['year'], d['pmid']] for d in result.pop('objects') ]
         
         # ...and so on for anything else we need
 
