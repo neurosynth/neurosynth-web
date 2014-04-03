@@ -87,10 +87,10 @@ def datatables_postprocessor(result, **kwargs):
     'datatables' key in the request arguments list. """
     if 'sEcho' in request.args:
         result['sEcho'] = int(request.args['sEcho']) # for security
-        result['iTotalRecords'] = Study.query.count()  # Get the number of total records from DB
-        result['iTotalDisplayRecords'] = Study.query.count()
-        result.pop('num_results')
-        result.pop('total_pages')
+        # Get the number of total records from DB
+        result['iTotalRecords'] = Study.query.count()
+        # Workaround for datatables. it wants total results after query too, We can only provide a rough estimate.
+        result['iTotalDisplayRecords'] = int(result.pop('num_results'))*int(result.pop('total_pages'))
         result.pop('page')
         result['aaData'] = [ [d['title'], d['authors'], d['journal'], d['year'], d['pmid']] for d in result.pop('objects') ]
         
