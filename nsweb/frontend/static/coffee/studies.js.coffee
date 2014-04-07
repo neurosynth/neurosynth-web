@@ -16,10 +16,10 @@ $(document).ready ->
 
     # tbl.fnSetFilteringDelay(500)
 
-  $('#study-tab-content a').click (e) ->
-    #e.preventDefault()
-    $(this).tab('show')
-    return
+  #$('#study-tab-content a').click (e) ->
+  #  #e.preventDefault()
+  #  $(this).tab('show')
+  #  return
 
   $('#study-peaks').dataTable()
   return

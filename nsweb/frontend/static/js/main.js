@@ -19,16 +19,9 @@ $(document).ready(function() {
       }, null, null
     ]
   });
-  $('#study-tab-content a').click(function(e) {
-    $(this).tab('show');
-  });
   $('#study-peaks').dataTable();
 });
 
 $(document).ready(function() {
-  $('#feature-content-menu a').click(function(e) {
-    e.preventDefault();
-    $(this).tab('show');
-  });
   $('#features_table').dataTable();
 });

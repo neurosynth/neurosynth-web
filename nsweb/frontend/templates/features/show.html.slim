@@ -8,24 +8,11 @@
   .row
     .span11.content
       ul#feature-content-menu.nav.nav-tabs
-        /li
-          /a href=#map data-toggle="tab" Map
         li.active
-          a href=#studies data-toggle="tab" Studies
+          a href="#studies" data-toggle="tab" Studies
         li
-          a href=#help data-toggle='tab' Help
+          a href="#help" data-toggle="tab" Help
       #feature-tab-content.tab-content
-        /#map.tab-pane
-          //- imgs_to_load = @feature.images.select { |img| img.label =~ /reverse/ }
-          // - imgs_to_load = @feature.images.map { |i| {'name' => i.label, 'id' => i.id, 'download' => "/images/#{i.id}/download", 'intent' => (i.stat + ' :').capitalize }  }
-          /- options = { panzoomEnabled: false }
-          /= render :partial => 'shared/viewer', :locals => { :images => @images, :options => options }
-          //- images = options_for_select(@feature.images.map { |i| [i.label, i.id] }, imgs_to_load[0]['id'])
-          // #feature-image-selector
-          //   | Select image type:
-          //   = select_tag 'feature_image_select', images
-          /#load-location-box
-            /button#load-location.btn.btn-success View location data at cursor
         #studies.tab-pane.active
           h3 Studies associated with the feature {{feature}}
           table#features_table.table-striped.table-hover.table.table-condensed.default-datatable
