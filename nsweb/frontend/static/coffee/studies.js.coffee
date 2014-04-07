@@ -17,7 +17,7 @@ $(document).ready ->
     # tbl.fnSetFilteringDelay(500)
 
   $('#study-tab-content a').click (e) ->
-    e.preventDefault()
+    #e.preventDefault()
     $(this).tab('show')
     return
 

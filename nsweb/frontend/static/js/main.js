@@ -20,7 +20,6 @@ $(document).ready(function() {
     ]
   });
   $('#study-tab-content a').click(function(e) {
-    e.preventDefault();
     $(this).tab('show');
   });
   $('#study-peaks').dataTable();

@@ -1,0 +1,24 @@
+{% set page_title = 'Neurosynth|Features' %}
+{% extends "layout/base.html" %}
+{% block content %}
+  <div class="span9">
+      <table id="features_table" class="table-striped table-hover table table-condensed">
+          <thead>
+              <tr>
+                  <th  style="width: 220px;">Name</th>
+                  <th  style="width: 60px;">Num. studies</th>
+                  <th  style="width: 80px;">Num. activations</th>
+              </tr>
+          </thead>
+          <tbody>
+            {% for f in features %}
+              <tr>
+                <td><a href={{url_for('features.index')}}>{{f.feature.feature}}</a></td>
+                <td>{{f.num_studies}}</td>
+                <td>{{f.num_activations}}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+      </table>
+  </div>
+{% endblock %}

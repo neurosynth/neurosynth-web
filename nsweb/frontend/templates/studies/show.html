@@ -24,9 +24,7 @@
                   </tr>
                   <tr>
                     <td class="row_label">PMID:</td>
-                    <td>
-                      <a>href={{ "http://www.ncbi.nlm.nih.gov/pubmed/%s"|format(study.pmid) }}>{{study.pmid}}</a>
-                    </td>
+                    <td><a href={{ "http://www.ncbi.nlm.nih.gov/pubmed/%s"|format(study.pmid) }}> {{study.pmid}}</a></td>
                   </tr>
                 </tbody>
               </table>
@@ -76,9 +74,7 @@
                     <tbody>
                       {% for f in study.frequencies %}
                         <tr>
-                          <td>
-                            <a>href={{url_for('features.show', id=f.feature.id)}} {{f.feature.feature}}</a>
-                          </td>
+                          <td><a href={{url_for('features.show', id=f.feature.id)}}>{{f.feature.feature}}</a></td>
                           <td>{{f.frequency}}</td>
                         </tr>
                       {% endfor %}

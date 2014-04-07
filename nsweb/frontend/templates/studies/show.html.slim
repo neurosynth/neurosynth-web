@@ -21,8 +21,7 @@
                     td {{study.year}}
                   tr
                     td.row_label PMID:
-                    td
-                      a href={{ "http://www.ncbi.nlm.nih.gov/pubmed/%s"|format(study.pmid) }}>{{study.pmid}}
+                    td <a href={{ "http://www.ncbi.nlm.nih.gov/pubmed/%s"|format(study.pmid) }}> {{study.pmid}}</a>
           .row
             .span5
               ul#study-menu.nav.nav-tabs
