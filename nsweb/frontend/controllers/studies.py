@@ -1,8 +1,8 @@
-from flask import Blueprint, render_template, request, make_response
+from flask import Blueprint, render_template, request
 from nsweb.models import Study
 from nsweb.core import apimanager, add_blueprint
 
-bp = Blueprint('home',__name__,url_prefix='/studies')
+bp = Blueprint('studies',__name__,url_prefix='/studies')
 
 @bp.route('/')
 def index():
@@ -26,13 +26,13 @@ def show(id):
     }
     return render_template('studies/show.html.slim', study=study, viewer_settings=viewer_settings)
 
-@bp.route('/download')
+# @bp.route('/download')
 # gave up on this b/c issue is not image download I think?
-def download():
-    image = 'sadf'
-    response = make_response(image)
-    response.headers["Content-Disposition"] = "attachment; filename=asdf"
-    return response
+# def download():
+#     image = 'sadf'
+#     response = make_response(image)
+#     response.headers["Content-Disposition"] = "attachment; filename=asdf"
+#     return response
 
 add_blueprint(bp)
 
@@ -47,7 +47,6 @@ def update_result(result, **kwargs):
         result['features'] = result.pop('frequencies')
         for f in result['features']:
             f['frequency'] = round(f['frequency'], 3)
-        pass
 
 def datatables_preprocessor(search_params={}, **kwargs):
     """ For DataTables AJAX requests, we may need to change the search params. 
@@ -58,7 +57,7 @@ def datatables_preprocessor(search_params={}, **kwargs):
         search_params['limit']  = int(request.args['iDisplayLength'])
         search_params['offset'] = int(request.args['iDisplayStart'])
         
-        #Yea... these are list of dictionary... Flask-restless has an undocumented python 2.5 workaround hack that breaks documented functionality. This is the workaround for the workaround. -_-
+        #Yea... this is a list of dictionary... Flask-restless has an undocumented python 2.5 workaround hack that breaks documented functionality. This is the workaround for the workaround. -_-
         search_params['order_by'] = [{
                                       'field': ['title','authors','journal','year','pmid'][int(request.args['iSortCol_0'])] ,
                                       'direction': str(request.args['sSortDir_0'])
@@ -72,14 +71,6 @@ def datatables_preprocessor(search_params={}, **kwargs):
                                    ]
         search_params['disjunction'] = True
 
-#         field = ['title','authors','journal','year','pmid'][int(request.args['iSortCol_0'])]
-#         search_params['order_by'] = '{{"field":{0},"direction":{1} }}'.format(field,request.args['sSortDir_0']),
-
-
-
-        # Convert the DataTables query parameters into what flask-restless wants
-        # if 'iDisplayStart' in request.args:
-
 def datatables_postprocessor(result, **kwargs):
     """ A wrapper for DataTables requests. Just takes the JSON object to be 
     returned and adds the fields DataTables is expecting. This should probably be 
@@ -92,10 +83,8 @@ def datatables_postprocessor(result, **kwargs):
         # Workaround for datatables. it wants total results after query too, We can only provide a rough estimate.
         result['iTotalDisplayRecords'] = int(result.pop('num_results'))*int(result.pop('total_pages'))
         result.pop('page')
-        result['aaData'] = [ [d['title'], d['authors'], d['journal'], d['year'], d['pmid']] for d in result.pop('objects') ]
+        result['aaData'] = [ [d['title'], d['authors'], d['journal'], d['year'], '<a href=http://www.ncbi.nlm.nih.gov/pubmed/{0}>{0}</a>'.format(d['pmid']) ] for d in result.pop('objects') ]
         
-        # ...and so on for anything else we need
-
 includes=['pmid',
         'title',
         'authors',

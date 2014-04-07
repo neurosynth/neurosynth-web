@@ -19,21 +19,21 @@ $(document).ready(function() {
       }, null, null
     ]
   });
-  $('#study-peaks').on('click', 'tr', (function(_this) {
-    return function(e) {
-      var data, i, row;
-      row = $(e.target).closest('tr')[0];
-      data = $('#study-peaks').dataTable().fnGetData(row);
-      return data = (function() {
-        var _i, _len, _results;
-        _results = [];
-        for (_i = 0, _len = data.length; _i < _len; _i++) {
-          i = data[_i];
-          _results.push(parseInt(i));
-        }
-        return _results;
-      })();
-    };
-  })(this));
-  return $('#study-menu a:first').tab('show');
+  $('#study-peaks a').click(function(e) {
+    e.preventDefault();
+    $(this).tab('show');
+  });
+  return $(document).ready(function() {
+    $('#study-peaks').dataTable();
+  });
+});
+
+$(document).ready(function() {
+  $('#feature-content-menu a').click(function(e) {});
+  e.preventDefault();
+  $(this).tab('show');
+});
+
+$(document).ready(function() {
+  $('#features_table').dataTable();
 });

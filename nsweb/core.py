@@ -49,7 +49,7 @@ def add_blueprint(blueprint):
 def register_blueprints():
 
 #     from nsweb.api import features
-    from nsweb.api import locations
+#     from nsweb.api import locations
 
     for blueprint in _blueprints:
         app.register_blueprint(blueprint)

@@ -1,10 +1,10 @@
-- set page_title = 'Neurosynth|Study'
+- set page_title='Neurosynth|Study'
 - extends "layout/base.html"
 - block content
   - import "macros/viewers.html.slim" as viewers
   .row
     .span11
-        h3 = {{study.title}}
+        h3 {{study.title}}
         #show-study
           .row
             .span11
@@ -21,12 +21,15 @@
                     td {{study.year}}
                   tr
                     td.row_label PMID:
-                    td <a href={{ "http://www.ncbi.nlm.nih.gov/pubmed/%s"|format(study.pmid) }}>study.pmid</a>
+                    td
+                      a href={{ "http://www.ncbi.nlm.nih.gov/pubmed/%s"|format(study.pmid) }}>{{study.pmid}}
           .row
             .span5
               ul#study-menu.nav.nav-tabs
-                li a href="#activations" 'Activations'
-                li a href="#features" 'Features'
+                li.active
+                  a href="#activations" data-toggle="tab" Activations
+                li
+                  a href="#features" data-toggle="tab" Features
             .span6
               /p {{viewers.viewer(viewer_settings)|safe}}
               #study-tab-content.tab-content
@@ -50,7 +53,7 @@
                         th Feature
                         th Loading
                     tbody
-                      - for f in study.features
+                      - for f in study.frequencies
                         tr
-                          td f.name
-                          td f
+                          td {{f.feature.feature}}
+                          td {{f.frequency}}
