@@ -12,7 +12,7 @@ def index():
 def show(id):
     # return features.root_path
     feature = Feature.query.get_or_404(id)
-    return render_template('features/show.html.slim', frequencies=feature.frequencies)
+    return render_template('features/show.html.slim', frequencies=feature.frequencies, feature=feature.feature)
 
 @bp.route('/<string:name>/')
 def find_feature(name):
