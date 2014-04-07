@@ -55,5 +55,5 @@
                     tbody
                       - for f in study.frequencies
                         tr
-                          td {{f.feature.feature}}
+                          td <a href={{url_for('features.show', id=f.feature.id)}}>{{f.feature.feature}}</a>
                           td {{f.frequency}}

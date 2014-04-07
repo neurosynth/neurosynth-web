@@ -39,8 +39,8 @@ def datatables_preprocessor(search_params={}, **kwargs): #TODO: move to init or 
 
     if 'sEcho' in request.args:
         # Add any filters we need...
-        search_params['limit'] = request.args['iDisplayLength']
-        search_params['offset'] = request.args['iDisplayStart']
+        search_params['results_per_page'] = int(request.args['iDisplayLength'])
+        search_params['offset'] = int(request.args['iDisplayStart'])
 
         #Yea... this is a list of dictionary... Flask-restless has an undocumented python 2.5 workaround hack that breaks documented functionality. This is the workaround for the workaround. -_-
         search_params['order_by'] = [{
@@ -67,9 +67,15 @@ def datatables_postprocessor(result, **kwargs):
         # Get the number of total records from DB
         result['iTotalRecords'] = Feature.query.count()
         # Workaround for datatables. it wants total results after query too, We can only provide a rough estimate.
-        result['iTotalDisplayRecords'] = int(result.pop('num_results'))*int(result.pop('total_pages'))
+        result['iTotalDisplayRecords'] = result.pop('num_results')
         result.pop('page')
-        result['aaData'] = [ [d['title'], d['authors'],d['frequency'], d['journal'], d['year'], d['pmid']] for d in result.pop('objects') ]
+        result.pop('total_pages')
+        result['aaData'] = [ ['<a href=http://www.ncbi.nlm.nih.gov/pubmed/{0}>{1}</a>'.format(d['pmid'],d['title']),
+                            d['authors'],
+                            d['frequency'],
+                            d['journal'],
+                            d['year'],
+                            ] for d in result.pop('objects') ]
 
 #db columns
 includes=['id',

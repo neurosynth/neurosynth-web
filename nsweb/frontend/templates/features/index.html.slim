@@ -11,6 +11,7 @@
           tbody
             - for f in features
               tr
-                td {{f.feature}}
+                td
+                  a href={{url_for('feature/' + f.feature.id)}} {{f.feature.feature}}
                 td {{f.num_studies}}
                 td {{f.num_activations}}

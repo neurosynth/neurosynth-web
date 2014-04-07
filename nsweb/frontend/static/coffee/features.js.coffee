@@ -2,15 +2,12 @@
 # All this logic will automatically be available in application.js.
 # You can use CoffeeScript in this file: http://jashkenas.github.com/coffee-script/
 $(document).ready ->
-
-    $('#feature-content-menu a').click (e) ->
+  $('#feature-content-menu a').click (e) ->
     e.preventDefault()
     $(this).tab('show')
     return
-
-  $(document).ready ->
-    $('#features_table').dataTable()
-    return
+  $('#features_table').dataTable()
+  return
 
 
     # $('#feature_image_select').change((e) ->

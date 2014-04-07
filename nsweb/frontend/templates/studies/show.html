@@ -1,0 +1,94 @@
+{% set page_title='Neurosynth|Study' %}
+{% extends "layout/base.html" %}
+{% block content %}
+  {% import "macros/viewers.html.slim" as viewers %}
+  <div class="row">
+    <div class="span11">
+        <h3>{{study.title}}</h3>
+        <div id="show-study">
+          <div class="row">
+            <div class="span11">
+              <table class="table-striped table-hover table table-condensed">
+                <tbody>
+                  <tr>
+                    <td class="row_label">Authors:</td>
+                    <td>{{study.authors}}</td>
+                  </tr>
+                  <tr>
+                    <td class="row_label">Journal:</td>
+                    <td>{{study.journal}}</td>
+                  </tr>
+                  <tr>
+                    <td class="row_label">Year:</td>
+                    <td>{{study.year}}</td>
+                  </tr>
+                  <tr>
+                    <td class="row_label">PMID:</td>
+                    <td>
+                      <a>href={{ "http://www.ncbi.nlm.nih.gov/pubmed/%s"|format(study.pmid) }}>{{study.pmid}}</a>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="row">
+            <div class="span5">
+              <ul id="study-menu" class="nav nav-tabs">
+                <li class="active">
+                  <a  data-toggle="tab" href="#activations">Activations</a>
+                </li>
+                <li>
+                  <a  data-toggle="tab" href="#features">Features</a>
+                </li>
+              </ul>
+            </div>
+            <div class="span6">
+              <div id="study-tab-content" class="tab-content">
+                <div id="activations" class="tab-pane active">
+                  <table id="study-peaks" class="table table-striped table-hover table-condensed small-datatable">
+                    <thead>
+                      <tr>
+                        <th>x</th>
+                        <th>y</th>
+                        <th>z</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for p in study.peaks %}
+                        <tr>
+                          <td>{{p.x}}</td>
+                          <td>{{p.y}}</td>
+                          <td>{{p.z}}</td>
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+                <div id="features" class="tab-pane">
+                  <table id="study-features" class="table table-striped table-hover table-condensed small-datatable">
+                    <thead>
+                      <tr>
+                        <th>Feature</th>
+                        <th>Loading</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for f in study.frequencies %}
+                        <tr>
+                          <td>
+                            <a>href={{url_for('features.show', id=f.feature.id)}} {{f.feature.feature}}</a>
+                          </td>
+                          <td>{{f.frequency}}</td>
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+    </div>
+  </div>
+{% endblock %}

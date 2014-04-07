@@ -19,21 +19,17 @@ $(document).ready(function() {
       }, null, null
     ]
   });
-  $('#study-peaks a').click(function(e) {
+  $('#study-tab-content a').click(function(e) {
     e.preventDefault();
     $(this).tab('show');
   });
-  return $(document).ready(function() {
-    $('#study-peaks').dataTable();
+  $('#study-peaks').dataTable();
+});
+
+$(document).ready(function() {
+  $('#feature-content-menu a').click(function(e) {
+    e.preventDefault();
+    $(this).tab('show');
   });
-});
-
-$(document).ready(function() {
-  $('#feature-content-menu a').click(function(e) {});
-  e.preventDefault();
-  $(this).tab('show');
-});
-
-$(document).ready(function() {
   $('#features_table').dataTable();
 });

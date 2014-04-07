@@ -16,14 +16,13 @@ $(document).ready ->
 
     # tbl.fnSetFilteringDelay(500)
 
-  $('#study-peaks a').click (e) ->
+  $('#study-tab-content a').click (e) ->
     e.preventDefault()
     $(this).tab('show')
     return
 
-  $(document).ready ->
-    $('#study-peaks').dataTable()
-    return
+  $('#study-peaks').dataTable()
+  return
 
     # $('#study-peaks').on('click', 'tr', (e) =>
         # row = $(e.target).closest('tr')[0]

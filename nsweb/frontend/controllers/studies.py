@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request
 from nsweb.models import Study
 from nsweb.core import apimanager, add_blueprint
+from flask.helpers import url_for
 
 bp = Blueprint('studies',__name__,url_prefix='/studies')
 
@@ -54,7 +55,7 @@ def datatables_preprocessor(search_params={}, **kwargs):
 
     if 'sEcho' in request.args:
         # Add any filters we need...
-        search_params['limit']  = int(request.args['iDisplayLength'])
+        search_params['results_per_page'] = int(request.args['iDisplayLength'])
         search_params['offset'] = int(request.args['iDisplayStart'])
         
         #Yea... this is a list of dictionary... Flask-restless has an undocumented python 2.5 workaround hack that breaks documented functionality. This is the workaround for the workaround. -_-
@@ -80,10 +81,14 @@ def datatables_postprocessor(result, **kwargs):
         result['sEcho'] = int(request.args['sEcho']) # for security
         # Get the number of total records from DB
         result['iTotalRecords'] = Study.query.count()
-        # Workaround for datatables. it wants total results after query too, We can only provide a rough estimate.
-        result['iTotalDisplayRecords'] = int(result.pop('num_results'))*int(result.pop('total_pages'))
+        result['iTotalDisplayRecords'] = result.pop('num_results')
         result.pop('page')
-        result['aaData'] = [ [d['title'], d['authors'], d['journal'], d['year'], '<a href=http://www.ncbi.nlm.nih.gov/pubmed/{0}>{0}</a>'.format(d['pmid']) ] for d in result.pop('objects') ]
+        result.pop('total_pages')
+        result['aaData'] = [ ['<a href={0}>{1}</a>'.format(url_for('studies.show',id=str(d['pmid'])),d['title']),
+                              d['authors'],
+                              d['journal'],
+                              d['year'],
+                              '<a href=http://www.ncbi.nlm.nih.gov/pubmed/{0}>{0}</a>'.format(d['pmid']) ] for d in result.pop('objects') ]
         
 includes=['pmid',
         'title',
