@@ -21,10 +21,11 @@ class TestCase(Base):
             create_app(database_uri=SQLALCHEMY_DATABASE_URI, debug=DEBUG, aptana=DEBUG_WITH_APTANA)
             
             #creates and registers blueprints in nsweb.blueprints
-            import nsweb.api.studies
-            import nsweb.api.features
-            import nsweb.api.images
-            import nsweb.api.locations
+            import nsweb.frontend.controllers.studies
+            import nsweb.frontend.controllers.features
+            #import nsweb.frontend.controllers.images
+            import nsweb.frontend.controllers.locations
+            
             #loads blueprints
             register_blueprints()
             #return app

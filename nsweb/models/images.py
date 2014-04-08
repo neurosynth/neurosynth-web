@@ -18,24 +18,21 @@ class Image(db.Model):
         'polymorphic_on': type,
         'polymorphic_identity': 'image'
     }
-   
-#     def __init__(self,image_file, label=None, display=True, download=True, stat=None):#name,kind,comments,stat,
-# #         self.name=name
-#         self.label=label
-# #         self.kind=kind
-# #         self.comments=comments
-#         self.stat=stat
-#         self.image_file=image_file
-#         self.display=display
-#         self.download=download
+
+    def __init__(self,image_file, label=None, display=True, download=True, stat=None):#name,kind,comments,stat,
+#         self.name=name
+        self.label=label
+#         self.kind=kind
+#         self.comments=comments
+        self.stat=stat
+        self.image_file=image_file
+        self.display=display
+        self.download=download
 
 class FeatureImage(Image):
     __mapper_args__={'polymorphic_identity': 'feature'}
     feature_id = db.Column(db.Integer, db.ForeignKey(Feature.id), nullable=True)
-    ## this works but its not the sqlalchemy way. I'm nt sure why.
-#     feature = db.relationship(Feature, backref=db.backref('images',cascade='all, delete-orphan')) 
 
 class LocationImage(Image):
     __mapper_args__={'polymorphic_identity': 'location'}
     location_id = db.Column(db.Integer, db.ForeignKey(Location.id), nullable=True)
-#     location = db.relationship(Location, backref=db.backref('images',cascade='all, delete-orphan'))

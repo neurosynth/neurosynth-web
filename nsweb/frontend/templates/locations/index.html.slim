@@ -1,0 +1,22 @@
+- set page_title = 'Neurosynth|Location'
+- extends "layout/base.html"
+- block content
+  - coords = [0, 0, 0].join(", ")
+  javascript:
+      xyz = '#{coords.gsub(', ', '_')}'
+
+  .row#locations
+      .span11
+          h2 Locations
+          .big-text
+              .lead Explore structure-to-function mappings around the brain.
+              .top-space20
+                  .lead To start, enter x/y/z coordinates:
+                  = text_field_tag "x-pos", 0, {:class => 'plane-pos' }
+                  = text_field_tag "y-pos", 0, {:class => 'plane-pos' }
+                  = text_field_tag "z-pos", 0, {:class => 'plane-pos' }
+              .top-space20
+                  .lead Or click anywhere on the brain:
+  .row
+      .span11
+          = render :partial => 'shared/location_viewer', :locals => { :images => [], :scale => 0.9 }

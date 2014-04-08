@@ -5,7 +5,7 @@ from nsweb.models.studies import Study
 from nsweb.models.peaks import Peak
 from nsweb.models.frequencies import Frequency
 from nsweb.models.images import FeatureImage, LocationImage
-from nsweb import settings
+from nsweb.initializers import settings
 import os
 from neurosynth.base.dataset import Dataset
 import numpy as np

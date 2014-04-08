@@ -32,6 +32,6 @@ class StudiesTest(TestCase):
         self.populate_db()
         response = self.client.get('/api/studies')
         studies = Study.query.all()
-        from nsweb.blueprints.studies import includes
+        from nsweb.frontend.controllers.studies import includes
         json = self.restless_json(fields=includes,page_num=1,objects=studies,total_pages=1)
         assert response.data == json
