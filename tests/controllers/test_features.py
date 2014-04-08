@@ -33,6 +33,6 @@ class FeaturesTest(TestCase):
         self.populate_db()
         response = self.client.get('/api/features')
         features = Feature.query.all()
-        from nsweb.blueprints.features import includes
+        from nsweb.frontend.controllers.features import includes
         json = self.restless_json(fields=includes,page_num=1,objects=features,total_pages=1)
         assert response.data == json
