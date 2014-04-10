@@ -1,6 +1,5 @@
 from tests import *
 
-
 class FeaturesTest(TestCase):
 
     def test_empty_api_features_returns_200(self):

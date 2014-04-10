@@ -10,7 +10,6 @@ def index():
  
 @bp.route('/<int:id>/')
 def show(id):
-    # return features.root_path
     feature = Feature.query.get_or_404(id)
     return render_template('features/show.html.slim', frequencies=feature.frequencies, feature=feature.feature)
 
@@ -18,9 +17,9 @@ def show(id):
 def find_feature(name):
     """ If the passed ID isn't numeric, assume it's a feature name,
     and retrieve the corresponding numeric ID. 
-    DOES NOT WORK BECAUSE CANNOT OVERWRITE instance_id. """
+    """
     id = Feature.query.filter_by(feature=name).first().id
-    return redirect(url_for('features/'+str(id)))
+    return redirect(url_for('features.show',id=id))
 
 add_blueprint(bp)
 
