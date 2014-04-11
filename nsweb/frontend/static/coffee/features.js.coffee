@@ -17,7 +17,7 @@ $(document).ready ->
     "sPaginationType": "full_numbers"
     "iDisplayLength": 10
     "bProcessing": true
-    "sAjaxSource": '/api/features/'+url_id.pop()
+    "sAjaxSource": '/features/api/'+url_id.pop()
     "bDeferRender": true
     "bStateSave": true
   #$('#feature-content-menu b').click (e) ->

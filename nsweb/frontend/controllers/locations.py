@@ -7,7 +7,7 @@ bp = Blueprint('locations',__name__,url_prefix='/locations')
 
 def translateCoords(id):
 	'''
-	Translates coords from x_y_z to x,y,z
+	Translates coords from x_y_z to int x,y,z
 	'''
 	return [int(i) for i in id.split('_')]
 
@@ -18,7 +18,7 @@ def index():
 @bp.route('/<string:id>')
 def show(id):
 	x,y,z = translateCoords(id)
-	radius=6
+	radius = 6
 	peaks = Location.closestPeaks(radius,x,y,z)
 	return render_template('locations/show.html', radius=radius, xyz=[x,y,z])
 

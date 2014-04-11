@@ -22,7 +22,7 @@ def find_feature(name):
     id = Feature.query.filter_by(feature=name).first().id
     return redirect(url_for('features.show',id=id))
 
-@app.route('/api/features/<string:name>/')
+@bp.route('/api/<string:name>/')
 def find_api_feature(name):
     """ If the passed ID isn't numeric, assume it's a feature name,
     and retrieve the corresponding numeric ID. 
@@ -30,7 +30,7 @@ def find_api_feature(name):
     id = Feature.query.filter_by(feature=name).first().id
     return redirect(url_for('features.api',id=id))
 
-@app.route('/api/features/<int:id>/')
+@bp.route('/api/<int:id>/')
 def api(id):
     data = [ ['<a href={0}>{1}</a>'.format(url_for('studies.show',id=str(f.pmid)),f.study.title),
               f.study.authors,

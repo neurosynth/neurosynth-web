@@ -27,7 +27,7 @@ def show(id):
     }
     return render_template('studies/show.html.slim', study=study, viewer_settings=viewer_settings)
 
-@app.route('/api/studies/<int:id>/')
+@bp.route('/api/<int:id>/')
 def api(id):
     data = [ ['<a href={0}>{1}</a>'.format(url_for('feature.show',id=str(s.feature_id)),s.feature.feature),
               s.frequency,
