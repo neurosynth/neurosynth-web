@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for
 from nsweb.models import Feature
-from nsweb.core import apimanager, add_blueprint
+from nsweb.core import apimanager, add_blueprint, app
+from flask.json import jsonify, dumps
 
 bp = Blueprint('features',__name__,url_prefix='/features')
  
@@ -11,7 +12,7 @@ def index():
 @bp.route('/<int:id>/')
 def show(id):
     feature = Feature.query.get_or_404(id)
-    return render_template('features/show.html.slim', frequencies=feature.frequencies, feature=feature.feature)
+    return render_template('features/show.html.slim', feature=feature.feature)
 
 @bp.route('/<string:name>/')
 def find_feature(name):
@@ -21,6 +22,25 @@ def find_feature(name):
     id = Feature.query.filter_by(feature=name).first().id
     return redirect(url_for('features.show',id=id))
 
+@app.route('/api/features/<string:name>/')
+def find_api_feature(name):
+    """ If the passed ID isn't numeric, assume it's a feature name,
+    and retrieve the corresponding numeric ID. 
+    """
+    id = Feature.query.filter_by(feature=name).first().id
+    return redirect(url_for('features.api',id=id))
+
+@app.route('/api/features/<int:id>/')
+def api(id):
+    data = [ ['<a href={0}>{1}</a>'.format(url_for('studies.show',id=str(f.pmid)),f.study.title),
+              f.study.authors,
+              f.study.journal,
+              f.frequency,
+              ] for f in Feature.query.get_or_404(id).frequencies]
+#     data=dumps({'aadata':data})
+    data=jsonify(aadata=data)
+    stuff=request.args
+    return data
 add_blueprint(bp)
 
 
@@ -43,16 +63,16 @@ def datatables_preprocessor(search_params={}, **kwargs): #TODO: move to init or 
 
         #Yea... this is a list of dictionary... Flask-restless has an undocumented python 2.5 workaround hack that breaks documented functionality. This is the workaround for the workaround. -_-
         search_params['order_by'] = [{
-                                      'field': ['title','authors','journal','year','pmid'][int(request.args['iSortCol_0'])] ,
+                                      'field': ['feature','num_studies','num_activations'][int(request.args['iSortCol_0'])] ,
                                       'direction': str(request.args['sSortDir_0'])
                                       }]
         search_params['filters'] = [
-                                    {'name': 'title', 'op': 'like', 'val': '%'+str(request.args['sSearch'])+'%'},
-                                    {'name': 'authors', 'op': 'like', 'val': '%'+str(request.args['sSearch'])+'%'},
-                                    {'name': 'journal', 'op': 'like', 'val': '%'+str(request.args['sSearch'])+'%'},
-                                    {'name': 'loading', 'op': 'eq', 'val': str(request.args['sSearch'])+'%'},
-                                    {'name': 'year', 'op': 'eq', 'val': str(request.args['sSearch'])+'%'},
-                                    {'name': 'pmid', 'op': 'eq', 'val': str(request.args['sSearch'])+'%'},
+                                    {'name': 'feature', 'op': 'like', 'val': '%'+str(request.args['sSearch'])+'%'},
+                                    {'name': 'num_studies', 'op': 'eq', 'val': str(request.args['sSearch'])+'%'},
+                                    {'name': 'num_activations', 'op': 'eq', 'val': str(request.args['sSearch'])+'%'},
+#                                     {'name': 'loading', 'op': 'eq', 'val': str(request.args['sSearch'])+'%'},
+#                                     {'name': 'year', 'op': 'eq', 'val': str(request.args['sSearch'])+'%'},
+#                                     {'name': 'pmid', 'op': 'eq', 'val': str(request.args['sSearch'])+'%'},
                                    ]
         search_params['disjunction'] = True
 
@@ -69,25 +89,16 @@ def datatables_postprocessor(result, **kwargs):
         result['iTotalDisplayRecords'] = result.pop('num_results')
         result.pop('page')
         result.pop('total_pages')
-        result['aaData'] = [ ['<a href=http://www.ncbi.nlm.nih.gov/pubmed/{0}>{1}</a>'.format(d['pmid'],d['title']),
-                            d['authors'],
-                            d['frequency'],
-                            d['journal'],
-                            d['year'],
+        result['aaData'] = [ ['<a href={0}>{1}</a>'.format(url_for('features.show',id=d['id']),d['feature']),
+                            d['num_studies'],
+                            d['num_activations'],
                             ] for d in result.pop('objects') ]
-
+        result
 #db columns
 includes=['id',
         'feature',
         'num_studies',
         'num_activations',
-        'images',
-        'images.stat',
-        'images.feature_id',
-        'images.image_file',
-        'images.label',
-        'studies',
-        'studies.pmid'
 ]
 add_blueprint(apimanager.create_api_blueprint(Feature,
                                             methods=['GET'],
@@ -96,7 +107,7 @@ add_blueprint(apimanager.create_api_blueprint(Feature,
                                             max_results_per_page=100,
                                             include_columns=includes,
                                               postprocessors={
-                                                  'GET_SINGLE': [update_result],
+#                                                   'GET_SINGLE': [update_result],
                                                   'GET_MANY': [datatables_postprocessor]
                                               },
                                               preprocessors={

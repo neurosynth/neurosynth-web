@@ -2,8 +2,8 @@
 # All this logic will automatically be available in application.js.
 # You can use CoffeeScript in this file: http://jashkenas.github.com/coffee-script/
 $(document).ready ->
-  tbl = $('table[class*=studies-datatable]').dataTable
-    "sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
+  tbl = $('#studies-datatable').dataTable
+    # "sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
     "sPaginationType": "full_numbers"
     "iDisplayLength": 10
     "bProcessing": true
@@ -12,7 +12,7 @@ $(document).ready ->
     "bDeferRender": true
     "bStateSave": true
 
-    aoColumns: [ { sWidth: '45%'}, { sWidth: '25%' }, { sWidth: '15%'}, null, null]
+    #aoColumns: [ { sWidth: '45%'}, { sWidth: '25%' }, { sWidth: '15%'}, null, null]
 
     # tbl.fnSetFilteringDelay(500)
 
@@ -21,8 +21,8 @@ $(document).ready ->
   #  $(this).tab('show')
   #  return
 
-  $('#study-peaks').dataTable()
-  return
+  #$('#study-peaks').dataTable()
+  #return
 
     # $('#study-peaks').on('click', 'tr', (e) =>
         # row = $(e.target).closest('tr')[0]

@@ -8,9 +8,3 @@
                   th style='width: 220px;' Name
                   th style='width: 60px;' Num. studies
                   th style='width: 80px;' Num. activations
-          tbody
-            - for f in features
-              tr
-                td <a href={{url_for('features.show',id=f.id)}}>{{f.feature}}</a>
-                td {{f.num_studies}}
-                td {{f.num_activations}}

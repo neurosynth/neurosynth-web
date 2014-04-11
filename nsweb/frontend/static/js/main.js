@@ -1,27 +1,35 @@
 $(document).ready(function() {
   var tbl;
-  tbl = $('table[class*=studies-datatable]').dataTable({
-    "sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
+  return tbl = $('#studies-datatable').dataTable({
     "sPaginationType": "full_numbers",
     "iDisplayLength": 10,
     "bProcessing": true,
     "bServerSide": true,
     "sAjaxSource": '/api/studies',
     "bDeferRender": true,
-    "bStateSave": true,
-    aoColumns: [
-      {
-        sWidth: '45%'
-      }, {
-        sWidth: '25%'
-      }, {
-        sWidth: '15%'
-      }, null, null
-    ]
+    "bStateSave": true
   });
-  $('#study-peaks').dataTable();
 });
 
 $(document).ready(function() {
-  $('#features_table').dataTable();
+  var tbl, url_id;
+  tbl = $('#features_table').dataTable({
+    "sPaginationType": "full_numbers",
+    "iDisplayLength": 10,
+    "bProcessing": true,
+    "bServerSide": true,
+    "sAjaxSource": '/api/features',
+    "bDeferRender": true,
+    "bStateSave": true
+  });
+  url_id = document.URL.split('/');
+  url_id.pop();
+  return tbl = $('#feature_table').dataTable({
+    "sPaginationType": "full_numbers",
+    "iDisplayLength": 10,
+    "bProcessing": true,
+    "sAjaxSource": '/api/features/' + url_id.pop(),
+    "bDeferRender": true,
+    "bStateSave": true
+  });
 });

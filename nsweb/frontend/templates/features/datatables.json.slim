@@ -1,9 +1,0 @@
-- aoColumns = []
-- aaData = []
-- @features.each do |f|
-	/ - set_names = f.feature_sets.map { |fs| link_to(fs.name, set_path(fs)) }.join(', ')
-	- set_names = link_to(f.set_name, set_path(f.set_name))
-	- aaData << [link_to(f.name, feature_path(f.name)), set_names, f.n_studies.to_s, f.n_peaks.to_s]
-- data = { 'aaData' => aaData }
-- puts data.to_json
-= data.to_json.html_safe

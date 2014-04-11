@@ -14,9 +14,9 @@ class Location(db.Model):
         self.z=z
     
     @classmethod
-    def closestPeaks(radius,x,y,z):
+    def closestPeaks(radius,x,y,z,offset=0):
         '''Finds closest peaks approximated to a cube. Because its SO Fast and Easy!'''
-        points = Peak.query.filter(x <= x+radius and x>=x-radius and y<= y+radius and y>=y-radius and z<= z+radius and z>=z-radius).all() #fast cube db search
+        points = Peak.query.offset(offset).filter(x <= x+radius and x>=x-radius and y<= y+radius and y>=y-radius and z<= z+radius and z>=z-radius).all() #fast cube db search
         points = [p for p in points if pow(x-p.x, 2) + pow(y-p.y, 2) + pow(z-p.z, 2) <= radius] #euclidean distance filter
         return points
         

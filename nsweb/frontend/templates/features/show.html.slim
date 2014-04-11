@@ -15,20 +15,22 @@
       #feature-tab-content.tab-content
         #studies.tab-pane.active
           h3 Studies associated with the feature {{feature}}
-          table#features_table.table-striped.table-hover.table.table-condensed.default-datatable
+          script
+            var id = {{id}}
+          table#feature_table.table-striped.table-hover.table.table-condensed.default-datatable
             thead
               tr
                 th Title
                 th Authors
                 th Journal
                 th Loading
-            tbody
-                - for f in frequencies
-                  tr
-                    td <a href={{url_for('studies.show',id=f.study.pmid)}}> {{f.study.title}}</a>
-                    td {{f.study.authors}}
-                    td {{f.study.journal}}
-                    td {{f.frequency}}
+            /tbody
+                /- for f in frequencies
+                  /tr
+                    /td <a href={{url_for('studies.show',id=f.study.pmid)}}> {{f.study.title}}</a>
+                    /td {{f.study.authors}}
+                    /td {{f.study.journal}}
+                    /td {{f.frequency}}
         #help.tab-pane
           h3 What is this?
           p This page displays information for an automated Neurosynth meta-analysis of the feature "#{@feature.name}". The meta-analysis was performed by automatically identifying all studies in the Neurosynth database that loaded highly on the feature, and then performing meta-analyses to identify brain regions that were consistently or preferentially reported in the tables of those studies.
