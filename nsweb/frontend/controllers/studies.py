@@ -1,6 +1,6 @@
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, request, jsonify
 from nsweb.models import Study
-from nsweb.core import apimanager, add_blueprint
+from nsweb.core import apimanager, add_blueprint, app
 from flask.helpers import url_for
 
 bp = Blueprint('studies',__name__,url_prefix='/studies')
@@ -26,6 +26,15 @@ def show(id):
         'options': { 'panzoomEnabled': 'false' },
     }
     return render_template('studies/show.html.slim', study=study, viewer_settings=viewer_settings)
+
+@app.route('/api/studies/<int:id>/')
+def api(id):
+    data = [ ['<a href={0}>{1}</a>'.format(url_for('feature.show',id=str(s.feature_id)),s.feature.feature),
+              s.frequency,
+              ] for s in Study.query.get_or_404(id).frequencies]
+#     data=dumps({'aadata':data})
+    data=jsonify(aadata=data)
+    return data
 
 # @bp.route('/download')
 # gave up on this b/c issue is not image download I think?

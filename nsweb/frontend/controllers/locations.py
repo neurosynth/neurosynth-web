@@ -1,25 +1,35 @@
 from nsweb.core import add_blueprint
 from nsweb.models import Location
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, redirect, jsonify, url_for
+from flask.json import jsonify
 
 bp = Blueprint('locations',__name__,url_prefix='/locations')
 
+def translateCoords(id):
+	'''
+	Translates coords from x_y_z to x,y,z
+	'''
+	return [int(i) for i in id.split('_')]
+
 @bp.route('/')
 def index():
-	return render_template('locations/index.html')
+	return redirect(url_for('locations.show',id='0_0_0'))
 
-@bp.route('/<id>')
+@bp.route('/<string:id>')
 def show(id):
-	xyz = [int(i) for i in id.split('_')]
+	x,y,z = translateCoords(id)
 	radius=6
-	peaks = Location.closestPeaks(radius,xyz[0],xyz[1],xyz[2])
-	return render_template('locations/show.html', peaks=peaks, xyz=xyz)
+	peaks = Location.closestPeaks(radius,x,y,z)
+	return render_template('locations/show.html', radius=radius, xyz=[x,y,z])
+
+@bp.route('/api/<string:id>')
+def api(id):
+	x,y,z = translateCoords(id)
+	peaks = Location.closestPeaks(6,x,y,z)
+	data = [ [p.study.title, p.study.authors, p.study.journal] for p in peaks]
+	return jsonify(aadata=data)
+
 add_blueprint(bp)
 
-# Begin API stuff
-# add_blueprint(apimanager.create_api_blueprint(Location,
-#                                               methods=['GET'],
-#                                               collection_name='locations',
-#                                               results_per_page=20,
-#                                               max_results_per_page=100))
+
 

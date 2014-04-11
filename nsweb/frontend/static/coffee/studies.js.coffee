@@ -2,7 +2,7 @@
 # All this logic will automatically be available in application.js.
 # You can use CoffeeScript in this file: http://jashkenas.github.com/coffee-script/
 $(document).ready ->
-  tbl = $('#studies-datatable').dataTable
+  $('#studies-datatable').dataTable
     # "sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
     "sPaginationType": "full_numbers"
     "iDisplayLength": 10
@@ -12,6 +12,15 @@ $(document).ready ->
     "bDeferRender": true
     "bStateSave": true
 
+  url_id=document.URL.split('/')
+  url_id.pop()
+  $('#feature_table').dataTable
+    "sPaginationType": "full_numbers"
+    "iDisplayLength": 10
+    "bProcessing": true
+    "sAjaxSource": '/api/studies/'+url_id.pop()
+    "bDeferRender": true
+    "bStateSave": true
     #aoColumns: [ { sWidth: '45%'}, { sWidth: '25%' }, { sWidth: '15%'}, null, null]
 
     # tbl.fnSetFilteringDelay(500)

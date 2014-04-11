@@ -52,7 +52,7 @@
                         th Feature
                         th Loading
                     tbody
-                      - for f in study.frequencies
-                        tr
-                          td <a href={{url_for('features.show', id=f.feature.id)}}>{{f.feature.feature}}</a>
-                          td {{f.frequency}}
+                      /- for f in study.frequencies
+                        /tr
+                          /td <a href={{url_for('features.show', id=f.feature.id)}}>{{f.feature.feature}}</a>
+                          /td {{f.frequency}}
