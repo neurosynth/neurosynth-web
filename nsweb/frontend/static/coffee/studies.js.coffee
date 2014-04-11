@@ -14,7 +14,7 @@ $(document).ready ->
 
   url_id=document.URL.split('/')
   url_id.pop()
-  $('#feature_table').dataTable
+  $('#study-features').dataTable
     "sPaginationType": "full_numbers"
     "iDisplayLength": 10
     "bProcessing": true

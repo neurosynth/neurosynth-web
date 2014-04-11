@@ -38,7 +38,7 @@ def api(id):
               f.frequency,
               ] for f in Feature.query.get_or_404(id).frequencies]
 #     data=dumps({'aadata':data})
-    data=jsonify(aadata=data)
+    data=jsonify(aaData=data)
     stuff=request.args
     return data
 add_blueprint(bp)

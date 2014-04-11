@@ -1,6 +1,6 @@
 $(document).ready(function() {
-  var tbl;
-  return tbl = $('#studies-datatable').dataTable({
+  var url_id;
+  $('#studies-datatable').dataTable({
     "sPaginationType": "full_numbers",
     "iDisplayLength": 10,
     "bProcessing": true,
@@ -9,11 +9,21 @@ $(document).ready(function() {
     "bDeferRender": true,
     "bStateSave": true
   });
+  url_id = document.URL.split('/');
+  url_id.pop();
+  return $('#study-features').dataTable({
+    "sPaginationType": "full_numbers",
+    "iDisplayLength": 10,
+    "bProcessing": true,
+    "sAjaxSource": '/studies/api/' + url_id.pop(),
+    "bDeferRender": true,
+    "bStateSave": true
+  });
 });
 
 $(document).ready(function() {
-  var tbl, url_id;
-  tbl = $('#features_table').dataTable({
+  var url_id;
+  $('#features_table').dataTable({
     "sPaginationType": "full_numbers",
     "iDisplayLength": 10,
     "bProcessing": true,
@@ -24,11 +34,11 @@ $(document).ready(function() {
   });
   url_id = document.URL.split('/');
   url_id.pop();
-  return tbl = $('#feature_table').dataTable({
+  return $('#feature_table').dataTable({
     "sPaginationType": "full_numbers",
     "iDisplayLength": 10,
     "bProcessing": true,
-    "sAjaxSource": '/api/features/' + url_id.pop(),
+    "sAjaxSource": '/features/api/' + url_id.pop(),
     "bDeferRender": true,
     "bStateSave": true
   });

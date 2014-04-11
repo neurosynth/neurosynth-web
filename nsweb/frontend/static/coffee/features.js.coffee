@@ -2,7 +2,7 @@
 # All this logic will automatically be available in application.js.
 # You can use CoffeeScript in this file: http://jashkenas.github.com/coffee-script/
 $(document).ready ->
-  tbl = $('#features_table').dataTable
+  $('#features_table').dataTable
     "sPaginationType": "full_numbers"
     "iDisplayLength": 10
     "bProcessing": true
@@ -13,7 +13,7 @@ $(document).ready ->
 
   url_id=document.URL.split('/')
   url_id.pop()
-  tbl = $('#feature_table').dataTable
+  $('#feature_table').dataTable
     "sPaginationType": "full_numbers"
     "iDisplayLength": 10
     "bProcessing": true

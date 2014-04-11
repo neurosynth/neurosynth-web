@@ -29,11 +29,11 @@ def show(id):
 
 @bp.route('/api/<int:id>/')
 def api(id):
-    data = [ ['<a href={0}>{1}</a>'.format(url_for('feature.show',id=str(s.feature_id)),s.feature.feature),
-              s.frequency,
-              ] for s in Study.query.get_or_404(id).frequencies]
+    data = [ ['<a href={0}>{1}</a>'.format(url_for('feature.show',id=f.feature_id),f.feature.feature),
+              f.frequency,
+              ] for f in Study.query.get_or_404(id).frequencies]
 #     data=dumps({'aadata':data})
-    data=jsonify(aadata=data)
+    data=jsonify(aaData=data)
     return data
 
 # @bp.route('/download')
