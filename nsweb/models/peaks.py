@@ -12,3 +12,10 @@ class Peak(db.Model):
         self.y=y
         self.z=z
 
+    @classmethod
+    def closestPeaks(cls, radius, x, y, z):
+        '''Finds closest peaks approximated to a cube. Because its SO Fast and Easy!'''
+        points = Peak.query.filter(cls.x<=x+radius).filter(cls.x>=x-radius).filter(Peak.y<=y+radius).filter(Peak.y>=y-radius).filter(Peak.z<=z+radius).filter(Peak.z>=z-radius)
+        points = points.all()
+        points = [p for p in points if pow(x-p.x, 2) + pow(y-p.y, 2) + pow(z-p.z, 2) <= radius] #euclidean distance filter
+        return points

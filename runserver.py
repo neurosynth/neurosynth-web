@@ -12,6 +12,7 @@ def main():
     
     import nsweb.frontend.controllers.studies
     import nsweb.frontend.controllers.features
+    import nsweb.frontend.controllers.locations
     
     #loads blueprints
     register_blueprints()

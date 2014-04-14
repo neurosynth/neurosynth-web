@@ -27,14 +27,6 @@ def show(id):
     }
     return render_template('studies/show.html.slim', study=study, viewer_settings=viewer_settings)
 
-@bp.route('/api/<int:id>/')
-def api(id):
-    data = [ ['<a href={0}>{1}</a>'.format(url_for('feature.show',id=f.feature_id),f.feature.feature),
-              f.frequency,
-              ] for f in Study.query.get_or_404(id).frequencies]
-#     data=dumps({'aadata':data})
-    data=jsonify(aaData=data)
-    return data
 
 # @bp.route('/download')
 # gave up on this b/c issue is not image download I think?
@@ -69,7 +61,7 @@ def datatables_preprocessor(search_params={}, **kwargs):
         
         #Yea... this is a list of dictionary... Flask-restless has an undocumented python 2.5 workaround hack that breaks documented functionality. This is the workaround for the workaround. -_-
         search_params['order_by'] = [{
-                                      'field': ['title','authors','journal','year','pmid'][int(request.args['iSortCol_0'])] ,
+                                      'field': ['title','authors','journal','year','pmid'][int(request.args['iSortCol_0'])],
                                       'direction': str(request.args['sSortDir_0'])
                                       }]
         search_params['filters'] = [
