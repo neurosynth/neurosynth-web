@@ -18,7 +18,7 @@ $(document).ready ->
     "sPaginationType": "full_numbers"
     "iDisplayLength": 10
     "bProcessing": true
-    "sAjaxSource": '/studies/api/'+url_id.pop()
+    "sAjaxSource": '/api/studies/'+url_id.pop()
     "bDeferRender": true
     "bStateSave": true
     #aoColumns: [ { sWidth: '45%'}, { sWidth: '25%' }, { sWidth: '15%'}, null, null]

@@ -15,7 +15,7 @@ $(document).ready(function() {
     "sPaginationType": "full_numbers",
     "iDisplayLength": 10,
     "bProcessing": true,
-    "sAjaxSource": '/studies/api/' + url_id.pop(),
+    "sAjaxSource": '/api/studies/' + url_id.pop(),
     "bDeferRender": true,
     "bStateSave": true
   });
@@ -38,7 +38,7 @@ $(document).ready(function() {
     "sPaginationType": "full_numbers",
     "iDisplayLength": 10,
     "bProcessing": true,
-    "sAjaxSource": '/features/api/' + url_id.pop(),
+    "sAjaxSource": '/api/features/' + url_id.pop(),
     "bDeferRender": true,
     "bStateSave": true
   });

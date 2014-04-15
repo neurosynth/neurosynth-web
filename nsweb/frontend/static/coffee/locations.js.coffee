@@ -72,7 +72,7 @@ $(document).ready ->
         iDisplayLength: 10
         bProcessing: true
         #aaSorting: [[1, 'desc']]
-        sAjaxSource: '/locations/api/'+url_id.pop()
+        sAjaxSource: '/api/locations/'+url_id.pop()
         # fnRowCallback: (nRow, aData, iDisplayIndex) ->
                             # $cell=$('td:eq(0)', nRow)
                             # feature = $cell.text()

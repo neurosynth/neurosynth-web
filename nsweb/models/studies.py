@@ -9,8 +9,8 @@ class Study(db.Model):
     year = db.Column(db.Integer)
     space = db.Column(db.String(10))
     table_num = db.Column(db.String(50))
-    peaks = db.relationship('Peak', backref=db.backref('study', lazy='joined'), lazy='joined')
-    features = association_proxy('frequencies','feature')
+    peaks = db.relationship('Peak', backref=db.backref('study', lazy='joined'), lazy='dynamic')
+#    features = association_proxy('frequencies','feature')
 
     def __init__(self, pmid, space, doi='', title='', journal='', authors='', year=0, table_num=''):
         self.pmid=pmid
