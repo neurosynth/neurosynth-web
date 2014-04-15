@@ -6,10 +6,9 @@ from nsweb.models import peaks
 
 bp = Blueprint('locations',__name__,url_prefix='/locations')
 
-@bp.route('/<string:id>')
-def show(id):
-	x,y,z,radius = [int(i) for i in id.split('_')]
-	points = Peak.closestPeaks(radius,x,y,z)
+@bp.route('/<string:val>/')
+def show(val):
+	x,y,z,radius = [int(i) for i in val.split('_')]
 	return render_template('locations/show.html', radius=radius, xyz=[x,y,z])
 
 @bp.route('/')

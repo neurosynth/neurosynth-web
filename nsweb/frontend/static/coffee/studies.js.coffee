@@ -2,23 +2,31 @@
 # All this logic will automatically be available in application.js.
 # You can use CoffeeScript in this file: http://jashkenas.github.com/coffee-script/
 $(document).ready ->
-  $('#studies-datatable').dataTable
+  $('#studies_table').dataTable
     # "sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
     "sPaginationType": "full_numbers"
     "iDisplayLength": 10
     "bProcessing": true
     "bServerSide": true
-    "sAjaxSource": '/api/studies'
+    "sAjaxSource": '/api/studies/'
     "bDeferRender": true
     "bStateSave": true
 
   url_id=document.URL.split('/')
-  url_id.pop()
-  $('#study-features').dataTable
+  url_id=url_id[url_id.length-2]
+  $('#study_features_table').dataTable
     "sPaginationType": "full_numbers"
     "iDisplayLength": 10
     "bProcessing": true
-    "sAjaxSource": '/api/studies/'+url_id.pop()
+    "sAjaxSource": '/api/studies/features/'+url_id+'/'
+    "bDeferRender": true
+    "bStateSave": true
+
+  $('#study_peaks_table').dataTable
+    "sPaginationType": "full_numbers"
+    "iDisplayLength": 10
+    "bProcessing": true
+    "sAjaxSource": '/api/studies/peaks/'+url_id+'/'
     "bDeferRender": true
     "bStateSave": true
     #aoColumns: [ { sWidth: '45%'}, { sWidth: '25%' }, { sWidth: '15%'}, null, null]

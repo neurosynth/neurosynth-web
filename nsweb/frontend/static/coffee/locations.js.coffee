@@ -17,7 +17,23 @@
 
 
 $(document).ready ->
-
+  url_id=document.URL.split('/')
+  url_id=url_id[url_id.length-2]
+  $('#location_studies_table').dataTable({
+    #sDom: "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>"
+    sPaginationType: "full_numbers"
+    iDisplayLength: 10
+    bProcessing: true
+    #aaSorting: [[1, 'desc']]
+    sAjaxSource: '/api/locations/'+url_id
+    # fnRowCallback: (nRow, aData, iDisplayIndex) ->
+                        # $cell=$('td:eq(0)', nRow)
+                        # feature = $cell.text()
+                        # val = '<a href="/features/' + feature + '">' + feature + '</a>'
+                        # $cell.html(val)
+                        # nRow
+    # 'aoColumns': [ { sWidth: '45%'}, { sWidth: '25%' }, { sWidth: '15%'}]
+  })
     # Handle location viewer separately because we already have a viewer on the page.
     # Eventually the code should be refactored to gracefully handle multiple viewers
     # by storing handles and calling as needed.
@@ -64,30 +80,14 @@ $(document).ready ->
     # $('#load-location').click((e) ->
         # loadLocationFromCursor(viewer.coords_xyz())
     # )
-  url_id=document.URL.split('/')
-  url_id.pop()
-    $('#location-features-datatable').dataTable({
-        #sDom: "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>"
-        sPaginationType: "full_numbers"
-        iDisplayLength: 10
-        bProcessing: true
-        #aaSorting: [[1, 'desc']]
-        sAjaxSource: '/api/locations/'+url_id.pop()
-        # fnRowCallback: (nRow, aData, iDisplayIndex) ->
-                            # $cell=$('td:eq(0)', nRow)
-                            # feature = $cell.text()
-                            # val = '<a href="/features/' + feature + '">' + feature + '</a>'
-                            # $cell.html(val)
-                            # nRow
-        # 'aoColumns': [ { sWidth: '45%'}, { sWidth: '25%' }, { sWidth: '15%'}]
-    })
 
-    # Load state (e.g., which tab to display)
-    activeTab = window.cookie.get('locationTab')
-    $("#location-menu li:eq(#{activeTab}) a").tab('show')
-    # $(viewer).on('imagesLoaded', ((e) ->
-    #     # Start from seed voxel.
-    #     # viewer.paint()
-    #     viewer.moveToAtlasCoords(seed)
-    # ))
+
+  # Load state (e.g., which tab to display)
+  # activeTab = window.cookie.get('locationTab')
+  # $("#location-menu li:eq(#{activeTab}) a").tab('show')
+  # $(viewer).on('imagesLoaded', ((e) ->
+  #     # Start from seed voxel.
+  #     # viewer.paint()
+  #     viewer.moveToAtlasCoords(seed)
+  # ))
 

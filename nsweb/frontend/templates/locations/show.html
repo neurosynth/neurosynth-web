@@ -1,0 +1,47 @@
+{% set page_title = 'Neurosynth|Location' %}
+{% extends "layout/base.html" %}
+{% block content %}
+  <div class="row">
+    <div class="span11">
+      <row class="top-space20">
+        <div class="span11">
+          <ul id="location-menu" class="nav nav-tabs">
+            <li>
+              <a  data-toggle="tab" href="#features">Features</a>
+            </li>
+            <li class="active">
+              <a  data-toggle="tab" href="#studies">Studies</a>
+            </li>
+          </ul>
+          <div id="location-tab-content" class="tab-content">
+            <div id="features" class="tab-pane">
+              <table id="location_features_table" class="table-striped table-hover table table-condensed">
+                <thead>
+                  <tr>
+                    <th>Feature</th>
+                    <th>z-score</th>
+                    <th>post. prob.</th>
+                  </tr>
+                </thead>
+              </table>
+            </div>
+            <div id="studies" class="tab-pane active">
+              <h3>Studies</h3>
+              <div class="lead">activations within {{radius}} mm of {{xyz|join(', ')}}:</div>
+              <table id="location_studies_table" class="table-striped table-hover table table-condensed small-datatable">
+                <thead>
+                  <tr>
+                    <th>Title</th>
+                    <th>Authors</th>
+                    <th>Journal</th>
+                    <th>Peaks</th>
+                  </tr>
+                </thead>
+              </table>
+            </div>
+          </div>
+        </div>
+      </row>
+    </div>
+  </div>
+{% endblock %}

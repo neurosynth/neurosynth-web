@@ -13,15 +13,6 @@ class Location(db.Model):
         self.x=x
         self.y=y
         self.z=z
-    
-#     @classmethod
-#     def closestPeaks(cls, radius, x, y, z):
-#         '''Finds closest peaks approximated to a cube. Because its SO Fast and Easy!'''
-#         from nsweb.models import Peak
-#         radius=6
-#         points = Peak.query.filter(Peak.x <= Peak.x + radius).count()# and x >= x-radius and y <= y+radius and y >= y-radius and z <= z+radius and z >= z-radius).all() #fast cube db search
-#         points = [p for p in points if pow(x-p.x, 2) + pow(y-p.y, 2) + pow(z-p.z, 2) <= radius] #euclidean distance filter
-#         return points
         
 class LocationFeature(db.Model):
     feature_id = db.Column(db.Integer, db.ForeignKey(Feature.id), primary_key=True)

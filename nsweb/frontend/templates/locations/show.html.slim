@@ -3,35 +3,29 @@
 - block content
   .row
     .span11
-      .big-text
-        /| Data for location:
-        /text_field_tag "x-pos", @location.x, {:class => 'plane-pos' }
-        /text_field_tag "y-pos", @location.y, {:class => 'plane-pos' }
-        /text_field_tag "z-pos", @location.z, {:class => 'plane-pos' }
-        / get Ajax working properly here. best to wait till viewer might need to do something before returning a view.
-        / Or should I update URL directly? might be best to change url Id into a parameter so the entire page doesn't get redrawn and scripts downloaded
       row.top-space20
         .span11
           ul#location-menu.nav.nav-tabs
             li
-              a href="#features" Features
+              a href="#features" data-toggle="tab" Features
             li.active
-              a href="#studies" Studies
+              a href="#studies" data-toggle="tab" Studies
 
           #location-tab-content.tab-content
-            #features.tab-pane.active
-              table#location-features-datatable.table-striped.table-hover.table.table-condensed
+            #features.tab-pane
+              table#location_features_table.table-striped.table-hover.table.table-condensed
                 thead
                   tr
                     th Feature
                     th z-score
                     th post. prob.
-            #studies.tab-pane
+            #studies.tab-pane.active
               h3 Studies
               .lead activations within {{radius}} mm of {{xyz|join(', ')}}:
-              table#study-table.table-striped.table-hover.table.table-condensed.small-datatable
+              table#location_studies_table.table-striped.table-hover.table.table-condensed.small-datatable
                 thead
                   tr
                     th Title
                     th Authors
                     th Journal
+                    th Peaks

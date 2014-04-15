@@ -30,29 +30,17 @@
                 li
                   a href="#features" data-toggle="tab" Features
             .span6
-              /p {{viewers.viewer(viewer_settings)|safe}}
               #study-tab-content.tab-content
                 #activations.tab-pane.active
-                  table#study-peaks.table.table-striped.table-hover.table-condensed.small-datatable
+                  table#study_peaks_table.table.table-striped.table-hover.table-condensed.small-datatable
                     thead
                       tr
                         th x
                         th y
                         th z
-                    tbody
-                      - for p in study.peaks
-                        tr
-                          td {{p.x}}
-                          td {{p.y}}
-                          td {{p.z}}
                 #features.tab-pane
-                  table#study-features.table.table-striped.table-hover.table-condensed.small-datatable
+                  table#study_features_table.table.table-striped.table-hover.table-condensed.small-datatable
                     thead
                       tr
                         th Feature
                         th Loading
-                    /tbody
-                      /- for f in study.frequencies
-                        /tr
-                          /td <a href={{url_for('features.show', id=f.feature.id)}}>{{f.feature.feature}}</a>
-                          /td {{f.frequency}}

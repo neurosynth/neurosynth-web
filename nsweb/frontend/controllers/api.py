@@ -1,6 +1,7 @@
 from nsweb.core import add_blueprint
 from flask import Blueprint, redirect, jsonify, url_for, request
 from nsweb.models import *
+from flask_sqlalchemy import sqlalchemy
 
 bp = Blueprint('apis',__name__,url_prefix='/api')
 
@@ -54,12 +55,19 @@ def features_server_side_api():
     return result
 
 # Begin client side APIs 
-@bp.route('/studies/<int:val>/')
-def studies_api(val):
-    data=Study.query.get_or_404(val)
+@bp.route('/studies/features/<int:val>/')
+def studies_features_api(val):
+    data=Study.query.get(val)
     data = [ ['<a href={0}>{1}</a>'.format(url_for('features.show',val=f.feature_id),f.feature.feature),
               round(f.frequency,3),
               ] for f in data.frequencies]
+    data=jsonify(aaData=data)
+    return data
+
+@bp.route('/studies/peaks/<int:val>/')
+def studies_peaks_api(val):
+    data=Study.query.get(val)
+    data = [ [p.x,p.y,p.z] for p in data.peaks.all()]
     data=jsonify(aaData=data)
     return data
 
@@ -73,7 +81,7 @@ def find_api_feature(name):
 
 @bp.route('/features/<int:val>/')
 def features_api(val):
-    data = Feature.query.get_or_404(val)
+    data = Feature.query.get(val)
     data = [ ['<a href={0}>{1}</a>'.format(url_for('studies.show',val=f.pmid),f.study.title),
               f.study.authors,
               f.study.journal,
@@ -82,10 +90,13 @@ def features_api(val):
     data=jsonify(aaData=data)
     return data
 
-@bp.route('/locations/<string:val>')
+@bp.route('/locations/<string:val>/')
 def locations_api(val):
     x,y,z,radius = [int(i) for i in val.split('_')]
     points = Peak.closestPeaks(radius,x,y,z)
+#    points = points.with_entities(Study.title,Study.authors,Study.journal).add_columns(sqlalchemy.func.count(Peak.id))
+#     points = points.distinct(Peak.pmid)
+#     data = [ [p[0], p[1], p[2],p[3]] for p in points]
     data = [ [p.study.title, p.study.authors, p.study.journal] for p in points]
     return jsonify(aaData=data)
 
