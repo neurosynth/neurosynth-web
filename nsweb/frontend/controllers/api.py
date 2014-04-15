@@ -1,8 +1,7 @@
-from nsweb.core import add_blueprint
+from nsweb.core import add_blueprint, db
 from flask import Blueprint, redirect, jsonify, url_for, request
 from nsweb.models import *
 from flask_sqlalchemy import sqlalchemy
-
 bp = Blueprint('apis',__name__,url_prefix='/api')
 
 
@@ -94,10 +93,8 @@ def features_api(val):
 def locations_api(val):
     x,y,z,radius = [int(i) for i in val.split('_')]
     points = Peak.closestPeaks(radius,x,y,z)
-#    points = points.with_entities(Study.title,Study.authors,Study.journal).add_columns(sqlalchemy.func.count(Peak.id))
-#     points = points.distinct(Peak.pmid)
-#     data = [ [p[0], p[1], p[2],p[3]] for p in points]
-    data = [ [p.study.title, p.study.authors, p.study.journal] for p in points]
+    points = points.group_by(Peak.pmid)
+    points = points.add_columns(sqlalchemy.func.count(Peak.id))
+    data = [ [p[0].study.title, p[0].study.authors, p[0].study.journal,p[1] ] for p in points]
     return jsonify(aaData=data)
-
 add_blueprint(bp)
