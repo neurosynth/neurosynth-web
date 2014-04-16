@@ -1,8 +1,8 @@
 var loadFromBoxes, updateRadiusBox, updateRadiusSlider;
 
 $(document).ready(function() {
-  var url_id;
-  $('#studies_table').dataTable({
+  var iDelay, tbl, url_id;
+  tbl = $('#studies_table').dataTable({
     "sPaginationType": "full_numbers",
     "iDisplayLength": 10,
     "bProcessing": true,
@@ -11,6 +11,7 @@ $(document).ready(function() {
     "bDeferRender": true,
     "bStateSave": true
   });
+  tbl.fnSetFilteringDelay(iDelay = 400);
   url_id = document.URL.split('/');
   url_id = url_id[url_id.length - 2];
   $('#study_features_table').dataTable({
@@ -32,8 +33,8 @@ $(document).ready(function() {
 });
 
 $(document).ready(function() {
-  var url_id;
-  $('#features_table').dataTable({
+  var iDelay, tbl, url_id;
+  tbl = $('#features_table').dataTable({
     "sPaginationType": "full_numbers",
     "iDisplayLength": 10,
     "bProcessing": true,
@@ -42,6 +43,7 @@ $(document).ready(function() {
     "bDeferRender": true,
     "bStateSave": true
   });
+  tbl.fnSetFilteringDelay(iDelay = 400);
   url_id = document.URL.split('/');
   url_id.pop();
   return $('#feature_table').dataTable({

@@ -14,6 +14,8 @@ class Peak(db.Model):
 
     @classmethod
     def closestPeaks(cls, radius, x, y, z):
-        points = Peak.query.filter(cls.x<=x+radius,cls.x>=x-radius,cls.y<=y+radius,cls.y>=y-radius,cls.z<=z+radius,cls.z>=z-radius,(x-cls.x)*(x-cls.x)+(y-cls.y)*(y-cls.y)+(z-cls.z)*(z-cls.z) <= radius*radius)
-#         points = [p for p in points if pow(x-p.x, 2) + pow(y-p.y, 2) + pow(z-p.z, 2) <= pow(radius,2)] #euclidean distance filter
-        return points
+        '''
+        Returns an optimized query using euclidean distance to find closest peaks within a radius of x, y, z
+        '''
+        # find peaks in a box then run heavier euclidean distance formula on what's left
+        return Peak.query.filter(cls.x<=x+radius,cls.x>=x-radius,cls.y<=y+radius,cls.y>=y-radius,cls.z<=z+radius,cls.z>=z-radius,(x-cls.x)*(x-cls.x)+(y-cls.y)*(y-cls.y)+(z-cls.z)*(z-cls.z) <= radius*radius)

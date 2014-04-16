@@ -13,7 +13,7 @@ def studies_server_side_api():
     order_by = '{0} {1}'.format(['title','authors','journal','year','pmid'][int(request.args['iSortCol_0'])],str(request.args['sSortDir_0']))
     search = str(request.args['sSearch']).strip()
     data = Study.query
-    if search:
+    if search:#No empty search on my watch
         search = '%{}%'.format(search)
         data=data.filter( Study.title.like( search ) | Study.authors.like( search ) | Study.journal.like( search ) | Study.year.like( search ) | Study.pmid.like(search) )
     data=data.order_by(order_by)
@@ -37,7 +37,7 @@ def features_server_side_api():
     order_by = '{0} {1}'.format(['feature','num_studies','num_activations'][int(request.args['iSortCol_0'])],str(request.args['sSortDir_0']))
     search = str(request.args['sSearch']).strip()
     data = Feature.query
-    if search:
+    if search: #No empty search on my watch
         search = '%{}%'.format(search)
         data = data.filter( Feature.feature.like( search ) | Feature.num_studies.like( search ) | Feature.num_activations.like( search ) )
     data=data.order_by(order_by)
@@ -57,6 +57,7 @@ def features_server_side_api():
 @bp.route('/studies/features/<int:val>/')
 def studies_features_api(val):
     data=Study.query.get(val)
+#     data=Frequency.query.filter_by(pmid=int(val))#attempted optimization. Join causes slower performance however
     data = [ ['<a href={0}>{1}</a>'.format(url_for('features.show',val=f.feature_id),f.feature.feature),
               round(f.frequency,3),
               ] for f in data.frequencies]
@@ -66,7 +67,9 @@ def studies_features_api(val):
 @bp.route('/studies/peaks/<int:val>/')
 def studies_peaks_api(val):
     data=Study.query.get(val)
-    data = [ [p.x,p.y,p.z] for p in data.peaks.all()]
+#     data=Peak.query.filter_by(pmid=int(val))#attempted optimization. Join causes slower performance however
+    data=[ [p.x,p.y,p.z] for p in data.peaks]
+#     data=Peak.query.filter_by(pmid=int(val)).with_entities(Peak.x,Peak.y,Peak.z).all() #attempted optimization.
     data=jsonify(aaData=data)
     return data
 
@@ -81,6 +84,7 @@ def find_api_feature(name):
 @bp.route('/features/<int:val>/')
 def features_api(val):
     data = Feature.query.get(val)
+#     data=Frequency.query.filter_by(feature_id=int(val))#attempted optimization. Join causes slower performance however
     data = [ ['<a href={0}>{1}</a>'.format(url_for('studies.show',val=f.pmid),f.study.title),
               f.study.authors,
               f.study.journal,
@@ -93,8 +97,8 @@ def features_api(val):
 def locations_api(val):
     x,y,z,radius = [int(i) for i in val.split('_')]
     points = Peak.closestPeaks(radius,x,y,z)
-    points = points.group_by(Peak.pmid)
-    points = points.add_columns(sqlalchemy.func.count(Peak.id))
+    points = points.group_by(Peak.pmid)#prevents duplicate studies
+    points = points.add_columns(sqlalchemy.func.count(Peak.id))#counts duplicate peaks
     data = [ [p[0].study.title, p[0].study.authors, p[0].study.journal,p[1] ] for p in points]
     return jsonify(aaData=data)
 add_blueprint(bp)

@@ -2,7 +2,7 @@
 # All this logic will automatically be available in application.js.
 # You can use CoffeeScript in this file: http://jashkenas.github.com/coffee-script/
 $(document).ready ->
-  $('#features_table').dataTable
+  tbl=$('#features_table').dataTable
     "sPaginationType": "full_numbers"
     "iDisplayLength": 10
     "bProcessing": true
@@ -10,6 +10,7 @@ $(document).ready ->
     "sAjaxSource": '/api/features'
     "bDeferRender": true
     "bStateSave": true
+  tbl.fnSetFilteringDelay(iDelay=400)
 
   url_id=document.URL.split('/')
   url_id.pop()
