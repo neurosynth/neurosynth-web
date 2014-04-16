@@ -4,14 +4,14 @@
 
 # Grabs the current locations from the x/y/z fields and loads the corresponding URL
 loadFromBoxes = () ->
-  coords = [$('x-in').val(), $('y-in').val(), $('z-in').val(), $('rad-out').val()]
+  coords = [$('#x-in').val(), $('#y-in').val(), $('#z-in').val(), $('#rad-out').val()]
   window.location = '/locations/' + coords.join('_')+'/'
 
 updateRadiusBox = () ->
-  $('rad-out').val($('rad-in').val())
+  $('#rad-out').val($('#rad-in').val())
 
 updateRadiusSlider = () ->
-  $('rad-in').val($('rad-out').val())
+  $('#rad-in').val($('#rad-out').val())
 
 #
 # # Get the current cursor position and load the corresponding URL
