@@ -3,6 +3,15 @@
 - block content
   .row
     .span11
+      .big-text Data for location:
+        form action="demo_form.asp"
+
+          input type="number" name="x-in" min="-90" max="90" value="{{x}}"
+          input type="number" name="y-in" min="-72" max="108" value="{{y}}"
+          input type="number" name="z-in" min="-106" max="90" value="{{z}}"
+          input type="range"  name="rad-in" min="1" max="20" value="{{radius}}" onChange="updateRadiusBox()"
+          input type="number" name="rad-out" min="1" max="20" value="{{radius}}" onChange="updateRadiusSlider()"
+          input type="button" value="Submit" onclick="loadFromBoxes()"
       row.top-space20
         .span11
           ul#location-menu.nav.nav-tabs
@@ -21,7 +30,7 @@
                     th post. prob.
             #studies.tab-pane.active
               h3 Studies
-              .lead activations within {{radius}} mm of {{xyz|join(', ')}}:
+              .lead activations within {{radius}} mm of {{[x,y,z]|join(', ')}}:
               table#location_studies_table.table-striped.table-hover.table.table-condensed.small-datatable
                 thead
                   tr

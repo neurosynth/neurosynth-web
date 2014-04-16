@@ -3,9 +3,16 @@
 # You can use CoffeeScript in this file: http://jashkenas.github.com/coffee-script/
 
 # Grabs the current locations from the x/y/z fields and loads the corresponding URL
-# loadLocationFromTextBoxes = () ->
-    # coords = [$('#x-pos').val(), $('#y-pos').val(), $('#z-pos').val()]
-    # window.location = '/locations/' + coords.join('_')
+loadFromBoxes = () ->
+  coords = [$('x-in').val(), $('y-in').val(), $('z-in').val(), $('rad-out').val()]
+  window.location = '/locations/' + coords.join('_')+'/'
+
+updateRadiusBox = () ->
+  $('rad-out').val($('rad-in').val())
+
+updateRadiusSlider = () ->
+  $('rad-in').val($('rad-out').val())
+
 #
 # # Get the current cursor position and load the corresponding URL
 # loadLocationFromCursor = (coords) ->

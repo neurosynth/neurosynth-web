@@ -3,6 +3,17 @@
 {% block content %}
   <div class="row">
     <div class="span11">
+      <div class="big-text">
+           Data for location:
+      </div>
+      <form  action="demo_form.asp">
+          <input  max="90" type="number" name="x-in" value="{{x}}" min="-90" />
+          <input  max="108" type="number" name="y-in" value="{{y}}" min="-72" />
+          <input  max="90" type="number" name="z-in" value="{{z}}" min="-106" />
+          <input  max="20" type="range" name="rad-in" value="{{radius}}" min="1" />
+          <input  max="20" type="number" name="rad-out" value="{{radius}}" min="1" />
+          <input  type="button" onclick="loadFromBoxes()" value="Submit" />
+      </form>
       <row class="top-space20">
         <div class="span11">
           <ul id="location-menu" class="nav nav-tabs">
@@ -27,7 +38,7 @@
             </div>
             <div id="studies" class="tab-pane active">
               <h3>Studies</h3>
-              <div class="lead">activations within {{radius}} mm of {{xyz|join(', ')}}:</div>
+              <div class="lead">activations within {{radius}} mm of {{[x,y,z]|join(', ')}}:</div>
               <table id="location_studies_table" class="table-striped table-hover table table-condensed small-datatable">
                 <thead>
                   <tr>

@@ -1,3 +1,5 @@
+var loadFromBoxes, updateRadiusBox, updateRadiusSlider;
+
 $(document).ready(function() {
   var url_id;
   $('#studies_table').dataTable({
@@ -51,6 +53,20 @@ $(document).ready(function() {
     "bStateSave": true
   });
 });
+
+loadFromBoxes = function() {
+  var coords;
+  coords = [$('x-in').val(), $('y-in').val(), $('z-in').val(), $('rad-out').val()];
+  return window.location = '/locations/' + coords.join('_') + '/';
+};
+
+updateRadiusBox = function() {
+  return $('rad-out').val($('rad-in').val());
+};
+
+updateRadiusSlider = function() {
+  return $('rad-in').val($('rad-out').val());
+};
 
 $(document).ready(function() {
   var url_id;
