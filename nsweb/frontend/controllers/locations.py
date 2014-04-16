@@ -13,7 +13,7 @@ def show(val):
 
 @bp.route('/')
 def index():
-	return redirect(url_for('locations.show',id='0_0_0_6'))
+	return redirect(url_for('locations.show',val='0_0_0_6'))
 
 add_blueprint(bp)
 
