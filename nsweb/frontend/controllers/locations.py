@@ -9,7 +9,7 @@ bp = Blueprint('locations',__name__,url_prefix='/locations')
 @bp.route('/<string:val>/')
 def show(val):
 	x,y,z,radius = [int(i) for i in val.split('_')]
-	return render_template('locations/show.html',radius=radius,x=x,y=y,z=z)
+	return render_template('locations/index.html.slim',radius=radius,x=x,y=y,z=z)
 
 @bp.route('/')
 def index():

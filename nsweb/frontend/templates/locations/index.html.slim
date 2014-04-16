@@ -1,22 +1,42 @@
 - set page_title = 'Neurosynth|Location'
 - extends "layout/base.html"
 - block content
-  - coords = [0, 0, 0].join(", ")
-  javascript:
-      xyz = '#{coords.gsub(', ', '_')}'
-
-  .row#locations
-      .span11
-          h2 Locations
-          .big-text
-              .lead Explore structure-to-function mappings around the brain.
-              .top-space20
-                  .lead To start, enter x/y/z coordinates:
-                  = text_field_tag "x-pos", 0, {:class => 'plane-pos' }
-                  = text_field_tag "y-pos", 0, {:class => 'plane-pos' }
-                  = text_field_tag "z-pos", 0, {:class => 'plane-pos' }
-              .top-space20
-                  .lead Or click anywhere on the brain:
   .row
-      .span11
-          = render :partial => 'shared/location_viewer', :locals => { :images => [], :scale => 0.9 }
+    .span11
+      h2 Data for location:
+      b X:
+      input type="number" name="x-in" id="x-in" min="-90" max="90" value="{{x}}"
+      b Y:
+      input type="number" name="y-in" id="y-in" min="-72" max="108" value="{{y}}"
+      b Z:
+      input type="number" name="z-in" id="z-in" min="-106" max="90" value="{{z}}"
+      b Radius:
+      input type="range"  name="rad-in" id="rad-in" min="1" max="20" value="{{radius}}" onChange="updateRadiusBox()"
+      input type="number" name="rad-out" id="rad-out" min="1" max="20" value="{{radius}}" onChange="updateRadiusSlider()"
+      input type="button" id="submit" value="Submit" onclick="loadFromBoxes()"
+      row.top-space20
+        .span11
+          ul#location-menu.nav.nav-tabs
+            li
+              a href="#features" data-toggle="tab" Features
+            li.active
+              a href="#studies" data-toggle="tab" Studies
+
+          #location-tab-content.tab-content
+            #features.tab-pane
+              table#location_features_table.table-striped.table-hover.table.table-condensed
+                thead
+                  tr
+                    th Feature
+                    th z-score
+                    th post. prob.
+            #studies.tab-pane.active
+              h3 Studies
+              .lead activations within {{radius}} mm of {{[x,y,z]|join(', ')}}:
+              table#location_studies_table.table-striped.table-hover.table.table-condensed.small-datatable
+                thead
+                  tr
+                    th Title
+                    th Authors
+                    th Journal
+                    th Peaks

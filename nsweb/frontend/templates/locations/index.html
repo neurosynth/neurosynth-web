@@ -1,0 +1,58 @@
+{% set page_title = 'Neurosynth|Location' %}
+{% extends "layout/base.html" %}
+{% block content %}
+  <div class="row">
+    <div class="span11">
+      <h2>Data for location:</h2>
+      <b>X:</b>
+      <input  name="x-in" min="-90" max="90" value="{{x}}" type="number" id="x-in" />
+      <b>Y:</b>
+      <input  name="y-in" min="-72" max="108" value="{{y}}" type="number" id="y-in" />
+      <b>Z:</b>
+      <input  name="z-in" min="-106" max="90" value="{{z}}" type="number" id="z-in" />
+      <b>Radius:</b>
+      <input  name="rad-in" min="1" max="20" value="{{radius}}" onChange="updateRadiusBox()" type="range" id="rad-in" />
+      <input  name="rad-out" min="1" max="20" value="{{radius}}" onChange="updateRadiusSlider()" type="number" id="rad-out" />
+      <input  type="button" id="submit" value="Submit" onclick="loadFromBoxes()" />
+      <row class="top-space20">
+        <div class="span11">
+          <ul id="location-menu" class="nav nav-tabs">
+            <li>
+              <a  data-toggle="tab" href="#features">Features</a>
+            </li>
+            <li class="active">
+              <a  data-toggle="tab" href="#studies">Studies</a>
+            </li>
+          </ul>
+          <div id="location-tab-content" class="tab-content">
+            <div id="features" class="tab-pane">
+              <table id="location_features_table" class="table-striped table-hover table table-condensed">
+                <thead>
+                  <tr>
+                    <th>Feature</th>
+                    <th>z-score</th>
+                    <th>post. prob.</th>
+                  </tr>
+                </thead>
+              </table>
+            </div>
+            <div id="studies" class="tab-pane active">
+              <h3>Studies</h3>
+              <div class="lead">activations within {{radius}} mm of {{[x,y,z]|join(', ')}}:</div>
+              <table id="location_studies_table" class="table-striped table-hover table table-condensed small-datatable">
+                <thead>
+                  <tr>
+                    <th>Title</th>
+                    <th>Authors</th>
+                    <th>Journal</th>
+                    <th>Peaks</th>
+                  </tr>
+                </thead>
+              </table>
+            </div>
+          </div>
+        </div>
+      </row>
+    </div>
+  </div>
+{% endblock %}
