@@ -1,7 +1,7 @@
 - set page_title='Neurosynth|Study'
 - extends "layout/base.html"
 - block content
-  - import "macros/viewers.html.slim" as viewers
+  - import "macros/study_viewer.html.slim" as viewers
   .row
     .span11
         h3 {{study.title}}
@@ -30,6 +30,7 @@
                 li
                   a href="#features" data-toggle="tab" Features
             .span6
+              p {{viewers.viewer(viewer_settings)|safe}}
               #study-tab-content.tab-content
                 #activations.tab-pane.active
                   table#study_peaks_table.table.table-striped.table-hover.table-condensed.small-datatable

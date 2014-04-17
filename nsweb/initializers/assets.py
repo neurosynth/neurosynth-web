@@ -23,8 +23,9 @@ js_vendor = Bundle('js/vendor/jquery-1.11.0.min.js',
 # application js bundle
 # js_main = Bundle('coffee/*.coffee', filters='coffeescript', output='js/main.js')
 js_main = Bundle('coffee/studies.js.coffee',
-                  'coffee/features.js.coffee',
-                  'coffee/locations.js.coffee',
+                 'coffee/features.js.coffee',
+                 'coffee/locations.js.coffee',
+                 'coffee/viewer.js.coffee',
                  filters='coffeescript', output='js/main.js')
 
 

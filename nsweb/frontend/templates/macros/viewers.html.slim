@@ -3,14 +3,14 @@
   .viewer
     #viewer-left
       #view-coronal.view
-        canvas (height=220 width=220)
+        %canvas height="220" width="220"
         %#nav-yaxis.slider.nav-slider-vertical
       #view-axial.view
-        canvas (height=264 width=220)
+        %canvas height="264" width="220"
         %#nav-zaxis.slider.nav-slider-vertical
     #viewer-right
       #view-sagittal.view
-        canvas (height=220 width=264)
+        %canvas height="220" width="264"
         %#nav-xaxis.slider.nav-slider-horizontal
       #data-panel
         #coordinates.data-row
@@ -23,22 +23,22 @@
           .data-label Description:
           %#image-description
     #layer-panel
-      | Layers
+      b Layers
       #layer-list-panel
-        #layer_visible_list
-        ul#layer-list.layer-settings
+        %#layer_visible_list
+        %ul#layer-list.layer-settings
       #layer-settings-panel
         .layer-container-half-width
-          | Color palette:
+            b Color palette:
           select#select-color.layer-settings
-          | Positive/Negative:
-          select#select-sign.layer-settings
-        #checkbox-list
+            b Positive/Negative:
+          %select#select-sign.layer-settings
+        %#checkbox-list
         .layer-container-full-width
           .layer-settings-row label Thresholds:
-            input#neg-threshold-text.slider-text
-            #neg-threshold.slider.layer-settings.layer-settings-slider
-            #threshold-zero -/+
-            #pos-threshold.slider.layer-settings.layer-settings-slider
-            input#pos-threshold-text.slider-text
-          .layer-settings-row
+          %input#neg-threshold-text.slider-text
+          %#neg-threshold.slider.layer-settings.layer-settings-slider
+          %#threshold-zero -/+
+          %#pos-threshold.slider.layer-settings.layer-settings-slider
+          %input#pos-threshold-text.slider-text
+          %.layer-settings-row
