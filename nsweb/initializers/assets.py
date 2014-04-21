@@ -12,10 +12,7 @@ css_all = Bundle('css/bootstrap.min.css',
                  filters='cssmin', output='css/main.min.css')
 
 # vendor js bundle
-js_vendor = Bundle('js/vendor/jquery-1.11.0.min.js',
-                   'js/vendor/bootstrap.min.js',
-                   'js/vendor/jquery.dataTables.js',
-                   'js/vendor/modernizr-2.6.2-respond-1.1.0.min.js',
+js_vendor = Bundle('js/vendor/*.js',
                    'js/nsviewer/*.js',
                    'js/datatables.js',
                    filters='jsmin', output='js/vendor.min.js')
