@@ -13,16 +13,15 @@ def index():
 def show(val):
     study = Study.query.get_or_404(val)
     viewer_settings = {
-        'scale': 0.75,
-        'images': [ { 
-            'name': 'activations',
-            'data': {
-                'dims': [91, 109, 91],
-                'peaks': [[p.x,p.y,p.z] for p in study.peaks]
+        "images": [ { 
+            "name": "activations",
+            "data": {
+                "dims": [91, 109, 91],
+                "peaks": [[p.x,p.y,p.z] for p in study.peaks]
             },
-            'colorPalette': 'red'
+            "colorPalette": "red"
         }],
-        'options': { 'panzoomEnabled': 'false' },
+        "options": { "panzoomEnabled": "false" },
     }
     return render_template('studies/show.html.slim', study=study, viewer_settings=viewer_settings)
 

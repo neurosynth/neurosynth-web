@@ -30,7 +30,23 @@ $(document).ready(function() {
     "sAjaxSource": '/api/studies/peaks/' + url_id + '/',
     "bDeferRender": true,
     "bStateSave": true
-  });
+  }, $('#study_peaks_table').on('click', 'tr', (function(_this) {
+    return function(e) {
+      var data, i, row;
+      row = $(e.target).closest('tr')[0];
+      data = $('#study_peaks_table').dataTable().fnGetData(row);
+      data = (function() {
+        var _i, _len, _results;
+        _results = [];
+        for (_i = 0, _len = data.length; _i < _len; _i++) {
+          i = data[_i];
+          _results.push(parseInt(i));
+        }
+        return _results;
+      })();
+      return viewer.moveToAtlasCoords(data);
+    };
+  })(this)));
 });
 
 $(document).ready(function() {
