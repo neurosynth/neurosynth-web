@@ -30,23 +30,10 @@ $(document).ready ->
     "sAjaxSource": '/api/studies/peaks/'+url_id+'/'
     "bDeferRender": true
     "bStateSave": true
-    #aoColumns: [ { sWidth: '45%'}, { sWidth: '25%' }, { sWidth: '15%'}, null, null]
 
-    # tbl.fnSetFilteringDelay(500)
-
-  #$('#study-tab-content a').click (e) ->
-  #  #e.preventDefault()
-  #  $(this).tab('show')
-  #  return
-
-  #$('#study-peaks').dataTable()
-  #return
-
-    # $('#study-peaks').on('click', 'tr', (e) =>
-        # row = $(e.target).closest('tr')[0]
-        # data = $('#study-peaks').dataTable().fnGetData(row)
-        # data = (parseInt(i) for i in data)
-        # # viewer.moveToAtlasCoords(data)
-    # )
-
-    # $('#study-menu a:first').tab('show')
+    $('#study_peaks_table').on('click', 'tr', (e) =>
+      row = $(e.target).closest('tr')[0]
+      data = $('#study_peaks_table').dataTable().fnGetData(row)
+      data = (parseInt(i) for i in data)
+      viewer.moveToAtlasCoords(data)
+    )
