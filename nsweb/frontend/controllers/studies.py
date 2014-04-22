@@ -26,14 +26,5 @@ def show(val):
     }
     return render_template('studies/show.html.slim', study=study, viewer_settings=viewer_settings)
 
-
-# @bp.route('/download')
-# gave up on this b/c issue is not image download I think?
-# def download():
-#     image = 'sadf'
-#     response = make_response(image)
-#     response.headers["Content-Disposition"] = "attachment; filename=asdf"
-#     return response
-
 add_blueprint(bp)
 

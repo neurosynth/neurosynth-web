@@ -1,6 +1,7 @@
 - set page_title = 'Neurosynth|Location'
 - extends "layout/base.html"
 - block content
+  - import "macros/viewers.html.slim" as viewers
   .row
     .span11
       h2 Data for location:
@@ -21,7 +22,8 @@
               a href="#features" data-toggle="tab" Features
             li.active
               a href="#studies" data-toggle="tab" Studies
-
+            li
+              a href="#images" data-toggle="tab" Images
           #location-tab-content.tab-content
             #features.tab-pane
               table#location_features_table.table-striped.table-hover.table.table-condensed
@@ -40,3 +42,9 @@
                     th Authors
                     th Journal
                     th Peaks
+            #images.tab-pane
+              h3 Images
+              .lead Functional connectivity and meta-analytic coactivation maps for (#{coords}):
+              p {{viewers.viewer(viewer_settings)|safe}}
+              #load-location-box
+                button#load-location.btn.btn-success Re-seed at cursor location

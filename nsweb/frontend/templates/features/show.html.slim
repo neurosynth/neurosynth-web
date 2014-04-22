@@ -1,15 +1,16 @@
 - set page_title = 'Neurosynth|Feature'
 - extends "layout/base.html"
-
 - block content
+  - import "macros/viewers.html.slim" as viewers
   h2 {{feature}}
   .lead An automated meta-analysis of {{frequencies|count}} studies
-
   .row
     .span11.content
       ul#feature-content-menu.nav.nav-tabs
         li.active
           a href="#studies" data-toggle="tab" Studies
+        li
+          a href="#maps" data-toggle="tab" Map
         li
           a href="#help" data-toggle="tab" Help
       #feature-tab-content.tab-content
@@ -22,6 +23,10 @@
                 th Authors
                 th Journal
                 th Loading
+        #map.tab-pane
+          p {{viewers.viewer(viewer_settings)|safe}}
+          #load-location-box
+            button#load-location.btn.btn-success View location data at cursor
         #help.tab-pane
           h3 What is this?
           p This page displays information for an automated Neurosynth meta-analysis of the feature "#{@feature.name}". The meta-analysis was performed by automatically identifying all studies in the Neurosynth database that loaded highly on the feature, and then performing meta-analyses to identify brain regions that were consistently or preferentially reported in the tables of those studies.
