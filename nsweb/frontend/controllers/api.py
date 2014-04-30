@@ -8,11 +8,11 @@ bp = Blueprint('apis',__name__,url_prefix='/api')
 # Begin server side APIs 
 @bp.route('/studies/')
 def studies_server_side_api():
+    data = Study.query
     results_per_page = int(request.args['iDisplayLength'])
     offset = int(request.args['iDisplayStart'])
     order_by = '{0} {1}'.format(['title','authors','journal','year','pmid'][int(request.args['iSortCol_0'])],str(request.args['sSortDir_0']))
     search = str(request.args['sSearch']).strip()
-    data = Study.query
     if search:#No empty search on my watch
         search = '%{}%'.format(search)
         data=data.filter( Study.title.like( search ) | Study.authors.like( search ) | Study.journal.like( search ) | Study.year.like( search ) | Study.pmid.like(search) )
@@ -99,6 +99,11 @@ def locations_api(val):
     points = Peak.closestPeaks(radius,x,y,z)
     points = points.group_by(Peak.pmid)#prevents duplicate studies
     points = points.add_columns(sqlalchemy.func.count(Peak.id))#counts duplicate peaks
-    data = [ [p[0].study.title, p[0].study.authors, p[0].study.journal,p[1] ] for p in points]
-    return jsonify(aaData=data)
+    if 'sEcho' in request.args:
+        data = [ [p[0].study.title, p[0].study.authors, p[0].study.journal,p[1] ] for p in points]
+        data = jsonify(aaData=data)
+    else:
+        data = [ {'pmid':p[0].study.pmid,'peaks':p[1] } for p in points]
+        data = jsonify(data=data)
+    return data
 add_blueprint(bp)

@@ -63,7 +63,7 @@ $(document).ready(function() {
   tbl.fnSetFilteringDelay(iDelay = 400);
   url_id = document.URL.split('/');
   url_id.pop();
-  return $('#feature_table').dataTable({
+  $('#feature_table').dataTable({
     "sPaginationType": "full_numbers",
     "iDisplayLength": 10,
     "bProcessing": true,
@@ -71,6 +71,10 @@ $(document).ready(function() {
     "bDeferRender": true,
     "bStateSave": true
   });
+  $('#feature-content-menu').click(function(e) {
+    return e.preventDefault();
+  });
+  $(this).tab('show');
 });
 
 loadFromBoxes = function() {
@@ -95,7 +99,7 @@ $(document).ready(function() {
     sPaginationType: "full_numbers",
     iDisplayLength: 10,
     bProcessing: true,
-    sAjaxSource: '/api/locations/' + url_id
+    sAjaxSource: '/api/locations/' + url_id + '/?sEcho=1'
   });
 });
 
@@ -124,7 +128,7 @@ window.loadImages = function(imgs, clear) {
   for (_i = 0, _len = imgs.length; _i < _len; _i++) {
     img = imgs[_i];
     if ((img.id != null) && (img.url == null)) {
-      img.url = '/images/' + img.id + '/download';
+      img.url = '/images/' + img.id + '/';
     }
   }
   return viewer.loadImages(imgs);

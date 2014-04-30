@@ -1,6 +1,6 @@
 from nsweb.core import create_app, db
-from nsweb.settings import SQLALCHEMY_DATABASE_URI, DEBUG, DEBUG_WITH_APTANA, FEATURE_DATABASE, PICKLE_DATABASE, FEATURE_FREQUENCY_THRESHOLD
-from nsweb.helpers import database_builder
+from nsweb.initializers.settings import SQLALCHEMY_DATABASE_URI, DEBUG, DEBUG_WITH_APTANA, FEATURE_DATABASE, PICKLE_DATABASE, FEATURE_FREQUENCY_THRESHOLD, DATA_DIR, FULL_DATABASE
+from nsweb.initializers import database_builder
 import os
 
 def main():
@@ -10,7 +10,7 @@ def main():
     ### Uncomment the following lines to initialize the Dataset instance from .txt files the first time
     if not os.path.isfile(PICKLE_DATABASE):
         builder = database_builder.DatabaseBuilder(db, 
-        	studies='/Users/rahul/Downloads/full_database_revised.txt',
+        	studies=DATA_DIR+FULL_DATABASE,
         	features=FEATURE_DATABASE)
         builder.dataset.save(PICKLE_DATABASE, keep_mappables=True)
 

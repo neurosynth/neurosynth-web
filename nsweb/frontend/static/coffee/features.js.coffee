@@ -21,14 +21,10 @@ $(document).ready ->
     "sAjaxSource": '/api/features/'+url_id.pop()
     "bDeferRender": true
     "bStateSave": true
-  #$('#feature-content-menu b').click (e) ->
-   # e.preventDefault()
-   # $(this).tab('show')
-   # return
-  #$('#features_table').dataTable()
-  #return
-
-
+  $('#feature-content-menu').click (e) ->
+    e.preventDefault()
+   $(this).tab('show')
+   return
     # $('#feature_image_select').change((e) ->
         # label = $(this).children("option:selected").text()
         # id = $(this).val()

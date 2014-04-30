@@ -48,3 +48,11 @@
               p {{viewers.viewer(viewer_settings)|safe}}
               #load-location-box
                 button#load-location.btn.btn-success Re-seed at cursor location
+                script type="text/javascript"
+                  |
+                  var options = { panzoomEnabled: false, xyz: [{{x}}, {{y}}, {{z}}]}
+                  var settings = ['no-zoom', 'layers','nav','checkboxes']
+                  var images = {{images}}[]
+                p {{viewers.viewer()}}
+                #load-location-box
+                  button#load-location.btn.btn-success Re-seed at cursor location

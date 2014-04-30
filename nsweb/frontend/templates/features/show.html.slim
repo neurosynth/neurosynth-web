@@ -24,7 +24,11 @@
                 th Journal
                 th Loading
         #maps.tab-pane
-          p {{viewers.viewer(viewer_settings)|safe}}
+          script type="text/javascript"
+            |var options = {"panzoomEnabled":false}
+            var settings = ['no-zoom', 'layers','nav','checkboxes']
+            var images = [{{images}}]
+          p {{viewers.viewer()}}
           #load-location-box
             button#load-location.btn.btn-success View location data at cursor
         #help.tab-pane

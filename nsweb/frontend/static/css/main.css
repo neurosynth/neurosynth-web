@@ -1,0 +1,384 @@
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rahul\/Documents\/workspace\/nsweb\/nsweb\/frontend\/static\/scss\/explore\.css\.scss}line{font-family:\000031}}
+#image-library {
+  width: 520px;
+  font-size: 12px;
+  height: 500px; }
+
+  @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rahul\/Documents\/workspace\/nsweb\/nsweb\/frontend\/static\/scss\/explore\.css\.scss}line{font-family:\0000311}}
+  #explore-wrapper {
+    float: left; }
+
+    @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rahul\/Documents\/workspace\/nsweb\/nsweb\/frontend\/static\/scss\/explore\.css\.scss}line{font-family:\0000315}}
+    .source {
+      clear: left;
+      float: left;
+      margin-top: 5px;
+      font-size: 16px;
+      line-height: 1.2em; }
+      @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rahul\/Documents\/workspace\/nsweb\/nsweb\/frontend\/static\/scss\/explore\.css\.scss}line{font-family:\0000323}}
+      .source .source-label {
+        float: left;
+        line-height: 2em; }
+        @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rahul\/Documents\/workspace\/nsweb\/nsweb\/frontend\/static\/scss\/explore\.css\.scss}line{font-family:\0000329}}
+        .source input {
+          margin: 0px 4px 0px 8px;
+          float: left; }
+          @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rahul\/Documents\/workspace\/nsweb\/nsweb\/frontend\/static\/scss\/explore\.css\.scss}line{font-family:\0000335}}
+          .source button {
+            margin: 0px;
+            float: left; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rahul\/Documents\/workspace\/nsweb\/nsweb\/frontend\/static\/scss\/explore\.css\.scss}line{font-family:\0000342}}
+#button-set > button {
+  margin: 0px 5px 0px 0px;
+  font-size: 20px;
+  padding: 10px; }
+
+  @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rahul\/Documents\/workspace\/nsweb\/nsweb\/frontend\/static\/scss\/explore\.css\.scss}line{font-family:\0000348}}
+  #explore-data-panel {
+    background: #eee;
+    border: 1px solid #ccc;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    width: 250px;
+    margin-left: 15px;
+    margin-top: 25px;
+    padding: 10px;
+    float: left; }
+
+    @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rahul\/Documents\/workspace\/nsweb\/nsweb\/frontend\/static\/scss\/explore\.css\.scss}line{font-family:\0000361}}
+    .explore-data-box {
+      float: left;
+      padding-bottom: 10px;
+      font-size: 16px; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rahul\/Documents\/workspace\/nsweb\/nsweb\/frontend\/static\/scss\/features\.css\.scss}line{font-family:\000031}}
+.feature_search {
+  margin-top: 20px; }
+  @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rahul\/Documents\/workspace\/nsweb\/nsweb\/frontend\/static\/scss\/features\.css\.scss}line{font-family:\000037}}
+  .feature_search input {
+    width: 300px; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rahul\/Documents\/workspace\/nsweb\/nsweb\/frontend\/static\/scss\/features\.css\.scss}line{font-family:\0000312}}
+#feature-image-selector {
+  width: 300px;
+  margin: 20px 15px 0px 0px;
+  float: right; }
+  @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rahul\/Documents\/workspace\/nsweb\/nsweb\/frontend\/static\/scss\/features\.css\.scss}line{font-family:\0000317}}
+  #feature-image-selector select {
+    width: 260px; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rahul\/Documents\/workspace\/nsweb\/nsweb\/frontend\/static\/scss\/home\.css\.scss}line{font-family:\000031}}
+.mini-box {
+  padding-left: 10px;
+  border-left: 1px solid #999;
+  float: right; }
+
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rahul\/Documents\/workspace\/nsweb\/nsweb\/frontend\/static\/scss\/jquery-ui-override\.css\.scss}line{font-family:\000031}}
+.ui-slider-range.ui-widget-header {
+  background: white; }
+
+  @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rahul\/Documents\/workspace\/nsweb\/nsweb\/frontend\/static\/scss\/jquery-ui-override\.css\.scss}line{font-family:\000035}}
+  .ui-slider {
+    border-radius: 2px; }
+
+    @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rahul\/Documents\/workspace\/nsweb\/nsweb\/frontend\/static\/scss\/jquery-ui-override\.css\.scss}line{font-family:\000039}}
+    .ui-slider-horizontal {
+      height: 6px;
+      top: 2px; }
+      @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rahul\/Documents\/workspace\/nsweb\/nsweb\/frontend\/static\/scss\/jquery-ui-override\.css\.scss}line{font-family:\0000312}}
+      .ui-slider-horizontal .ui-slider-handle {
+        height: 20px;
+        top: -7px;
+        margin-left: -4px;
+        border-radius: 2px;
+        width: 8px; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rahul\/Documents\/workspace\/nsweb\/nsweb\/frontend\/static\/scss\/jquery-ui-override\.css\.scss}line{font-family:\0000321}}
+.ui-slider-vertical {
+  width: 6px;
+  left: 4px; }
+  @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rahul\/Documents\/workspace\/nsweb\/nsweb\/frontend\/static\/scss\/jquery-ui-override\.css\.scss}line{font-family:\0000324}}
+  .ui-slider-vertical .ui-slider-handle {
+    width: 20px;
+    height: 8px;
+    margin-left: -2px;
+    border-radius: 2px; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rahul\/Documents\/workspace\/nsweb\/nsweb\/frontend\/static\/scss\/locations\.css\.scss}line{font-family:\000031}}
+.big-text {
+  font-size: 36px;
+  float: left; }
+  @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rahul\/Documents\/workspace\/nsweb\/nsweb\/frontend\/static\/scss\/locations\.css\.scss}line{font-family:\000038}}
+  .big-text input {
+    width: 60px;
+    font-size: 32px;
+    font-weight: bold;
+    line-height: 1.2em;
+    height: 36px;
+    margin: 0px 0px 4px 10px;
+    text-align: center; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rahul\/Documents\/workspace\/nsweb\/nsweb\/frontend\/static\/scss\/locations\.css\.scss}line{font-family:\0000319}}
+#locations .lead {
+  float: left;
+  clear: left; }
+
+  @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rahul\/Documents\/workspace\/nsweb\/nsweb\/frontend\/static\/scss\/locations\.css\.scss}line{font-family:\0000324}}
+  #loc-view-axial {
+    height: 195px;
+    margin-bottom: 20px;
+    margin-left: 20px; }
+
+    @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rahul\/Documents\/workspace\/nsweb\/nsweb\/frontend\/static\/scss\/locations\.css\.scss}line{font-family:\0000331}}
+    #loc-view-coronal {
+      height: 165px;
+      margin-left: 20px; }
+
+      @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rahul\/Documents\/workspace\/nsweb\/nsweb\/frontend\/static\/scss\/locations\.css\.scss}line{font-family:\0000337}}
+      #loc-view-sagittal {
+        height: 200px; }
+
+        @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rahul\/Documents\/workspace\/nsweb\/nsweb\/frontend\/static\/scss\/locations\.css\.scss}line{font-family:\0000342}}
+        .loc-viewer {
+          margin-left: 20px; }
+
+          @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rahul\/Documents\/workspace\/nsweb\/nsweb\/frontend\/static\/scss\/locations\.css\.scss}line{font-family:\0000346}}
+          #study-table {
+            font-size: 13px; }
+
+            @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rahul\/Documents\/workspace\/nsweb\/nsweb\/frontend\/static\/scss\/locations\.css\.scss}line{font-family:\0000350}}
+            #load-location-box {
+              width: 300px;
+              text-align: center;
+              margin-top: 30px;
+              float: left; }
+
+
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rahul\/Documents\/workspace\/nsweb\/nsweb\/frontend\/static\/scss\/viewer\.css\.scss}line{font-family:\000031}}
+#viewer-left {
+  width: 260px;
+  float: left; }
+
+  @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rahul\/Documents\/workspace\/nsweb\/nsweb\/frontend\/static\/scss\/viewer\.css\.scss}line{font-family:\000037}}
+  #viewer-right {
+    width: 280px;
+    float: left; }
+
+    @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rahul\/Documents\/workspace\/nsweb\/nsweb\/frontend\/static\/scss\/viewer\.css\.scss}line{font-family:\0000313}}
+    #view-axial {
+      width: 260px;
+      height: 260px;
+      margin-bottom: 10px; }
+
+      @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rahul\/Documents\/workspace\/nsweb\/nsweb\/frontend\/static\/scss\/viewer\.css\.scss}line{font-family:\0000319}}
+      #view-coronal {
+        width: 260px;
+        height: 220px;
+        margin-bottom: 20px; }
+
+        @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rahul\/Documents\/workspace\/nsweb\/nsweb\/frontend\/static\/scss\/viewer\.css\.scss}line{font-family:\0000325}}
+        #view-sagittal {
+          width: 264px;
+          height: 260px; }
+
+          @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rahul\/Documents\/workspace\/nsweb\/nsweb\/frontend\/static\/scss\/viewer\.css\.scss}line{font-family:\0000330}}
+          .view {
+            float: left; }
+
+            @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rahul\/Documents\/workspace\/nsweb\/nsweb\/frontend\/static\/scss\/viewer\.css\.scss}line{font-family:\0000334}}
+            .nav-slider-vertical {
+              height: 100%;
+              margin-left: 5px;
+              float: left; }
+
+              @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rahul\/Documents\/workspace\/nsweb\/nsweb\/frontend\/static\/scss\/viewer\.css\.scss}line{font-family:\0000340}}
+              .nav-slider-horizontal {
+                width: 100%;
+                margin-top: 5px;
+                float: left; }
+
+                @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rahul\/Documents\/workspace\/nsweb\/nsweb\/frontend\/static\/scss\/viewer\.css\.scss}line{font-family:\0000346}}
+                canvas {
+                  float: left; }
+
+                  @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rahul\/Documents\/workspace\/nsweb\/nsweb\/frontend\/static\/scss\/viewer\.css\.scss}line{font-family:\0000350}}
+                  #layer-panel {
+                    width: 290px;
+                    float: left;
+                    margin-left: 12px; }
+
+                    @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rahul\/Documents\/workspace\/nsweb\/nsweb\/frontend\/static\/scss\/viewer\.css\.scss}line{font-family:\0000356}}
+                    #layer-settings-panel {
+                      font-size: 14px;
+                      clear: left;
+                      width: 280px;
+                      margin-top: 10px;
+                      float: left; }
+
+                      @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rahul\/Documents\/workspace\/nsweb\/nsweb\/frontend\/static\/scss\/viewer\.css\.scss}line{font-family:\0000364}}
+                      .layer-container-half-width {
+                        width: 50%;
+                        float: left; }
+
+                        @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rahul\/Documents\/workspace\/nsweb\/nsweb\/frontend\/static\/scss\/viewer\.css\.scss}line{font-family:\0000369}}
+                        .layer-container-full-width {
+                          width: 100%;
+                          float: left; }
+
+                          @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rahul\/Documents\/workspace\/nsweb\/nsweb\/frontend\/static\/scss\/viewer\.css\.scss}line{font-family:\0000374}}
+                          #checkbox-list {
+                            float: left;
+                            margin: 20px 0px 0px 30px; }
+
+                            @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rahul\/Documents\/workspace\/nsweb\/nsweb\/frontend\/static\/scss\/viewer\.css\.scss}line{font-family:\0000379}}
+                            .checkbox_row {
+                              font-size: 14px;
+                              margin-bottom: 5px; }
+                              @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rahul\/Documents\/workspace\/nsweb\/nsweb\/frontend\/static\/scss\/viewer\.css\.scss}line{font-family:\0000382}}
+                              .checkbox_row > input {
+                                margin-right: 5px; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rahul\/Documents\/workspace\/nsweb\/nsweb\/frontend\/static\/scss\/viewer\.css\.scss}line{font-family:\0000387}}
+select.layer-settings {
+  width: 120px; }
+
+  @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rahul\/Documents\/workspace\/nsweb\/nsweb\/frontend\/static\/scss\/viewer\.css\.scss}line{font-family:\0000391}}
+  #layer-list-panel {
+    width: 285px;
+    float: left; }
+
+    @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rahul\/Documents\/workspace\/nsweb\/nsweb\/frontend\/static\/scss\/viewer\.css\.scss}line{font-family:\0000396}}
+    #layer-list {
+      width: 280px;
+      float: left; }
+
+      @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rahul\/Documents\/workspace\/nsweb\/nsweb\/frontend\/static\/scss\/viewer\.css\.scss}line{font-family:\00003101}}
+      #layer_visible_list {
+        width: 25px;
+        float: left; }
+
+        @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rahul\/Documents\/workspace\/nsweb\/nsweb\/frontend\/static\/scss\/viewer\.css\.scss}line{font-family:\00003106}}
+        .visibility_icon {
+          width: 20px;
+          float: left;
+          text-align: center;
+          padding: 5px 3px;
+          background: white;
+          border-left: 1px solid #999999;
+          border-right: 1px solid #999999; }
+
+          @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rahul\/Documents\/workspace\/nsweb\/nsweb\/frontend\/static\/scss\/viewer\.css\.scss}line{font-family:\00003117}}
+          .deletion_icon {
+            width: 20px;
+            float: left;
+            text-align: center;
+            padding: 5px 3px;
+            background: white;
+            border-left: 1px solid #999999;
+            border-right: 1px solid #999999; }
+
+            @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rahul\/Documents\/workspace\/nsweb\/nsweb\/frontend\/static\/scss\/viewer\.css\.scss}line{font-family:\00003128}}
+            .download_icon {
+              width: 20px;
+              float: left;
+              text-align: center;
+              padding: 5px 3px;
+              background: white;
+              border-left: 1px solid #999999;
+              border-right: 1px solid #999999; }
+
+              @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rahul\/Documents\/workspace\/nsweb\/nsweb\/frontend\/static\/scss\/viewer\.css\.scss}line{font-family:\00003139}}
+              #data-panel {
+                margin-top: 10px;
+                float: left;
+                font: 12px; }
+
+                @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rahul\/Documents\/workspace\/nsweb\/nsweb\/frontend\/static\/scss\/viewer\.css\.scss}line{font-family:\00003145}}
+                .data-row {
+                  padding-bottom: 15px;
+                  float: left;
+                  width: 100%;
+                  clear: both; }
+
+                  @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rahul\/Documents\/workspace\/nsweb\/nsweb\/frontend\/static\/scss\/viewer\.css\.scss}line{font-family:\00003152}}
+                  .data-label {
+                    width: 100px;
+                    float: left;
+                    margin-right: 5px;
+                    padding-top: 5px; }
+
+                    @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rahul\/Documents\/workspace\/nsweb\/nsweb\/frontend\/static\/scss\/viewer\.css\.scss}line{font-family:\00003159}}
+                    .data-value {
+                      font-size: 24px;
+                      float: left;
+                      line-height: 1.2em; }
+
+                      @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rahul\/Documents\/workspace\/nsweb\/nsweb\/frontend\/static\/scss\/viewer\.css\.scss}line{font-family:\00003165}}
+                      ul#layer-list {
+                        margin: 0px;
+                        padding: 0px;
+                        list-style: none; }
+                        @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rahul\/Documents\/workspace\/nsweb\/nsweb\/frontend\/static\/scss\/viewer\.css\.scss}line{font-family:\00003166}}
+                        ul#layer-list li {
+                          border-width: 1px 1px 1px 1px;
+                          border-style: solid;
+                          border-color: #ddddbb #999999 #999999 #ddddbb;
+                          background: white;
+                          border-radius: 3px;
+                          -moz-border-radius: 3px;
+                          margin: 0px;
+                          float: left; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rahul\/Documents\/workspace\/nsweb\/nsweb\/frontend\/static\/scss\/viewer\.css\.scss}line{font-family:\00003181}}
+#image-description {
+  padding: 7px 5px;
+  background: #eeeeee;
+  border: 1px solid #cccccc;
+  clear: left;
+  font-size: 12px;
+  border-radius: 3px;
+  -moz-border-radius: 3px; }
+
+  @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rahul\/Documents\/workspace\/nsweb\/nsweb\/frontend\/static\/scss\/viewer\.css\.scss}line{font-family:\00003191}}
+  .layer_label {
+    float: left;
+    width: 180px;
+    background: #cccccc;
+    padding: 5px 3px;
+    font-size: 12px; }
+    @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rahul\/Documents\/workspace\/nsweb\/nsweb\/frontend\/static\/scss\/viewer\.css\.scss}line{font-family:\00003197}}
+    .layer_label.selected {
+      background: #ccffff; }
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rahul\/Documents\/workspace\/nsweb\/nsweb\/frontend\/static\/scss\/viewer\.css\.scss}line{font-family:\00003202}}
+.layer-settings-row {
+  float: left;
+  clear: both;
+  margin-top: 8px;
+  width: 100%; }
+
+  @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rahul\/Documents\/workspace\/nsweb\/nsweb\/frontend\/static\/scss\/viewer\.css\.scss}line{font-family:\00003209}}
+  .slider-text {
+    width: 36px;
+    float: left;
+    font-size: 12px;
+    line-height: 1.2em;
+    text-align: center; }
+
+    @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rahul\/Documents\/workspace\/nsweb\/nsweb\/frontend\/static\/scss\/viewer\.css\.scss}line{font-family:\00003217}}
+    .layer-settings-slider {
+      width: 60px;
+      margin: 3px 8px 0px 4px;
+      float: left; }
+
+      @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/rahul\/Documents\/workspace\/nsweb\/nsweb\/frontend\/static\/scss\/viewer\.css\.scss}line{font-family:\00003223}}
+      #threshold-zero {
+        float: left;
+        width: 24px;
+        font-size: 12px;
+        margin-left: 8px; }

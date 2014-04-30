@@ -52,3 +52,6 @@ coverage.xml
 # Sphinx documentation
 docs/_build/
 Data/
+Data/full_database_revised.txt
+Data/neurosynth_dataset.pkl
+

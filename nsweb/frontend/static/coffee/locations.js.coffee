@@ -32,7 +32,7 @@ $(document).ready ->
     iDisplayLength: 10
     bProcessing: true
     #aaSorting: [[1, 'desc']]
-    sAjaxSource: '/api/locations/'+url_id
+    sAjaxSource: '/api/locations/'+url_id+'/?sEcho=1'
     # fnRowCallback: (nRow, aData, iDisplayIndex) ->
                         # $cell=$('td:eq(0)', nRow)
                         # feature = $cell.text()

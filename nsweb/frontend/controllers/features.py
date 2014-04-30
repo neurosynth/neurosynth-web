@@ -12,19 +12,16 @@ def index():
 @bp.route('/<int:val>/')
 def show(val):
     feature = Feature.query.get_or_404(val)
-    reverse=False
-    viewer_settings = {
-                       'images': [ { 
-                                    'name': i.label,
-                                    'id': i.id,
-                                    'download': url_for('images.download',val=i.id),#"/images/{}/".format(i.id),
-                                    'intent': (i.stat + ' :').capitalize,
-                                    'visible': True,
-                                    'colorPalette': 'red',
-                                    } for i in feature.images],
-                       'options': { 'panzoomEnabled': 'false' },
-                       }
-    return render_template('features/show.html.slim', feature=feature.feature, viewer_settings=viewer_settings)
+    images=''
+    for i in feature.images:
+#        if i.visible:
+        reverse=i.label.find('reverse')
+        images+= '{{"name":"{0}","id":{1},"download":"/images/{1}","intent":"{2}","visible":{3},"colorPalette":{4}}},'.format(i.name,
+                                                                                                                          i.id,
+                                                                                                                          (i.stat + ' :').capitalize(),
+                                                                                                                          'true' if reverse else'false',
+                                                                                                                          '"red"' if reverse else '"blue"')
+    return render_template('features/show.html.slim', feature=feature.feature, images=images)
 
 @bp.route('/<string:name>/')
 def find_feature(name):

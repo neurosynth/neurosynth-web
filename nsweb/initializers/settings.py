@@ -7,6 +7,7 @@ IMAGE_DIR=DATA_DIR + 'Images/'
 SQLALCHEMY_DATABASE_URI = 'sqlite:///' + DATA_DIR + 'prod.db'
 PICKLE_DATABASE = DATA_DIR + 'neurosynth_dataset.pkl'
 FEATURE_DATABASE = DATA_DIR + 'abstract_features.txt'
+FULL_DATABASE = 'full_database_revised.txt'
 LOGGING_PATH = DATA_DIR + 'log.txt'
 LOGGING_LEVEL = 'DEBUG'
 DEBUG = True
