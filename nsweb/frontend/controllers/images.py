@@ -12,7 +12,7 @@ def download(val):
         filename=filename.image_file
     else:
         abort(404)
-    return send_from_directory('/', filename)
+    return send_from_directory(IMAGE_DIR, filename)
 
 @bp.route('/anatomical/data')
 def brain():
