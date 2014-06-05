@@ -1,0 +1,45 @@
+// Place all the styles related to the studies controller here.
+// They will automatically be included in application.css.
+// You can use Sass (SCSS) here: http://sass-lang.com/
+.row_label
+	font-weight: bold
+
+= small-font
+	font-size: 12px
+
+= smaller-table
+	.dataTables_wrapper
+		+small-font
+	.dataTables_filter
+		input
+			+small-font
+			height: 1.1em
+			width: 60px
+		label
+			+small-font			
+	.dataTables_processing
+		+small-font
+	.dataTables_length
+		select
+			+small-font
+		label
+			+small-font
+
+// = small-font
+// 	dataTables_processing
+// 	font-size: 12px
+
+// #study-peaks_filter input
+// 	+small-font
+// 	height: 1.1em
+// 	width: 60px
+
+// #study-peaks
+// 	+small-font
+
+// #study-peaks_filter label
+// 	+small-font
+
+// #study-peaks_
+#show-study
+	+smaller-table

@@ -1,6 +1,6 @@
 from nsweb.core import create_app, db
-from nsweb.settings import SQLALCHEMY_DATABASE_URI, DEBUG, DEBUG_WITH_APTANA, FEATURE_DATABASE, PICKLE_DATABASE, FEATURE_FREQUENCY_THRESHOLD
-from nsweb.helpers import database_builder
+from nsweb.initializers.settings import SQLALCHEMY_DATABASE_URI, DEBUG, DATA_DIR, DEBUG_WITH_APTANA, PICKLE_DATABASE, FEATURE_FREQUENCY_THRESHOLD
+from nsweb.initializers import database_builder
 import os
 
 def main():
@@ -10,8 +10,8 @@ def main():
     ### Uncomment the following lines to initialize the Dataset instance from .txt files the first time
     if not os.path.isfile(PICKLE_DATABASE):
         builder = database_builder.DatabaseBuilder(db, 
-        	studies='/Users/rahul/Downloads/full_database_revised.txt',
-        	features=FEATURE_DATABASE)
+        	studies=os.path.join(DATA_DIR, 'studies.txt'),
+        	features=os.path.join(DATA_DIR, 'features.txt'))
         builder.dataset.save(PICKLE_DATABASE, keep_mappables=True)
 
     # Create a new builder from a pickled Dataset instance and populate the DB
@@ -22,18 +22,18 @@ def main():
     print "Adding features..."
     
     # Use this for rapid testing... set to None to initialize full DB
-    feature_list = ['pain','emotion','language','memory','amygdala']
+    features = ['pain','emotion','language','memory','amygdala']
 
-    builder.add_features(feature_list=feature_list)
+    builder.add_features(features=features)
 
     print "Adding studies..."
-    builder.add_studies(feature_list=feature_list)
+    builder.add_studies(features=features, limit=100)
     
     print "Adding feature-based meta-analysis images..."
-    builder.generate_feature_images(feature_list=feature_list)
+    builder.generate_feature_images(features=features)
 
     print "Adding location-based coactivation images..."
-    builder.generate_location_images(min_studies=500, add_to_db=True)
+    # builder.generate_location_images(min_studies=500, add_to_db=True)
 
 if __name__ == '__main__':
     main()

@@ -1,0 +1,47 @@
+- set page_title='Neurosynth|Study'
+- extends "layout/base.html"
+- block content
+  - import "macros/study_viewer.html.slim" as viewers
+  .row
+    .span11
+        h3 {{study.title}}
+        #show-study
+          .row
+            .span11
+              table.table-striped.table-hover.table.table-condensed
+                tbody
+                  tr
+                    td.row_label Authors:
+                    td {{study.authors}}
+                  tr
+                    td.row_label Journal:
+                    td {{study.journal}}
+                  tr
+                    td.row_label Year:
+                    td {{study.year}}
+                  tr
+                    td.row_label PMID:
+                    td <a href={{ "http://www.ncbi.nlm.nih.gov/pubmed/%s"|format(study.pmid) }}> {{study.pmid}}</a>
+          .row
+            .span5
+              ul#study-menu.nav.nav-tabs
+                li.active
+                  a href="#activations" data-toggle="tab" Activations
+                li
+                  a href="#features" data-toggle="tab" Features
+            .span6
+              p {{viewers.viewer(viewer_settings)|safe}}
+              #study-tab-content.tab-content
+                #activations.tab-pane.active
+                  table#study_peaks_table.table.table-striped.table-hover.table-condensed.small-datatable
+                    thead
+                      tr
+                        th x
+                        th y
+                        th z
+                #features.tab-pane
+                  table#study_features_table.table.table-striped.table-hover.table-condensed.small-datatable
+                    thead
+                      tr
+                        th Feature
+                        th Loading

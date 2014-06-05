@@ -1,0 +1,44 @@
+- macro viewer(viewer_settings)
+  script type="text/javascript" var options = {{viewer_settings.options}}, settings = ['no-zoom', 'layers','nav','checkboxes'], images = {{viewer_settings.images}}
+  .viewer
+    #viewer-left
+      #view-coronal.view
+        %canvas height="220" width="220"
+        %#nav-yaxis.slider.nav-slider-vertical
+      #view-axial.view
+        %canvas height="264" width="220"
+        %#nav-zaxis.slider.nav-slider-vertical
+    #viewer-right
+      #view-sagittal.view
+        %canvas height="220" width="264"
+        %#nav-xaxis.slider.nav-slider-horizontal
+      #data-panel
+        #coordinates.data-row
+          .data-label Coordinates:
+          %#data-current-coords.data-value
+        #value.data-row
+          %#image-intent.data-label Value:
+          %#data-current-value.data-value
+        #description.data-row
+          .data-label Description:
+          %#image-description
+    #layer-panel
+      b Layers
+      #layer-list-panel
+        %#layer_visible_list
+        %ul#layer-list.layer-settings
+      #layer-settings-panel
+        .layer-container-half-width
+            b Color palette:
+          select#select-color.layer-settings
+            b Positive/Negative:
+          %select#select-sign.layer-settings
+        %#checkbox-list
+        .layer-container-full-width
+          .layer-settings-row label Thresholds:
+          %input#neg-threshold-text.slider-text
+          %#neg-threshold.slider.layer-settings.layer-settings-slider
+          %#threshold-zero -/+
+          %#pos-threshold.slider.layer-settings.layer-settings-slider
+          %input#pos-threshold-text.slider-text
+          %.layer-settings-row

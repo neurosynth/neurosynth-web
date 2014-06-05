@@ -1,0 +1,25 @@
+#main {
+	margin: 0 auto
+	margin-bottom: 30px
+	float: none
+}
+
+#content {
+	padding: 30px
+}
+
+.container {	
+	background: white
+	border-left: 1px solid #666
+	border-right: 1px solid #666
+	border-bottom: 1px solid #999
+	padding-bottom: 20px
+}
+
+.top-space20 {
+	margin-top: 20px
+}
+
+.top-space40 {
+	margin-top: 40px
+}

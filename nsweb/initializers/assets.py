@@ -1,4 +1,5 @@
 from flask_assets import Environment, Bundle
+from nsweb.initializers import settings
 
 #sweetness: http://webassets.readthedocs.org/en/latest/builtin_filters.html
 
@@ -28,6 +29,9 @@ js_main = Bundle('coffee/studies.js.coffee',
 
 def init_assets(app):
     webassets = Environment(app)
+    # webassets.directory = settings.STATIC_FOLDER
+    print settings.STATIC_FOLDER
+    webassets.url = '/static'
     webassets.register('css_all', css_all)
     webassets.register('js_vendor', js_vendor)
     webassets.register('js_main', js_main)

@@ -3,7 +3,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_restless import APIManager
-from flask_security import Security
+# from flask_security import Security
 from slimish_jinja import SlimishExtension
 from jinja2.ext import autoescape
 
@@ -11,11 +11,10 @@ from nsweb.initializers.settings import STATIC_FOLDER, TEMPLATE_FOLDER
 from nsweb.initializers.assets import init_assets
 
 
-# We aren't using getters anymore b/c @property wasn't working outside of classes -_-. We can create a proper singleton if we really wanted...
 app=Flask('NSWeb', static_folder=STATIC_FOLDER, template_folder=TEMPLATE_FOLDER)
 db=SQLAlchemy()
 apimanager=APIManager()
-security = Security()
+# security = Security()
 _blueprints = []
 
 

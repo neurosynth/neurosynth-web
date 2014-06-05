@@ -1,11 +1,7 @@
 import os
 import sys
 
-# Borrowing a trick from nibabel to enable some functionality coming
-# from setuptools.
-# For some commands, use setuptools
-
-__version__ = '0.1.dev'
+__version__ = '0.1'
 
 if len(set(('test', 'easy_install')).intersection(sys.argv)) > 0:
     import setuptools
@@ -21,19 +17,12 @@ if 'setuptools' in sys.modules:
             test='nose>=0.10.1')
     )
 
-# # fetch version from within neurosynth module
-# with open(os.path.join('neurosynth', 'version.py')) as f:
-#     exec(f.read())
-
 setup(name="nsweb",
       version=__version__,
-      description="Web Server for Neurosynth",
+      description="Neurosynth web app",
       maintainer='Tal Yarkoni',
       maintainer_email='tyarkoni@gmail.com',
-      url='http://github.com/neurosynth/neurosynth',
+      url='http://github.com/psychoinformaticslab/nsweb',
       packages=["nsweb","tests"],
-#       package_data={'neurosynth': ['resources/*'],
-#                     'neurosynth.tests': ['data/*']
-#                     },
       **extra_setuptools_args
       )

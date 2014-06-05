@@ -1,0 +1,50 @@
+- set page_title = 'Neurosynth|Location'
+- extends "layout/base.html"
+- block content
+  - import "macros/viewers.html.slim" as viewers
+  .row
+    .span11
+      h2 Data for location:
+      b X:
+      input type="number" name="x-in" id="x-in" min="-90" max="90" value="{{x}}"
+      b Y:
+      input type="number" name="y-in" id="y-in" min="-72" max="108" value="{{y}}"
+      b Z:
+      input type="number" name="z-in" id="z-in" min="-106" max="90" value="{{z}}"
+      b Radius:
+      input type="range"  name="rad-in" id="rad-in" min="1" max="20" value="{{radius}}"
+      input type="number" name="rad-out" id="rad-out" min="1" max="20" value="{{radius}}"
+      input id="radius-submit" type="button" value="Go"
+      row.top-space20
+        .span11
+          ul#location-menu.nav.nav-tabs
+            li
+              a href="#features" data-toggle="tab" Features
+            li.active
+              a href="#studies" data-toggle="tab" Studies
+            li
+              a href="#images" data-toggle="tab" Images
+          #location-tab-content.tab-content
+            #features.tab-pane
+              table#location_features_table.table-striped.table-hover.table.table-condensed
+                thead
+                  tr
+                    th Feature
+                    th z-score
+                    th post. prob.
+            #studies.tab-pane.active
+              h3 Studies
+              .lead activations within {{radius}} mm of {{[x,y,z]|join(', ')}}:
+              table#location_studies_table.table-striped.table-hover.table.table-condensed.small-datatable
+                thead
+                  tr
+                    th Title
+                    th Authors
+                    th Journal
+                    th Peaks
+            #images.tab-pane
+              h3 Images
+              .lead Functional connectivity and meta-analytic coactivation maps for (#{coords}):
+              p {{viewers.viewer(viewer_settings)|safe}}
+              #load-location-box
+                button#load-location.btn.btn-success Re-seed at cursor location

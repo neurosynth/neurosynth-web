@@ -1,6 +1,7 @@
 from nsweb.initializers import settings
 from nsweb.core import app, setup_logging, create_app, register_blueprints
 from flask_script import Manager
+
 #registers models
 import nsweb.models
 manager = Manager(app)
@@ -10,11 +11,11 @@ def main():
     
     #creates and registers blueprints in nsweb.blueprints
     
-    import nsweb.frontend.controllers.studies
-    import nsweb.frontend.controllers.features
-    import nsweb.frontend.controllers.locations
-    import nsweb.frontend.controllers.api
-    import nsweb.frontend.controllers.images
+    import nsweb.controllers.studies
+    import nsweb.controllers.features
+    import nsweb.controllers.locations
+    import nsweb.controllers.api
+    import nsweb.controllers.images
     
     #loads blueprints
     register_blueprints()
@@ -32,7 +33,7 @@ def main():
     except:
         pass
     app.run(use_debugger=use_debugger, debug=app.debug,
-            use_reloader=use_debugger)
+            use_reloader=use_debugger, port=5001)
 
 if __name__ == "__main__":
     main()

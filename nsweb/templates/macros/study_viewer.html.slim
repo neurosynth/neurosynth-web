@@ -1,0 +1,12 @@
+- macro viewer(viewer_settings)
+  script type="text/javascript" var options = {{viewer_settings.options}}, settings = ['no-zoom','nav'], images = {{viewer_settings.images}}
+  .viewer.top-space20
+    #view-axial.view style="width: 270px; height: 264px"
+      %canvas height="264" width="220"
+      %#nav-zaxis.slider.nav-slider-vertical
+    #view-sagittal.view style="width: 264px; height: 300px"
+      %canvas height="220" width="264"
+      %#nav-xaxis.slider.nav-slider-horizontal
+    #view-coronal.view style="width: 270px; height: 220px;"
+      %canvas height="220" width="220"
+      %#nav-yaxis.slider.nav-slider-vertical
