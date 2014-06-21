@@ -1,7 +1,7 @@
 - set page_title = 'Neurosynth|Location'
 - extends "layout/base.html"
 - block content
-  - import "macros/viewers.html.slim" as viewers
+  - import "macros/study_viewer.html.slim" as viewers
   .row
     .span11
       h2 Data for location:
@@ -20,9 +20,9 @@
           ul#location-menu.nav.nav-tabs
             li
               a href="#features" data-toggle="tab" Features
-            li.active
-              a href="#studies" data-toggle="tab" Studies
             li
+              a href="#studies" data-toggle="tab" Studies
+            li.active
               a href="#images" data-toggle="tab" Images
           #location-tab-content.tab-content
             #features.tab-pane
@@ -32,19 +32,25 @@
                     th Feature
                     th z-score
                     th post. prob.
-            #studies.tab-pane.active
+            #studies.tab-pane
               h3 Studies
-              .lead activations within {{radius}} mm of {{[x,y,z]|join(', ')}}:
+              .lead All studies reporting activation within {{radius}} mm of ({{[x,y,z]|join(', ')}}):
               table#location_studies_table.table-striped.table-hover.table.table-condensed.small-datatable
                 thead
                   tr
                     th Title
                     th Authors
                     th Journal
-                    th Peaks
-            #images.tab-pane
+                    th Activations
+            #images.tab-pane.active
               h3 Images
-              .lead Functional connectivity and meta-analytic coactivation maps for (#{coords}):
-              p {{viewers.viewer(viewer_settings)|safe}}
+              .lead Functional connectivity and meta-analytic coactivation maps for ({{[x,y,z]|join(', ')}}):
               #load-location-box
                 button#load-location.btn.btn-success Re-seed at cursor location
+                script type="text/javascript"
+                  |
+                  var options = { panzoomEnabled: false, xyz: [{{x}}, {{y}}, {{z}}]}
+                  var settings = ['no-zoom', 'layers','nav','checkboxes']
+                  var images = {{images}}
+                p {{viewers.viewer()|safe}}
+

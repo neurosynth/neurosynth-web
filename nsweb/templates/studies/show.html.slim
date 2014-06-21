@@ -30,7 +30,11 @@
                 li
                   a href="#features" data-toggle="tab" Features
             .span6
-              p {{viewers.viewer(viewer_settings)|safe}}
+              script type="text/javascript"
+                |var options = {"panzoomEnabled":false}
+                var settings = ['no-zoom', 'nav']
+                var images = [{"name":"activations","data":{"dims":[91,109,91],"peaks": {{peaks}} },"colorPalette":"red"}]
+              p {{viewers.viewer()|safe}}
               #study-tab-content.tab-content
                 #activations.tab-pane.active
                   table#study_peaks_table.table.table-striped.table-hover.table-condensed.small-datatable

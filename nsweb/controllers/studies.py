@@ -12,18 +12,8 @@ def index():
 @bp.route('/<int:val>/')
 def show(val):
     study = Study.query.get_or_404(val)
-    viewer_settings = {
-        "images": [ { 
-            "name": "activations",
-            "data": {
-                "dims": [91, 109, 91],
-                "peaks": [[p.x,p.y,p.z] for p in study.peaks]
-            },
-            "colorPalette": "red"
-        }],
-        "options": { "panzoomEnabled": 0 },
-    }
-    return render_template('studies/show.html.slim', study=study, viewer_settings=viewer_settings)
+    peaks =[{"x": p.x,"y":p.y,"z":p.z} for p in study.peaks]
+    return render_template('studies/show.html.slim', study=study, peaks=peaks)
 
 add_blueprint(bp)
 

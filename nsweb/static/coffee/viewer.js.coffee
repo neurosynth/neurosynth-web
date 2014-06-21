@@ -4,15 +4,21 @@ window.loadImages = (imgs = null, clear = true) ->
   # If clear is true, remove all images and add the anatomical underlay
   if clear
     window.viewer.clearImages()
-    imgs.unshift({'id': 'anatomical', 'json': true, 'name': 'anatomical', 'colorPalette': 'grayscale', 'cache': true, 'url':'/images/anatomical/data' })
+    imgs.unshift({
+      'id': 'anatomical', 
+      'json': false,
+      'name':'anatomical', 
+      'colorPalette': 'grayscale', 
+      'cache': true, 
+      'url':'/images/anatomical' })
   for img in imgs
     # img.json = true
-    img.url = '/images/' + img.id + '/download' if img.id? and !img.url?
+    img.url = '/images/' + img.id + '/' if img.id? and !img.url?
   viewer.loadImages(imgs)
 
 # Turn text into HTML to make sure links are displayed
 textToHTML = (el) ->
-  $(el).html($(el).text()) 
+  $(el).html($(el).text())
 
 $(document).ready ->
   # options = if 'no-zoom' in settings then { panzoomEnabled: false } else {}
@@ -21,7 +27,7 @@ $(document).ready ->
   viewer.addView "#view-axial", Viewer.AXIAL
   viewer.addView "#view-coronal", Viewer.CORONAL
   viewer.addView "#view-sagittal", Viewer.SAGITTAL
- 
+
   if 'nav' in settings
     viewer.addSlider "nav-xaxis", ".slider#nav-xaxis", "horizontal",  0, 1, 0.5, 0.01, Viewer.XAXIS
     viewer.addSlider "nav-yaxis", ".slider#nav-yaxis", "vertical", 0, 1, 0.5, 0.01, Viewer.YAXIS

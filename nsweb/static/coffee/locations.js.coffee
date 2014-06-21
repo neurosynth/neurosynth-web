@@ -22,7 +22,7 @@ $(document).ready ->
     iDisplayLength: 10
     bProcessing: true
     #aaSorting: [[1, 'desc']]
-    sAjaxSource: '/api/locations/'+url_id
+    sAjaxSource: '/api/locations/'+url_id+'/?sEcho=1'
     # fnRowCallback: (nRow, aData, iDisplayIndex) ->
                         # $cell=$('td:eq(0)', nRow)
                         # feature = $cell.text()
@@ -34,6 +34,7 @@ $(document).ready ->
 
   $('#radius-submit').click ((e) =>
     coords = [$('#x-in').val(), $('#y-in').val(), $('#z-in').val(), $('#rad-out').val()]
+    coords[3] = 20 if coords[3] > 20
     window.location = '/locations/' + coords.join('_')+'/'
   )
 

@@ -29,7 +29,7 @@ $(document).ready ->
           id: id
           name: name
           colorPalette: color
-          download: "/images/#{id}/download"
+          download: "/images/#{id}/"
         }], false)
         src = 'remove'
     else

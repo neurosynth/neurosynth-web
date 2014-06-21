@@ -34,6 +34,7 @@ def main():
 
     print "Adding location-based coactivation images..."
     # builder.generate_location_images(min_studies=500, add_to_db=True)
+    builder.add_location_images('/data/neurosynth/data/locations/images', limit=200)
 
 if __name__ == '__main__':
     main()

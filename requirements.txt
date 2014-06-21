@@ -5,6 +5,6 @@ Flask-Restless>=0.12
 Flask-Script
 Flask-SQLAlchemy>=1.0
 Flask-WTF
-neurosynth>=0.3.2
+neurosynth
 numpy>=1.8
 pandas>=0.13

@@ -81,12 +81,15 @@ $(document).ready(function() {
     sPaginationType: "full_numbers",
     iDisplayLength: 10,
     bProcessing: true,
-    sAjaxSource: '/api/locations/' + url_id
+    sAjaxSource: '/api/locations/' + url_id + '/?sEcho=1'
   });
   $('#radius-submit').click(((function(_this) {
     return function(e) {
       var coords;
       coords = [$('#x-in').val(), $('#y-in').val(), $('#z-in').val(), $('#rad-out').val()];
+      if (coords[3] > 20) {
+        coords[3] = 20;
+      }
       return window.location = '/locations/' + coords.join('_') + '/';
     };
   })(this)));
@@ -117,17 +120,17 @@ window.loadImages = function(imgs, clear) {
     window.viewer.clearImages();
     imgs.unshift({
       'id': 'anatomical',
-      'json': true,
+      'json': false,
       'name': 'anatomical',
       'colorPalette': 'grayscale',
       'cache': true,
-      'url': '/images/anatomical/data'
+      'url': '/images/anatomical'
     });
   }
   for (_i = 0, _len = imgs.length; _i < _len; _i++) {
     img = imgs[_i];
     if ((img.id != null) && (img.url == null)) {
-      img.url = '/images/' + img.id + '/download';
+      img.url = '/images/' + img.id + '/';
     }
   }
   return viewer.loadImages(imgs);

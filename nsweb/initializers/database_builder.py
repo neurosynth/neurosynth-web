@@ -10,6 +10,7 @@ import os
 from neurosynth.base.dataset import Dataset
 import numpy as np
 import random
+from glob import glob
 
 
 
@@ -232,7 +233,7 @@ class DatabaseBuilder:
             self.db.session.commit()
 
 
-    def generate_location_images(self, image_dir=None, add_to_db=True, min_studies=50, **kwargs):
+    def generate_location_images(self, image_dir=None, add_to_db=False, min_studies=50, **kwargs):
         """ Create a full set of location-based coactivation images via Neurosynth. 
         Right now this isn't parallelized and will take a couple of days to run. 
         Args:
@@ -294,14 +295,31 @@ class DatabaseBuilder:
 
             # Create a new Location record and add LocationImage
             if add_to_db:
-                location = Location(x=seed[0], y=seed[1], z=seed[2])
-                location.images = [LocationImage(
-                    image_file=image_dir + '/' + name + '_' + imgs_to_keep[0] + '.nii.gz',
-                    label='coactivation: (%d, %d, %d)' % tuple(seed),
-                    stat='z-score',
-                    display=1,
-                    download=1)
-                ]
-                self.db.session.add(location)
+                self.add_location_images(self, image_dir)
+
+
+    def add_location_images(self, image_dir, search=None, limit=None):
+        """ Filter all the images in the passed directory and add records. """
+        
+        if search is None:
+            search = '*_pFgA_z.nii.gz'
+        
+        images = glob(os.path.join(image_dir, search))
+
+        if limit is None:
+            limit = len(images)
+
+        for img in images[:limit]:
+
+            x, y, z = [int(i) for i in os.path.basename(img).split('_')[:3]]
+            location = Location(x=x, y=y, z=z)
+            location.images = [LocationImage(
+                image_file=image_dir + '/' + name + '_' + imgs_to_keep[0] + '.nii.gz',
+                label='coactivation: (%d, %d, %d)' % tuple(seed),
+                stat='z-score',
+                display=1,
+                download=1)
+            ]
+            self.db.session.add(location)
 
         self.db.session.commit()
