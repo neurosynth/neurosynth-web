@@ -1,9 +1,4 @@
-# Place all the behaviors and hooks related to the matching controller here.
-# All this logic will automatically be available in application.js.
-# You can use CoffeeScript in this file: http://jashkenas.github.com/coffee-script/
 
-
-#
 # # Get the current cursor position and load the corresponding URL
 # loadLocationFromCursor = (coords) ->
     # [x, y, z] = coords
@@ -14,28 +9,72 @@
 
 
 $(document).ready ->
-  url_id=document.URL.split('/')
-  url_id=url_id[url_id.length-2]
-  $('#location_studies_table').dataTable({
-    #sDom: "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>"
-    sPaginationType: "full_numbers"
-    iDisplayLength: 10
-    bProcessing: true
-    #aaSorting: [[1, 'desc']]
-    sAjaxSource: '/api/locations/'+url_id+'/?sEcho=1'
-    # fnRowCallback: (nRow, aData, iDisplayIndex) ->
-                        # $cell=$('td:eq(0)', nRow)
-                        # feature = $cell.text()
-                        # val = '<a href="/features/' + feature + '">' + feature + '</a>'
-                        # $cell.html(val)
-                        # nRow
-    # 'aoColumns': [ { sWidth: '45%'}, { sWidth: '25%' }, { sWidth: '15%'}]
-  })
 
-  $('#radius-submit').click ((e) =>
+  return if not $('#page-location').length
+
+  getLocationString = () ->
     coords = [$('#x-in').val(), $('#y-in').val(), $('#z-in').val(), $('#rad-out').val()]
     coords[3] = 20 if coords[3] > 20
-    window.location = '/locations/' + coords.join('_')+'/'
+    coords.join('_')
+
+  loadLocationStudies = () ->
+    url = '/locations/' + getLocationString() + '/studies?dt=1'
+    $('#location_studies_table').DataTable().ajax.url(url).load().order([3, 'desc'])
+
+  loadLocationImages = () ->
+    url = '/locations/' + getLocationString()  + '/images'
+    $.get(url, (result) ->
+      window.loadImages(result.data)
+      )
+
+  loadLocationFeatures = () ->
+    url = '/locations/' + getLocationString() + '/features'
+    $('#location_features_table').DataTable().ajax.url(url).load().order([1, 'desc'])
+
+    #TODO: IMPLEMENT MOVE CURSOR TO SEED
+
+  update = ->
+    loadLocationStudies()
+    loadLocationImages()
+    loadLocationFeatures()
+    base = window.location.href.split('?')[0]
+    coords = { x: $('#x-in').val(), y: $('#y-in').val(), z: $('#z-in').val(), r: $('#rad-out').val()}
+    xyz = [coords.x, coords.y, coords.z]
+    info = 'Studies reporting activation within ' + coords.r + ' mm of (' + xyz.join(', ') + '):'
+    $('#current-location-info').text(info)
+    # TODO: IMPLEMENT ONPOPSTATE
+    window.history.pushState(null, null, base + '?' + $.param(coords))
+  
+  $('#location_studies_table').dataTable({
+    paginationType: "full_numbers"
+    displayLength: 25
+    processing: true
+    autoWidth: true
+    # orderClasses: false
+  })
+
+  $('#location_features_table').dataTable({
+    paginationType: "full_numbers"
+    displayLength: 25
+    processing: true
+    autoWidth: true
+    # orderClasses: false
+    columnDefs: [{
+      targets: 0
+      render: (data, type, row, meta) ->
+        '<a href="/features/'+ data + '">' + data + '</a>'
+    }]
+  })
+
+  # Load state (e.g., which tab to display)
+  activeTab = window.cookie.get('locationTab')
+  $("#location-menu li:eq(#{activeTab}) a").tab('show')
+
+  update()
+
+  ### EVENTS ###
+  $('#radius-submit').click ((e) =>
+    update()
   )
 
   $('#rad-in').change((e) =>
@@ -46,60 +85,25 @@ $(document).ready ->
     $('#rad-in').val($('#rad-out').val())
   )
 
-    # Handle location viewer separately because we already have a viewer on the page.
-    # Eventually the code should be refactored to gracefully handle multiple viewers
-    # by storing handles and calling as needed.
+  # Update cookie to reflect last tab user was on
+  $('#location-menu a').click ((e) =>
+      e.preventDefault()
+      activeTab = $('#location-menu a').index($(e.target))
+      window.cookie.set('locationTab', activeTab)
+      $(e.target).tab('show')
+      if activeTab == 2
+          viewer.paint()
+  )
 
-    # seed = (parseInt(i) for i in xyz.split('_'))
-#
-    # if $('.loc-viewer').length
-        # locationViewer = new Viewer("#dummy", ".dummy", true, {panzoomEnabled: false})
-        # locationViewer.addView "#loc-view-axial", Viewer.AXIAL
-        # locationViewer.addView "#loc-view-coronal", Viewer.CORONAL
-        # locationViewer.addView "#loc-view-sagittal", Viewer.SAGITTAL
-        # locationViewer.addSlider "nav-xaxis", ".slider#loc-nav-xaxis", "horizontal",  0, 1, 0.5, 0.01, Viewer.XAXIS
-        # locationViewer.addSlider "nav-yaxis", ".slider#loc-nav-yaxis", "vertical", 0, 1, 0.5, 0.01, Viewer.YAXIS
-        # locationViewer.addSlider "nav-zaxis", ".slider#loc-nav-zaxis", "vertical", 0, 1, 0.5, 0.01, Viewer.ZAXIS
-        # locationViewer.clearImages()
-        # imgs = {
-            # id: 'anatomical'
-            # json: true
-            # name: 'anatomical'
-            # colorPalette: 'grayscale'
-            # cache: true
-            # url: '/images/anatomical/data'
-        # }
-        # locationViewer.loadImages(imgs, null, true, true)
-        # locationViewer.moveToAtlasCoords(seed)
-#
-        # $(locationViewer).on('afterClick', (e) =>
-            # loadLocationFromCursor(locationViewer.coords_xyz())
-        # )
-#
-    # $('#location-menu a').click ((e) =>
-        # e.preventDefault()
-        # activeTab = $('#location-menu a').index($(e.target))
-        # window.cookie.set('locationTab', activeTab)
-        # $(e.target).tab('show')
-        # if activeTab == 2
-            # viewer.paint()
-    # )
-#
-    # $('.plane-pos').keypress((e) ->
-        # loadLocationFromTextBoxes() if(e.which == 13)
-    # )
-#
-    # $('#load-location').click((e) ->
-        # loadLocationFromCursor(viewer.coords_xyz())
-    # )
+  $('.plane-pos').keypress((e) ->
+      update() if(e.which == 13)
+  )
 
-
-  # Load state (e.g., which tab to display)
-  # activeTab = window.cookie.get('locationTab')
-  # $("#location-menu li:eq(#{activeTab}) a").tab('show')
-  # $(viewer).on('imagesLoaded', ((e) ->
-  #     # Start from seed voxel.
-  #     # viewer.paint()
-  #     viewer.moveToAtlasCoords(seed)
-  # ))
+  $('#load-location').click((e) ->
+      xyz = viewer.coords_xyz()
+      $('#x-in').val(xyz[0])
+      $('#y-in').val(xyz[1])
+      $('#z-in').val(xyz[2])
+      update()
+  )
 

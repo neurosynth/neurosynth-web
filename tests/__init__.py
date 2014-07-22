@@ -1,4 +1,4 @@
-from mock import MagicMock, Mock, patch
+# from mock import MagicMock, Mock, patch
 import re
 import inspect
 from flask.json import jsonify
@@ -16,19 +16,18 @@ from flask_sqlalchemy import BaseQuery
 
 class TestCase(Base):
     def create_app(self):
-        if app.config.get('DEBUG_WITH_APTANA') == None:
-            '''creates the app and a sqlite database in memory'''
-            create_app(database_uri=SQLALCHEMY_DATABASE_URI, debug=DEBUG, aptana=DEBUG_WITH_APTANA)
-            
-            #creates and registers blueprints in nsweb.blueprints
-            import nsweb.frontend.controllers.studies
-            import nsweb.frontend.controllers.features
-            #import nsweb.frontend.controllers.images
-            import nsweb.frontend.controllers.locations
-            
-            #loads blueprints
-            register_blueprints()
-            #return app
+        '''creates the app and a sqlite database in memory'''
+        create_app(database_uri=SQLALCHEMY_DATABASE_URI)
+        
+        #creates and registers blueprints in nsweb.blueprints
+        import nsweb.frontend.controllers.studies
+        import nsweb.frontend.controllers.features
+        #import nsweb.frontend.controllers.images
+        import nsweb.frontend.controllers.locations
+        
+        #loads blueprints
+        register_blueprints()
+        #return app
 
     def setUp(self):
         '''creates tables'''

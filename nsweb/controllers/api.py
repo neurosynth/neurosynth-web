@@ -5,6 +5,9 @@ from flask_sqlalchemy import sqlalchemy
 bp = Blueprint('apis',__name__,url_prefix='/api')
 
 
+### NOTE: THIS API IS BEING GRADUALLY PHASED OUT IN FAVOR OF METHODS IN THE 
+# MODEL SPECIFIC CONTROLLER MODULES. ###
+
 # Begin server side APIs 
 @bp.route('/studies/')
 def studies_server_side_api():
@@ -39,14 +42,14 @@ def features_server_side_api():
     data = Feature.query
     if search: #No empty search on my watch
         search = '%{}%'.format(search)
-        data = data.filter( Feature.feature.like( search ) | Feature.num_studies.like( search ) | Feature.num_activations.like( search ) )
+        data = data.filter( Feature.name.like( search ) | Feature.num_studies.like( search ) | Feature.num_activations.like( search ) )
     data=data.order_by(order_by)
     data=data.paginate(page=offset/results_per_page, per_page=results_per_page, error_out=False)
     result = {}
     result['sEcho'] = int(request.args['sEcho']) # for security
     result['iTotalRecords'] = Feature.query.count()
     result['iTotalDisplayRecords'] = data.total
-    result['aaData'] = [ ['<a href={0}>{1}</a>'.format(url_for('features.show',val=d.id),d.name),
+    result['aaData'] = [ ['<a href={0}>{1}</a>'.format(url_for('features.show',val=d.name),d.name),
                             d.num_studies,
                             d.num_activations,
                             ] for d in data.items ]
@@ -58,7 +61,7 @@ def features_server_side_api():
 def studies_features_api(val):
     data=Study.query.get(val)
 #     data=Frequency.query.filter_by(pmid=int(val))#attempted optimization. Join causes slower performance however
-    data = [ ['<a href={0}>{1}</a>'.format(url_for('features.show',val=f.feature_id),vf.feature.name),
+    data = [ ['<a href={0}>{1}</a>'.format(url_for('features.show',val=f.feature_id), f.feature.name),
               round(f.frequency,3),
               ] for f in data.frequencies]
     data=jsonify(aaData=data)
@@ -68,9 +71,9 @@ def studies_features_api(val):
 def studies_peaks_api(val):
     data=Study.query.get(val)
 #     data=Peak.query.filter_by(pmid=int(val))#attempted optimization. Join causes slower performance however
-    data=[ [p.x,p.y,p.z] for p in data.peaks]
+    data=[ [p.table,p.x,p.y,p.z] for p in data.peaks]
 #     data=Peak.query.filter_by(pmid=int(val)).with_entities(Peak.x,Peak.y,Peak.z).all() #attempted optimization.
-    data=jsonify(aaData=data)
+    data=jsonify(data=data)
     return data
 
 @bp.route('/features/<string:name>/')
@@ -93,14 +96,30 @@ def features_api(val):
     data=jsonify(aaData=data)
     return data
 
+@bp.route('/locations/')
+def location_list_api():
+    locations = Location.query.all()
+    data = [{'x': l.x, 'y': l.y, 'z': l.z} for l in locations]
+    return jsonify(data=data)
+
 @bp.route('/locations/<string:val>/')
-def locations_api(val):
-    x,y,z,radius = [int(i) for i in val.split('_')]
+def location_api(val):
+    args = [int(i) for i in val.split('_')]
+    if len(args) == 3: args.append(10)
+    x, y, z, radius = args
+
+    ### PEAKS ###
     # Limit search to 20 mm to keep things fast
     if radius > 20: radius = 20
     points = Peak.closestPeaks(radius,x,y,z)
     points = points.group_by(Peak.pmid) #prevents duplicate studies
     points = points.add_columns(sqlalchemy.func.count(Peak.id)) #counts duplicate peaks
+
+    ### IMAGES ###
+    location = Location.query.filter_by(x=x, y=y, z=z).first()
+    images = [] if location is None else location.images
+    images = [{'label': i.label, 'id': i.id} for i in images if i.display]
+
     if 'sEcho' in request.args:
         data = []
         for p in points:
@@ -109,7 +128,10 @@ def locations_api(val):
             data.append([link, s.authors, s.journal,p[1]])
         data = jsonify(aaData=data)
     else:
-        data = [ {'pmid':p[0].study.pmid,'peaks':p[1] } for p in points]
+        data = {
+            'studies': [{'pmid':p[0].study.pmid,'peaks':p[1] } for p in points],
+            'images': images
+        }
         data = jsonify(data=data)
     return data
     

@@ -1,5 +1,7 @@
-from nsweb.models.features import *
-from nsweb.models.locations import *
+from nsweb.core import db
+from nsweb.models.features import Feature, Topic
+from nsweb.models.locations import Location
+from nsweb.models.genes import Gene
 from sqlalchemy.orm.relationships import foreign
 
 class Image(db.Model):
@@ -36,3 +38,12 @@ class FeatureImage(Image):
 class LocationImage(Image):
     __mapper_args__={'polymorphic_identity': 'location'}
     location_id = db.Column(db.Integer, db.ForeignKey(Location.id), nullable=True)
+
+class TopicImage(Image):
+    __mapper_args__={'polymorphic_identity': 'topic'}
+    topic_id = db.Column(db.Integer, db.ForeignKey(Topic.id), nullable=True)
+
+class GeneImage(Image):
+    __mapper_args__={'polymorphic_identity': 'gene'}
+    gene_id = db.Column(db.Integer, db.ForeignKey(Gene.id), nullable=True)
+

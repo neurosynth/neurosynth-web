@@ -1,0 +1,22 @@
+#page-genes input.plane-pos {
+	width: 50px;
+	font-size: 20px;
+	// font-weight: bold;
+	height: 34px;
+	line-height: 1.2em;
+	margin: 0px 0px 4px 6px;
+	text-align: center;
+	vertical-align: top;
+	padding: 3px;
+	border-radius: 3px;
+}
+
+#coordinates.data-row {
+	text-align: center
+}
+
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+  -webkit-appearance: none; 
+  margin: 0; 
+}

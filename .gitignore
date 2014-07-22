@@ -52,4 +52,10 @@ coverage.xml
 
 # Sphinx documentation
 docs/_build/
+
+# Data
 data/
+
+# Config, cache, and other stuff we don't need to share
+nsweb/initializers/settings.py
+nsweb/static/.webassets-cache/

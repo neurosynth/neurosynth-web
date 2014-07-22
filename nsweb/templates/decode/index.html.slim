@@ -1,0 +1,11 @@
+- set page_title = 'Neurosynth -- decode image'
+- extends "layout/base.html"
+- block content
+  .row#page-decode
+    .col-md-12.content
+      h2 Decode image
+      p Image must be in Nifti format. Note: if the image is not in MNI152 2 mm space (with dimensions 91 x 109 x 91), Neurosynth will resample it to the required dimensions. Please note that <b>this will often result in an inappropriately aligned image</b>.
+      form method="POST" action="" enctype="multipart/form-data"
+        {{ form.hidden_tag() }}
+        {{ form.image_file.label }} {{ form.image_file(size=20) }}
+        input type="submit" value="Decode!"

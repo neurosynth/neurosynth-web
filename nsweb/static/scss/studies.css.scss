@@ -1,0 +1,38 @@
+.row_label {
+  font-weight: bold;
+}
+
+@mixin small-font {
+  font-size: 12px;
+}
+
+@mixin smaller-table {
+  .dataTables_wrapper {
+    @include small-font;
+  }
+  .dataTables_filter {
+    input {
+      @include small-font;
+      height: 1.1em;
+      width: 60px;
+    }
+    label {
+      @include small-font;
+    }
+  }
+  .dataTables_processing {
+    @include small-font;
+  }
+  .dataTables_length {
+    select {
+      @include small-font;
+    }
+    label {
+      @include small-font;
+    }
+  }
+}
+
+#show-study {
+  @include smaller-table;
+}

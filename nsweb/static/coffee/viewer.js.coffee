@@ -21,17 +21,21 @@ textToHTML = (el) ->
   $(el).html($(el).text())
 
 $(document).ready ->
+
+  return if not $('.view').length   # Skip if no viewer exists
+
   # options = if 'no-zoom' in settings then { panzoomEnabled: false } else {}
   cache = settings.cache || true
   viewer = new Viewer("#layer-list", ".layer-settings", cache, options)
-  viewer.addView "#view-axial", Viewer.AXIAL
-  viewer.addView "#view-coronal", Viewer.CORONAL
-  viewer.addView "#view-sagittal", Viewer.SAGITTAL
+
+  viewer.addView("#view-axial", Viewer.AXIAL) if $('#view-axial').length
+  viewer.addView("#view-coronal", Viewer.CORONAL) if $('#view-coronal').length
+  viewer.addView("#view-sagittal", Viewer.SAGITTAL) if $('#view-sagittal').length
 
   if 'nav' in settings
-    viewer.addSlider "nav-xaxis", ".slider#nav-xaxis", "horizontal",  0, 1, 0.5, 0.01, Viewer.XAXIS
-    viewer.addSlider "nav-yaxis", ".slider#nav-yaxis", "vertical", 0, 1, 0.5, 0.01, Viewer.YAXIS
-    viewer.addSlider "nav-zaxis", ".slider#nav-zaxis", "vertical", 0, 1, 0.5, 0.01, Viewer.ZAXIS
+    viewer.addSlider "nav-xaxis", ".slider#nav-xaxis", "horizontal",  0, 1, 0.5, 0.01, Viewer.XAXIS if $('#view-sagittal').length
+    viewer.addSlider "nav-yaxis", ".slider#nav-yaxis", "vertical", 0, 1, 0.5, 0.01, Viewer.YAXIS if $('#view-coronal').length
+    viewer.addSlider "nav-zaxis", ".slider#nav-zaxis", "vertical", 0, 1, 0.5, 0.01, Viewer.ZAXIS if $('#view-axial').length
 
   if 'layers' in settings
     viewer.addSlider "opacity", ".slider#opacity", "horizontal", 0, 1, 1, 0.01, null, '#opacity-text'
@@ -48,7 +52,7 @@ $(document).ready ->
     viewer.addSettingsCheckboxes('#checkbox-list', 'standard')
 
   window.viewer = viewer
-  loadImages()
+  # loadImages()
 
   # Kludge for link to Yeo et al
   $(viewer).on('imagesLoaded', (e) => textToHTML('#image-description'))

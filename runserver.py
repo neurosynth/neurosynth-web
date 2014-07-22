@@ -1,39 +1,15 @@
 from nsweb.initializers import settings
 from nsweb.core import app, setup_logging, create_app, register_blueprints
-from flask_script import Manager
 
-#registers models
-import nsweb.models
-manager = Manager(app)
+#set up the flask app
+create_app()
+
+#set up logging
+setup_logging(logging_path=settings.LOGGING_PATH,level=settings.LOGGING_LEVEL)
+    
 def main():
-    #sets up the flask app
-    create_app(database_uri = settings.SQLALCHEMY_DATABASE_URI)
     
-    #creates and registers blueprints in nsweb.blueprints
-    
-    import nsweb.controllers.studies
-    import nsweb.controllers.features
-    import nsweb.controllers.locations
-    import nsweb.controllers.api
-    import nsweb.controllers.images
-    
-    #loads blueprints
-    register_blueprints()
-    
-    #sets up logging
-    setup_logging(logging_path=settings.LOGGING_PATH,level=settings.LOGGING_LEVEL)
-    
-    # print app.url_map   # Display all routes--for debugging
-    
-    # To allow aptana to receive errors, set use_debugger=False
-    if app.debug: use_debugger = True
-    try:
-        # Disable Flask's debugger if external debugger is requested
-        use_debugger = not(app.config.get('DEBUG_WITH_APTANA'))
-    except:
-        pass
-    app.run(use_debugger=use_debugger, debug=app.debug,
-            use_reloader=use_debugger, port=5001)
+    app.run(debug=app.debug, port=5008)
 
 if __name__ == "__main__":
     main()

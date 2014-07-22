@@ -1,34 +1,63 @@
-from flask import Blueprint, render_template, redirect, url_for
+from flask import Blueprint, render_template, redirect, url_for, request, jsonify, abort
 from nsweb.models import Feature
 from nsweb.core import add_blueprint
 from flask.helpers import url_for
+import simplejson as json
+import re
 
 bp = Blueprint('features',__name__,url_prefix='/features')
  
+
+def find_feature(val):
+    ''' Retrieve feature by either id (when int) or name (when string) '''
+    feature = Feature.query.get(val) if re.match('\d+$', val) else Feature.query.filter_by(name=val).first()
+    if feature is None: abort(404)
+    return feature
+    
 @bp.route('/')
 def index():
-    return render_template('features/index.html.slim', features=Feature.query.all())
+    return render_template('features/index.html.slim')
  
-@bp.route('/<int:val>/')
+@bp.route('/<string:val>/')
 def show(val):
-    feature = Feature.query.get_or_404(val)
-    images=''
-    for i in feature.images:
-#        if i.visible:
-        reverse=i.label.find('reverse')
-        images+= '{{"name":"{0}","id":{1},"download":"/images/{1}","intent":"{2}","visible":{3},"colorPalette":{4}}},'.format(i.name,
-                                                                                                                          i.id,
-                                                                                                                          (i.stat + ' :').capitalize(),
-                                                                                                                          'true' if reverse else'false',
-                                                                                                                          '"red"' if reverse else '"blue"')
-    return render_template('features/show.html.slim', feature=feature.name, images=images)
+    feature = find_feature(val)
+    n_studies = feature.frequencies.count()
+    return render_template('features/show.html.slim', feature=feature.name, n_studies=n_studies)
 
-@bp.route('/<string:name>/')
-def find_feature(name):
-    """ If the passed ID isn't numeric, assume it's a feature name,
-    and retrieve the corresponding numeric ID. 
-    """
-    val = Feature.query.filter_by(feature=name).first().id
-    return redirect(url_for('features.show',val=val))
+@bp.route('/<string:val>/images')
+def get_images(val):
+    feature = find_feature(val)
+    images = [{
+        'id': img.id,
+        'name': img.label,
+        'colorPalette': 'red' if 'reverse' in img.label else 'blue',
+        # "intent": (img.stat + ':').capitalize(),
+        'url': '/images/%s' % img.id,
+        'visible': 1 if 'reverse' in img.label else 0
+    } for img in feature.images if img.display]
+    return jsonify(data=images)
+
+@bp.route('/<string:val>/images/reverseinference')
+def get_reverse_inference_image(val):
+    """ Horrible hack to get this working; totally mucks up API pattern, so clean up later. """
+    feature = find_feature(val)
+    img = [i for i in feature.images if 'reverse' in i.label][0]
+    from nsweb.controllers import images
+    return images.download(img.id)
+
+@bp.route('/<string:val>/studies')
+def get_studies(val):
+    feature = find_feature(val) 
+    if 'dt' in request.args:
+        data = []
+        for f in feature.frequencies:
+            s = f.study
+            link = '<a href={0}>{1}</a>'.format(url_for('studies.show',val=s.pmid),s.title)
+            data.append([link, s.authors, s.journal, round(f.frequency, 3)])
+        data = jsonify(data=data)
+    else:
+        data = jsonify(studies=[s.pmid for s in feature.studies])
+    return data
 
 add_blueprint(bp)
+

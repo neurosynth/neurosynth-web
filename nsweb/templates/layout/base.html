@@ -9,7 +9,7 @@
     <title>{% block title %}{{ page_title|default(('Neurosynth')) }}{% endblock %}</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    {% assets "css_all" -%}
+    {% assets "css" -%}
       <link rel="stylesheet" href="{{ ASSET_URL }}">
     {%- endassets %}
     {% block css_style %}
@@ -44,7 +44,8 @@
 					<li class=""><a href="">Home</a></li>
 					<li class=""><a href="/features/">Features</a></li>
 					<li class=""><a href="/studies/">Studies</a></li>
-			        <li class=""><a href="/locations/">Locations</a></li>
+                    <li class=""><a href="/locations/">Locations</a></li>
+			        <li class=""><a href="/decode/">Decoder</a></li>
 		        </ul>
 		        <ul class="nav navbar-nav navbar-right">
 		        </ul>
@@ -76,12 +77,7 @@
     </div>
 
     
-    {% assets "js_vendor" -%}
-      <script src="{{ ASSET_URL }}"></script>
-    {% endassets %}
-    {#<script src="{{ url_for('static', filename='js/main.js') }}"></script>#}
-    
-    {% assets "js_main" -%}
+    {% assets "js" -%}
       <script src="{{ ASSET_URL }}"></script>
     {% endassets %}
 </body>

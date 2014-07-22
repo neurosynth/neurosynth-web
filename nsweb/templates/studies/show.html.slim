@@ -2,50 +2,47 @@
 - extends "layout/base.html"
 - block content
   - import "macros/study_viewer.html.slim" as viewers
+  .row#page-study
+    .col-md-12
+      h3 {{study.title}}
+      table.table-striped.table-hover.table.table-condensed
+        tbody
+          tr
+            td.row_label Authors:
+            td {{study.authors}}
+          tr
+            td.row_label Journal:
+            td {{study.journal}}
+          tr
+            td.row_label Year:
+            td {{study.year}}
+          tr
+            td.row_label PMID:
+            td <a href={{ "http://www.ncbi.nlm.nih.gov/pubmed/%s"|format(study.pmid) }}> {{study.pmid}}</a>
   .row
-    .span11
-        h3 {{study.title}}
-        #show-study
-          .row
-            .span11
-              table.table-striped.table-hover.table.table-condensed
-                tbody
-                  tr
-                    td.row_label Authors:
-                    td {{study.authors}}
-                  tr
-                    td.row_label Journal:
-                    td {{study.journal}}
-                  tr
-                    td.row_label Year:
-                    td {{study.year}}
-                  tr
-                    td.row_label PMID:
-                    td <a href={{ "http://www.ncbi.nlm.nih.gov/pubmed/%s"|format(study.pmid) }}> {{study.pmid}}</a>
-          .row
-            .span5
-              ul#study-menu.nav.nav-tabs
-                li.active
-                  a href="#activations" data-toggle="tab" Activations
-                li
-                  a href="#features" data-toggle="tab" Features
-            .span6
-              script type="text/javascript"
-                |var options = {"panzoomEnabled":false}
-                var settings = ['no-zoom', 'nav']
-                var images = [{"name":"activations","data":{"dims":[91,109,91],"peaks": {{peaks}} },"colorPalette":"red"}]
-              p {{viewers.viewer()|safe}}
-              #study-tab-content.tab-content
-                #activations.tab-pane.active
-                  table#study_peaks_table.table.table-striped.table-hover.table-condensed.small-datatable
-                    thead
-                      tr
-                        th x
-                        th y
-                        th z
-                #features.tab-pane
-                  table#study_features_table.table.table-striped.table-hover.table-condensed.small-datatable
-                    thead
-                      tr
-                        th Feature
-                        th Loading
+    .col-md-6
+      p {{viewers.viewer(scale=0.75)|safe}}
+    .col-md-6
+      ul#study-menu.nav.nav-tabs
+        li.active
+          a href="#activations" data-toggle="tab" Activations
+        li
+          a href="#features" data-toggle="tab" Features
+      script type="text/javascript"
+        |var options = {"panzoomEnabled":false}
+        var settings = ['no-zoom', 'nav']
+      #study-tab-content.tab-content
+        #activations.tab-pane.active
+          table#study_peaks_table.table.table-striped.table-hover.table-condensed.small-datatable
+            thead
+              tr
+                th table
+                th x
+                th y
+                th z
+        #features.tab-pane
+          table#study_features_table.table.table-striped.table-hover.table-condensed.small-datatable
+            thead
+              tr
+                th Feature
+                th Loading

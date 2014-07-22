@@ -4,20 +4,27 @@ from nsweb.models.locations import Location
 from nsweb.models.studies import Study
 from nsweb.models.peaks import Peak
 from nsweb.models.frequencies import Frequency
-from nsweb.models.images import FeatureImage, LocationImage
+from nsweb.models.images import FeatureImage, LocationImage, GeneImage
+from nsweb.models.genes import Gene
 from nsweb.initializers import settings
 import os
+from os.path import join, basename
 from neurosynth.base.dataset import Dataset
+from neurosynth.base import transformations
+import nibabel as nb
 import numpy as np
+import pandas as pd
 import random
 from glob import glob
+import simplejson as json
+from copy import deepcopy
 
 
 
 class DatabaseBuilder:
 
 
-    def __init__(self, db, dataset=None, studies=None, features=None, reset_db=False):
+    def __init__(self, db, dataset=None, studies=None, features=None, reset_db=False, reset_dataset=False):
         """ Initialize instance from a pickled Neurosynth Dataset instance or a 
         pair of study and feature .txt files. 
         Args:
@@ -30,15 +37,16 @@ class DatabaseBuilder:
             features: name of file containing feature data.
             reset_db: if True, will drop and re-create all database tables before 
                 adding new content. If False (default), will add content incrementally.
+            reset_dataset: if True, will regenerate the pickled Neurosynth dataset.
         """
 
         # Load or create Neurosynth Dataset instance
-        if dataset is None:
+        if dataset is None or reset_dataset or (isinstance(dataset, basestring) and not os.path.exists(dataset)):
             if (studies is None) or (features is None):
-                raise ValueError("If dataset is None, both studies and features must be provided.")
+                raise ValueError("To generate a new Dataset instance, both studies and features must be provided.")
             dataset = Dataset(studies)
             dataset.add_features(features)
-            dataset.save('/Users/tal/Downloads/dataset.pkl')
+            dataset.save(settings.PICKLE_DATABASE, keep_mappables=True)
         else:
             dataset = Dataset.load(dataset)
             if features is not None:
@@ -57,7 +65,31 @@ class DatabaseBuilder:
         self.db.create_all()
 
 
-    def add_features(self, features=None, image_dir=None):
+    def add_features_to_database(self, features, image_dir=None, min_studies=50, 
+                                threshold=0.001, generate_images=True, update_db=True):
+        """ Add new features to an existing Dataset and optionally update the 
+        Features, Studies, etc. in the database. """
+
+        old_features = set(self.dataset.feature_table.data.columns)
+
+        self.dataset.add_features(features, min_studies=min_studies, 
+                    threshold=threshold, merge='left')
+
+        new_features = list(set(self.dataset.feature_table.data.columns) - old_features)
+        print "Adding %d new features." % len(new_features)
+        print new_features
+
+        if update_db:
+            self.add_features(new_features)
+            self.add_studies(new_features)
+
+        if generate_images:
+            self.generate_feature_images(image_dir, new_features, update_db)
+
+        self.dataset.save(settings.PICKLE_DATABASE, keep_mappables=True)
+
+
+    def add_features(self, features=None, image_dir=None, reset=False):
         ''' Add Feature records to the DB. 
         Args:
             features: A list of feature names to add to the db. If None,  will use 
@@ -65,6 +97,8 @@ class DatabaseBuilder:
             image_dir: folder to save generated feature images in. If None, do not 
                 save any images.
         '''
+        if reset:
+            Feature.query.delete()
 
         if features is None:
             features = self.dataset.get_feature_names()
@@ -112,12 +146,12 @@ class DatabaseBuilder:
         name = feature.name
 
         feature.images.extend([
-            FeatureImage(image_file=image_dir+'_'+name+'_pAgF_z_FDR_0.05.nii.gz',
+            FeatureImage(image_file=join(image_dir, name + '_pAgF_z_FDR_0.05.nii.gz'),
                 label='%s: forward inference' % name,
                 stat='z-score',
                 display=1,
                 download=1),
-            FeatureImage(image_file=image_dir+name+'_pFgA_z_FDR_0.05.nii.gz',
+            FeatureImage(image_file=join(image_dir, name + '_pFgA_z_FDR_0.05.nii.gz'),
                 label='%s: reverse inference' % name,
                 stat='z-score',
                 display=1,
@@ -125,16 +159,23 @@ class DatabaseBuilder:
         ])
 
 
-    def add_studies(self, features=None, threshold=0.001, limit=None):
+    def add_studies(self, features=None, threshold=0.001, limit=None, reset=False):
         """ Add studies to the DB.
         Args:
             features: list of names of features to map studies onto. If None, use all available.
             threshold: Float or integer; minimum value in FeatureTable data array for inclusion.
             limit: integer; maximum number of studies to add (order will be randomized).
+            reset: Drop all existing records before populating.
+        Notes:
+            By default, will not create new Study records if an existing one matches. This ensures 
+            that we can gracefully add new feature associations without mucking up the DB.
+            To explicitly replace old records, pass reset=True.
         """
+        if reset:
+            Study.query.delete()
 
         # For efficiency, get all feature data up front, so we only need to densify array once
-        feature_data = self.dataset.get_feature_data(features=features).to_dense()
+        feature_data = self.dataset.get_feature_data(features=features)
         feature_names = feature_data.columns
 
         study_inds = range(len(self.dataset.mappables))
@@ -146,22 +187,26 @@ class DatabaseBuilder:
         for i in study_inds:
 
             m = self.dataset.mappables[i]
-            peaks = [Peak(x=float(p.x),
-                          y=float(p.y),
-                          z=float(p.z),
-                          table=p.table_num
-                          ) for (ind,p) in m.data.iterrows()]
-            data = m.data.iloc[0]
-            study = Study(
-                      pmid=int(m.id),
-                      space=data['space'],
-                      doi=data['doi'],
-                      title=data['title'],
-                      journal=data['journal'],
-                      authors=data['authors'],
-                      year=data['year'])
-            study.peaks.extend(peaks)
-            self.db.session.add(study)
+            id = int(m.id)
+            
+            study = Study.query.get(id)
+            if study is None:
+                peaks = [Peak(x=float(p.x),
+                              y=float(p.y),
+                              z=float(p.z),
+                              table=p.table_num
+                              ) for (ind,p) in m.data.iterrows()]
+                data = m.data.iloc[0]
+                study = Study(
+                          pmid=id,
+                          space=data['space'],
+                          doi=data['doi'],
+                          title=data['title'],
+                          journal=data['journal'],
+                          authors=data['authors'],
+                          year=data['year'])
+                study.peaks.extend(peaks)
+                self.db.session.add(study)
              
             # Map features onto studies via a Frequency join table that also stores frequency info
             pmid_frequencies = list(feature_data.ix[m.id,:])
@@ -174,8 +219,8 @@ class DatabaseBuilder:
 
                     # Track number of studies and peaks so we can update Feature table more
                     # efficiently later
-                    self.features[feature_name][1]+=1
-                    self.features[feature_name][2]+=len(peaks)
+                    self.features[feature_name][1] += 1
+                    self.features[feature_name][2] += study.peaks.count()
 
          
         # Commit records in batches of 1000 to conserve memory.
@@ -215,7 +260,7 @@ class DatabaseBuilder:
 
         # Set up defaults
         if image_dir is None:
-            image_dir = settings.IMAGE_DIR + 'features/'
+            image_dir = join(settings.IMAGE_DIR, 'features')
             if not os.path.exists(image_dir):
                 os.makedirs(image_dir)
 
@@ -233,6 +278,72 @@ class DatabaseBuilder:
             self.db.session.commit()
 
 
+    def generate_location_features(self, feature_dir=None, output_dir=None, 
+            min_studies_at_voxel=50):
+        """ Create json files containing feature data for every point in the brain. """
+        if feature_dir is None:
+            feature_dir = join(settings.IMAGE_DIR, 'features')
+        if output_dir is None:
+            output_dir = settings.LOCATION_FEATURE_DIR
+
+        masker = self.dataset.masker
+
+        study_names = self.dataset.image_table.ids
+        feature_names = self.dataset.get_feature_names()
+        imgs = np.array(self.dataset.image_table.data.todense())
+        p_active = imgs.sum(1)
+        # Save this for later
+        ijk_reduced = np.array(np.where(p_active >= min_studies_at_voxel)[0]).squeeze()
+
+        # Load rev inference z-score and posterior prob image data
+        imgs = glob(join(feature_dir, '*pFgA_z.nii.gz'))
+        print "Found %d imgs." % len(imgs)
+        rev_inf_z = np.zeros((self.dataset.image_table.data.shape[0], len(imgs)))
+        for i, img in enumerate(imgs):
+            rev_inf_z[:,i] = masker.mask(img)
+
+        imgs = glob(join(feature_dir, '*pFgA_given_pF=0.50.nii.gz'))
+        rev_inf_pp = np.zeros((self.dataset.image_table.data.shape[0], len(imgs)))
+        for i, img in enumerate(imgs):
+            rev_inf_pp[:,i] = masker.mask(img)
+
+        print "Done loading..."
+        print len(ijk_reduced)
+        print ijk_reduced.shape
+        print ijk_reduced
+        p_active = masker.unmask(p_active).squeeze()
+        keep_vox = np.where(p_active >= min_studies_at_voxel)
+        ijk = zip(*keep_vox)  # Exclude voxels with few studies
+        xyz = transformations.mat_to_xyz(np.array(ijk))[:, ::-1]
+
+        print "Processing voxels..."
+        num_vox = len(xyz)
+        num_features = len(feature_names)
+
+        for i, seed in enumerate(xyz):
+
+            location_name = '_'.join(str(x) for x in seed)
+            featurefile = join(output_dir, '%s_features.txt' % location_name)
+            # if os.path.isfile(featurefile): continue
+            print "\nProcessing %d/%d..." % (i + 1, num_vox)
+            ind = ijk_reduced[i]
+            # print ind
+            z_scores = list(rev_inf_z[ind,:].ravel())
+            z_scores = ['%.2f' % x for x in z_scores]
+            print "Getting posterior probs..."
+            pp = list(rev_inf_pp[ind,:].ravel())
+            pp = ['%.2f' % x for x in pp]
+            # print pp.shape
+            # print "Writing to file..."
+            data = {
+                'data': []
+            }
+            for j in range(num_features):
+                # data['data'].append([feature_names[j], z_scores[j]])
+                data['data'].append([feature_names[j], z_scores[j], pp[j]])
+            json.dump(data, open(featurefile, 'w'))
+
+
     def generate_location_images(self, image_dir=None, add_to_db=False, min_studies=50, **kwargs):
         """ Create a full set of location-based coactivation images via Neurosynth. 
         Right now this isn't parallelized and will take a couple of days to run. 
@@ -244,7 +355,7 @@ class DatabaseBuilder:
         from neurosynth.analysis import meta
 
         if image_dir is None:
-            image_dir = settings.IMAGE_DIR + 'locations/'
+            image_dir = join(settings.IMAGE_DIR, 'coactivation')
             if not os.path.exists(image_dir):
                 os.makedirs(image_dir)
 
@@ -298,28 +409,109 @@ class DatabaseBuilder:
                 self.add_location_images(self, image_dir)
 
 
-    def add_location_images(self, image_dir, search=None, limit=None):
+    def add_location_images(self, image_dir=None, search=None, limit=None, overwrite=False):
         """ Filter all the images in the passed directory and add records. """
         
+        if image_dir is None:
+            image_dir = join(settings.IMAGE_DIR, 'coactivation')
+
         if search is None:
             search = '*_pFgA_z.nii.gz'
+
+        extra_assets = [
+            {
+                'name': 'YeoBucknerFCMRI',
+                'path': join('/data/neurosynth/data/locations', 'fcmri', 'functional_connectivity_%d_%d_%d.nii.gz'),
+                'label': 'Functional connectivity',
+                'description': "This image displays resting-state functional connectivity for the seed region in a sample of 1,000 subjects. Image provided courtesy of Yeo, Buckner and colleagues. For details, see <a href='http://jn.physiology.org/content/106/3/1125.long'>Yeo et al (2011)</a>."
+            }
+        ]
         
-        images = glob(os.path.join(image_dir, search))
+        images = glob(join(image_dir, search))
+        print "Found %d images to add." % len(images)
 
         if limit is None:
             limit = len(images)
 
         for img in images[:limit]:
 
-            x, y, z = [int(i) for i in os.path.basename(img).split('_')[:3]]
+            x, y, z = [int(i) for i in basename(img).split('_')[:3]]
+            if (not overwrite) and self.db.session.query(Location).filter_by(x=x, y=y, z=z).count():
+                continue
             location = Location(x=x, y=y, z=z)
             location.images = [LocationImage(
-                image_file=image_dir + '/' + name + '_' + imgs_to_keep[0] + '.nii.gz',
-                label='coactivation: (%d, %d, %d)' % tuple(seed),
+                image_file=img,
+                label='coactivation: (%d, %d, %d)' % (x, y, z),
                 stat='z-score',
                 display=1,
                 download=1)
             ]
+            
+            # Add any additional assets
+            for xtra in extra_assets:
+                xtra_path = xtra['path'] % (x, y, z)
+                if os.path.exists(xtra_path):
+                    location.images.append(LocationImage(
+                        image_file = xtra_path,
+                        label = xtra['label'],
+                        display = 1,
+                        download = 1
+                        ))
+
             self.db.session.add(location)
 
         self.db.session.commit()
+
+    def add_genes(self, gene_dir=None, reset=True):
+        """ Add records for genes, working from a directory containing gene images. """
+        if reset:
+            Gene.query.delete()
+        if gene_dir is None:
+            gene_dir = settings.GENE_IMAGE_DIR
+        genes = glob(join(gene_dir, "*.nii.gz"))
+        print "Adding %d genes..." % len(genes)
+        found = {}
+        for (i, g) in enumerate(genes):
+            symbol = basename(g).split('_')[2]
+            if symbol == 'A' or symbol == 'CUST' or symbol.startswith('LOC') or symbol in found:
+                continue
+            found[symbol] = 1
+            gene = Gene(name=symbol, symbol=symbol)
+            gene.images = [GeneImage(
+                image_file = g,
+                label = "AHBA gene expression levels for " + symbol,
+                stat = "z-score",
+                display=1,
+                download=0
+                )]
+
+            self.db.session.add(gene)
+            if i % 1000 == 0:
+                self.db.session.commit()
+
+    def generate_decoding_data(self, features=None):
+        """ Save image data for feature maps we use in decoding as a separate 
+        numpy array for rapid use. """
+        if features is None:
+            features = dataset.get_feature_names()
+        path = join(settings.IMAGE_DIR, 'features', '%s_pFgA_z.nii.gz')
+        images = [path % f for f in features]
+        images = [i for i in images if os.path.exists(i)]
+        n_vox, n_studies = self.dataset.image_table.data.shape[0], len(features)
+        data = np.zeros((n_vox, n_studies))
+        for (i, img) in enumerate(images):
+            data[:,i] = self.dataset.masker.mask(img)
+        data = pd.DataFrame(data, columns=features)
+        data.to_msgpack(settings.DECODING_DATA)
+
+    def generate_topics(self, topic_keys, doc_topics):
+        """ Seed the database with topics. """
+        # images = glob(join(settings.TOPIC_DIR, 'images', '*_p?g?_z.nii.gz'))
+        # temporarily store old FeatureTable while we analyze topics
+        ft = deepcopy(self.dataset.feature_table)
+        self.dataset.add_features(doc_topics)
+        
+
+
+
+

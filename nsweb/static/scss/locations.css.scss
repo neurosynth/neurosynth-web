@@ -1,18 +1,23 @@
-// Place all the styles related to the locations controller here.
-// They will automatically be included in application.css.
-// You can use Sass (SCSS) here: http://sass-lang.com/
 .big-text {
 	font-size: 36px;
 	float: left;
 
 	input {
-		width: 60px;
+		width: 80px;
 		font-size: 32px;
 		font-weight: bold;
-		line-height: 1.2em;
-		height: 36px;
-		margin: 0px 0px 4px 10px;
+		height: 48px;
+		margin: 0px 0px 4px 6px;
 		text-align: center;
+		vertical-align: middle;
+		padding: 0px 4px 0px 10px;
+		border-radius: 5px;
+	}
+
+	input[type=number]::-webkit-inner-spin-button, 
+	input[type=number]::-webkit-outer-spin-button { 
+	  -webkit-appearance: none; 
+	  margin: 0; 
 	}
 }
 

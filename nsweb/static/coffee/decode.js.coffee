@@ -2,15 +2,25 @@
 # All this logic will automatically be available in application.js.
 # You can use CoffeeScript in this file: http://jashkenas.github.com/coffee-script/
 $(document).ready ->
-	$('#decode_form').submit( (e) ->
-		window.location.replace('/decode/' + $('#neurovault_id').val())
-		e.preventDefault()
-	)
+  # $('#decode_form').submit( (e) ->
+  #   window.location.replace('/decode/' + $('#neurovault_id').val())
+  #   e.preventDefault()
+  # )
 
-	$('table[class*=decode-datatable]').dataTable
-		"sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
-		"sPaginationType": "bootstrap"
-		"iDisplayLength": 10
-		'aaSorting': [[1, 'desc']]
+  return if not $('#page-decode').length
 
-	$('#decode-tab-menu a:first').tab('show')
+  image_id = document.URL.split('/').slice(-2)[0]
+
+  loadImages()
+
+  $('#decoding_results_table').DataTable().ajax.url('/decode/' + image_id + '/data').load()
+
+  $('#decoding_results_table').on('click', 'i', (e) =>
+    row = $(e.target).closest('tr')
+    feature = $('td:eq(1)', row).text()
+    load_reverse_inference_image(feature)
+    # Load scatterplot
+    $('.scatterplot').html('<img src="/decode/' + image_id + '/scatter/' + feature + '.png" width="500">')
+  )
+
+  # $('#decode-tab-menu a:first').tab('show')

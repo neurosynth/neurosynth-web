@@ -8,19 +8,16 @@ bp = Blueprint('images',__name__,url_prefix='/images')
 
 @bp.route('/<int:val>/')
 def download(val):
-    filename = Image.query.get_or_404(val)
-    if filename.download:
-        filename=filename.image_file
+    image = Image.query.get_or_404(val)
+    if image.download:
+        filename = image.image_file
     else:
         abort(404)
-    return send_from_directory(IMAGE_DIR, filename, as_attachment=True, 
-    		attachment_filename=filename)
+    return send_file(os.path.join(IMAGE_DIR, filename), as_attachment=True, 
+            attachment_filename=os.path.basename(filename))
 
 @bp.route('/anatomical')
 def anatomical_underlay():
-    # json = jsonify()
-    # json.data=open(IMAGE_DIR+'data.json').read()
-    # return json
     return send_file(os.path.join(IMAGE_DIR, 'anatomical.nii.gz'), as_attachment=True,
     		attachment_filename='anatomical.nii.gz')
 
