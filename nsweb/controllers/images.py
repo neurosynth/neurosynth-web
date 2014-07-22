@@ -1,55 +1,36 @@
-from flask import send_from_directory, Blueprint, abort, jsonify, redirect, url_for, send_file
+from flask import send_from_directory, Blueprint, abort, request, jsonify, redirect, url_for, send_file
 from nsweb.models import Image, Feature, Location
 from nsweb.initializers.settings import IMAGE_DIR
 from nsweb.core import add_blueprint
 import os
+import datetime as dt
 
 bp = Blueprint('images',__name__,url_prefix='/images')
+
+def send_nifti(filename, attachment_filename=None):
+    """ Sends back a cache-controlled nifti image to the browser """
+    if not os.path.exists(filename) or '..' in filename or '.nii' not in filename:
+        abort(404)
+
+    if attachment_filename is None:
+        attachment_filename = os.path.basename(filename)
+
+    resp = send_file(os.path.join(IMAGE_DIR, filename), as_attachment=True,
+            attachment_filename=attachment_filename, conditional=True,
+            add_etags=True)
+    resp.last_modified = dt.datetime.fromtimestamp(os.path.getmtime(filename))
+    resp.make_conditional(request)
+    return resp
 
 @bp.route('/<int:val>/')
 def download(val):
     image = Image.query.get_or_404(val)
-    if image.download:
-        filename = image.image_file
-    else:
+    if not image.download:
         abort(404)
-    return send_file(os.path.join(IMAGE_DIR, filename), as_attachment=True, 
-            attachment_filename=os.path.basename(filename))
+    return send_nifti(image.image_file)
 
 @bp.route('/anatomical')
 def anatomical_underlay():
-    return send_file(os.path.join(IMAGE_DIR, 'anatomical.nii.gz'), as_attachment=True,
-    		attachment_filename='anatomical.nii.gz')
-
-# @bp.route('/coactivation/<int:val>/')
-# def coactivation_image(xyz):
-	
-
-# @bp.route('/feature/<int:val>/')
-# def featureimage_download(val):
-#     images=Feature.query.get_or_404(val)
-#     images=images.images
-#     return
-#  
-# @bp.route('/feature/<string:name>/')
-# def find_feature(name):
-#     """ If the passed ID isn't numeric, assume it's a feature name,
-#     and retrieve the corresponding numeric ID. 
-#     """
-#     val = Feature.query.filter_by(feature=name).first().id
-#     return redirect(url_for('images.featureimage_download',val=val))
-#  
-# @bp.route('/location/<int:val>/')
-# def locationimage_download(val):
-#     images=Location.query.query.get_or_404(val)
-#     images=images.images
-#     return
-#  
-# @bp.route('/location/<string:val>/')
-# def find_location(val):
-#     x,y,z = [int(i) for i in val.split('_')]
-#     val=Location.query.filter_by(x=x,y=y,z=z)
-#     val=val.id
-#     return redirect(url_for('images.locationimage_download',val=val))
+    return send_nifti(os.path.join(IMAGE_DIR, 'anatomical.nii.gz'), 'anatomical.nii.gz')
 
 add_blueprint(bp)
