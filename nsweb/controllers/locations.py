@@ -5,7 +5,7 @@ from nsweb.models.peaks import Peak
 import simplejson as json
 from flask_sqlalchemy import sqlalchemy
 from nsweb.initializers import settings
-from os.path import join
+from os.path import join, exists
 
 bp = Blueprint('locations',__name__,url_prefix='/locations')
 
@@ -74,6 +74,6 @@ def get_studies(val):
 def get_features(val):
     x, y, z, radius = get_params(val)
     f = join(settings.LOCATION_FEATURE_DIR, '%d_%d_%d_features.txt' % (x,y,z))
-    return open(f).read()
+    return open(f).read() if exists(f) else '{"data":[]}'
 
 add_blueprint(bp)
