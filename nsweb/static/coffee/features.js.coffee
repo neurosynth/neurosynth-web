@@ -61,3 +61,8 @@ $(document).ready ->
       if activeTab == 1
           viewer.paint()
   )
+
+  $('#load-location').click((e) ->
+      xyz = viewer.coords_xyz()
+      window.location.replace('/locations/?x=' + xyz[0] + '&y=' + xyz[1] + '&z=' + xyz[2])
+  )
