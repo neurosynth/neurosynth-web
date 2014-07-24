@@ -18,9 +18,11 @@ $(document).ready ->
   $('#decoding_results_table').on('click', 'i', (e) =>
     row = $(e.target).closest('tr')
     feature = $('td:eq(1)', row).text()
-    load_reverse_inference_image(feature)
+    load_reverse_inference_image(feature, true)
     # Load scatterplot
     $('.scatterplot').html('<img src="/decode/' + image_id + '/scatter/' + feature + '.png" width="500">')
   )
 
   # $('#decode-tab-menu a:first').tab('show')
+
+  # $('canvas#scatterplot')

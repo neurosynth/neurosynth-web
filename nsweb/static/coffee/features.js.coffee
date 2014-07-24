@@ -86,7 +86,7 @@ $(document).ready ->
       activeTab = $('#feature-menu a').index($(e.target))
       window.cookie.set('featureTab', activeTab)
       $(e.target).tab('show')
-      if activeTab == 1
+      if activeTab == 0
           viewer.paint()
   )
 
@@ -94,16 +94,3 @@ $(document).ready ->
       xyz = viewer.coords_xyz()
       window.location.replace('/locations?x=' + xyz[0] + '&y=' + xyz[1] + '&z=' + xyz[2])
   )
-
-  $('.plane-pos').change((e) ->
-    coords = [$('#x-in').val(), $('#y-in').val(), $('#z-in').val()]
-    viewer.moveToAtlasCoords((parseInt(c) for c in coords))
-  )
-
-  $(viewer).on('afterLocationChange', ->
-    coords = viewer.coords_xyz()
-    $('#x-in').val(coords[0])
-    $('#y-in').val(coords[1])
-    $('#z-in').val(coords[2])
-  )
-

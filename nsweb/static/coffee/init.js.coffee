@@ -30,13 +30,14 @@ urlToParams = () ->
     JSON.parse "{\"" + decodeURI(search).replace(/"/g, "\"").replace(/&/g, "\",\"").replace(RegExp("=", "g"), "\":\"") + "\"}"
 window.urlToParams = urlToParams
 
-load_reverse_inference_image = (feature) ->
+load_reverse_inference_image = (feature, scatterplot=false) ->
     imgs = [{
       'name': feature + ' (reverse inference)'
       'url': '/features/' + feature + '/images/reverseinference'
     }]
     # 4th argument is color cycling
     viewer.loadImages(imgs, null, null, true)
+    $(viewer).on('imagesLoaded', () -> scatter()) if scatterplot
 
 
 $(document).ready ->

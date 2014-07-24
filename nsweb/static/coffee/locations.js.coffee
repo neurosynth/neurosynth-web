@@ -40,14 +40,17 @@ $(document).ready ->
     base = window.location.href.split('?')[0]
     coords = { x: $('#x-in').val(), y: $('#y-in').val(), z: $('#z-in').val(), r: $('#rad-out').val()}
     xyz = [coords.x, coords.y, coords.z]
-    info = 'Studies reporting activation within ' + coords.r + ' mm of (' + xyz.join(', ') + '):'
-    $('#current-location-info').text(info)
-    # TODO: IMPLEMENT ONPOPSTATE
+    study_info = 'Studies reporting activation within ' + coords.r + ' mm of (' + xyz.join(', ') + ')'
+    $('#current-location-studies') .text(study_info)
+    map_info = 'Functional connectivity and coactivation maps for (' + xyz.join(', ') + ')'
+    $('#current-location-maps').html(map_info)
+    
+    # TODO: IMPLEMENT ONPOPSTATE  
     window.history.pushState(null, null, base + '?' + $.param(coords))
   
   $('#location_studies_table').dataTable({
     paginationType: "full_numbers"
-    displayLength: 25
+    displayLength: 10
     processing: true
     autoWidth: true
     # orderClasses: false
@@ -55,7 +58,7 @@ $(document).ready ->
 
   $('#location_features_table').dataTable({
     paginationType: "full_numbers"
-    displayLength: 25
+    displayLength: 10
     processing: true
     autoWidth: true
     # orderClasses: false
@@ -91,7 +94,7 @@ $(document).ready ->
       activeTab = $('#location-menu a').index($(e.target))
       window.cookie.set('locationTab', activeTab)
       $(e.target).tab('show')
-      if activeTab == 2
+      if activeTab == 0
           viewer.paint()
   )
 

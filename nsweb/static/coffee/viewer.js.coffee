@@ -63,3 +63,15 @@ $(document).ready ->
       $('#description.data-row').toggle(!$('#image-description').is(':empty'))
   )
 
+  $('.plane-pos').change((e) ->
+    coords = [$('#x-in').val(), $('#y-in').val(), $('#z-in').val()]
+    viewer.moveToAtlasCoords((parseInt(c) for c in coords))
+  )
+
+  $(viewer).on('afterLocationChange', ->
+    coords = viewer.coords_xyz()
+    $('#x-in').val(coords[0])
+    $('#y-in').val(coords[1])
+    $('#z-in').val(coords[2])
+  )
+
