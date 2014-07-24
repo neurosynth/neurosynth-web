@@ -1,11 +1,17 @@
-- set page_title = 'Neurosynth|Feature'
+- set page_title = 'Neurosynth: ' + feature
 - extends "layout/base.html"
 - block content
-  - import "macros/viewers.html.slim" as viewers
-  h2 {{feature}}
-  .lead An automated meta-analysis of {{n_studies}} studies
+  - import "macros/_feature_viewer.html.slim" as viewers
+  .row
+    .col-md-8
+      h1.top-space0 {{feature}}
+      .lead An automated meta-analysis of {{n_studies}} studies
+    .col-md-2
+      .feature-search
+        span Search for another feature:
+        input type="text" id="feature-search"
   .row#page-feature
-    .col-md-12.content
+    .col-md-10.col-md-offset-1.content
       ul#feature-menu.nav.nav-tabs
         li.active
           a href="#studies" data-toggle="tab" Studies
@@ -15,7 +21,7 @@
           a href="#help" data-toggle="tab" Help
       #feature-tab-content.tab-content
         #studies.tab-pane.active
-          h3 Studies associated with the feature {{feature}}
+          h3 Studies associated with the feature "{{feature}}"
           table#feature_studies_table.table-striped.table-hover.table.table-condensed.default-datatable
             thead
               tr
@@ -28,8 +34,6 @@
             |var options = {"panzoomEnabled":false}
             var settings = ['no-zoom', 'layers','nav','checkboxes']
           p {{viewers.viewer()|safe}}
-          #load-location-box
-            button#load-location.btn.btn-success View location data at cursor
         #help.tab-pane
           h3 What is this?
           p This page displays information for an automated Neurosynth meta-analysis of the feature "{{feature}}". The meta-analysis was performed by automatically identifying all studies in the Neurosynth database that loaded highly on the feature, and then performing meta-analyses to identify brain regions that were consistently or preferentially reported in the tables of those studies.

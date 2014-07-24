@@ -18,6 +18,11 @@ def find_feature(val):
 def index():
     return render_template('features/index.html.slim')
  
+@bp.route('/feature_names/')
+def get_feature_names():
+    names = [f.name for f in Feature.query.all()]  # optimize this later--select only names
+    return jsonify(data=names)
+
 @bp.route('/<string:val>/')
 def show(val):
     feature = find_feature(val)
