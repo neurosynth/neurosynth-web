@@ -6,3 +6,44 @@
 .form-group {
 	width: 400px;
 }
+
+.huge-text {
+	font-size: 
+}
+
+@font-face {
+	font-family: 'Computer Modern';
+	src: url('/static/fonts/cmunss.otf');
+}
+
+@font-face {
+	font-family: 'Computer Modern Bold';
+	src: url('/static/fonts/cmunsx.otf');
+}
+
+.big-text {
+	font-size: 36px;
+	float: left;
+
+	input {
+		width: 80px;
+		font-size: 32px;
+		font-weight: bold;
+		height: 48px;
+		margin: 0px 0px 4px 6px;
+		text-align: center;
+		vertical-align: middle;
+		padding: 0px 4px 0px 10px;
+		border-radius: 5px;
+	}
+
+	input[type=number]::-webkit-inner-spin-button, 
+	input[type=number]::-webkit-outer-spin-button { 
+	  -webkit-appearance: none; 
+	  margin: 0; 
+	}
+}
+
+ul.nav-tabs {
+	font-size: 16px;
+}

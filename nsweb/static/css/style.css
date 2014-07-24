@@ -16,10 +16,40 @@
 	padding-bottom: 20px
 }
 
+.top-space0 {
+	padding-top: 0px;
+	margin-top: 0px;
+}
+
 .top-space20 {
 	margin-top: 20px
 }
 
 .top-space40 {
 	margin-top: 40px
+}
+
+.huge-text {
+	font-size: 92px;
+	font-family: 'Computer Modern';
+}
+
+#footer {
+	font-family: 'Computer Modern';
+	font-size: 15px;
+	text-align: center;
+}
+
+.footer-info {
+	padding-top: 12px;
+	text-align: left;
+}
+
+.footer-links ul li {
+	display: inline;
+	text-decoration: none;
+}
+
+body, h1, h2, h3, h4, h5 {
+	font-family: 'Computer Modern';
 }
