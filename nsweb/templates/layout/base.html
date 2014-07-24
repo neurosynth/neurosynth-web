@@ -41,7 +41,7 @@
 	        </div>
 	        <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
 		        <ul class="nav navbar-nav">
-					<li class=""><a href="">Home</a></li>
+					<li class=""><a href="/">Home</a></li>
 					<li class=""><a href="/features/">Features</a></li>
 					<li class=""><a href="/studies/">Studies</a></li>
                     <li class=""><a href="/locations/">Locations</a></li>
@@ -74,6 +74,45 @@
         <div id="content">
             {% block content %}{% endblock %}
         </div>
+        <hr class="top-space40">
+        <div class="row" id="footer">
+            <div class="col-md-12">
+                <div class="row footer-buttons">
+                <div class="col-md-12">
+                <iframe src="http://ghbtns.com/github-btn.html?user=tyarkoni&repo=neurosynth&type=fork&count=true" allowtransparency="true" frameborder="0" scrolling="0" width="90" height="20"></iframe><iframe src="http://ghbtns.com/github-btn.html?user=tyarkoni&repo=neurosynth&type=watch&count=true" allowtransparency="true" frameborder="0" scrolling="0" width="90" height="20"></iframe>
+                <a href="https://twitter.com/share" class="twitter-share-button" data-via="neurosynth">Tweet</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+<a href="https://twitter.com/neurosynth" class="twitter-follow-button" data-show-count="true">Follow @neurosynth</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+                </div></div>
+                <div class="row footer-info">
+                <div class="col-md-3 col-md-offset-4" style="padding-top: 20px;">Created and maintained by <a href="http://talyarkoni.org">Tal Yarkoni</a><br />Funded by NIH award R01MH096906<br />
+                </div>
+                <div class="col-md-2 support">
+                <img src="{{ url_for('static', filename='images/nimh-logo.png')}}" width="100px">
+                </div>
+                </div>
+                <div class="row footer-links">
+                <div class="col-md-6 col-md-offset-3">
+                <ul>
+      <li><a href="https://github.com/neurosynth/neurosynth">GitHub</a></li>
+      <li>&middot;</li>
+      <li><a href="../getting-started/#examples">Examples</a></li>
+      <li>&middot;</li>
+      <li><a href="/about">About</a></li>
+      <li>&middot;</li>
+      <li><a href="/faq">FAQ</a></li>
+      <li>&middot;</li>
+      <li><a href="/blog">Blog</a></li>
+      <li>&middot;</li>
+      <li><a href="http://neurovault.org">NeuroVault</a></li>
+      <li>&middot;</li>
+      <li><a href="https://groups.google.com/d/forum/neurosynthlist">Mailing list</a></li>
+    </ul></div></div>
+            </div>
+        </div>
+    </div>
+    <div class="top-space40"></div>
     </div>
 
     
