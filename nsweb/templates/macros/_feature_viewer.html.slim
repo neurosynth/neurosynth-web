@@ -1,19 +1,22 @@
-- macro viewer(layers=True, planes=['axial', 'coronal', 'sagittal'])
-  .viewer
+- macro viewer()
+  .viewer#feature-viewer
+
     .viewer-left-col
-      - if 'coronal' in planes
-        #view-coronal.view
-          %canvas height="220" width="220"
-          %#nav-yaxis.slider.nav-slider-vertical
-      - if 'axial' in planes
-        #view-axial.view
-          %canvas height="264" width="220"
-          %#nav-zaxis.slider.nav-slider-vertical
+
+      #view-coronal.view
+        %canvas height="220" width="220"
+        %#nav-yaxis.slider.nav-slider-vertical
+
+      #view-axial.view
+        %canvas height="264" width="220"
+        %#nav-zaxis.slider.nav-slider-vertical
+
     .viewer-middle-col
-      - if 'sagittal' in planes
-        #view-sagittal.view
-          %canvas height="220" width="264"
-          %#nav-xaxis.slider.nav-slider-horizontal
+
+      #view-sagittal.view
+        %canvas height="220" width="264"
+        %#nav-xaxis.slider.nav-slider-horizontal
+
       .layer-data-panel
 
         .coordinate-info
@@ -38,12 +41,15 @@
           h5 Description
           %#image-description
 
-    - if layers
-      .viewer-right-col
+
+    .viewer-right-col
+
+      #layer-panel
         span Layers
         #layer-list-panel
           %#layer_visible_list
           %ul#layer-list.layer-settings
+
         #layer-settings-panel
           .layer-container-half-width
             span Color palette:
@@ -64,3 +70,4 @@
               .row-label Opacity:
               input#opacity-text.slider-text
               %#opacity.slider.layer-settings.layer-settings-slider
+
