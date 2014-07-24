@@ -2,6 +2,7 @@
 - extends "layout/base.html"
 - block content
   - import "macros/viewers.html.slim" as viewers
+  - import "macros/_scatterplot.html.slim" as scatterplot
   h2 Decoding results
   .row#page-decode
     .col-md-9
@@ -11,6 +12,7 @@
         var images = {{images}}
       p {{viewers.viewer()|safe}}
       %.scatterplot
+      p {{ scatterplot.scatter() }}
     .col-md-3
       table#decoding_results_table.table.table-striped.table-hover.table-condensed
         thead
@@ -18,3 +20,6 @@
             %th
             th feature
             th correlation
+  / .row
+  /   .col-md-12
+      / p {{ scatterplot.scatter() }}

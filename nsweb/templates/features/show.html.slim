@@ -14,13 +14,18 @@
     .col-md-10.col-md-offset-1.content
       ul#feature-menu.nav.nav-tabs
         li.active
-          a href="#studies" data-toggle="tab" Studies
-        li
           a href="#maps" data-toggle="tab" Map
+        li
+          a href="#studies" data-toggle="tab" Studies
         li
           a href="#help" data-toggle="tab" Help
       #feature-tab-content.tab-content
-        #studies.tab-pane.active
+        #maps.tab-pane.active
+          script type="text/javascript"
+            |var options = {"panzoomEnabled":false}
+            var settings = ['no-zoom', 'layers','nav','checkboxes']
+          p {{viewers.viewer()|safe}}
+        #studies.tab-pane
           h3 Studies associated with the feature "{{feature}}"
           table#feature_studies_table.table-striped.table-hover.table.table-condensed.default-datatable
             thead
@@ -29,11 +34,6 @@
                 th Authors
                 th Journal
                 th Loading
-        #maps.tab-pane
-          script type="text/javascript"
-            |var options = {"panzoomEnabled":false}
-            var settings = ['no-zoom', 'layers','nav','checkboxes']
-          p {{viewers.viewer()|safe}}
         #help.tab-pane
           h3 What is this?
           p This page displays information for an automated Neurosynth meta-analysis of the feature "{{feature}}". The meta-analysis was performed by automatically identifying all studies in the Neurosynth database that loaded highly on the feature, and then performing meta-analyses to identify brain regions that were consistently or preferentially reported in the tables of those studies.

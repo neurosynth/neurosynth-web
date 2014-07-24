@@ -1,7 +1,7 @@
-- set page_title = 'Neurosynth|Location'
+- set page_title = 'Neurosynth: (' + [x,y,z]|join(', ') + ')'
 - extends "layout/base.html"
 - block content
-  - import "macros/viewers.html.slim" as viewers
+  - import "macros/_feature_viewer.html.slim" as viewers
   .row#page-location
     .col-md-12
       .big-text
@@ -10,15 +10,22 @@
         input type="number" class="plane-pos" name="y-in" id="y-in" min="-72" max="108" value="{{y}}"
         input type="number" class="plane-pos" name="z-in" id="z-in" min="-106" max="90" value="{{z}}"
       %.row
-    .col-md-12.top-space20
+    .col-md-10.col-md-offset-1.top-space20
       ul#location-menu.nav.nav-tabs
+        li.active
+          a href="#maps" data-toggle="tab" Maps
         li
           a href="#features" data-toggle="tab" Features
         li
           a href="#studies" data-toggle="tab" Studies
-        li.active
-          a href="#images" data-toggle="tab" Images
       #location-tab-content.tab-content
+        #maps.tab-pane.active
+          %h3#current-location-maps
+          script type="text/javascript"
+            |
+            var options = { panzoomEnabled: false, xyz: [{{x}}, {{y}}, {{z}}]}
+            var settings = ['no-zoom', 'layers','nav','checkboxes']
+          p {{viewers.viewer()|safe}}
         #features.tab-pane
           table#location_features_table.table-striped.table-hover.table.table-condensed.small-datatable
             thead
@@ -27,13 +34,16 @@
                 th z-score
                 th post. prob.
         #studies.tab-pane
-          h3 Studies
-          .option-bar
-            b Adjust radius:
-            input type="range"  name="rad-in" id="rad-in" min="1" max="20" value="{{radius}}"
-            input type="number" name="rad-out" id="rad-out" min="1" max="20" value="{{radius}}"
-            input id="radius-submit" type="button" value="Go"
-          %#current-location-info.lead
+          .location-studies-head
+            %h3#current-location-studies
+            .location-adjust-radius
+              .radius-element Adjust radius:
+              .radius-element
+                input type="range"  name="rad-in" id="rad-in" min="1" max="20" value="{{radius}}"
+              .radius-element
+                input type="number" name="rad-out" id="rad-out" min="1" max="20" value="{{radius}}"
+              .radius-element
+                input id="radius-submit" type="button" value="Go"
           table#location_studies_table.table-striped.table-hover.table.table-condensed.small-datatable
             thead
               tr
@@ -41,14 +51,4 @@
                 th Authors
                 th Journal
                 th Activations
-        #images.tab-pane.active
-          h3 Images
-          .lead Functional connectivity and meta-analytic coactivation maps for ({{[x,y,z]|join(', ')}}):
-          script type="text/javascript"
-            |
-            var options = { panzoomEnabled: false, xyz: [{{x}}, {{y}}, {{z}}]}
-            var settings = ['no-zoom', 'layers','nav','checkboxes']
-          p {{viewers.viewer()|safe}}
-          #load-location-box
-            button#load-location.btn.btn-success Re-seed at cursor location
 
