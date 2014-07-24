@@ -2,30 +2,34 @@
 - extends "layout/base.html"
 - block content
   - import "macros/viewers.html.slim" as viewers
-  .row#page-location
+  .row#page-home
     .col-md-12
       .page-header
-        .massive neurosynth.org
+        .huge-text neurosynth.org
 
-      %h3 What is this?
-      p.big NeuroSynth is a platform for large-scale, automated synthesis of functional magnetic resonance imaging (fMRI) data extracted from published articles. It's a website wrapped around a set of open-source Python and JavaScript packages. Neurosynth lets you run crude but useful analyses of fMRI data on a very large scale. For example, here's an automated meta-analysis of {{ 'reward' }}  visualized interactively:
+      .lead Neurosynth is a platform for large-scale, automated synthesis of functional magnetic resonance imaging (fMRI) data.
+
+      .lead It takes published articles reporting fMRI results and turns them into this:
   .row
     .col-md-12.top-space20
-  /     script type="text/javascript"
-  /       |var options = {"panzoomEnabled":false};
-  /       var settings = ['no-zoom', 'layers','nav','checkboxes'];
-  /       var images = {{images}};
-
-  /     - options = { panzoomEnabled: false }
-  /     = render :partial => 'shared/row_viewer', :locals => { :options => options, :images => [{'name' => @image.name, 'id' => @image.id, 'colorPalette' => 'intense red-blue', 'sign' => 'both'}] }
-      %p.big 
+      script type="text/javascript"
+        |var options = {"panzoomEnabled":false}
+        var settings = ['no-zoom']
+        var feature = '{{ feature.name }}'
+      p {{ viewers.viewer() }}
+      p.meta-description An automated meta-analysis of {{ feature.num_studies }} studies of {{ feature.name }} 
       %hr
-      %h3 News
+  .row
+    .col-md-12
+      h3 News
       .row-fluid
         .span8
-          %p News goes here
-        .span2.offset1
-          a.twitter-timeline href="https://twitter.com/neurosynth" data-widget-id="335214024004349953"
-            |Tweets by @neurosynth
-          script type="text/javascript"
-            |!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
+          p News goes here
+        / .span2.offset1
+        /   a.twitter-timeline href="https://twitter.com/neurosynth" data-widget-id="335214024004349953"
+        /     |Tweets by @neurosynth
+        /   script type="text/javascript"
+        /     |!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
+  / .row
+  /   .col-md-12.top-space20
+  /     %img src="{{url_for('static', filename='images/nimh-logo.png')}}"
