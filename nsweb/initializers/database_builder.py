@@ -18,6 +18,7 @@ import random
 from glob import glob
 import simplejson as json
 from copy import deepcopy
+import re
 
 
 
@@ -105,6 +106,9 @@ class DatabaseBuilder:
         else:
             features = list(set(self.dataset.get_feature_names()) & set(features))
 
+        # Remove features that start with a number
+        features = [f for f in features if re.match('[a-zA-Z]+', f)]
+
         # Store features for faster counting of studies/activations
         self.features = {}
 
@@ -146,12 +150,12 @@ class DatabaseBuilder:
         name = feature.name
 
         feature.images.extend([
-            FeatureImage(image_file=join(image_dir, name + '_pAgF_z_FDR_0.05.nii.gz'),
+            FeatureImage(image_file=join(image_dir, name + '_pAgF_z_FDR_0.01.nii.gz'),
                 label='%s: forward inference' % name,
                 stat='z-score',
                 display=1,
                 download=1),
-            FeatureImage(image_file=join(image_dir, name + '_pFgA_z_FDR_0.05.nii.gz'),
+            FeatureImage(image_file=join(image_dir, name + '_pFgA_z_FDR_0.01.nii.gz'),
                 label='%s: reverse inference' % name,
                 stat='z-score',
                 display=1,
@@ -401,7 +405,7 @@ class DatabaseBuilder:
             # Call Neurosynth to do the heavy lifting
             # network.coactivation(self.dataset, [seed], threshold=0.1, outroot=outroot)
             ma = meta.MetaAnalysis(self.dataset, studies, **kwargs)
-            imgs_to_keep = ['pFgA_z_FDR_0.05']  # Just the reverse inference
+            imgs_to_keep = ['pFgA_z_FDR_0.01']  # Just the reverse inference
             ma.save_results(output_dir=image_dir, prefix=name, image_list=imgs_to_keep)
 
             # Create a new Location record and add LocationImage
