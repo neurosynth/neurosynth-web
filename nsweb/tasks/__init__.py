@@ -13,20 +13,16 @@ from os.path import join, basename, exists
 from nsweb.tasks.scatterplot import scatter
 
 
-def load_image(dataset, filename):
+def load_image(dataset, filename, save_resampled=True):
+    """ Load an image, resampling into MNI space if needed. """
     filename = join(settings.IMAGE_UPLOAD_DIR, filename)
-    img = check_image(filename)
-    return dataset.masker.mask(img)
-
-def check_image(img):
-    """ Check an image's dimensions and resample to the correct orientation/size """
-    if isinstance(img, basestring):
-        img = nb.load(img)
-        # resample image if it's not the right shape
+    img = nb.load(filename)
     if img.shape[:3] != (91, 109, 91):
         img = resample_img(img, target_affine=decode_image.anatomical.get_affine(), 
-                target_shape=(91, 109, 91))
-    return img
+                            target_shape=(91, 109, 91), interpolation='nearest')
+        if save_resampled:
+            img.to_filename(filename)
+    return dataset.masker.mask(img)
 
 def get_decoder_feature_data(dd, feature):
     """ Get feature's data: check in the decoder DataFrame first, and if not found, 
