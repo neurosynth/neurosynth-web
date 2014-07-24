@@ -13,6 +13,7 @@ import re
 import uuid
 import requests
 from os.path import join, basename, exists
+import os
 
 bp = Blueprint('decode',__name__,url_prefix='/decode')
 
@@ -25,10 +26,13 @@ configure_uploads(app, (images))
 @bp.route('/', methods=['GET','POST'])
 @login_required
 def index():
-    
+
+    # Decode from a URL or from a NeuroVault ID
     if 'url' in request.args:
-        print "HI"
         return decode_from_url(request.args['url'])
+    elif 'neurovault' in request.args:
+        return decode_from_neurovault(request.args['neurovault'])
+
 
     form = UploadForm()
     if request.method == 'POST' and form.validate_on_submit():
@@ -49,18 +53,31 @@ def decode_from_url(url):
     ext = re.search('\.nii(\.gz)?$', url)
     if ext is None:
         abort(404)  # Change to informative error message later
-    head = requests.head(url).headers
-    if 'content-length' in head and int(head['content-length']) > 2000000:
+    head = requests.head(url)
+    if head.status_code not in [200, 301, 302]: abort(404)
+    headers = head.headers
+    if 'content-length' in headers and int(headers['content-length']) > 2000000:
         abort(404)
     f = requests.get(url)
     uid = uuid.uuid4().hex
     filename = join(settings.IMAGE_UPLOAD_DIR, uid + ext.group(0))
-    open(filename, 'wb').write(f.content)
+    with open(filename, 'wb') as outfile:
+        outfile.write(f.content)
+    os.chmod(filename, 0666)  # Make sure celery worker has permission to overwrite
     img = Upload(image_file=filename, label=url, user=None, uuid=uid, display=1, download=0)
     db.session.add(img)
     db.session.commit()
     result = decode_image.delay(filename).wait()  # wait for decoder to finish
     return redirect(url_for('decode.show', val=img.uuid))
+
+def decode_from_neurovault(id):
+    if not re.match('\d+$', id): abort(404)
+    try:
+        resp = requests.get('http://neurovault.org/api/images/%s/?format=json' % str(id))
+        nv_data = json.loads(resp.content)
+        return decode_from_url(nv_data['file'])
+    except Exception, e:
+        abort(404)
 
 @bp.route('/<string:val>/')
 def show(val):
