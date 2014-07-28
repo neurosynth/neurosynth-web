@@ -1,30 +1,45 @@
 - set page_title = 'Neurosynth'
 - extends "layout/base.html"
 - block content
-  - import "macros/viewers.html.slim" as viewers
+  - import "macros/_home_viewer.html.slim" as viewers
   .row#page-home
-    .col-md-12
-      .page-header
-        .huge-text neurosynth.org
+    .col-md-9.col-md-offset-1
+      .huge-text neurosynth.org
 
       .lead Neurosynth is a platform for large-scale, automated synthesis of functional magnetic resonance imaging (fMRI) data.
 
-      .lead It takes published articles reporting fMRI results and turns them into this:
+      .lead It takes thousands of published articles reporting the results of fMRI studies, chews on them for a bit, and then spits out images that look like this:
   .row
-    .col-md-12.top-space20
+    .col-md-10.col-md-offset-1
       script type="text/javascript"
         |var options = {"panzoomEnabled":false}
-        var settings = ['no-zoom']
+        var settings = ['no-zoom', 'nav']
         var feature = '{{ feature.name }}'
-      p {{ viewers.viewer() }}
-      p.meta-description An automated meta-analysis of {{ feature.num_studies }} studies of {{ feature.name }} 
-      %hr
+      p {{ viewers.viewer(feature) }}
+  %hr.top-space40
+  / .row
+  /   .col-md-10.col-md-offset-1
+  /     .row
+  /       .col-md-3
+  /         h3 Learn
+  /       .col-md-3
+  /         h3 Browse
+  /       .col-md-3
+  /         h3 Decode
+  / %hr.top-space40
   .row
-    .col-md-12
-      h3 News
-      .row-fluid
-        .span8
-          p News goes here
+    .col-md-10.col-md-offset-1
+      h3 Database Status
+      .current-status style="font-size: 18px;"
+        p
+          |{{ stats['n_peaks'] }} activations reported in <a href="/studies" class="big-link">{{ stats['n_studies'] }} studies</a>
+        p 
+          | Interactive, downloadable meta-analyses of <a href="/features" class="big-link">{{ stats['n_features'] }} features</a>
+        p
+          | Functional connectivity/coactivation maps for <a href="/locations" class="big-link">{{ stats['n_locations']}} brain locations</a>
+        / p
+        /   | {{ stats['n_decodings'] }} brain images <a href="/decode">decoded online</a>
+          
         / .span2.offset1
         /   a.twitter-timeline href="https://twitter.com/neurosynth" data-widget-id="335214024004349953"
         /     |Tweets by @neurosynth
