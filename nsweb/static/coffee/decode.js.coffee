@@ -38,6 +38,11 @@ $(document).ready ->
         scatter.select(xv, yv)
       )
 
+    $('#load-location').click((e) ->
+        xyz = viewer.coords_xyz()
+        window.location.href = '/locations?x=' + xyz[0] + '&y=' + xyz[1] + '&z=' + xyz[2]
+    )
+
   else if $('#page-decode-index').length
 
     $('#neurovault-button').click( ->
