@@ -15,7 +15,7 @@ from nsweb.tasks.scatterplot import scatter
 
 def load_image(dataset, filename, save_resampled=True):
     """ Load an image, resampling into MNI space if needed. """
-    filename = join(settings.IMAGE_UPLOAD_DIR, filename)
+    filename = join(settings.DECODED_IMAGE_DIR, filename)
     img = nb.load(filename)
     if img.shape[:3] != (91, 109, 91):
         img = resample_img(img, target_affine=decode_image.anatomical.get_affine(), 
@@ -85,9 +85,8 @@ def decode_image(filename, **kwargs):
         r = np.corrcoef(data.T, dd.values.T)[0,1:]
         outfile = join(settings.DECODING_RESULTS_DIR, uuid + '.txt')
         pd.Series(r, index=dd.columns).to_csv(outfile, sep='\t')
+        return True
     except Exception, e:
-        print e
-        print e.message
         return False
 
 @celery.task(base=NeurosynthTask)
