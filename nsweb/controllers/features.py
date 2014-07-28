@@ -42,13 +42,15 @@ def get_images(val):
     } for img in feature.images if img.display]
     return jsonify(data=images)
 
-@bp.route('/<string:val>/images/reverseinference')
+@bp.route('/<string:val>/images/reverseinference/')
 def get_reverse_inference_image(val):
-    """ Horrible hack to get this working; totally mucks up API pattern, so clean up later. """
+    # Horrible hacks here to serve just reverse inference images with or 
+    # without FDR; totally mucks up API pattern, so clean up later.
     feature = find_feature(val)
+    fdr = ('nofdr' not in request.args.keys())
     img = [i for i in feature.images if 'reverse' in i.label][0]
     from nsweb.controllers import images
-    return images.download(img.id)
+    return images.download(img.id, fdr)
 
 @bp.route('/<string:val>/studies')
 def get_studies(val):
