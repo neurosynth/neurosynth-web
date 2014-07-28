@@ -40,7 +40,7 @@ $(document).ready ->
         minLength: 2
         delay: 0
         select: (e, ui) -> 
-          window.location.replace('/features/' + ui.item.value)
+          window.location.href = '/features/' + ui.item.value
         # only match words that start with string, and limit to 10
         source: (request, response) ->
           re = $.ui.autocomplete.escapeRegex(request.term)
@@ -54,7 +54,7 @@ $(document).ready ->
     
   $('#feature-search').keyup((e) ->
     text = $('#feature-search').val()
-    window.location.replace('/features/' + text) if (e.keyCode == 13)
+    window.location.href = ('/features/' + text) if (e.keyCode == 13)
   )
 
   loadFeatureStudies = () ->
@@ -87,5 +87,5 @@ $(document).ready ->
 
   $('#load-location').click((e) ->
       xyz = viewer.coords_xyz()
-      window.location.replace('/locations?x=' + xyz[0] + '&y=' + xyz[1] + '&z=' + xyz[2])
+      window.location.href = '/locations?x=' + xyz[0] + '&y=' + xyz[1] + '&z=' + xyz[2]
   )
