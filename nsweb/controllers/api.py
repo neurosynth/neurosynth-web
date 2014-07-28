@@ -6,7 +6,7 @@ bp = Blueprint('apis',__name__,url_prefix='/api')
 
 
 ### NOTE: THIS API IS BEING GRADUALLY PHASED OUT IN FAVOR OF METHODS IN THE 
-# MODEL SPECIFIC CONTROLLER MODULES. ###
+# MODEL-SPECIFIC CONTROLLER MODULES. ###
 
 # Begin server side APIs 
 @bp.route('/studies/')
@@ -20,7 +20,7 @@ def studies_server_side_api():
         search = '%{}%'.format(search)
         data=data.filter( Study.title.like( search ) | Study.authors.like( search ) | Study.journal.like( search ) | Study.year.like( search ) | Study.pmid.like(search) )
     data=data.order_by(order_by)
-    data=data.paginate(page=offset/results_per_page, per_page=results_per_page, error_out=False)
+    data=data.paginate(page=(offset/results_per_page)+1, per_page=results_per_page, error_out=False)
     result = {}
     result['sEcho'] = int(request.args['sEcho']) # for security
     result['iTotalRecords'] = Study.query.count()
@@ -44,7 +44,7 @@ def features_server_side_api():
         search = '%{}%'.format(search)
         data = data.filter( Feature.name.like( search ) | Feature.num_studies.like( search ) | Feature.num_activations.like( search ) )
     data=data.order_by(order_by)
-    data=data.paginate(page=offset/results_per_page, per_page=results_per_page, error_out=False)
+    data=data.paginate(page=(offset/results_per_page)+1, per_page=results_per_page, error_out=False)
     result = {}
     result['sEcho'] = int(request.args['sEcho']) # for security
     result['iTotalRecords'] = Feature.query.count()
