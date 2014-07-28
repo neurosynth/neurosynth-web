@@ -8,6 +8,6 @@ from locations import *
 from peaks import *
 from frequencies import *
 from downloads import *
-from uploads import *
+from decodings import *
 from users import *
 from genes import *
