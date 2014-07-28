@@ -45,10 +45,8 @@ def create_app(debug=True):
     if settings.SQL_ADAPTER == 'sqlite':
         db_uri = settings.SQLALCHEMY_SQLITE_URI
     elif settings.SQL_ADAPTER == 'mysql':
-        if hasattr(settings, 'SQLALCHEMY_MYSQL_URI'):
-            db_uri = settings.SQLALCHEMY_SQLITE_URI
-        else:
-            db_uri = 'mysql://%s:%s@localhost/%s' % (settings.MYSQL_USER, settings.MYSQL_PASSWORD, settings.MYSQL_DB)
+        db_to_use = settings.MYSQL_DEVELOPMENT_DB if settings.DEBUG else settings.MYSQL_PRODUCTION_DB
+        db_uri = 'mysql://%s:%s@localhost/%s' % (settings.MYSQL_USER, settings.MYSQL_PASSWORD, db_to_use)
     else:
         raise ValueError("Value of SQL_ADAPTER in settings must be either 'sqlite' or 'mysql'")
 
