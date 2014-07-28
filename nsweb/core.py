@@ -13,6 +13,20 @@ from nsweb.initializers import settings
 from nsweb.initializers.assets import init_assets
 from nsweb.initializers import make_celery
 
+# Kind of a hack to deal with the fact that the db instance isn't aware of the app context, 
+# so we end up with a global session that persists over time. This would be okay except that 
+# MySQL's default isolation level is too high, so that new records created in one session
+# can't be viewed in another until it closes. We should probably rewrite all 
+# session interactions so they're scoped and close at the end of the request, but in the 
+# meantime, we use apply_driver_hacks() to manually set the isolation level at engine creation.
+# Solution borrowed from:
+# http://stackoverflow.com/questions/12384323/when-a-flask-application-with-flask-sqlalchemy-is-running-how-do-i-use-mysql-cl
+class UnlockedAlchemy(SQLAlchemy):
+    def apply_driver_hacks(self, app, info, options):
+        if not "isolation_level" in options:
+            options["isolation_level"] = "READ COMMITTED"  # For example
+        return super(UnlockedAlchemy, self).apply_driver_hacks(app, info, options)
+
 
 app=Flask('NSWeb', static_folder=settings.STATIC_FOLDER, template_folder=settings.TEMPLATE_FOLDER)
 manager = Manager(app)
@@ -21,7 +35,7 @@ manager = Manager(app)
 celery = make_celery(app)
 from nsweb.tasks import *
 
-db=SQLAlchemy()
+db=UnlockedAlchemy()
 _blueprints = []
 
 def setup_logging(logging_path,level):
