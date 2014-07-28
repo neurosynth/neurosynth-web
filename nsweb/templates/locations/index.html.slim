@@ -11,7 +11,7 @@
         input type="number" class="plane-pos" name="z-in" id="z-in" min="-106" max="90" value="{{z}}"
       %.row
     .col-md-10.col-md-offset-1.top-space20
-      ul#location-menu.nav.nav-tabs
+      ul#location-menu.nav.nav-pills
         li.active
           a href="#maps" data-toggle="tab" Maps
         li
@@ -27,6 +27,7 @@
             var settings = ['no-zoom', 'layers','nav','checkboxes']
           p {{viewers.viewer()|safe}}
         #features.tab-pane
+          h3 Feature loadings (reverse inference)
           table#location_features_table.table-striped.table-hover.table.table-condensed.small-datatable
             thead
               tr

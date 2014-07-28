@@ -1,9 +1,9 @@
-- set page_title='Neurosynth|Study'
+- set page_title='Neurosynth: ' + study.pmid|string
 - extends "layout/base.html"
 - block content
   - import "macros/study_viewer.html.slim" as viewers
   .row#page-study
-    .col-md-12
+    .col-md-10.col-md-offset-1
       h2 {{study.title}}
       table.table-striped.table-hover.table.table-condensed
         tbody
@@ -20,10 +20,10 @@
             td.row_label PMID:
             td <a href={{ "http://www.ncbi.nlm.nih.gov/pubmed/%s"|format(study.pmid) }}> {{study.pmid}}</a>
   .row
-    .col-md-6
+    .col-md-5.col-md-offset-1
       p {{viewers.viewer(scale=0.75)|safe}}
-    .col-md-6
-      ul#study-menu.nav.nav-tabs
+    .col-md-5
+      ul#study-menu.nav.nav-pills
         li.active
           a href="#activations" data-toggle="tab" Activations
         li
@@ -33,14 +33,16 @@
         var settings = ['no-zoom', 'nav']
       #study-tab-content.tab-content
         #activations.tab-pane.active
+          h3 Extracted activations
           table#study_peaks_table.table.table-striped.table-hover.table-condensed.small-datatable
             thead
               tr
-                th table
+                th table no. (in paper)
                 th x
                 th y
                 th z
         #features.tab-pane
+          h3 Extracted features
           table#study_features_table.table.table-striped.table-hover.table-condensed.small-datatable
             thead
               tr

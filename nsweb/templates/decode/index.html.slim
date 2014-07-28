@@ -1,11 +1,20 @@
-- set page_title = 'Neurosynth -- decode image'
+- set page_title = 'Neurosynth -- online image decoder'
 - extends "layout/base.html"
 - block content
   .row#page-decode
     .col-md-12.content
-      h2 Decode image
-      p Image must be in Nifti format. Note: if the image is not in MNI152 2 mm space (with dimensions 91 x 109 x 91), Neurosynth will resample it to the required dimensions. Please note that <b>this will often result in an inappropriately aligned image</b>.
-      form method="POST" action="" enctype="multipart/form-data"
-        {{ form.hidden_tag() }}
-        {{ form.image_file.label }} {{ form.image_file(size=20) }}
+      h2 Neurosynth Image Decoder
+      p The Neurosynth Image Decoder compares any Nifti-format image on the web against selected images in the Neurosynth database and returns an interactive visualization of the similarity.
+
+      p 
+        |If you want to decode an image that isn't already on the web, we recommend that you <a href="http://neurovault.org/images/add_for_neurosynth">upload the image to NeuroVault</a>. The process will take you just a few seconds, will provide a permanent home (if desired) for the image, and will redirect you back to the Neurosynth decoder results as soon as the upload is completed.
+
+      p Alternatively, you can paste the full URL of a Nifti image (only .nii or .nii.gz extensions allowed) that's already on the web.
+
+      form method="GET" action="" enctype="multipart/form-data"
+        / {{ form.hidden_tag() }}
+        / {{ form.image_file.label }} {{ form.image_file(size=20) }}
+        / {{ form.image_url.label }} {{ form.image_url(size=20) }}
+        input type="text" name="url"
         input type="submit" value="Decode!"
+

@@ -1,25 +1,41 @@
 - set page_title = 'Neurosynth -- online image decoder'
 - extends "layout/base.html"
 - block content
-  - import "macros/viewers.html.slim" as viewers
+  - import "macros/_decode_viewer.html.slim" as viewers
   - import "macros/_scatterplot.html.slim" as scatterplot
-  h2 Decoding results
   .row#page-decode
-    .col-md-9
-      script type="text/javascript"
-        |var options = {"panzoomEnabled":false}
-        var settings = ['no-zoom', 'layers','nav','checkboxes']
-        var images = {{images}}
-      p {{viewers.viewer()|safe}}
-      %.scatterplot
-      p {{ scatterplot.scatter() }}
-    .col-md-3
-      table#decoding_results_table.table.table-striped.table-hover.table-condensed
-        thead
-          tr
-            %th
-            th feature
-            th correlation
-  / .row
-  /   .col-md-12
-      / p {{ scatterplot.scatter() }}
+    .col-md-offset-1
+      h2 Decoding results
+      .decode-viewer style="width: 580px; float: left;"
+        ul#decode-menu.nav.nav-pills
+          li.active
+            a href="#maps" data-toggle="tab" Map
+          li
+            a href="#scatter" data-toggle="tab" Plot
+          li
+            a href="#info" data-toggle="tab" Info
+        #decode-tab-content.tab-content.top-space20
+          #maps.tab-pane.active
+            script type="text/javascript"
+              |var options = {"panzoomEnabled":false};
+              var settings = ['no-zoom', 'layers','nav','checkboxes'];
+              var images = {{images}};
+              var image_id = '{{ image_id }}';
+            p {{viewers.viewer()|safe}}
+          #scatter.tab-pane
+            #scatterplot style="width: 500px; float: left; position: relative;"
+              h4 There's nothing here yet!
+              p That's probably because you haven't selected a Neurosynth term to compare this image against. To replace this annoying message with a pretty scatter plot, select one of the terms over there in the table on the right.
+
+              p Note that most images will usually take 1 - 2 seconds to show up--we're computing them fresh, just for you!
+          #info.tab-pane
+            p Information!
+      .feature-list style="width: 200px; margin-left: 20px; margin-top: 50px;"
+        h4 Feature loadings
+        p To compare the decoded image against a term, click on an arrow below.
+        table#decoding_results_table.table.table-striped.table-hover.table-condensed
+          thead
+            tr
+              %th
+              th feature
+              th corr.
