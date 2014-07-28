@@ -6,6 +6,8 @@ import simplejson as json
 from flask_sqlalchemy import sqlalchemy
 from nsweb.initializers import settings
 from os.path import join, exists
+from nsweb.tasks import make_coactivation_map
+from nsweb.controllers.images import send_nifti
 
 bp = Blueprint('locations',__name__,url_prefix='/locations')
 
@@ -45,11 +47,26 @@ def get_images(val):
             'colorPalette': 'yellow' if 'coactivation' in img.label else 'red',
             'url': '/images/%s' % img.id,
             'visible': 0 if 'coactivation' in img.label else 1,
-            'download': img.download
+            'download': img.download,
+            'description': img.description,
+            'intent': img.stat
         } for img in location.images if img.display]
     else:
         images = []
     return jsonify(data=images)
+
+
+@bp.route('/<string:val>/coactivation')
+def get_coactivation_image(val):
+    x, y, z, r = get_params(val)
+    filename = 'metaanalytic_coactivation_%s_%s_%s_pFgA_z.nii.gz' % (str(x), str(y), str(z))
+    filename = join(settings.IMAGE_DIR, 'locations', 'coactivation', filename)
+    print filename
+    if not exists(filename):
+        result = make_coactivation_map.delay(int(x), int(y), int(z)).wait()
+    if exists(filename):
+        return send_nifti(filename)
+    return abort(404)
 
 
 @bp.route('/<string:val>/studies')

@@ -1,6 +1,7 @@
 from celery import Task
 from nsweb.initializers import settings
 from neurosynth.base.dataset import Dataset
+from neurosynth.analysis import meta
 from celery.utils import cached_property
 import numpy as np
 import pandas as pd
@@ -11,6 +12,7 @@ from nilearn.image import resample_img
 from nsweb.core import celery
 from os.path import join, basename, exists
 from nsweb.tasks.scatterplot import scatter
+import traceback
 
 
 def load_image(dataset, filename, save_resampled=True):
@@ -87,6 +89,21 @@ def decode_image(filename, **kwargs):
         pd.Series(r, index=dd.columns).to_csv(outfile, sep='\t')
         return True
     except Exception, e:
+        return False
+
+@celery.task(base=NeurosynthTask)
+def make_coactivation_map(x, y, z, r=6, min_studies=0.01):
+    try:
+        dataset = make_coactivation_map.dataset
+        ids = dataset.get_ids_by_peaks([[x, y, z]], r=r, threshold=0.05)
+        if len(ids) < 50: return False
+        ma = meta.MetaAnalysis(dataset, ids, min_studies=min_studies)
+        outdir = join(settings.IMAGE_DIR, 'locations', 'coactivation')
+        prefix = 'metaanalytic_coactivation_%s_%s_%s' % (str(x), str(y), str(z))
+        ma.save_results(outdir, prefix)
+        return True
+    except Exception, e:
+        # print traceback.format_exc()
         return False
 
 @celery.task(base=NeurosynthTask)
