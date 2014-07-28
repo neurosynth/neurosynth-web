@@ -16,3 +16,40 @@
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
 }
+
+.decoder-description {
+	font-size: 18px;
+	margin-top: 30px;
+}
+
+.decoder-options {
+	width: 100%;
+	position: relative;
+	margin: 40px 0px 0px 15px;
+}
+
+.button-box {
+	margin-right: 40px;
+	float: left;
+}
+
+.btn-giant {
+	font-size: 26px !important;
+	line-height: 1.2em;
+}
+
+.decoder-or {
+	float: left;
+	vertical-align: middle;
+	margin: 12px 10px 0px 0px;
+	font-size: 20px;
+}
+
+.decoder-form {
+	vertical-align: middle;
+	float: left;
+	margin: 10px 0px 0px 0px;
+	font-size: 20px;
+	line-height: 1.4em;
+}
+

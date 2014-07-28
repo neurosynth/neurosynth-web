@@ -55,7 +55,7 @@ def decode_from_url(url, metadata={}):
         name = metadata.get('name', basename(url))
         neurovault_id = metadata.get('id', None)
         uid = uuid.uuid4().hex
-        filename = join(settings.IMAGE_UPLOAD_DIR, uid + ext.group(0))
+        filename = join(settings.DECODED_IMAGE_DIR, uid + ext.group(0))
         modified = headers.get('last-modified', None)
         if modified is not None:
             modified = datetime(*parsedate(modified)[:6])
@@ -104,6 +104,7 @@ def show(decoding=None, uuid=None):
         'colorPalette': 'intense red-blue',
         'sign': 'both',
         'url': '/decode/%s/image' % decoding.uuid,
+        'download': decoding.download
     }]
     return render_template('decode/show.html.slim', image_id=uuid, images=json.dumps(images))
 
