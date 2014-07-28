@@ -4,6 +4,7 @@ from nsweb.initializers.settings import IMAGE_DIR
 from nsweb.core import add_blueprint
 import os
 import datetime as dt
+import re
 
 bp = Blueprint('images',__name__,url_prefix='/images')
 
@@ -23,11 +24,13 @@ def send_nifti(filename, attachment_filename=None):
     return resp
 
 @bp.route('/<int:val>/')
-def download(val):
+def download(val, fdr=True):
     image = Image.query.get_or_404(val)
     if not image.download:
         abort(404)
-    return send_nifti(image.image_file)
+    filename = image.image_file if fdr else image.uncorrected_image_file
+    print "\n\n", filename, "\n\n"
+    return send_nifti(filename)
 
 @bp.route('/anatomical')
 def anatomical_underlay():

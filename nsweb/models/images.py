@@ -9,7 +9,7 @@ class Image(db.Model):
     name=db.Column(db.String(200))
     label=db.Column(db.String(200))
     kind=db.Column(db.String(200))
-    comments=db.Column(db.String(200))
+    description=db.Column(db.Text)
     stat=db.Column(db.String(200))
     image_file=db.Column(db.String(200))
     display=db.Column(db.Boolean)
@@ -21,15 +21,13 @@ class Image(db.Model):
         'polymorphic_identity': 'image'
     }
 
-    def __init__(self,image_file, label=None, display=True, download=True, stat=None):#name,kind,comments,stat,
-#         self.name=name
-        self.label=label
-#         self.kind=kind
-#         self.comments=comments
-        self.stat=stat
-        self.image_file=image_file
-        self.display=display
-        self.download=download
+    @property
+    def uncorrected_image_file(self):
+        """ Returns an uncorrected version of the filename if one is found. """
+        if '_FDR' not in self.image_file:
+            return self.image_file
+        return self.image_file.split('_FDR')[0] + '.nii.gz'
+
 
 class FeatureImage(Image):
     __mapper_args__={'polymorphic_identity': 'feature'}
