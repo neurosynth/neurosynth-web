@@ -443,9 +443,8 @@ class DatabaseBuilder:
                 'name': 'YeoBucknerFCMRI',
                 'path': join('/data/neurosynth/data/locations', 'fcmri', 'functional_connectivity_%d_%d_%d.nii.gz'),
                 'label': 'Functional connectivity',
-                'description': "This image displays resting-state functional connectivity for the seed region in a sample of 1,000 subjects. To reduce blurring of signals across cerebro-cerebellar and cerebro-striatal boundaries, fMRI signals from adjacent cerebral cortex were regressed from the cerebellum and striatum. For details, see <a href='http://jn.physiology.org/content/106/3/1125.long'>Yeo et al (2011)</a>, <a href='http://jn.physiology.org/cgi/pmidlookup?view=long&pmid=21795627'>Buckner et al (2011)</a>, and <a href='http://jn.physiology.org/cgi/pmidlookup?view=long&pmid=22832566'>Choi et al (2012)</a>.",
                 'stat': 'correlation (r)',
-
+                'description': "This image displays resting-state functional connectivity for the seed region in a sample of 1,000 subjects. To reduce blurring of signals across cerebro-cerebellar and cerebro-striatal boundaries, fMRI signals from adjacent cerebral cortex were regressed from the cerebellum and striatum. For details, see <a href='http://jn.physiology.org/content/106/3/1125.long'>Yeo et al (2011)</a>, <a href='http://jn.physiology.org/cgi/pmidlookup?view=long&pmid=21795627'>Buckner et al (2011)</a>, and <a href='http://jn.physiology.org/cgi/pmidlookup?view=long&pmid=22832566'>Choi et al (2012)</a>.",
             }
         ]
         
@@ -463,7 +462,7 @@ class DatabaseBuilder:
             location = Location(x=x, y=y, z=z)
             location.images = [LocationImage(
                 image_file=img,
-                label='coactivation: (%d, %d, %d)' % (x, y, z),
+                label='Meta-analytic coactivation' % (x, y, z),
                 stat='z-score',
                 display=1,
                 download=1,
@@ -480,7 +479,8 @@ class DatabaseBuilder:
                         label = xtra['label'],
                         display = 1,
                         download = 1,
-                        description = xtra['description']
+                        description = xtra['description'],
+                        stats=xtra['stat']
                         ))
 
             self.db.session.add(location)

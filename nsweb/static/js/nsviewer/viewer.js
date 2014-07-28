@@ -326,7 +326,7 @@
       this.updateDataDisplay();
       this.userInterface.updateThresholdSliders(this.layerList.activeLayer.image);
       this.userInterface.updateComponents(this.layerList.activeLayer.getSettings());
-      return $(this).trigger('layerSelected');
+      return $(this).trigger('layerSelected', this.layerList.activeLayer);
     };
 
     Viewer.prototype.deleteLayer = function(target) {
@@ -627,7 +627,7 @@
         positiveThreshold: 0,
         negativeThreshold: 0,
         description: '',
-        intent: 'Value:'
+        intent: 'Intensity'
       }, options);
       this.name = options.name;
       this.sign = options.sign;

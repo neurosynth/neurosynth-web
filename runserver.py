@@ -9,7 +9,7 @@ setup_logging(logging_path=settings.LOGGING_PATH,level=settings.LOGGING_LEVEL)
     
 def main():
     
-    app.run(debug=app.debug, port=5008)
+    app.run(debug=app.debug, port=5001)
 
 if __name__ == "__main__":
     main()

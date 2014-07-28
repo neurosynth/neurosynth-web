@@ -11,7 +11,7 @@ from nsweb.models import Study, Peak, Feature, Frequency, Image, FeatureImage, L
 
 #this is here for now. Needs to be replaced with the factory later!
 from nsweb.initializers import database_builder
-from tests.settings import DATA_DIR, PICKLE_DATABASE, FEATURE_DATABASE, PROD_PICKLE_DATABASE, IMAGE_DIR, SQLALCHEMY_DATABASE_URI, DEBUG, DEBUG_WITH_APTANA
+from tests.settings import ASSET_DIR, PICKLE_DATABASE, FEATURE_DATABASE, PROD_PICKLE_DATABASE, IMAGE_DIR, SQLALCHEMY_DATABASE_URI, DEBUG, DEBUG_WITH_APTANA
 from flask_sqlalchemy import BaseQuery
 
 class TestCase(Base):
@@ -45,8 +45,8 @@ class TestCase(Base):
         '''populates the database with Studies, Peaks, Features, and Frequencies. Image location as well if images is True'''
         if not os.path.isfile(PICKLE_DATABASE):
             builder = database_builder.DatabaseBuilder(db, 
-                                                       studies=DATA_DIR+'test_dataset.txt',
-                                                       features=DATA_DIR+ 'test_features.txt')
+                                                       studies=ASSET_DIR+'test_dataset.txt',
+                                                       features=ASSET_DIR+ 'test_features.txt')
             builder.dataset.save(PICKLE_DATABASE)
 
         builder = database_builder.DatabaseBuilder(db, dataset=PICKLE_DATABASE, reset_db=True)
