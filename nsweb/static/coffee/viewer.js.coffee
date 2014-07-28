@@ -60,22 +60,20 @@ $(document).ready ->
 
   # Hide description box when empty
   $(viewer).on('layerSelected', (e, layer) =>
-    console.log(layer)
-    console.log(e)
     $('.intensity-label').text(layer.intent + ":")
     textToHTML('#image-description')
     $('#description.data-row').toggle(!$('#image-description').is(':empty'))
   )
 
   $('.plane-pos').change((e) ->
-    coords = [$('#x-in').val(), $('#y-in').val(), $('#z-in').val()]
+    coords = [$('#current-x').val(), $('#current-y').val(), $('#current-z').val()]
     viewer.moveToAtlasCoords((parseInt(c) for c in coords))
   )
 
   $(viewer).on('afterLocationChange', ->
     coords = viewer.coords_xyz()
-    $('#x-in').val(coords[0])
-    $('#y-in').val(coords[1])
-    $('#z-in').val(coords[2])
+    $('#current-x').val(coords[0])
+    $('#current-y').val(coords[1])
+    $('#current-z').val(coords[2])
   )
 
