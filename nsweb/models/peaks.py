@@ -4,7 +4,7 @@ class Peak(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     pmid = db.Column(db.Integer,db.ForeignKey(Study.pmid))
-    table = db.Column(db.String)
+    table = db.Column(db.String(10))
     x = db.Column(db.Float)
     y = db.Column(db.Float)
     z = db.Column(db.Float)
