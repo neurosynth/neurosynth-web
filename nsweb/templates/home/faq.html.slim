@@ -1,0 +1,28 @@
+- set page_title = 'Neurosynth|Features'
+- extends "layout/base.html"
+- block content
+
+  .row#page-faq
+    .col-md-10.col-md-offset-1
+      h1 Neurosynth: Frequently Asked Questions
+
+      .faq-toc
+        - set count = 1
+        - for s in data['sections']
+          h3 {{ s['name'] }}
+          ul
+            - for item in s['questions']
+              - set count = count + 1
+              li 
+                a href="#q{{count|string}}" {{ item['q'] }}
+
+      %hr
+      .faq-contents
+        - set count = 1
+        - for s in data['sections']
+          h3.top-space40 {{ s['name'] }}
+          - for item in s['questions']
+            - set count = count + 1
+            %a name="q{{count|string}}"
+            .faq-q {{ item['q'] }}
+            .faq-a {{ item['a'] }}
