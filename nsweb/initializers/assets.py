@@ -6,7 +6,8 @@ from os.path import join
 #sweetness: http://webassets.readthedocs.org/en/latest/builtin_filters.html
 
 # application css bundle
-css_nsweb = Bundle('scss/viewer.css.scss',
+css_nsweb = Bundle('scss/home.css.scss',
+                'scss/viewer.css.scss',
                 'scss/features.css.scss',
                 'scss/studies.css.scss',
                 'scss/locations.css.scss',
