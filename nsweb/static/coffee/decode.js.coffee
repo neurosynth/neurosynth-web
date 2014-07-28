@@ -7,36 +7,42 @@ $(document).ready ->
   #   e.preventDefault()
   # )
 
-  return if not $('#page-decode').length
+  if $('#page-decode-show').length
 
-  loadImages()
+    loadImages()
 
-  tbl = $('#decoding_results_table').DataTable()
-  tbl.ajax.url('/decode/' + image_id + '/data').load()
+    tbl = $('#decoding_results_table').DataTable()
+    tbl.ajax.url('/decode/' + image_id + '/data').load()
 
-  last_row_selected = null
-  $('#decoding_results_table').on('click', 'button', (e) =>
-    row = $(e.target).closest('tr')
-    $(last_row_selected).children('td').removeClass('highlight-table-row')
-    $(row).children('td').addClass('highlight-table-row')
-    last_row_selected = row
-    feature = $('td:eq(1)', row).text()
-    imgs = load_reverse_inference_image(feature)
-    viewer.loadImages(imgs)
-    $(viewer).off('imagesLoaded')
-    $(viewer).on('imagesLoaded', (e) ->
-      viewer.deleteLayer(1)  if viewer.layerList.layers.length == 4
+    last_row_selected = null
+    $('#decoding_results_table').on('click', 'button', (e) =>
+      row = $(e.target).closest('tr')
+      $(last_row_selected).children('td').removeClass('highlight-table-row')
+      $(row).children('td').addClass('highlight-table-row')
+      last_row_selected = row
+      feature = $('td:eq(1)', row).text()
+      imgs = load_reverse_inference_image(feature)
+      viewer.loadImages(imgs)
+      $(viewer).off('imagesLoaded')
+      $(viewer).on('imagesLoaded', (e) ->
+        viewer.deleteLayer(1)  if viewer.layerList.layers.length == 4
+      )
+      # Load scatterplot
+      $('#scatterplot').html('<img src="/decode/' + image_id + '/scatter/' + feature + '.png" width="500px">')
     )
-    # Load scatterplot
-    $('#scatterplot').html('<img src="/decode/' + image_id + '/scatter/' + feature + '.png" width="500px">')
-  )
 
-  $(viewer).on("afterLocationChange", (evt, data) ->
-    if scatter?
-      xv = viewer.getValue(1, data.ijk, space='image')
-      yv = viewer.getValue(0, data.ijk, space='image')
-      scatter.select(xv, yv)
-    )
+    $(viewer).on("afterLocationChange", (evt, data) ->
+      if scatter?
+        xv = viewer.getValue(1, data.ijk, space='image')
+        yv = viewer.getValue(0, data.ijk, space='image')
+        scatter.select(xv, yv)
+      )
+
+  else if $('#page-decode-index').length
+
+    $('#neurovault-button').click( ->
+      window.location.href = 'http://neurovault.org/images/add_for_neurosynth'
+      )
 
   # $('#decode-tab-menu a:first').tab('show')
 

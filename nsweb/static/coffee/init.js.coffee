@@ -37,6 +37,7 @@ load_reverse_inference_image = (feature, fdr=false) ->
     name: feature + ' (reverse inference)'
     url: url
     colorPalette: 'yellow'
+    download: true
   }]
 
 $(document).ready ->
@@ -45,13 +46,13 @@ $(document).ready ->
   window.cookie = NSCookie.load()
 
   # Decoding results for pages that use it
-  if $('#page-decode, #page-genes').length
+  if $('#page-decode-show, #page-genes').length
 
     tbl = $('#decoding_results_table').dataTable
       paginationType: "simple"
       displayLength: 10
       processing: true
-      stateSave: true
+      stateSave: false
       orderClasses: false
       autoWidth: false
       order: [[2, 'desc']]
