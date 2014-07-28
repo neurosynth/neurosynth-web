@@ -38,7 +38,8 @@ def get_images(val):
         'colorPalette': 'red' if 'reverse' in img.label else 'blue',
         # "intent": (img.stat + ':').capitalize(),
         'url': '/images/%s' % img.id,
-        'visible': 1 if 'reverse' in img.label else 0
+        'visible': 1 if 'reverse' in img.label else 0,
+        'download': img.download
     } for img in feature.images if img.display]
     return jsonify(data=images)
 

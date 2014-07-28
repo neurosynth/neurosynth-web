@@ -29,7 +29,6 @@ def download(val, fdr=True):
     if not image.download:
         abort(404)
     filename = image.image_file if fdr else image.uncorrected_image_file
-    print "\n\n", filename, "\n\n"
     return send_nifti(filename)
 
 @bp.route('/anatomical')
