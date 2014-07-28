@@ -1,20 +1,22 @@
 - set page_title = 'Neurosynth -- online image decoder'
 - extends "layout/base.html"
 - block content
-  .row#page-decode
-    .col-md-12.content
+  .row#page-decode-index
+    .col-md-10.content.col-md-offset-1
       h2 Neurosynth Image Decoder
-      p The Neurosynth Image Decoder compares any Nifti-format image on the web against selected images in the Neurosynth database and returns an interactive visualization of the similarity.
+      .decoder-description
+        p
+          | The Neurosynth Image Decoder allows you to quantitatively and interactively compare any Nifti-format brain volume to selected images in the Neurosynth database. You can see an example of the decoder in action <a href="/decode?neurovault=308">here</a>.
 
-      p 
-        |If you want to decode an image that isn't already on the web, we recommend that you <a href="http://neurovault.org/images/add_for_neurosynth">upload the image to NeuroVault</a>. The process will take you just a few seconds, will provide a permanent home (if desired) for the image, and will redirect you back to the Neurosynth decoder results as soon as the upload is completed.
+        p To use the decoder, either upload your image to NeuroVault (recommended), or paste a link to it below.
 
-      p Alternatively, you can paste the full URL of a Nifti image (only .nii or .nii.gz extensions allowed) that's already on the web.
+      .decoder-options
+        .button-box
+          button.btn.btn-primary.btn-giant#neurovault-button Upload an Image
+        .decoder-or ...or paste a link:
+        .decoder-form
+          form method="GET" action="" enctype="multipart/form-data"
+            input type="text" name="url"
+            input type="submit" value="Decode!" class="btn btn-primary"
 
-      form method="GET" action="" enctype="multipart/form-data"
-        / {{ form.hidden_tag() }}
-        / {{ form.image_file.label }} {{ form.image_file(size=20) }}
-        / {{ form.image_url.label }} {{ form.image_url(size=20) }}
-        input type="text" name="url"
-        input type="submit" value="Decode!"
 
