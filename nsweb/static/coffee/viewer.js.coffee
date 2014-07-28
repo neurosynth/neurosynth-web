@@ -59,9 +59,12 @@ $(document).ready ->
   $(viewer).on('imagesLoaded', (e) => textToHTML('#image-description'))
 
   # Hide description box when empty
-  $(viewer).on('layerSelected', (e) =>
-      textToHTML('#image-description')
-      $('#description.data-row').toggle(!$('#image-description').is(':empty'))
+  $(viewer).on('layerSelected', (e, layer) =>
+    console.log(layer)
+    console.log(e)
+    $('.intensity-label').text(layer.intent + ":")
+    textToHTML('#image-description')
+    $('#description.data-row').toggle(!$('#image-description').is(':empty'))
   )
 
   $('.plane-pos').change((e) ->
