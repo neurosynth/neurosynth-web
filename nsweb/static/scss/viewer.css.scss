@@ -116,7 +116,8 @@ select.layer-settings {
 }
 
 li.layer_list_item {
-  line-height: 20px;
+  line-height: 1.2em;
+  height: 30px;
 }
 
 #layer_visible_list {
@@ -211,11 +212,15 @@ ul#layer-list {
 .layer_label {
   float: left;
   width: 180px;
-  background: #cccccc;
+  background: #eeeeee;
   padding: 5px 3px;
   font-size: 12px;
   &.selected {
-    background: #ccffff;
+    background: #9fafc7;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    border: 1px ridge #666666;
   }
 }
 
