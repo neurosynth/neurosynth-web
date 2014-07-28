@@ -9,20 +9,35 @@ $(document).ready ->
 
   return if not $('#page-decode').length
 
-  image_id = document.URL.split('/').slice(-2)[0]
-
   loadImages()
 
-  $('#decoding_results_table').DataTable().ajax.url('/decode/' + image_id + '/data').load()
+  tbl = $('#decoding_results_table').DataTable()
+  tbl.ajax.url('/decode/' + image_id + '/data').load()
 
-  $('#decoding_results_table').on('click', 'i', (e) =>
+  last_row_selected = null
+  $('#decoding_results_table').on('click', 'button', (e) =>
     row = $(e.target).closest('tr')
+    $(last_row_selected).children('td').removeClass('highlight-table-row')
+    $(row).children('td').addClass('highlight-table-row')
+    last_row_selected = row
     feature = $('td:eq(1)', row).text()
-    load_reverse_inference_image(feature, true)
+    imgs = load_reverse_inference_image(feature)
+    viewer.loadImages(imgs)
+    $(viewer).off('imagesLoaded')
+    $(viewer).on('imagesLoaded', (e) ->
+      viewer.deleteLayer(1)  if viewer.layerList.layers.length == 4
+    )
     # Load scatterplot
-    $('.scatterplot').html('<img src="/decode/' + image_id + '/scatter/' + feature + '.png" width="500">')
+    $('#scatterplot').html('<img src="/decode/' + image_id + '/scatter/' + feature + '.png" width="500px">')
   )
+
+  $(viewer).on("afterLocationChange", (evt, data) ->
+    if scatter?
+      xv = viewer.getValue(1, data.ijk, space='image')
+      yv = viewer.getValue(0, data.ijk, space='image')
+      scatter.select(xv, yv)
+    )
 
   # $('#decode-tab-menu a:first').tab('show')
 
-  # $('canvas#scatterplot')
+  # $(viewer).on('imagesLoaded', () -> scatter()) if scatterplot

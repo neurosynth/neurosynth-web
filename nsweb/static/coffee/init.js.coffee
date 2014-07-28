@@ -30,24 +30,16 @@ urlToParams = () ->
     JSON.parse "{\"" + decodeURI(search).replace(/"/g, "\"").replace(/&/g, "\",\"").replace(RegExp("=", "g"), "\":\"") + "\"}"
 window.urlToParams = urlToParams
 
-load_reverse_inference_image = (feature, scatterplot=false) ->
-    imgs = [{
-      'name': feature + ' (reverse inference)'
-      'url': '/features/' + feature + '/images/reverseinference'
-    }]
-    # 4th argument is color cycling
-    viewer.loadImages(imgs, null, null, true)
-    $(viewer).on('imagesLoaded', () -> scatter()) if scatterplot
-
+load_reverse_inference_image = (feature, fdr=false) ->
+  url = '/features/' + feature + '/images/reverseinference'
+  url += '?nofdr' if not fdr
+  [{
+    name: feature + ' (reverse inference)'
+    url: url
+    colorPalette: 'yellow'
+  }]
 
 $(document).ready ->
-
-  # # Update location based on current viewer coords
-  # $('#load-location').click((e) =>
-  #   xyz = viewer.coords_xyz()
-  #   url = '/locations/?x=' + xyz[0] + '&y=' + xyz[1] + '&z=' + xyz[2]
-  #   window.location.replace(url);
-  # )
 
   # Make site-wide cookie available
   window.cookie = NSCookie.load()
@@ -55,29 +47,29 @@ $(document).ready ->
   # Decoding results for pages that use it
   if $('#page-decode, #page-genes').length
 
-    $('#decoding_results_table').dataTable
-      paginationType: "full_numbers"
+    tbl = $('#decoding_results_table').dataTable
+      paginationType: "simple"
       displayLength: 10
       processing: true
       stateSave: true
       orderClasses: false
-      # ajax: '/decode/' + image_id + '/data'
+      autoWidth: false
       order: [[2, 'desc']]
       columns: [
         {
           data: null
-          # defaultContent: '<button>view</button>'
-          defaultContent: '<i class="fa fa-arrow-left"></i>'
+          defaultContent: '<button type="button" class="btn btn-xs btn-primary" style="line-height: 1em;"><span class="glyphicon glyphicon-arrow-left"></span></button>'
           width: '20%'
         },
         { 
           data: "feature"
           render: (data, type, row, meta) ->
             '<a href="/features/'+ data + '">' + data + '</a>'
-          width: '%45%'
+          width: '%60%'
         }, 
         {
           data: 'r'
-          width: '35%'
+          width: '20%'
           },
         ]
+

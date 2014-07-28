@@ -35,7 +35,7 @@ $(document).ready ->
 
     # autocomplete
     $.get('/features/feature_names', (result) ->
-      # alert(result.data.length)
+
       $('#feature-search').autocomplete( 
         minLength: 2
         delay: 0
@@ -56,11 +56,6 @@ $(document).ready ->
     text = $('#feature-search').val()
     window.location.replace('/features/' + text) if (e.keyCode == 13)
   )
-
-  # $('#feature-search').on('autocompleteselect', (e, ui) ->
-  #   alert('triggered')
-  #   window.location.replace('/features/' + ui.item)
-  # )
 
   loadFeatureStudies = () ->
     url = '/features/' + feature + '/studies?dt=1'
