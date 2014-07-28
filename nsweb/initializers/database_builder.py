@@ -90,7 +90,7 @@ class DatabaseBuilder:
         self.dataset.save(settings.PICKLE_DATABASE, keep_mappables=True)
 
 
-    def add_features(self, features=None, image_dir=None, reset=False):
+    def add_features(self, features=None, add_images=False, image_dir=None, reset=False):
         ''' Add Feature records to the DB. 
         Args:
             features: A list of feature names to add to the db. If None,  will use 
@@ -102,12 +102,9 @@ class DatabaseBuilder:
             Feature.query.delete()
 
         if features is None:
-            features = self.dataset.get_feature_names()
+            features = self._get_feature_names()
         else:
-            features = list(set(self.dataset.get_feature_names()) & set(features))
-
-        # Remove features that start with a number
-        features = [f for f in features if re.match('[a-zA-Z]+', f)]
+            features = list(set(self._get_feature_names()) & set(features))
 
         # Store features for faster counting of studies/activations
         self.features = {}
@@ -119,7 +116,7 @@ class DatabaseBuilder:
             # elements are the Feature instance, # of studies, and # of activations
             self.features[f] = [feature, 0, 0]
 
-            if image_dir is not None:
+            if add_images:
                 self.add_feature_images(feature, image_dir)
 
             self.db.session.add(feature)
@@ -127,7 +124,7 @@ class DatabaseBuilder:
         self.db.session.commit()
 
 
-    def add_feature_images(self, feature, image_dir, reset=True):
+    def add_feature_images(self, feature, image_dir=None, reset=True):
         """ Create DB records for the reverse and forward meta-analysis images for the given feature. 
         Args:
             feature: Either a Feature instance or the (string) name of a feature to update. If a 
@@ -135,6 +132,9 @@ class DatabaseBuilder:
             image_dir: Location to find images in
             reset: If True, deletes any existing FeatureImages before adding new ones
         """
+
+        if image_dir is None:
+            image_dir = join(settings.IMAGE_DIR, 'features')
 
         if isinstance(feature, basestring):
             if hasattr(self, 'features') and feature in self.features:
@@ -179,8 +179,11 @@ class DatabaseBuilder:
             Study.query.delete()
 
         # For efficiency, get all feature data up front, so we only need to densify array once
+        if features is None:
+            features = self._get_feature_names()
+
         feature_data = self.dataset.get_feature_data(features=features)
-        feature_names = feature_data.columns
+        feature_names = list(feature_data.columns)
 
         study_inds = range(len(self.dataset.mappables))
         if limit is not None:
@@ -198,13 +201,13 @@ class DatabaseBuilder:
                 peaks = [Peak(x=float(p.x),
                               y=float(p.y),
                               z=float(p.z),
-                              table=p.table_num
+                              table=str(p.table_num).replace('nan', '')
                               ) for (ind,p) in m.data.iterrows()]
                 data = m.data.iloc[0]
                 study = Study(
                           pmid=id,
                           space=data['space'],
-                          doi=data['doi'],
+                          doi=str(data['doi']).replace('nan', ''),
                           title=data['title'],
                           journal=data['journal'],
                           authors=data['authors'],
@@ -227,11 +230,11 @@ class DatabaseBuilder:
                     self.features[feature_name][2] += study.peaks.count()
 
          
-        # Commit records in batches of 1000 to conserve memory.
+        # Commit records in batches to conserve memory.
         # This is very slow because we're relying on the declarative base. Ideally should replace 
         # this with use of SQLAlchemy core, but probably not worth the trouble considering we 
         # only re-create the DB once in a blue moon.
-            if i % 1000 == 0:
+            if (i+1) % 100 == 0:
                 self.db.session.commit()
 
         self.db.session.commit()  # Commit any remaining studies
@@ -249,7 +252,8 @@ class DatabaseBuilder:
         self.db.session.commit()
 
 
-    def generate_feature_images(self, image_dir=None, features=None, add_to_db=True, **kwargs):
+    def generate_feature_images(self, image_dir=None, features=None, add_to_db=True, 
+                    overwrite=True, **kwargs):
         """ Create a full set of feature meta-analysis images via Neurosynth. 
         Args:
             image_dir: Folder in which to store images. If None, uses default 
@@ -258,6 +262,8 @@ class DatabaseBuilder:
                 If None, all available features are processed.
             add_to_db: if True, will create new FeatureImage records, and associate 
                 them with the corresponding Feature record.
+            overwrite: if True, always generate new meta-analysis images. If False, 
+                will skip any features that already have images.
             kwargs: optional keyword arguments to pass onto the Neurosynth meta-analysis.
         """
         from neurosynth.analysis import meta
@@ -269,10 +275,17 @@ class DatabaseBuilder:
                 os.makedirs(image_dir)
 
         if features is None:
-            features = self.dataset.get_feature_names()
+            features = self._get_feature_names()
+
+        # Remove features that already exist
+        if not overwrite:
+            files = glob(join(settings.IMAGE_DIR, 'features', '*_pFgA_z.nii.gz'))
+            existing = [basename(f).split('_')[0] for f in files]
+            features = list(set(features) - set(existing))
+            print features
 
         # Meta-analyze all images
-        meta.analyze_features(self.dataset, features, save=image_dir, **kwargs)
+        meta.analyze_features(self.dataset, features, save=image_dir, q=0.01, **kwargs)
 
         # Create FeatureImage records
         if add_to_db:
@@ -293,7 +306,7 @@ class DatabaseBuilder:
         masker = self.dataset.masker
 
         study_names = self.dataset.image_table.ids
-        feature_names = self.dataset.get_feature_names()
+        feature_names = self._get_feature_names()
         imgs = np.array(self.dataset.image_table.data.todense())
         p_active = imgs.sum(1)
         # Save this for later
@@ -413,9 +426,12 @@ class DatabaseBuilder:
                 self.add_location_images(self, image_dir)
 
 
-    def add_location_images(self, image_dir=None, search=None, limit=None, overwrite=False):
+    def add_location_images(self, image_dir=None, search=None, limit=None, overwrite=False, reset=False):
         """ Filter all the images in the passed directory and add records. """
         
+        if reset:
+            Location.query.delete()
+
         if image_dir is None:
             image_dir = join(settings.IMAGE_DIR, 'coactivation')
 
@@ -427,7 +443,9 @@ class DatabaseBuilder:
                 'name': 'YeoBucknerFCMRI',
                 'path': join('/data/neurosynth/data/locations', 'fcmri', 'functional_connectivity_%d_%d_%d.nii.gz'),
                 'label': 'Functional connectivity',
-                'description': "This image displays resting-state functional connectivity for the seed region in a sample of 1,000 subjects. Image provided courtesy of Yeo, Buckner and colleagues. For details, see <a href='http://jn.physiology.org/content/106/3/1125.long'>Yeo et al (2011)</a>."
+                'description': "This image displays resting-state functional connectivity for the seed region in a sample of 1,000 subjects. To reduce blurring of signals across cerebro-cerebellar and cerebro-striatal boundaries, fMRI signals from adjacent cerebral cortex were regressed from the cerebellum and striatum. For details, see <a href='http://jn.physiology.org/content/106/3/1125.long'>Yeo et al (2011)</a>, <a href='http://jn.physiology.org/cgi/pmidlookup?view=long&pmid=21795627'>Buckner et al (2011)</a>, and <a href='http://jn.physiology.org/cgi/pmidlookup?view=long&pmid=22832566'>Choi et al (2012)</a>.",
+                'stat': 'correlation (r)',
+
             }
         ]
         
@@ -437,7 +455,7 @@ class DatabaseBuilder:
         if limit is None:
             limit = len(images)
 
-        for img in images[:limit]:
+        for ind, img in enumerate(images[:limit]):
 
             x, y, z = [int(i) for i in basename(img).split('_')[:3]]
             if (not overwrite) and self.db.session.query(Location).filter_by(x=x, y=y, z=z).count():
@@ -448,7 +466,9 @@ class DatabaseBuilder:
                 label='coactivation: (%d, %d, %d)' % (x, y, z),
                 stat='z-score',
                 display=1,
-                download=1)
+                download=1,
+                description='This image displays regions coactivated with the seed region across all studies in the Neurosynth database. It represents meta-analytic coactivation rather than time series-based connectivity.'
+                )
             ]
             
             # Add any additional assets
@@ -459,12 +479,14 @@ class DatabaseBuilder:
                         image_file = xtra_path,
                         label = xtra['label'],
                         display = 1,
-                        download = 1
+                        download = 1,
+                        description = xtra['description']
                         ))
 
             self.db.session.add(location)
 
-        self.db.session.commit()
+            if not ((ind+1) % 1000):
+                self.db.session.commit()
 
     def add_genes(self, gene_dir=None, reset=True):
         """ Add records for genes, working from a directory containing gene images. """
@@ -497,15 +519,15 @@ class DatabaseBuilder:
         """ Save image data for feature maps we use in decoding as a separate 
         numpy array for rapid use. """
         if features is None:
-            features = dataset.get_feature_names()
+            features = self._get_feature_names()
         path = join(settings.IMAGE_DIR, 'features', '%s_pFgA_z.nii.gz')
         images = [path % f for f in features]
-        images = [i for i in images if os.path.exists(i)]
-        n_vox, n_studies = self.dataset.image_table.data.shape[0], len(features)
-        data = np.zeros((n_vox, n_studies))
-        for (i, img) in enumerate(images):
+        features = [(f, images[i]) for (i, f) in enumerate(features) if os.path.exists(images[i])]
+        n_vox, n_features = self.dataset.image_table.data.shape[0], len(features)
+        data = np.zeros((n_vox, n_features))
+        for (i, (f, img)) in enumerate(features):
             data[:,i] = self.dataset.masker.mask(img)
-        data = pd.DataFrame(data, columns=features)
+        data = pd.DataFrame(data, columns=[f[0] for f in features])
         data.to_msgpack(settings.DECODING_DATA)
 
     def generate_topics(self, topic_keys, doc_topics):
@@ -515,7 +537,14 @@ class DatabaseBuilder:
         ft = deepcopy(self.dataset.feature_table)
         self.dataset.add_features(doc_topics)
         
+    def _filter_features(self, features):
+        """ Remove any invalid feature names """
+        # Remove features that start with a number
+        features = [f for f in features if re.match('[a-zA-Z]+', f)]
+        return features
 
-
+    def _get_feature_names(self):
+        """ Return all (filtered) feature names in the Dataset instance """
+        return self._filter_features(self.dataset.get_feature_names())
 
 
