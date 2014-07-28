@@ -40,7 +40,19 @@ def create_app(debug=True):
 
     # Extra config stuff
     app.config['DEBUG'] = debug
-    app.config['SQLALCHEMY_DATABASE_URI'] = settings.SQLALCHEMY_DATABASE_URI
+
+    # Generate DB URI
+    if settings.SQL_ADAPTER == 'sqlite':
+        db_uri = settings.SQLALCHEMY_SQLITE_URI
+    elif settings.SQL_ADAPTER == 'mysql':
+        if hasattr(settings, 'SQLALCHEMY_MYSQL_URI'):
+            db_uri = settings.SQLALCHEMY_SQLITE_URI
+        else:
+            db_uri = 'mysql://%s:%s@localhost/%s' % (settings.MYSQL_USER, settings.MYSQL_PASSWORD, settings.MYSQL_DB)
+    else:
+        raise ValueError("Value of SQL_ADAPTER in settings must be either 'sqlite' or 'mysql'")
+
+    app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
     app.secret_key = "very_sekret"  # move this out of here eventually
     app.test_request_context().push() #h ave to create a request context for flask-salalchemy
     db.init_app(app)
