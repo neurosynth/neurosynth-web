@@ -44,7 +44,8 @@ def get_images(val):
             'name': img.label,
             'colorPalette': 'yellow' if 'coactivation' in img.label else 'red',
             'url': '/images/%s' % img.id,
-            'visible': 0 if 'coactivation' in img.label else 1
+            'visible': 0 if 'coactivation' in img.label else 1,
+            'download': img.download
         } for img in location.images if img.display]
     else:
         images = []

@@ -354,7 +354,7 @@
     };
 
     Viewer.prototype.updateUserInterface = function() {
-      this.userInterface.updateLayerList(this.layerList.getLayerNames(), this.layerList.getActiveIndex());
+      this.userInterface.updateLayerList(this.layerList.layers, this.layerList.getActiveIndex());
       this.userInterface.updateLayerVisibility(this.layerList.getLayerVisibilities());
       this.userInterface.updateLayerSelection(this.layerList.getActiveIndex());
       if (this.layerList.activeLayer != null) {
@@ -1136,8 +1136,9 @@
         l = layers[i];
         visibility_icon = this.viewSettings.visibilityIconEnabled ? "<div class='visibility_icon' title='Hide/show image'><span class='glyphicon glyphicon-eye-open'></i></div>" : '';
         deletion_icon = this.viewSettings.deletionIconEnabled ? "<div class='deletion_icon' title='Remove this layer'><span class='glyphicon glyphicon-trash'></i></div>" : '';
-        download_icon = true ? "<div class='download_icon' title='Download this image'><span class='glyphicon glyphicon-save'></i></div>" : '';
-        $(this.layerListId).append($(("<li class='layer_list_item'>" + visibility_icon + "<div class='layer_label'>") + l + ("</div>" + download_icon + deletion_icon + "</li>")));
+        console.log(l.download);
+        download_icon = l.download ? "<div class='download_icon' title='Download this image'><span class='glyphicon glyphicon-save'></i></div>" : '';
+        $(this.layerListId).append($(("<li class='layer_list_item'>" + visibility_icon + "<div class='layer_label'>") + l.name + ("</div>" + deletion_icon + download_icon + "</li>")));
       }
       $('.layer_label').click((function(_this) {
         return function(e) {

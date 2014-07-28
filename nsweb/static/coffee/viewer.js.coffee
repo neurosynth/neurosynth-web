@@ -5,12 +5,13 @@ window.loadImages = (imgs = null, clear = true) ->
   if clear
     window.viewer.clearImages()
     imgs.unshift({
-      'id': 'anatomical', 
-      'json': false,
-      'name':'anatomical', 
-      'colorPalette': 'grayscale', 
-      'cache': true, 
-      'url':'/images/anatomical' })
+      id: 'anatomical', 
+      json: false,
+      name:'anatomical', 
+      colorPalette: 'grayscale', 
+      cache: true,
+      download: true,
+      url:'/images/anatomical' })
   for img in imgs
     # img.json = true
     img.url = '/images/' + img.id + '/' if img.id? and !img.url?
