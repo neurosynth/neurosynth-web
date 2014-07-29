@@ -53,23 +53,25 @@ def get_images(val):
         'visible': 0 if 'coactivation' in img.label else 1,
         'download': img.download,
         'description': img.description,
-        'intent': img.stat
+        'intent': img.stat,
+        'positiveThreshold': 0 if 'coactivation' in img.label else 0.2,
+        'negativeThreshold': 0 if 'coactivation' in img.label else -0.2
     } for img in location.images if img.display]
 
     db.session.remove()
     return jsonify(data=images)
 
 
-@bp.route('/<string:val>/coactivation')
-def get_coactivation_image(val):
-    x, y, z, r = get_params(val)
-    filename = 'metaanalytic_coactivation_%s_%s_%s_pFgA_z.nii.gz' % (str(x), str(y), str(z))
-    filename = join(settings.IMAGE_DIR, 'locations', 'coactivation', filename)
-    if not exists(filename):
-        result = make_coactivation_map.delay(int(x), int(y), int(z)).wait()
-    if exists(filename):
-        return send_nifti(filename)
-    return abort(404)
+# @bp.route('/<string:val>/coactivation')
+# def get_coactivation_image(val):
+#     x, y, z, r = get_params(val)
+#     filename = 'metaanalytic_coactivation_%s_%s_%s_pFgA_z.nii.gz' % (str(x), str(y), str(z))
+#     filename = join(settings.IMAGE_DIR, 'locations', 'coactivation', filename)
+#     if not exists(filename):
+#         result = make_coactivation_map.delay(int(x), int(y), int(z)).wait()
+#     if exists(filename):
+#         return send_nifti(filename)
+#     return abort(404)
 
 
 @bp.route('/<string:val>/studies')
@@ -107,16 +109,16 @@ def make_location(x, y, z):
     filename = join(settings.IMAGE_DIR, 'locations', 'coactivation', filename)
     if not exists(filename):
         result = make_coactivation_map.delay(x, y, z).wait()
-        if result:
-            location.images.append(LocationImage(
-                name = 'Meta-analytic coactivation for seed (%d, %d, %d)' % (x, y, z),
-                image_file = filename,
-                label = 'Meta-analytic coactivation',
-                stat = 'z-score',
-                display = 1,
-                download = 1,
-                description = 'This image displays regions coactivated with the seed region across all studies in the Neurosynth database. It represents meta-analytic coactivation rather than time series-based connectivity.'
-            ))
+    if exists(filename):
+        location.images.append(LocationImage(
+            name = 'Meta-analytic coactivation for seed (%d, %d, %d)' % (x, y, z),
+            image_file = filename,
+            label = 'Meta-analytic coactivation',
+            stat = 'z-score',
+            display = 1,
+            download = 1,
+            description = 'This image displays regions coactivated with the seed region across all studies in the Neurosynth database. It represents meta-analytic coactivation rather than time series-based connectivity.'
+        ))
 
     # Add Yeo FC image if it exists
     filename = join('/data/neurosynth/data/locations', 'fcmri', 'functional_connectivity_%d_%d_%d.nii.gz' % (x, y, z))

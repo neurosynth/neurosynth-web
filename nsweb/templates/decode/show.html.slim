@@ -12,8 +12,8 @@
             a href="#maps" data-toggle="tab" Map
           li
             a href="#scatter" data-toggle="tab" Plot
-          li
-            a href="#info" data-toggle="tab" Info
+          / li
+          /   a href="#info" data-toggle="tab" Info
         #decode-tab-content.tab-content.top-space20
           #maps.tab-pane.active
             script type="text/javascript"
@@ -29,8 +29,9 @@
               p That's probably because you haven't selected a Neurosynth term to compare this image against. To replace this annoying message with a pretty scatter plot, select one of the terms over there in the table on the right.
 
               p Note that most images will usually take 1 - 2 seconds to show up--we're computing them fresh, just for you!
-          #info.tab-pane
-            h3 About this image
+          / #info.tab-pane
+          /   h4 About this image
+            
       .feature-list style="width: 200px; margin-left: 20px; margin-top: 50px;"
         h4 Feature loadings
         p To compare the decoded image against a term, click on an arrow below.

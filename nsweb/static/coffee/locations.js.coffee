@@ -46,7 +46,13 @@ $(document).ready ->
     $('#current-location-maps').html(map_info)
     
     # TODO: IMPLEMENT ONPOPSTATE  
-    window.history.pushState(null, null, base + '?' + $.param(coords))
+    # window.history.pushState(null, null, base + '?' + $.param(coords))
+
+  moveTo = ->
+    base = window.location.href.split('?')[0]
+    coords = { x: $('#x-in').val(), y: $('#y-in').val(), z: $('#z-in').val(), r: $('#rad-out').val()}
+    url = base + '?' + $.param(coords)
+    window.location.href = url
   
   $('#location_studies_table').dataTable({
     paginationType: "full_numbers"
@@ -98,7 +104,7 @@ $(document).ready ->
           viewer.paint()
   )
 
-  $('.plane-pos').keypress((e) ->
+  $('.data-for-location').keypress((e) ->
       update() if(e.which == 13)
   )
 
@@ -107,6 +113,7 @@ $(document).ready ->
       $('#x-in').val(xyz[0])
       $('#y-in').val(xyz[1])
       $('#z-in').val(xyz[2])
-      update()
+      # update()
+      moveTo()
   )
 

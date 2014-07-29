@@ -33,9 +33,10 @@ class Topic(Feature):
 
     id = db.Column(db.Integer, db.ForeignKey('feature.id'), primary_key = True)
     type = db.Column(db.String(50))
+    topic_set = db.Column(db.String(20))
     terms = db.Column(db.Text)
 
     __mapper_args__ = {
-        'polymorphic_identity':'feature',
+        'polymorphic_identity':'topic',
         'polymorphic_on':type
     }

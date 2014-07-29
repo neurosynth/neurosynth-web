@@ -34,3 +34,25 @@
 	margin-bottom: 25px;
 	font-size: 14px;
 }
+
+#page-code {
+
+	p {
+		clear: left;
+	}
+
+	.github-buttons {
+		float: left;
+		margin: 25px 0px 0px 20px;
+		clear: right;
+	}
+
+	.code-group {
+		float: left;
+		clear: both;
+
+		h3 {
+			float: left;
+		}
+	}	
+}
