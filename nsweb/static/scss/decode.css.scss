@@ -53,3 +53,20 @@
 	line-height: 1.4em;
 }
 
+#loading-message {
+	font-size: 26px;
+	width: 460px;
+	display: none;
+	z-index: 10;
+	position: absolute;
+	left: 100px;
+	top: 200px;
+	text-align: center;
+}
+
+#scatterplot {
+	position: relative;
+	img {
+		position: absolute;
+	}
+}

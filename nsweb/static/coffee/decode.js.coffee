@@ -28,7 +28,12 @@ $(document).ready ->
         viewer.deleteLayer(1)  if viewer.layerList.layers.length == 4
       )
       # Load scatterplot
-      $('#scatterplot').html('<img src="/decode/' + image_id + '/scatter/' + feature + '.png" width="500px">')
+      $('#loading-message').show()
+      $('#scatterplot').html('<img src="/decode/' + image_id + '/scatter/' + feature + '.png" width="500px" style="display:none;">')
+      $('#scatterplot>img').load( ->
+        $('#scatterplot>img').show()
+        $('#loading-message').hide()
+      )
     )
 
     $(viewer).on("afterLocationChange", (evt, data) ->

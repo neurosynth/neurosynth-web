@@ -106,7 +106,7 @@ def show(decoding=None, uuid=None):
         'url': '/decode/%s/image' % decoding.uuid,
         'download': decoding.download
     }]
-    return render_template('decode/show.html.slim', image_id=uuid, images=json.dumps(images))
+    return render_template('decode/show.html.slim', decoding=decoding, images=json.dumps(images))
 
 
 @bp.route('/<string:uuid>/data')

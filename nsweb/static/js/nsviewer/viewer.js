@@ -1136,7 +1136,6 @@
         l = layers[i];
         visibility_icon = this.viewSettings.visibilityIconEnabled ? "<div class='visibility_icon' title='Hide/show image'><span class='glyphicon glyphicon-eye-open'></i></div>" : '';
         deletion_icon = this.viewSettings.deletionIconEnabled ? "<div class='deletion_icon' title='Remove this layer'><span class='glyphicon glyphicon-trash'></i></div>" : '';
-        console.log(l.download);
         download_icon = l.download ? "<div class='download_icon' title='Download this image'><span class='glyphicon glyphicon-save'></i></div>" : '';
         $(this.layerListId).append($(("<li class='layer_list_item'>" + visibility_icon + "<div class='layer_label'>") + l.name + ("</div>" + deletion_icon + download_icon + "</li>")));
       }

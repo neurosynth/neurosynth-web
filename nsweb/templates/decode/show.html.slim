@@ -20,16 +20,17 @@
               |var options = {"panzoomEnabled":false};
               var settings = ['no-zoom', 'layers','nav','checkboxes'];
               var images = {{images}};
-              var image_id = '{{ image_id }}';
+              var image_id = '{{ decoding.uuid }}';
             p {{viewers.viewer()|safe}}
           #scatter.tab-pane
+            #loading-message Loading image...
             #scatterplot style="width: 500px; float: left; position: relative;"
               h4 There's nothing here yet!
               p That's probably because you haven't selected a Neurosynth term to compare this image against. To replace this annoying message with a pretty scatter plot, select one of the terms over there in the table on the right.
 
               p Note that most images will usually take 1 - 2 seconds to show up--we're computing them fresh, just for you!
           #info.tab-pane
-            p Information!
+            h3 About this image
       .feature-list style="width: 200px; margin-left: 20px; margin-top: 50px;"
         h4 Feature loadings
         p To compare the decoded image against a term, click on an arrow below.
