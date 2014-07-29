@@ -42,7 +42,7 @@ def code():
 
 @bp.route('/about/')
 def about():
-	return render_template('home/faq.html.slim')
+	return render_template('home/about.html.slim')
 
 add_blueprint(bp)
 
