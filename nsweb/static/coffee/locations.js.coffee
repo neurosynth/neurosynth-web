@@ -105,7 +105,7 @@ $(document).ready ->
   )
 
   $('.data-for-location').keypress((e) ->
-      update() if(e.which == 13)
+      moveTo() if(e.which == 13)
   )
 
   $('#load-location').click((e) ->
@@ -113,7 +113,6 @@ $(document).ready ->
       $('#x-in').val(xyz[0])
       $('#y-in').val(xyz[1])
       $('#z-in').val(xyz[2])
-      # update()
       moveTo()
   )
 
