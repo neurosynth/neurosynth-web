@@ -1,0 +1,84 @@
+{
+  "sections": [
+    {
+      "name": "Overview",
+      "questions": [
+        {
+          "q": "What is Neurosynth?",
+          "a": "Neurosynth is a platform for automatically synthesizing the results of many different neuroimaging studies."
+        }
+      ]
+    },
+    {
+      "name": "Methods",
+      "questions": [
+        {
+          "q": "How are these images generated?",
+          "a": "A full explanation is in our <a href=\"http://pilab.colorado.edu/publications/Yarkoni_NatureMethods_2011.pdf\">Nature Methods paper</a>. Briefly, the processing stream involves the following steps:<ul><li>Activation coordinates are extracted from published neuroimaging articles using an automated parser.</li><li>The full text of all articles is parsed, and each article is 'tagged' with a set of terms that occur at a high frequency in that article.</li><li>A list of several thousand terms that occur at high frequency in 20 or more studies is generated.</li><li>For each term of interest (e.g., 'emotion', 'language', etc.), the entire database of coordinates is divided into two sets: those that occur in articles containing the term, and those that don't.</li><li>A giant meta-analysis is performed comparing the coordinates reported for studies with and without the term of interest. In addition to producing statistical inference maps (i.e., z and p value maps), we also compute posterior probability maps, which display the likelihood of a given term being used in a study if activation is observed at a particular voxel.</li>"
+        },
+        {
+          "q": "Doesn't the coordinate extraction process have errors?",
+          "a": "Yes, and this is something we're continually working to improve. Our parser extracts coordinates from HTML articles, which presents some difficulties, because different publishers and journals format tables very differently. Moreover, many articles have idiosyncratic formatting or errors in the table HTML that can prevent data extraction. In the short term, we make an effort to patch the parser whenever we identify a systematic problem that affects multiple articles; however, this really isn't a great solution, and in the long term, we'd like to transition to a standards-based model where authors and publishers report and display activation data in a standardized, machine-readable format."
+        },
+        {
+          "q": "I found an error in the coordinate data for a paper. How can I fix it?",
+          "a": "Unfortunately, we don't have any way for users to contribute to the manual verification and validation of coordinates right now. You can <a href=\"mailto:tyarkoni@gmail.com\">send us an email</a> detailing any problems you find. We realize that this is less than ideal, and we'd love to move to a crowd-sourced model where other researchers can help validate and extend the database via a web interface. One such effort is <a href=\"http://brainspell.org\">brainspell.org</a>, where you can manually annotate coordinates and articles in the Neurosynth database. We eventually plan to integrate the annotations on brainspell into Neurosynth. In the meantime, if you'd like to help, you can email us with the details of any problems you identify. It's particularly helpful if you can identify systematic problems with the parser (e.g., that it consistently misses the third column in a particular kind of table in ScienceDirect articles). We're unlikely to address errors on a case-by-case basis unless they're part of a broader pattern. Of course, if you'd like to dive in and help write a better parser, that's even better--all of the Automated Coordinate Extraction (ACE) code is <a href=\"http://github.com/neurosynth/ace\">available at github</a>."
+        },
+        {
+          "q": "How come my study isn't in the database?",
+          "a": "For technical reasons, the database currently includes only a subset of published neuroimaging studies. Specifically, to be included, a study has to (a) be in a journal that we currently cover (each new journal or publisher requires us to write a custom filter, which isn't trivial); (b) be available online in HTML form (we currently don't work with PDFs, and some journals only have HTML versions for more recent articles); and (c) contain at least one activation coordinate that's detectable by our parser. Aside from these criteria, there are a small number of studies that present special problems for various reasons (< 2% of the total). But rest assured that we don't deliberately exclude any study from the database, so if there's a study you're interested in that isn't represented, odds are it just isn't covered yet. The database is continually growing as we have time to write filters for new journals, so check back from time to time."
+        },
+        {
+          "q": "How do you deal with the fact that different studies report coordinates in different stereotactic spaces?",
+          "a": "The results you see incorporate an automated correction for differences in stereotactic space. Specifically, we use a simple algorithm to determine whether a study is reporting results in MNI or Talairach space, and we convert Talairach results to MNI using the Lancaster et al (2007) transform. This doesn't work perfectly, but we can correctly detect the space being used about 80% of the time. In our manuscript, we report some supplemental analyses validating this approach. We plan to further improve the space detection algorithm when we have the time, and anticipate that with some work, we'll be able to achieve nearly perfect performance."
+        },
+        {
+          "q": "How do you distinguish between activations and deactivations when extracting coordinates from published articles?",
+          "a": "We don't; see above."
+        },
+        {
+          "q": "Are individual words or phrases really a good proxy for cognitive processes? Can you really say that studies that use the term 'pain' at a certain frequency are about pain?",
+          "a": "Depends. There's no question that the 'lexical assumption' we make will fail in many individual cases. For instance, many studies might use the word 'pain' in the context of emotional rather than physical pain, which might partly explain why we see a fair amount of amygdala activation in the meta-analysis map for pain (though much of that probably reflects the fact that pain is a salient and affectively negative signal). But ultimately it's an empirical question, and for the most part, the answer seems to be that, at least for relatively broad domains (e.g., working memory, language, emotion, etc.), individual terms are in fact a reasonably good substitute for much more careful coding of studies. If you compare the maps on this website with those that have been previously published in much more careful analyses (see our manuscript for examples), we think you'll be pleasantly surprised. So while we certainly don't see the current lexical approach as the final word, and ultimately hope to move to more refined approaches (e.g., we're currently working on topic modeling approaches that go beyond individual words or phrases), we feel pretty good about using words as a proxy for processes. The main limitation right now is a lack of specificity (i.e., narrower constructs like disgust are difficult to isolate from broader ones like negative emotion), and that's at the top of our agenda for improvement."
+        },
+        {
+          "q": "Isn't selection bias likely to play a role here? If everyone thinks that the amygdala is involved in emotion, isn't it likely that an automated meta-analysis will simply capture that bias?",
+          "a": "Yes, but we don't see this as any more of a concern for this type of analysis than for others. There's no question that biases in the primary literature skew the results of automated meta-analyses. We don't doubt that there's a general tendency towards confirmation bias, so that researchers are more likely than they should be to report that the amygdala is involved in emotion, that the left IFG is involved in speech production, that S2 is involved in tactile sensation, and so on. But it's important to recognize that this isn't really a limitation of our particular approach, and is a much more general problem. We all know, for example, that researchers are much more likely to look for and report emotion-related activation in the amgydala than in, say, motor cortex. Confirmation bias is unquestionably a huge problem for an automated meta-analysis, but we think it's just as big a problem for individual fMRI studies or other kinds of meta-analyses."
+        },
+        {
+          "q": "How come so many of the terms are non-content words no one cares about (e.g., 'addressed', 'abstract', or 'reliable')?",
+          "a": "<p>There are two reasons for this. One is that we didn't want to arbitrarily restrict the lexicon to just those words that we personally found meaningful. Some of the terms we think are uninteresting might be of considerable interest to someone else. Since there's no real cost to making additional terms available, we decided to make the list as comprehensive as possible in the latest version of Neurosynth.</p><p>The other reason we left non-content terms in is that they provide a nice baseline for evaluating the results of terms that we do care about. Since there's no particular reason why terms like 'several' or 'through' should be associated with specific patterns of activation, the expectation is that meta-analysis of such terms should reveal little or no activation. That's exactly what turns out to be true of most non-content words. In contrast, most of the terms researchers are likely to care about reveal robust patterns of activation, which gives us all the more reason to think the approach is working well.</p>"
+        }
+      ]
+    },
+    {
+      "name": "Interface",
+      "questions": [
+        {
+          "q": "Why do images take a while to load?",
+          "a": "<p>There are three reasons why images may take a while to display in the interactive viewer when you first load a page. First, the image files themselves are fairly large (typically around 1 MB each), and most pages on Neurosynth display multiple images simultaneously. This means that your browser is usually receiving 1 - 3 MB of data on each request. Needless to say, the images can't be rendered until they've been received, so users on slower connections may have to wait a bit.</p><p>Second, there's some overhead incurred by reading the binary Nifti image into memory in JavaScript; on most browsers, this adds another second or two of delay.</p><p>Lastly, some images are only generated on demand--for example, if you're the first user to vist a particular <a href=\"/locations/\">brain location</a>, you'll enjoy the privilege of waiting for the coactivation image for that voxel to be generated anew. This will typically only take a second or two, but can take as long as a minute in rare cases (specifically, when too many users are accessing Neurosynth and we need to spin up another background worker to handle the load).</p>"
+        },
+        {
+          "q": "When I enter coordinates manually, they're rounded to different numbers!",
+          "a": "Because the overlays have a resolution of 2mm, when you enter a set of coordinates manually, they'll be rounded to the nearest point we have data for. There are no available data at odd coordinates (e.g., [-11, 35, 27])."
+        }
+      ]
+    },
+    {
+      "name": "Images",
+      "questions": [
+        {
+          "q": "How are the images thresholded?",
+          "a": "<p>The images you see are thresholded to correct for multiple comparisons. We use a false discovery rate (FDR) criterion of .01, meaning that, on average, you can expect about 1% of the voxels you see activated in any given map to be false positives (though the actual proportion will vary and is impossible to determine).</p>"
+        },
+        {
+          "q": "What format are the downloadable images in?",
+          "a": "<p>When you click the download link below the map you're currently viewing, you'll start downloading a 3D image corresponding to the map you currently have loaded. The downloaded images are in NIFTI format, and the files are gzipped to conserve space. All major neuroimaging software packages should be able to read these images in without any problems. The images are all nominally in MNI152 2mm space (the default space in SPM and FSL), though there's a bit more to it than that, because technically we don't account very well for stereotactic differences between studies in the underlying database (we convert Talairach to MNI, but it's imperfect, and we don't account for more subtle differences between, e.g., FSL and SPM templates). For a more detailed explanation, see the paper.</p><p>Note that the downloaded images are not dynamically adjusted to reflect the viewing options you currently have set in your browser. For instance, if you've adjusted the settings to only display negative activations at a threshold of z = -7 or lower, clicking the download link won't give you an image with only extremely strong negative activations--it'll give you the original (FDR-corrected) image. Of course, you can easily recreate what you're seeing in your browser by adjusting the thresholds correspondingly in your off-line viewer.</p>"
+        },
+        {
+          "q": "What do the 'forward inference' and 'reverse inference' descriptions mean in the feature image names?",
+          "a": "<p><em>Short answer</em>:</p><ul><li>Forward inference map: z-scores corresponding to the likelihood that a region will activate if a study uses a particular term (i.e., P(Activation|Term));</li><li>Reverse inference map: z-scores corresponding to the likelihood that a term is used in a study given the presence of reported activation (i.e., P(Term|Activation));</li><li>Posterior probability map: the estimated probability of a term being used given the presence of activation (i.e., P(Term|Activation)).</li></ul><p><em>Long answer</em>: The forward inference and reverse inference maps are statistical inference maps; they display z-scores for two different kinds of analyses. The forward inference map can be interpreted in the same way as most standard whole-brain fMRI analysis: it displays the degree to which each voxel is consistently activated in studies that use a given term. For instance, the fact that the forward inference map for the term 'emotion' displays high z-scores in the amygdala implies that studies that use the word emotion a lot tend to report consistent activation in the amygdala. Note that, unlike most meta-analysis packages (e.g., ALE or MKDA), z-scores aren't generated through permutation, but using a chi-square test that compares the observed distribution of activations across a null of uniform distribution throughout gray matter. Generally speaking, this procedure gives slightly (but only very slightly) more liberal results than a permutation test would produce. (We use the chi-square test solely for pragmatic reasons: we generate thousands of maps at a time, so it's not computationally feasible to run thousands of permutations for each one.)</p><p>The reverse inference maps provides somewhat different (and, in our view, more useful) information. Whereas the forward inference maps tell you about the onsistency of activation for a given term, the reverse inference maps tell you about the relatively selectivity with which regions activate. Strictly speaking, these maps reflect a comparison between all the studies in our database that contain a term and all those that don't. So for instance, the fact that the amygdala shows very strong activation in the reverse inference map for emotion implies that studies that use the term emotion frequently are much more likely to report amygdala activation than studies that don't use the term emotion. That's important, because it controls for base rate differences between regions. Meaning, some regions (e.g., dorsal medial frontal cortex and lateral PFC) play a very broad role in cognition, and hence tend to be consistently activated for many different terms, despite lacking selectivity. The reverse inference maps let you make more confident claims that a given region is involved relatively selectively in a particular process, and isn't involved in just about every task.</p>"
+        }
+      ]
+    }
+  ]
+}
