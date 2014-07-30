@@ -10,7 +10,7 @@ window.loadImages = (imgs = null, clear = true) ->
       name:'anatomical', 
       colorPalette: 'grayscale', 
       cache: true,
-      download: true,
+      download: '/images/anatomical',
       url:'/images/anatomical' })
   for img in imgs
     # img.json = true

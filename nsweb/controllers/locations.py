@@ -51,7 +51,7 @@ def get_images(val):
         'colorPalette': 'yellow' if 'coactivation' in img.label else 'red',
         'url': '/images/%s' % img.id,
         'visible': 0 if 'coactivation' in img.label else 1,
-        'download': img.download,
+        'download': '/images/%s' % img.id,
         'description': img.description,
         'intent': img.stat,
         'positiveThreshold': 0 if 'coactivation' in img.label else 0.2,

@@ -39,7 +39,7 @@ def get_images(val):
         # "intent": (img.stat + ':').capitalize(),
         'url': '/images/%s' % img.id,
         'visible': 1 if 'reverse' in img.label else 0,
-        'download': img.download,
+        'download': '/images/%s' % img.id,
         'intent': 'z-score'
     } for img in feature.images if img.display]
     return jsonify(data=images)

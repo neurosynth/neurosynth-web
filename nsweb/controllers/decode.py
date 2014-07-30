@@ -104,7 +104,7 @@ def show(decoding=None, uuid=None):
         'colorPalette': 'intense red-blue',
         'sign': 'both',
         'url': '/decode/%s/image' % decoding.uuid,
-        'download': decoding.download
+        'download': '/decode/%s/image' % decoding.uuid
     }]
     return render_template('decode/show.html.slim', decoding=decoding, images=json.dumps(images))
 
