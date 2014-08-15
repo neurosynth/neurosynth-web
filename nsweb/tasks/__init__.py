@@ -48,11 +48,12 @@ class NeurosynthTask(Task):
 
     @cached_property
     def anatomical(self):
-        f = join(settings.ROOT_DIR, 'data', 'images', 'anatomical.nii.gz')
+        f = join(settings.IMAGE_DIR, 'anatomical.nii.gz')
         return nb.load(f)
 
     @cached_property
     def masks(self):
+        """ Return a dict of predefined region masks. """
         maps = {
             'cortex': '/Users/tyarkoni/Dropbox/AllenSynth/Images/Masks/cortex.nii',
             'subcortex': '/Users/tyarkoni/Dropbox/AllenSynth/Images/Masks/subcortex_drewUpdated.nii',
@@ -68,6 +69,7 @@ class NeurosynthTask(Task):
 
 @celery.task(base=NeurosynthTask)
 def count_studies(feature, threshold=0.001, **kwargs):
+    """ Count the number of studies in the Dataset for a given feature. """
     ids = count_studies.dataset.get_ids_by_features(str(feature), threshold=threshold)
     return len(ids)
 
@@ -77,6 +79,7 @@ def save_uploaded_image(filename, **kwargs):
     
 @celery.task(base=NeurosynthTask)
 def decode_image(filename, **kwargs):
+    """ Decode a retrieved image. """
     try:
         basefile = basename(filename)
         # Need to fix this--should probably add a "decode_id" field storing a UUID for 
@@ -93,6 +96,7 @@ def decode_image(filename, **kwargs):
 
 @celery.task(base=NeurosynthTask)
 def make_coactivation_map(x, y, z, r=6, min_studies=0.01):
+    """ Generate a coactivation map on-the-fly for the given seed voxel. """
     try:
         dataset = make_coactivation_map.dataset
         ids = dataset.get_ids_by_peaks([[x, y, z]], r=r)
@@ -108,8 +112,23 @@ def make_coactivation_map(x, y, z, r=6, min_studies=0.01):
 
 @celery.task(base=NeurosynthTask)
 def make_scatterplot(filename, feature, base_id, outfile=None, n_voxels=None, allow_nondecoder_features=False, 
-                    x_lab="Uploaded Image", y_lab=None, gene_masks=False, **kwargs):
-    """ Make scatterplot """
+                    x_lab="Uploaded Image", y_lab=None, gene_masks=False):
+    """ Generate a scatter plot displaying relationship between two images (typically a 
+        Neurosynth meta-analysis map and a retrieved image), where each voxel is an observation. 
+    Args:
+        filename (string): the local path to the retrieved image to plot on x axis
+        feature (string): the name of the Neurosynth feature to plot on y axis
+        base_id (string): the UUID to base the output filename on
+        outfile (string): if provided, the output file name
+        n_voxels (int): if provided, the number of voxels to randomly sample (if None, 
+            all voxels are used)
+        allow_nondecoder_features (boolean): whether to allow non-preloaded features 
+            (not currently implemented)
+        x_lab (string): x axis label
+        y_lab (string): y axis label
+        gene_masks (boolean): when True, uses predetermined subcortical ROIs as masks; 
+            otherwise uses cortex vs. subcortex
+    """
     try:
         # Get the data
         x = load_image(make_scatterplot.dataset, filename)
