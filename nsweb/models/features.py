@@ -22,6 +22,7 @@ class Feature(db.Model):
     studies = association_proxy('frequencies', 'study')
     images = db.relationship('FeatureImage', backref=db.backref('feature', lazy='joined'), lazy='dynamic')
     feature_set = db.relationship('FeatureSet', backref=db.backref('features', cascade='all, delete-orphan'))
+    display = db.Column(db.Boolean)
 
     __mapper_args__ = {
         'polymorphic_identity':'feature',

@@ -4,22 +4,8 @@ from nsweb.models.users import User
 from sqlalchemy.ext.hybrid import hybrid_property
 import simplejson as json
 
-# class JsonString(TypeDecorator):
-#     impl = Text
-
-#     def process_result_value(self, value, dialect):
-#         if value is None:
-#             return None
-#         else:
-#             return json.loads(value)
-
-#     def process_bind_param(self, value, dialect):
-#         if value is None:
-#             return None
-#         else:
-#             return json.dumps(value)
-
 class Decoding(db.Model):
+    
     id = db.Column(db.Integer, primary_key = True)
     url = db.Column(db.String(255), unique=True)
     neurovault_id = db.Column(db.Integer, nullable=True)

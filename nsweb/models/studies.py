@@ -11,3 +11,4 @@ class Study(db.Model):
     space = db.Column(db.String(10))
     peaks = db.relationship('Peak', backref=db.backref('study', lazy='joined'), lazy='dynamic')
     features = association_proxy('frequencies', 'feature')
+    analyses = association_proxy('inclusions', 'analysis')
