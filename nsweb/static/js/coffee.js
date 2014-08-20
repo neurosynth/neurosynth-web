@@ -129,7 +129,7 @@ window.loadImages = function(imgs, clear) {
       name: 'anatomical',
       colorPalette: 'grayscale',
       cache: true,
-      download: true,
+      download: '/images/anatomical',
       url: '/images/anatomical'
     });
   }
@@ -613,7 +613,7 @@ $(document).ready(function() {
   })(this)));
   $('.data-for-location').keypress(function(e) {
     if (e.which === 13) {
-      return update();
+      return moveTo();
     }
   });
   return $('#load-location').click(function(e) {
