@@ -14,6 +14,7 @@ from os.path import join, basename, exists
 import os
 from datetime import datetime
 from email.utils import parsedate
+from nsweb.controllers import error_page
 
 bp = Blueprint('decode',__name__,url_prefix='/decode')
 
@@ -28,7 +29,7 @@ def index():
 
     return render_template('decode/index.html.slim')
 
-def decode_from_url(url, metadata={}):
+def decode_from_url(url, metadata={}, render=True):
 
     # Basic URL validation
     if not url.startswith('http://'):
@@ -36,14 +37,15 @@ def decode_from_url(url, metadata={}):
     ext = re.search('\.nii(\.gz)?$', url)
 
     if ext is None:
-        abort(404)  # Change to informative error message later
+        return error_page("Invalid image extension; currently the decoder only accepts images in nifti format.")
 
     # Check that an image exists at the URL
     head = requests.head(url)
-    if head.status_code not in [200, 301, 302]: abort(404)
+    if head.status_code not in [200, 301, 302]:
+        return error_page("No image was found at the provided URL.")
     headers = head.headers
-    if 'content-length' in headers and int(headers['content-length']) > 2000000:
-        abort(404)
+    if 'content-length' in headers and int(headers['content-length']) > 2000000 and render:
+        return error_page("The requested Nifti image is too large. Files must be under 2 MB in size.")
 
     # Create record if it doesn't exist
     dec = Decoding.query.filter_by(url=url).first()
@@ -80,15 +82,19 @@ def decode_from_url(url, metadata={}):
             db.session.add(dec)
             db.session.commit()        
 
-    return show(dec, dec.uuid)
+    if render:
+        return show(dec, dec.uuid)
+    else:
+        return dec.uuid
 
 
-def decode_from_neurovault(id):
+def decode_from_neurovault(id, render=True):
 
-    if not re.match('\d+$', id): abort(404)
+    if not re.match('\d+$', id):
+        error_page("Invalid NeuroVault ID!")
     resp = requests.get('http://neurovault.org/api/images/%s/?format=json' % str(id))
     metadata = json.loads(resp.content)
-    return decode_from_url(metadata['file'], metadata)
+    return decode_from_url(metadata['file'], metadata, render=render)
 
 
 @bp.route('/<string:uuid>/')
@@ -142,6 +148,14 @@ def get_scatter(uuid, feature):
     return send_file(outfile, as_attachment=False, 
             attachment_filename=basename(outfile))
 
+### API ROUTES ###
+@bp.route('/data/')
+def get_data_api():
+    if 'url' in request.args:
+        id = decode_from_url(request.args['url'], render=False)
+    elif 'neurovault' in request.args:
+        id = decode_from_neurovault(request.args['neurovault'], render=False)
+    return get_data(id)
 
 add_blueprint(bp)
 
