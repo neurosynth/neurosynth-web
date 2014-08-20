@@ -44,8 +44,8 @@ def decode_from_url(url, metadata={}, render=True):
     if head.status_code not in [200, 301, 302]:
         return error_page("No image was found at the provided URL.")
     headers = head.headers
-    if 'content-length' in headers and int(headers['content-length']) > 2000000 and render:
-        return error_page("The requested Nifti image is too large. Files must be under 2 MB in size.")
+    if 'content-length' in headers and int(headers['content-length']) > 4000000 and render:
+        return error_page("The requested Nifti image is too large. Files must be under 4 MB in size.")
 
     # Create record if it doesn't exist
     dec = Decoding.query.filter_by(url=url).first()
