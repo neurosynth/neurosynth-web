@@ -87,6 +87,13 @@ def decode_image(filename, **kwargs):
         uuid = 'gene_' + basefile.split('_')[2] if basefile.startswith('gene') else basefile[:32]
         dataset, dd = decode_image.dataset, decode_image.dd
         data = load_image(dataset, filename)
+
+        # For genes, use only subcortical voxels
+        if basefile.startswith('gene'):
+            subcortex = decode_image.masks['subcortex']
+            data = data[subcortex]
+            dd = dd[subcortex,:]
+            
         r = np.corrcoef(data.T, dd.values.T)[0,1:]
         outfile = join(settings.DECODING_RESULTS_DIR, uuid + '.txt')
         pd.Series(r, index=dd.columns).to_csv(outfile, sep='\t')
@@ -167,5 +174,20 @@ def make_scatterplot(filename, feature, base_id, outfile=None, n_voxels=None, al
     except Exception, e:
         print e
         print e.message
+        return False
+
+@celery.task(base=NeurosynthTask)
+def run_metaanalysis(ids, name):
+    """ Run a user-defined meta-analysis.
+    Args:
+        ids (list): list of PMIDs identifying studies to include in the meta-analysis
+        name (string): name of the analysis; used in filename of output images
+    """
+    try:
+        ma = meta.MetaAnalysis(run_metaanalysis.dataset, ids)
+        outdir = join(settings.IMAGE_DIR, 'analyses')
+        ma.save_results(outdir, name, image_list=['pFgA_z_FDR_0.01', 'pAgF_z_FDR_0.01'])
+        return True
+    except Exception, e:
         return False
 
