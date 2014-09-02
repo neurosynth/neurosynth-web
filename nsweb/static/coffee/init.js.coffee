@@ -46,8 +46,10 @@ $(document).ready ->
   window.cookie = NSCookie.load()
 
   # Decoding results for pages that use it
-  if $('#page-decode-show, #page-genes').length
+  if $('#page-decode-show, #page-genes-show').length
 
+    console.log("Doing this...")
+    
     tbl = $('#decoding_results_table').dataTable
       paginationType: "simple"
       displayLength: 10
