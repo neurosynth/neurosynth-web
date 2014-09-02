@@ -20,9 +20,10 @@ def show(val):
     images = [{
         'name': val,
         'url': url_for('genes.get_image', val=val),
-        'colorPalette': 'red'
+        'colorPalette': 'intense red-blue',
+        'download': '/genes/%s/image' % val,
+        'sign': 'both'
     }]
-    print images
     return render_template('genes/show.html.slim', gene=val, images=json.dumps(images))
 
 @bp.route('/<string:val>/image')
@@ -33,12 +34,11 @@ def get_image(val):
     return send_file(img, as_attachment=True,
             attachment_filename=gene.symbol + '_AHBA.nii.gz')
 
-@bp.route('/<string:val>/decode')
+@bp.route('/<string:val>/data')
 def get_data(val):
     gene = Gene.query.filter_by(symbol=val).first()
     if gene is None: abort(404)
-    decode_file = 'gene_' + gene.symbol + '.txt'
-    filename = join(settings.DECODING_RESULTS_DIR, decode_file)
+    filename = join(settings.DECODING_RESULTS_DIR, 'gene_' + gene.symbol + '.txt')
     if not exists(filename):
         result = decode_image.delay(gene.images[0].image_file).wait()  # decode image
     data = open(filename).read().splitlines()
