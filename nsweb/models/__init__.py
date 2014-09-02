@@ -11,4 +11,4 @@ from frequencies import *
 from downloads import *
 from decodings import *
 from analyses import *
-# from genes import *
+from genes import *
