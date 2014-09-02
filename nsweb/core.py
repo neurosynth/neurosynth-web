@@ -21,21 +21,23 @@ from nsweb.initializers import make_celery
 # meantime, we use apply_driver_hacks() to manually set the isolation level at engine creation.
 # Solution borrowed from:
 # http://stackoverflow.com/questions/12384323/when-a-flask-application-with-flask-sqlalchemy-is-running-how-do-i-use-mysql-cl
-class UnlockedAlchemy(SQLAlchemy):
-    def apply_driver_hacks(self, app, info, options):
-        if not "isolation_level" in options:
-            options["isolation_level"] = "READ COMMITTED"  # For example
-        return super(UnlockedAlchemy, self).apply_driver_hacks(app, info, options)
+# class UnlockedAlchemy(SQLAlchemy):
+#     def apply_driver_hacks(self, app, info, options):
+#         if not "isolation_level" in options:
+#             options["isolation_level"] = "READ COMMITTED"  # For example
+#         return super(UnlockedAlchemy, self).apply_driver_hacks(app, info, options)
 
 
 app=Flask('NSWeb', static_folder=settings.STATIC_FOLDER, template_folder=settings.TEMPLATE_FOLDER)
+app.config['SQLALCHEMY_POOL_RECYCLE'] = 1800
 manager = Manager(app)
 
 # Initialize celery
 celery = make_celery(app)
 from nsweb.tasks import *
 
-db=UnlockedAlchemy()
+# db=UnlockedAlchemy()
+db = SQLAlchemy()
 _blueprints = []
 
 def setup_logging(logging_path,level):
@@ -98,7 +100,9 @@ def register_blueprints():
     import nsweb.controllers.api
     import nsweb.controllers.images
     import nsweb.controllers.decode
-    import nsweb.controllers.genes
+    # import nsweb.controllers.genes
+    # import nsweb.controllers.analyze
+    # import nsweb.controllers.topics
 
     for blueprint in _blueprints:
         app.register_blueprint(blueprint)
