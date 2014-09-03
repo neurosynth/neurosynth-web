@@ -55,12 +55,12 @@ class NeurosynthTask(Task):
     def masks(self):
         """ Return a dict of predefined region masks. """
         maps = {
-            'cortex': '/Users/tyarkoni/Dropbox/AllenSynth/Images/Masks/cortex.nii',
-            'subcortex': '/Users/tyarkoni/Dropbox/AllenSynth/Images/Masks/subcortex_drewUpdated.nii',
-            'hippocampus': '/Users/tyarkoni/Dropbox/AllenSynth/Images/Masks/FSL_BHipp_thr0.nii.gz',
-            'accumbens': '/Users/tyarkoni/Dropbox/AllenSynth/Images/Masks/FSL_BNAcc_thr0.nii',
-            'amygdala': '/Users/tyarkoni/Dropbox/AllenSynth/Images/Masks/FSL_BAmyg_thr0.nii',
-            'putamen': '/Users/tyarkoni/Dropbox/AllenSynth/Images/Masks/FSL_BPut_thr0.nii.gz',
+            'cortex': join(settings.IMAGE_DIR, 'Masks', 'cortex.nii'),
+            'subcortex': join(settings.IMAGE_DIR, 'Masks', 'subcortex_drewUpdated.nii'),
+            'hippocampus': join(settings.IMAGE_DIR, 'Masks', 'FSL_BHipp_thr0.nii.gz'),
+            'accumbens': join(settings.IMAGE_DIR, 'Masks', 'FSL_BNAcc_thr0.nii'),
+            'amygdala': join(settings.IMAGE_DIR, 'Masks', 'FSL_BAmyg_thr0.nii'),
+            'putamen': join(settings.IMAGE_DIR, 'Masks', 'FSL_BPut_thr0.nii.gz'),
             'min4': '/Volumes/data/AllenSynth/Data/Maps/voxel_counts_r6.nii.gz'
         }
         for m, img in maps.items():
