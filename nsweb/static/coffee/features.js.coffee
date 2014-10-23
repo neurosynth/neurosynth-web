@@ -10,7 +10,7 @@ $(document).ready ->
     displayLength: 10
     processing: true
     serverSide: true
-    ajaxSource: '/api/features'
+    ajax: '/api/features'
     deferRender: true
     stateSave: true
     autoWidth: true

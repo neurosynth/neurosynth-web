@@ -295,9 +295,9 @@ class DatabaseBuilder:
             self.db.session.commit()
 
 
-    def generate_location_features(self, feature_dir=None, output_dir=None, 
-            min_studies_at_voxel=50):
+    def generate_location_features(self, feature_dir=None, output_dir=None, min_studies_at_voxel=50):
         """ Create json files containing feature data for every point in the brain. """
+
         if feature_dir is None:
             feature_dir = join(settings.IMAGE_DIR, 'features')
         if output_dir is None:
@@ -306,23 +306,32 @@ class DatabaseBuilder:
         masker = self.dataset.masker
 
         study_names = self.dataset.image_table.ids
-        feature_names = self._get_feature_names()
-        imgs = np.array(self.dataset.image_table.data.todense())
-        p_active = imgs.sum(1)
+        p_active = self.dataset.image_table.data.sum(1)
+
+        v = np.where(p_active >= min_studies_at_voxel)[0]
         # Save this for later
-        ijk_reduced = np.array(np.where(p_active >= min_studies_at_voxel)[0]).squeeze()
+        ijk_reduced = np.array(v).squeeze()
 
-        # Load rev inference z-score and posterior prob image data
-        imgs = glob(join(feature_dir, '*pFgA_z.nii.gz'))
-        print "Found %d imgs." % len(imgs)
-        rev_inf_z = np.zeros((self.dataset.image_table.data.shape[0], len(imgs)))
-        for i, img in enumerate(imgs):
-            rev_inf_z[:,i] = masker.mask(img)
+        # Only use images contained in Feature table--we don't want users being linked 
+        # to features that don't exist in cases where there are orphaned images.
+        features = self.db.session.query(Feature.name).all()
+        n_features = 100 #len(features)
+        features = [i[0] for i in features[:n_features]]
 
-        imgs = glob(join(feature_dir, '*pFgA_given_pF=0.50.nii.gz'))
-        rev_inf_pp = np.zeros((self.dataset.image_table.data.shape[0], len(imgs)))
-        for i, img in enumerate(imgs):
-            rev_inf_pp[:,i] = masker.mask(img)
+        # Read in all rev inf z and posterior prob images
+        rev_inf_z = np.zeros((self.dataset.image_table.data.shape[0], n_features))
+        rev_inf_pp = np.zeros((self.dataset.image_table.data.shape[0], n_features))
+
+        print len(features)
+
+        print "Reading in images..."
+        for i, f in enumerate(features):
+
+            if (i+1) % 100 == 0:
+                print "Loaded feature #%d..." % (i+1)
+
+            rev_inf_z[:,i] = masker.mask(join(feature_dir, f + '_pFgA_z.nii.gz'))
+            rev_inf_pp[:,i] = masker.mask(join(feature_dir, f + '_pFgA_given_pF=0.50.nii.gz'))
 
         print "Done loading..."
         print len(ijk_reduced)
@@ -335,29 +344,24 @@ class DatabaseBuilder:
 
         print "Processing voxels..."
         num_vox = len(xyz)
-        num_features = len(feature_names)
 
         for i, seed in enumerate(xyz):
 
             location_name = '_'.join(str(x) for x in seed)
             featurefile = join(output_dir, '%s_features.txt' % location_name)
             # if os.path.isfile(featurefile): continue
-            print "\nProcessing %d/%d..." % (i + 1, num_vox)
+            if (i+1) % 1000 == 0:
+                print "\nProcessing %d/%d..." % (i + 1, num_vox)
             ind = ijk_reduced[i]
-            # print ind
             z_scores = list(rev_inf_z[ind,:].ravel())
             z_scores = ['%.2f' % x for x in z_scores]
-            print "Getting posterior probs..."
             pp = list(rev_inf_pp[ind,:].ravel())
             pp = ['%.2f' % x for x in pp]
-            # print pp.shape
-            # print "Writing to file..."
             data = {
                 'data': []
             }
-            for j in range(num_features):
-                # data['data'].append([feature_names[j], z_scores[j]])
-                data['data'].append([feature_names[j], z_scores[j], pp[j]])
+            for j in range(n_features):
+                data['data'].append([features[j], z_scores[j], pp[j]])
             json.dump(data, open(featurefile, 'w'))
 
 
@@ -433,15 +437,16 @@ class DatabaseBuilder:
             Location.query.delete()
 
         if image_dir is None:
-            image_dir = join(settings.IMAGE_DIR, 'coactivation')
+            image_dir = join(settings.IMAGE_DIR, 'fcmri')
 
         if search is None:
-            search = '*_pFgA_z.nii.gz'
+            # search = '*_pFgA_z.nii.gz'
+            search = "functional_connectivity_*.nii.gz"
 
         extra_assets = [
             {
                 'name': 'YeoBucknerFCMRI',
-                'path': join('/data/neurosynth/data/locations', 'fcmri', 'functional_connectivity_%d_%d_%d.nii.gz'),
+                'path': join(settings.IMAGE_DIR, 'fcmri', 'functional_connectivity_%d_%d_%d.nii.gz'),
                 'label': 'Functional connectivity',
                 'stat': 'correlation (r)',
                 'description': "This image displays resting-state functional connectivity for the seed region in a sample of 1,000 subjects. To reduce blurring of signals across cerebro-cerebellar and cerebro-striatal boundaries, fMRI signals from adjacent cerebral cortex were regressed from the cerebellum and striatum. For details, see <a href='http://jn.physiology.org/content/106/3/1125.long'>Yeo et al (2011)</a>, <a href='http://jn.physiology.org/cgi/pmidlookup?view=long&pmid=21795627'>Buckner et al (2011)</a>, and <a href='http://jn.physiology.org/cgi/pmidlookup?view=long&pmid=22832566'>Choi et al (2012)</a>.",
@@ -456,13 +461,13 @@ class DatabaseBuilder:
 
         for ind, img in enumerate(images[:limit]):
 
-            x, y, z = [int(i) for i in basename(img).split('_')[:3]]
+            x, y, z = [int(i) for i in basename(img).split('.')[0].split('_')[2:5]]
             if (not overwrite) and self.db.session.query(Location).filter_by(x=x, y=y, z=z).count():
                 continue
             location = Location(x=x, y=y, z=z)
             location.images = [LocationImage(
                 image_file=img,
-                label='Meta-analytic coactivation' % (x, y, z),
+                label='Meta-analytic coactivation (%s, %s, %s)' % (x, y, z),
                 stat='z-score',
                 display=1,
                 download=1,
@@ -530,12 +535,43 @@ class DatabaseBuilder:
         data = pd.DataFrame(data, columns=[f[0] for f in features])
         data.to_msgpack(settings.DECODING_DATA)
 
-    def generate_topics(self, topic_keys, doc_topics):
-        """ Seed the database with topics. """
+    def generate_topics(self, name, topic_keys, doc_topics, add_to_db=False, top_n=20):
+        """ Seed the database with topics. 
+        Args:
+            name: name of topic (e.g., 'topic10')
+            topic_keys: filename of topic key file
+            doc_topics: filename of document topic loadings
+            add_to_db: when True, adds new records to database_builder.py
+            top_n: int; how many of the top-loading words to store
+        """
         # images = glob(join(settings.TOPIC_DIR, 'images', '*_p?g?_z.nii.gz'))
         # temporarily store old FeatureTable while we analyze topics
         ft = deepcopy(self.dataset.feature_table)
         self.dataset.add_features(doc_topics)
+
+        # Generate topic images
+        output_dir = join(settings.IMAGE_DIR, 'topics', name)
+        if not exists(output_dir):
+            makedirs(output_dir)
+        features = self.dataset.get_feature_names()
+        meta.analyze_features(self.dataset, features, save=image_dir, q=0.01, **kwargs)
+
+        # Load top-loading terms
+        loadings = [' '.join(l.split()[2:(2+top_n)]) for l in open(topic_keys).read().splitlines()]
+
+        # Add Topic and associated Images to DB
+        if add_to_db:
+            for (i, f) in enumerate(features):
+                topic = Topic(name=f, topic_set=name, terms=loadings[i])
+                self.add_feature_images(topic, image_dir=join(settings.IMAGE_DIR, 'topics'))
+                db.session.add(topic)
+                db.session.commit()
+
+        # Map to Studies
+
+
+        # Restore original features
+        self.dataset.feature_table = ft
         
     def _filter_features(self, features):
         """ Remove any invalid feature names """
