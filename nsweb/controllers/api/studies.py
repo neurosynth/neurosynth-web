@@ -45,4 +45,4 @@ def get_study_peaks(val):
     data=[ [p.table,p.x,p.y,p.z] for p in data.peaks]
 #     data=Peak.query.filter_by(pmid=int(val)).with_entities(Peak.x,Peak.y,Peak.z).all() #attempted optimization.
     data=jsonify(data=data)
-    return data  return data
+    return data

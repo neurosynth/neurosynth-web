@@ -81,7 +81,8 @@ load_reverse_inference_image = function(feature, fdr) {
 $(document).ready(function() {
   var tbl;
   window.cookie = NSCookie.load();
-  if ($('#page-decode-show, #page-genes').length) {
+  if ($('#page-decode-show, #page-genes-show').length) {
+    console.log("Doing this...");
     return tbl = $('#decoding_results_table').dataTable({
       paginationType: "simple",
       displayLength: 10,
@@ -355,7 +356,7 @@ $(document).ready(function() {
     displayLength: 10,
     processing: true,
     serverSide: true,
-    ajaxSource: '/api/studies/',
+    ajax: '/api/studies/',
     deferRender: true,
     stateSave: true,
     orderClasses: false
@@ -367,7 +368,7 @@ $(document).ready(function() {
     paginationType: "full_numbers",
     displayLength: 10,
     processing: true,
-    ajaxSource: '/api/studies/features/' + url_id + '/',
+    ajax: '/api/studies/features/' + url_id + '/',
     deferRender: true,
     stateSave: true,
     order: [[1, 'desc']],
@@ -377,7 +378,7 @@ $(document).ready(function() {
     paginationType: "full_numbers",
     displayLength: 10,
     processing: true,
-    ajaxSource: '/api/studies/peaks/' + url_id + '/',
+    ajax: '/api/studies/peaks/' + url_id + '/',
     deferRender: true,
     stateSave: true,
     order: [[0, 'asc'], [2, 'asc']],
@@ -627,11 +628,13 @@ $(document).ready(function() {
 });
 
 $(document).ready(function() {
-  var last_row_selected, tbl;
-  if ($('#page-decode-show').length) {
+  var controller, last_row_selected, tbl;
+  if ($('#page-decode-show').length || $('#page-genes-show').length) {
+    controller = $('#page-decode-show').length ? 'decode' : 'genes';
+    console.log(controller);
     loadImages();
     tbl = $('#decoding_results_table').DataTable();
-    tbl.ajax.url('/decode/' + image_id + '/data').load();
+    tbl.ajax.url('/' + controller + '/' + image_id + '/data').load();
     last_row_selected = null;
     $('#decoding_results_table').on('click', 'button', (function(_this) {
       return function(e) {
@@ -650,7 +653,7 @@ $(document).ready(function() {
           }
         });
         $('#loading-message').show();
-        $('#scatterplot').html('<img src="/decode/' + image_id + '/scatter/' + feature + '.png" width="500px" style="display:none;">');
+        $('#scatterplot').html('<img src="/' + controller + '/' + image_id + '/scatter/' + feature + '.png" width="500px" style="display:none;">');
         return $('#scatterplot>img').load(function() {
           $('#scatterplot>img').show();
           return $('#loading-message').hide();
@@ -677,50 +680,7 @@ $(document).ready(function() {
   }
 });
 
-$(document).ready(function() {
-  var gene;
-  if (!$('#page-genes').length) {
-    return;
-  }
-  gene = document.URL.split('/').slice(-2)[0];
-  loadImages();
-  $('#decoding_results_table').DataTable().ajax.url('/genes/' + gene + '/decode').load();
-  $('#decoding_results_table').on('click', 'i', (function(_this) {
-    return function(e) {
-      var feature, row;
-      row = $(e.target).closest('tr');
-      feature = $('td:eq(1)', row).text();
-      load_reverse_inference_image(feature);
-      return $('.scatterplot').html('<img src="/genes/' + gene + '/scatter/' + feature + '.png" width="550">');
-    };
-  })(this));
-  $(viewer).on('afterClick', (function(_this) {
-    return function(e) {
-      var xyz;
-      xyz = viewer.coords_xyz();
-      $('#x-in').val(xyz[0]);
-      $('#y-in').val(xyz[1]);
-      return $('#z-in').val(xyz[2]);
-    };
-  })(this));
-  $(viewer).trigger('afterClick');
-  return $('.plane-pos').change((function(_this) {
-    return function(e) {
-      var coords, i;
-      coords = [$('#x-in').val(), $('#y-in').val(), $('#z-in').val()];
-      viewer.moveToAtlasCoords((function() {
-        var _i, _len, _results;
-        _results = [];
-        for (_i = 0, _len = coords.length; _i < _len; _i++) {
-          i = coords[_i];
-          _results.push(parseInt(i));
-        }
-        return _results;
-      })());
-      return $(viewer).trigger('afterClick');
-    };
-  })(this));
-});
+$(document).ready(function() {});
 
 $(document).ready(function() {
   var url;

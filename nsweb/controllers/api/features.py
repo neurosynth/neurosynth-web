@@ -4,9 +4,8 @@ from nsweb.models import Feature
 
 @bp.route('/features/')
 def get_feature_list():
-    args = request.get_json()
-    results_per_page = int(args['length'])
-    offset = int(args['start'])
+    results_per_page = int(request.args['length'])
+    offset = int(request.args['start'])
     order_by = '{0} {1}'.format(['name','num_studies','num_activations'][int(request.args['order[0][column]'])],str(request.args['order[0][dir]']))
     search = str(request.args['search[value]']).strip()
     data = Feature.query
