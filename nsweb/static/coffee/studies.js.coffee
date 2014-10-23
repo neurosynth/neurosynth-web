@@ -16,7 +16,7 @@ $(document).ready ->
     displayLength: 10
     processing: true
     serverSide: true
-    ajaxSource: '/api/studies/'
+    ajax: '/api/studies/'
     deferRender: true
     stateSave: true
     orderClasses: false
@@ -29,7 +29,7 @@ $(document).ready ->
     paginationType: "full_numbers"
     displayLength: 10
     processing: true
-    ajaxSource: '/api/studies/features/'+url_id+'/'
+    ajax: '/api/studies/features/'+url_id+'/'
     deferRender: true
     stateSave: true
     order: [[1, 'desc']]
@@ -39,7 +39,7 @@ $(document).ready ->
     paginationType: "full_numbers"
     displayLength: 10
     processing: true
-    ajaxSource: '/api/studies/peaks/'+url_id+'/'
+    ajax: '/api/studies/peaks/'+url_id+'/'
     deferRender: true
     stateSave: true
     order: [[0, 'asc'], [2, 'asc']]
