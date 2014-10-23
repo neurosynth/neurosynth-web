@@ -102,12 +102,12 @@ def make_coactivation_map(x, y, z, r=6, min_studies=0.01):
         ids = dataset.get_ids_by_peaks([[x, y, z]], r=r)
         if len(ids) < 50: return False
         ma = meta.MetaAnalysis(dataset, ids, min_studies=min_studies)
-        outdir = join(settings.IMAGE_DIR, 'locations', 'coactivation')
+        outdir = join(settings.IMAGE_DIR, 'coactivation')
         prefix = 'metaanalytic_coactivation_%s_%s_%s' % (str(x), str(y), str(z))
         ma.save_results(outdir, prefix, image_list=['pFgA_z_FDR_0.01'])
         return True
     except Exception, e:
-        # print traceback.format_exc()
+        print traceback.format_exc()
         return False
 
 @celery.task(base=NeurosynthTask)

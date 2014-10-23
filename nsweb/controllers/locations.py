@@ -106,8 +106,9 @@ def make_location(x, y, z):
 
     # Add Neurosynth coactivation image if it exists
     filename = 'metaanalytic_coactivation_%d_%d_%d_pFgA_z_FDR_0.01.nii.gz' % (x, y, z)
-    filename = join(settings.IMAGE_DIR, 'locations', 'coactivation', filename)
+    filename = join(settings.IMAGE_DIR, 'coactivation', filename)
     if not exists(filename):
+        print "Making new map!"
         result = make_coactivation_map.delay(x, y, z).wait()
     if exists(filename):
         location.images.append(LocationImage(
@@ -121,7 +122,7 @@ def make_location(x, y, z):
         ))
 
     # Add Yeo FC image if it exists
-    filename = join('/data/neurosynth/data/locations', 'fcmri', 'functional_connectivity_%d_%d_%d.nii.gz' % (x, y, z))
+    filename = join(settings.IMAGE_DIR, 'fcmri', 'functional_connectivity_%d_%d_%d.nii.gz' % (x, y, z))
     if exists(filename):
         location.images.append(LocationImage(
             name='YeoBucknerFCMRI for seed (%d, %d, %d)' % (x, y, z),
