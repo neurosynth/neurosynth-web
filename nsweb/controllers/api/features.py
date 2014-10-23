@@ -4,11 +4,11 @@ from nsweb.models import Feature
 
 @bp.route('/features/')
 def get_feature_list():
-    print request.args
-    results_per_page = int(request.args['iDisplayLength'])
-    offset = int(request.args['iDisplayStart'])
-    order_by = '{0} {1}'.format(['name','num_studies','num_activations'][int(request.args['iSortCol_0'])],str(request.args['sSortDir_0']))
-    search = str(request.args['sSearch']).strip()
+    args = request.get_json()
+    results_per_page = int(args['length'])
+    offset = int(args['start'])
+    order_by = '{0} {1}'.format(['name','num_studies','num_activations'][int(request.args['order[0][column]'])],str(request.args['order[0][dir]']))
+    search = str(request.args['search[value]']).strip()
     data = Feature.query
     if search: #No empty search on my watch
         search = '%{}%'.format(search)
@@ -16,10 +16,10 @@ def get_feature_list():
     data=data.order_by(order_by)
     data=data.paginate(page=(offset/results_per_page)+1, per_page=results_per_page, error_out=False)
     result = {}
-    result['sEcho'] = int(request.args['sEcho']) # for security
-    result['iTotalRecords'] = Feature.query.count()
-    result['iTotalDisplayRecords'] = data.total
-    result['aaData'] = [ ['<a href={0}>{1}</a>'.format(url_for('features.show',val=d.name),d.name),
+    result['draw'] = int(request.args['draw']) # for security
+    result['recordsTotal'] = Feature.query.count()
+    result['recordsFiltered'] = data.total
+    result['data'] = [ ['<a href={0}>{1}</a>'.format(url_for('features.show',val=d.name),d.name),
                             d.num_studies,
                             d.num_activations,
                             ] for d in data.items ]

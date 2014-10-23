@@ -26,13 +26,13 @@ def location_api(val):
     images = [] if location is None else location.images
     images = [{'label': i.label, 'id': i.id} for i in images if i.display]
 
-    if 'sEcho' in request.args:
+    if 'draw' in request.args:
         data = []
         for p in points:
             s = p[0].study
             link = '<a href={0}>{1}</a>'.format(url_for('studies.show',val=s.pmid),s.title)
             data.append([link, s.authors, s.journal,p[1]])
-        data = jsonify(aaData=data)
+        data = jsonify(data=data)
     else:
         data = {
             'studies': [{'pmid':p[0].study.pmid,'peaks':p[1] } for p in points],
