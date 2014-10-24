@@ -1,0 +1,12 @@
+- set page_title = 'Neurosynth: feature not found!'
+- extends "layout/base.html"
+- block content
+  .row
+    .col-md-8
+      h1.top-space0 {{Woops...}}
+      .lead Sorry, but we couldn't find the feature "{{feature}}!"
+      p The number of available features in Neurosynth is limited. It's possible we don't have enough studies yet to support a meta-analysis of this feature. It's also possible your fingers are too big for your keyboard and you need to type more carefully.
+      p Please try again:
+      .feature-search
+        span Search for another feature:
+        input type="text" id="feature-search"
