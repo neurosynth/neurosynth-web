@@ -10,9 +10,7 @@ bp = Blueprint('features',__name__,url_prefix='/features')
 
 def find_feature(val):
     ''' Retrieve feature by either id (when int) or name (when string) '''
-    feature = Feature.query.get(val) if re.match('\d+$', val) else Feature.query.filter_by(name=val).first()
-    if feature is None: abort(404)
-    return feature
+    return Feature.query.get(val) if re.match('\d+$', val) else Feature.query.filter_by(name=val).first()
     
 @bp.route('/')
 def index():
@@ -26,6 +24,8 @@ def get_feature_names():
 @bp.route('/<string:val>/')
 def show(val):
     feature = find_feature(val)
+    if feature is None:
+        return render_template('features/missing.html.slim', feature=val)
     n_studies = feature.frequencies.count()
     return render_template('features/show.html.slim', feature=feature.name, n_studies=n_studies)
 
@@ -56,7 +56,7 @@ def get_reverse_inference_image(val):
 
 @bp.route('/<string:val>/studies')
 def get_studies(val):
-    feature = find_feature(val) 
+    feature = find_feature(val)
     if 'dt' in request.args:
         data = []
         for f in feature.frequencies:
