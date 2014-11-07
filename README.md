@@ -9,14 +9,14 @@ Installation can be a rather cumbersome process. There are a large number of dep
 
 1. Create a new virtual-env to house all the Python dependencies.
 2. Install the [Neurosynth](http://github.com/neurosynth/neurosynth) package and its dependencies, as well as core computational/plotting packages:
-```
-pip install numpy scipy matplotlib pandas seaborn scikit-learn ply neurosynth
-```
+
+	pip install numpy scipy matplotlib pandas seaborn scikit-learn ply neurosynth
+
 3. Install node and coffeescript
 4. Install Flask and various other packages (see requirements.txt):
-```
-pip install SQLalchemy Flask simplejson jinja2 cssmin webassets pyscss Flask-Assets Flask-Babel Flask-Cake Flask-Mail Flask-Migrate Flask-Script Flask-SQLAlchemy Flask-User Flask-WTF
-```
+
+	pip install SQLalchemy Flask simplejson jinja2 cssmin webassets pyscss Flask-Assets Flask-Babel Flask-Cake Flask-Mail Flask-Migrate Flask-Script Flask-SQLAlchemy Flask-User Flask-WTF
+
 5. Install MySQL or MariaDB and a Python MySQL adapter (PyMySQL or MySQL-Python)
 6. Optional: Install and configure uwsgi. Copy or rename deploy/deploy-dev-template.ini to deploy/deploy-dev.ini. Modify settings as needed. Alternatively, you can just run python run_server.py to rely on the built-in server for local development.
 7. Optional: install and configure nginx or Apache to point to the development app. This isn't covered here. Alternatively, you can just run python run_server.py to rely on the built-in server for local development.
