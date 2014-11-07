@@ -16,24 +16,26 @@ def main():
             # reset_db=True, reset_dataset=True)
             reset_db=True, reset_dataset=True)
 
-    features = None
 
     print "Adding features..."
+    if settings.PROTOTYPE:
+        features = ['emotion', 'language', 'memory', 'pain', 'visual', 'attention', 'sensory']
+    else:
+        features = None
     builder.add_features(features=features, add_images=True)
 
     print "Adding studies..."
-    builder.add_studies(features=features)
-
-    # print "Adding new features to database..."
-    # builder.add_features_to_database('/Users/tyarkoni/Dropbox/Code/sandbox/cognitive_atlas_features.txt',
-    #                                 min_studies=30)
+    if settings.PROTOTYPE:
+        builder.add_studies(features=features, limit=100)
+    else:
+        builder.add_studies(features=features)
     
     print "Adding feature-based meta-analysis images..."
     builder.generate_feature_images(features, add_to_db=False, overwrite=False)
 
     print "Adding location-based coactivation images..."
     # builder.generate_location_images(min_studies=500, add_to_db=True)
-    builder.add_location_images('/data/neurosynth/data/locations/images', reset=True)
+    # builder.add_location_images('/data/neurosynth/data/locations/images', reset=True)
 
     print "Generating location feature data..."
     builder.generate_location_features()
@@ -54,10 +56,8 @@ def main():
         'autism', 'priming', 'stroop', 'social cognition', 'happy', 'timing', 'identity', 'iq',
         'parkinson', 'spatial attention', 'music', 'self', 'auditory', 'speech production',
         'speech perception']
-    # features = list(set(features))
 
-
-    # builder.generate_decoding_data(features)
+    builder.generate_decoding_data(features)
 
     # print "Adding genes..."
     # builder.add_genes()
