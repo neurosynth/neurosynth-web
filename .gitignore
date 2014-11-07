@@ -55,7 +55,8 @@ docs/_build/
 
 # Data
 #data/
-deploy/
+deploy/deploy-dev.ini
+deploy/deploy.ini
 
 # Config, cache, assets, and other stuff we don't need to share
 nsweb/initializers/settings.py
