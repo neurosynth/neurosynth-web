@@ -9,6 +9,7 @@ def main():
 
     print "Initializing DatabaseBuilder..."
     # Create a new builder from a pickled Dataset instance and populate the DB
+    # pass reset_dataset=False after first run to avoid rebuilding dataset
     dataset = settings.PICKLE_DATABASE
     builder = database_builder.DatabaseBuilder(db, dataset=dataset,
         	studies=os.path.join(settings.ASSET_DIR, 'studies.txt'),
