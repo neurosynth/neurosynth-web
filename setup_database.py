@@ -31,7 +31,7 @@ def main():
         builder.add_studies(features=features)
     
     print "Adding feature-based meta-analysis images..."
-    builder.generate_feature_images(features, add_to_db=False, overwrite=False)
+    builder.generate_feature_images(features=features, add_to_db=False, overwrite=False)
 
     print "Adding location-based coactivation images..."
     # builder.generate_location_images(min_studies=500, add_to_db=True)
