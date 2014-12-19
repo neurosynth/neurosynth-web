@@ -14,7 +14,7 @@ Flask-User
 Flask-WTF
 jinja2
 neurosynth
--e git+git://github.com/nilearn/nilearn.git
+-e git+https://github.com/nilearn/nilearn.git#egg=nilearn
 matplotlib
 MySQL-Python
 numpy>=1.8
