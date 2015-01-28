@@ -68,3 +68,6 @@ nsweb/static/.webassets-cache/
 
 TODO.txt
 running.txt
+
+#PyCharm
+.idea
