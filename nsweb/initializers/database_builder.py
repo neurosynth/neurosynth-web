@@ -9,6 +9,7 @@ from nsweb.models.genes import Gene
 from nsweb.initializers import settings
 import os
 from os.path import join, basename
+from os import makedirs
 from neurosynth.base.dataset import Dataset
 from neurosynth.base import transformations
 import nibabel as nb
@@ -40,15 +41,19 @@ class DatabaseBuilder:
                 adding new content. If False (default), will add content incrementally.
             reset_dataset: if True, will regenerate the pickled Neurosynth dataset.
         """
+        if reset_db:
+            print "WARNING: RESETTTING DATABASE!!!"
 
         # Load or create Neurosynth Dataset instance
         if dataset is None or reset_dataset or (isinstance(dataset, basestring) and not os.path.exists(dataset)):
+            print "\tInitializing a new Dataset..."
             if (studies is None) or (features is None):
                 raise ValueError("To generate a new Dataset instance, both studies and features must be provided.")
             dataset = Dataset(studies)
             dataset.add_features(features)
             dataset.save(settings.PICKLE_DATABASE, keep_mappables=True)
         else:
+            print "\tLoading existing Dataset..."
             dataset = Dataset.load(dataset)
             if features is not None:
                 dataset.add_features(features)
@@ -66,28 +71,28 @@ class DatabaseBuilder:
         self.db.create_all()
 
 
-    def add_features_to_database(self, features, image_dir=None, min_studies=50, 
-                                threshold=0.001, generate_images=True, update_db=True):
-        """ Add new features to an existing Dataset and optionally update the 
-        Features, Studies, etc. in the database. """
+    # def add_features_to_database(self, features, image_dir=None, min_studies=50, 
+    #                             threshold=0.001, generate_images=True, update_db=True):
+    #     """ Add new features to an existing Dataset and optionally update the 
+    #     Features, Studies, etc. in the database. """
 
-        old_features = set(self.dataset.feature_table.data.columns)
+    #     old_features = set(self.dataset.feature_table.data.columns)
 
-        self.dataset.add_features(features, min_studies=min_studies, 
-                    threshold=threshold, merge='left')
+    #     self.dataset.add_features(features, min_studies=min_studies, 
+    #                 threshold=threshold, merge='left')
 
-        new_features = list(set(self.dataset.feature_table.data.columns) - old_features)
-        print "Adding %d new features." % len(new_features)
-        print new_features
+    #     new_features = list(set(self.dataset.feature_table.data.columns) - old_features)
+    #     print "Adding %d new features." % len(new_features)
+    #     print new_features
 
-        if update_db:
-            self.add_features(new_features)
-            self.add_studies(new_features)
+    #     if update_db:
+    #         self.add_features(new_features)
+    #         self.add_studies(new_features)
 
-        if generate_images:
-            self.generate_feature_images(image_dir, new_features, update_db)
+    #     if generate_images:
+    #         self.generate_feature_images(image_dir, new_features, update_db)
 
-        self.dataset.save(settings.PICKLE_DATABASE, keep_mappables=True)
+    #     self.dataset.save(settings.PICKLE_DATABASE, keep_mappables=True)
 
 
     def add_features(self, features=None, add_images=False, image_dir=None, reset=False):
@@ -243,6 +248,10 @@ class DatabaseBuilder:
         self._update_feature_counts()
 
 
+    def _map_feature_to_studies(self, feature):
+        pass
+
+
     def _update_feature_counts(self):
         """ Update the num_studies and num_activations fields for all features. """
         for k, f in self.features.items():
@@ -315,8 +324,8 @@ class DatabaseBuilder:
         # Only use images contained in Feature table--we don't want users being linked 
         # to features that don't exist in cases where there are orphaned images.
         features = self.db.session.query(Feature.name).all()
-        n_features = 100 #len(features)
-        features = [i[0] for i in features[:n_features]]
+        features = [i[0] for i in features]
+        n_features = len(features)
 
         # Read in all rev inf z and posterior prob images
         rev_inf_z = np.zeros((self.dataset.image_table.data.shape[0], n_features))
@@ -437,7 +446,7 @@ class DatabaseBuilder:
             Location.query.delete()
 
         if image_dir is None:
-            image_dir = join(settings.IMAGE_DIR, 'fcmri')
+            image_dir = join(settings.IMAGE_DIR, 'coactivation')
 
         if search is None:
             # search = '*_pFgA_z.nii.gz'
@@ -493,7 +502,7 @@ class DatabaseBuilder:
             if not ((ind+1) % 1000):
                 self.db.session.commit()
 
-    def add_genes(self, gene_dir=None, reset=True):
+    def add_genes(self, gene_dir=None, reset=False):
         """ Add records for genes, working from a directory containing gene images. """
         if reset:
             Gene.query.delete()
@@ -504,10 +513,12 @@ class DatabaseBuilder:
         found = {}
         for (i, g) in enumerate(genes):
             symbol = basename(g).split('_')[2]
-            if symbol == 'A' or symbol == 'CUST' or symbol.startswith('LOC') or symbol in found:
+            if symbol == 'A' or symbol == 'CUST' or symbol.startswith('LOC') or symbol in found or len(symbol) > 20:
                 continue
             found[symbol] = 1
-            gene = Gene(name=symbol, symbol=symbol)
+            gene = Gene.query.filter_by(symbol=symbol).first()
+            if gene is None:
+                gene = Gene(name=symbol, symbol=symbol)
             gene.images = [GeneImage(
                 image_file = g,
                 label = "AHBA gene expression levels for " + symbol,
