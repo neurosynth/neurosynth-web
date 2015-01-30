@@ -342,7 +342,8 @@ make_scatterplot = function() {
 };
 
 $(document).ready(function() {
-  var iDelay, study, tbl, url, url_id;
+  var SELECTED, getSelection, iDelay, redrawTableSelection, saveSelection, study, tbl, url, url_id;
+  console.log('hello world');
   if (!$('#page-study').length) {
     return;
   }
@@ -362,6 +363,7 @@ $(document).ready(function() {
     orderClasses: false
   });
   tbl.fnSetFilteringDelay(iDelay = 400);
+  window.tbl = tbl;
   url_id = document.URL.split('/');
   url_id = url_id[url_id.length - 2];
   $('#study_features_table').dataTable({
@@ -384,7 +386,7 @@ $(document).ready(function() {
     order: [[0, 'asc'], [2, 'asc']],
     orderClasses: false
   });
-  return $('#study_peaks_table').on('click', 'tr', (function(_this) {
+  $('#study_peaks_table').on('click', 'tr', (function(_this) {
     return function(e) {
       var data, i, row;
       row = $(e.target).closest('tr')[0];
@@ -402,6 +404,64 @@ $(document).ready(function() {
       return viewer.moveToAtlasCoords(data);
     };
   })(this));
+  SELECTED = 'info';
+  getSelection = function() {
+    var selection;
+    return selection = JSON.parse(window.localStorage.getItem('selection') || "{}");
+  };
+  saveSelection = function(selection) {
+    return window.localStorage.setItem('selection', JSON.stringify(selection));
+  };
+  $('#studies_table').on('click', 'tr', function() {
+    var pmid, selection;
+    pmid = $(this).find('a').last().text();
+    selection = getSelection();
+    if (pmid in selection) {
+      delete selection[pmid];
+    } else {
+      selection[pmid] = 1;
+    }
+    saveSelection(selection);
+    return $(this).toggleClass(SELECTED);
+  });
+  redrawTableSelection = function() {
+    var selection;
+    selection = getSelection();
+    return $('tbody').find('tr').each(function() {
+      var pmid;
+      pmid = $(this).find('a').last().text();
+      if (pmid in selection) {
+        return $(this).addClass(SELECTED);
+      } else {
+        return $(this).removeClass(SELECTED);
+      }
+    });
+  };
+  $('#studies_table').on('draw.dt', function() {
+    return redrawTableSelection();
+  });
+  $('#select-all-btn').click(function() {
+    var selection;
+    selection = getSelection();
+    $('tbody').find('tr').each(function() {
+      var pmid;
+      pmid = $(this).find('a').last().text();
+      return selection[pmid] = 1;
+    });
+    saveSelection(selection);
+    return redrawTableSelection();
+  });
+  return $('#deselect-all-btn').click(function() {
+    var selection;
+    selection = getSelection();
+    $('tbody').find('tr').each(function() {
+      var pmid;
+      pmid = $(this).find('a').last().text();
+      return delete selection[pmid];
+    });
+    saveSelection(selection);
+    return redrawTableSelection();
+  });
 });
 
 $(document).ready(function() {
