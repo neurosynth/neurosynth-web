@@ -55,13 +55,13 @@ class NeurosynthTask(Task):
     def masks(self):
         """ Return a dict of predefined region masks. """
         maps = {
-            'cortex': join(settings.IMAGE_DIR, 'Masks', 'cortex.nii'),
-            'subcortex': join(settings.IMAGE_DIR, 'Masks', 'subcortex_drewUpdated.nii'),
+            'cortex': join(settings.IMAGE_DIR, 'Masks', 'cortex.nii.gz'),
+            'subcortex': join(settings.IMAGE_DIR, 'Masks', 'subcortex_drewUpdated.nii.gz'),
             'hippocampus': join(settings.IMAGE_DIR, 'Masks', 'FSL_BHipp_thr0.nii.gz'),
-            'accumbens': join(settings.IMAGE_DIR, 'Masks', 'FSL_BNAcc_thr0.nii'),
-            'amygdala': join(settings.IMAGE_DIR, 'Masks', 'FSL_BAmyg_thr0.nii'),
+            'accumbens': join(settings.IMAGE_DIR, 'Masks', 'FSL_BNAcc_thr0.nii.gz'),
+            'amygdala': join(settings.IMAGE_DIR, 'Masks', 'FSL_BAmyg_thr0.nii.gz'),
             'putamen': join(settings.IMAGE_DIR, 'Masks', 'FSL_BPut_thr0.nii.gz'),
-            'min4': '/Volumes/data/AllenSynth/Data/Maps/voxel_counts_r6.nii.gz'
+            # 'min4': '/Volumes/data/AllenSynth/Data/Maps/voxel_counts_r6.nii.gz'
         }
         for m, img in maps.items():
             maps[m] = load_image(self.dataset, img)
