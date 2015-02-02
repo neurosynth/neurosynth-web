@@ -1,7 +1,7 @@
 from flask import send_from_directory, Blueprint, abort, request, jsonify, redirect, url_for, send_file
-from nsweb.models import Image, Feature, Location
+from nsweb.models import Image, Feature, Location, Download
 from nsweb.initializers.settings import IMAGE_DIR
-from nsweb.core import add_blueprint
+from nsweb.core import add_blueprint, db
 import os
 import datetime as dt
 import re
@@ -28,6 +28,10 @@ def download(val, fdr=True):
     image = Image.query.get_or_404(val)
     if not image.download:
         abort(404)
+    # Log the download request
+    db.session.add(Download(image_id=val, ip=request.remote_addr))
+    db.session.commit()
+    # Send the file
     filename = image.image_file if fdr else image.uncorrected_image_file
     return send_nifti(filename)
 
