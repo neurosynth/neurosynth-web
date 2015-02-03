@@ -26,15 +26,15 @@ def load_image(dataset, filename, save_resampled=True):
             img.to_filename(filename)
     return dataset.masker.mask(img)
 
-def get_decoder_feature_data(dd, feature):
-    """ Get feature's data: check in the decoder DataFrame first, and if not found, 
+def get_decoder_analysis_data(dd, analysis):
+    """ Get analysis's data: check in the decoder DataFrame first, and if not found, 
     read from file (updating the in-memory DF). """
-    if feature not in dd.columns:
-            target_file = join(settings.IMAGE_DIR, 'features', feature + '_pFgA_z.nii.gz')
+    if analysis not in dd.columns:
+            target_file = join(settings.IMAGE_DIR, 'analyses', analysis + '_pFgA_z.nii.gz')
             if not exists(target_file):
                 return False
-            dd[feature] = load_image(make_scatterplot.dataset, target_file)
-    return dd[feature].values
+            dd[analysis] = load_image(make_scatterplot.dataset, target_file)
+    return dd[analysis].values
 
 class NeurosynthTask(Task):
 
@@ -68,9 +68,9 @@ class NeurosynthTask(Task):
         return maps
 
 @celery.task(base=NeurosynthTask)
-def count_studies(feature, threshold=0.001, **kwargs):
-    """ Count the number of studies in the Dataset for a given feature. """
-    ids = count_studies.dataset.get_ids_by_features(str(feature), threshold=threshold)
+def count_studies(analysis, threshold=0.001, **kwargs):
+    """ Count the number of studies in the Dataset for a given analysis. """
+    ids = count_studies.dataset.get_studies(features=str(analysis), frequency_threshold=threshold)
     return len(ids)
 
 @celery.task(base=NeurosynthTask)
@@ -107,7 +107,7 @@ def make_coactivation_map(x, y, z, r=6, min_studies=0.01):
     """ Generate a coactivation map on-the-fly for the given seed voxel. """
     try:
         dataset = make_coactivation_map.dataset
-        ids = dataset.get_ids_by_peaks([[x, y, z]], r=r)
+        ids = dataset.get_studies(peaks=[[x, y, z]], r=r)
         if len(ids) < 50: return False
         ma = meta.MetaAnalysis(dataset, ids, min_studies=min_studies)
         outdir = join(settings.IMAGE_DIR, 'coactivation')
@@ -119,18 +119,18 @@ def make_coactivation_map(x, y, z, r=6, min_studies=0.01):
         return False
 
 @celery.task(base=NeurosynthTask)
-def make_scatterplot(filename, feature, base_id, outfile=None, n_voxels=None, allow_nondecoder_features=False, 
+def make_scatterplot(filename, analysis, base_id, outfile=None, n_voxels=None, allow_nondecoder_analyses=False, 
                     x_lab="Uploaded Image", y_lab=None, gene_masks=False):
     """ Generate a scatter plot displaying relationship between two images (typically a 
         Neurosynth meta-analysis map and a retrieved image), where each voxel is an observation. 
     Args:
         filename (string): the local path to the retrieved image to plot on x axis
-        feature (string): the name of the Neurosynth feature to plot on y axis
+        analysis (string): the name of the Neurosynth analysis to plot on y axis
         base_id (string): the UUID to base the output filename on
         outfile (string): if provided, the output file name
         n_voxels (int): if provided, the number of voxels to randomly sample (if None, 
             all voxels are used)
-        allow_nondecoder_features (boolean): whether to allow non-preloaded features 
+        allow_nondecoder_analyses (boolean): whether to allow non-preloaded analyses 
             (not currently implemented)
         x_lab (string): x axis label
         y_lab (string): y axis label
@@ -140,7 +140,7 @@ def make_scatterplot(filename, feature, base_id, outfile=None, n_voxels=None, al
     try:
         # Get the data
         x = load_image(make_scatterplot.dataset, filename)
-        y = get_decoder_feature_data(make_scatterplot.dd, feature)
+        y = get_decoder_analysis_data(make_scatterplot.dd, analysis)
 
         # Subsample random voxels
         if n_voxels is not None:
@@ -149,11 +149,11 @@ def make_scatterplot(filename, feature, base_id, outfile=None, n_voxels=None, al
 
         # Set filename if needed
         if outfile is None:
-            outfile = join(settings.DECODING_SCATTERPLOTS_DIR, base_id + '_' + feature + '.png')
+            outfile = join(settings.DECODING_SCATTERPLOTS_DIR, base_id + '_' + analysis + '.png')
 
         # Generate and save scatterplot
         if y_lab is None:
-            y_lab='%s meta-analysis (z-score)' % feature
+            y_lab='%s meta-analysis (z-score)' % analysis
         masks = make_scatterplot.masks
         
         if gene_masks:

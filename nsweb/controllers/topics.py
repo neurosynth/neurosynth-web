@@ -12,11 +12,11 @@ bp = Blueprint('topics', __name__, url_prefix='/topics')
 def index():
     return render_template('topics/index.html.slim')
 
-@bp.route('/<string:feature_set>/<string:feature>')
+@bp.route('/<string:analysis_set>/<string:analysis>')
 def show(val):
-    topic = Topic.query.join(FeatureSet).filter(Topic.name == feature, FeatureSet.name == feature_set).first()
+    topic = Topic.query.join(AnalysisSet).filter(Topic.name == analysis, AnalysisSet.name == analysis_set).first()
     n_studies = topic.frequencies.count()
-    return render_template('features/show.html.slim', feature_set=topic.feature_set, topic=topic.id, n_studies=n_studies)
+    return render_template('analyses/show.html.slim', analysis_set=topic.analysis_set, topic=topic.id, n_studies=n_studies)
 
 
 add_blueprint(bp)

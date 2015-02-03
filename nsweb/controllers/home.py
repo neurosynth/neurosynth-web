@@ -1,11 +1,11 @@
 from flask import Blueprint, render_template
 from nsweb.core import add_blueprint
-from nsweb.models import Feature
+from nsweb.models import Analysis
 import random
 import simplejson as json
 from nsweb.initializers import settings
 from os.path import join
-from nsweb.models import Feature, Study, Location, Decoding, Download, Peak
+from nsweb.models import Analysis, Study, Location, Decoding, Download, Peak
 from sqlalchemy import func, distinct
 from nsweb.core import db
 
@@ -15,7 +15,7 @@ bp = Blueprint('home', __name__)
 def index():
     """ Returns the homepage. """
     stats = {
-    	'n_features': Feature.query.count(),
+    	'n_analyses': Analysis.query.count(),
     	'n_studies': Study.query.count(),
     	'n_peaks': Peak.query.count(),
     	'n_locations': Location.query.count(),
@@ -25,11 +25,11 @@ def index():
     }
 
     img = random.choice(['emotion', 'pain', 'language', 'attention', 'memory', 'motor', 'reward', 'sensation'])
-    # image = Image.where(:name => "feature_#{img}_reverse").joins(:feature).select(['images.id', 'images.name', 'features.name', 'features.n_studies']).first
+    # image = Image.where(:name => "analysis_#{img}_reverse").joins(:analysis).select(['images.id', 'images.name', 'analyses.name', 'analyses.n_studies']).first
     # news_items = [] #NewsItem.paginate(:page => params[:page], :per_page => 3).order('created_at DESC')
-    feature = random.choice(['reward', 'language', 'emotion', 'pain', 'working memory'])
-    feature = Feature.query.filter_by(name=feature).first()
-    return render_template('home/index.html.slim', feature=feature, stats=stats)
+    analysis = random.choice(['reward', 'language', 'emotion', 'pain', 'working memory'])
+    analysis = Analysis.query.filter_by(name=analysis).first()
+    return render_template('home/index.html.slim', analysis=analysis, stats=stats)
 
 @bp.route('/faq/')
 def faq():

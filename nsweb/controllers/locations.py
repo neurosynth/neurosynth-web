@@ -92,10 +92,10 @@ def get_studies(val):
         data = jsonify(data=data)
     return data
 
-@bp.route('/<string:val>/features')
-def get_features(val):
+@bp.route('/<string:val>/analyses')
+def get_analyses(val):
     x, y, z, radius = get_params(val)
-    f = join(settings.LOCATION_FEATURE_DIR, '%d_%d_%d_features.txt' % (x,y,z))
+    f = join(settings.LOCATION_FEATURE_DIR, '%d_%d_%d_analyses.txt' % (x,y,z))
     return open(f).read() if exists(f) else '{"data":[]}'
 
 def make_location(x, y, z):

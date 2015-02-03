@@ -121,7 +121,7 @@ def get_data(uuid):
     if dec is None: abort(404)
     data = open(join(settings.DECODING_RESULTS_DIR, dec.uuid + '.txt')).read().splitlines()
     data = [x.split('\t') for x in data]
-    data = [{'feature': f, 'r': round(float(v), 3)} for (f, v) in data]
+    data = [{'analysis': f, 'r': round(float(v), 3)} for (f, v) in data]
     return jsonify(data=data)
 
 
@@ -135,15 +135,15 @@ def get_image(uuid):
     return send_nifti(join(settings.DECODED_IMAGE_DIR, dec.filename), basename(dec.filename))
 
 
-@bp.route('/<string:uuid>/scatter/<string:feature>.png')
-@bp.route('/<string:uuid>/scatter/<string:feature>')
-def get_scatter(uuid, feature):
-    outfile = join(settings.DECODING_SCATTERPLOTS_DIR, uuid + '_' + feature + '.png')
+@bp.route('/<string:uuid>/scatter/<string:analysis>.png')
+@bp.route('/<string:uuid>/scatter/<string:analysis>')
+def get_scatter(uuid, analysis):
+    outfile = join(settings.DECODING_SCATTERPLOTS_DIR, uuid + '_' + analysis + '.png')
     if not exists(outfile):
-        """ Return .png of scatterplot between the uploaded image and specified feature. """
+        """ Return .png of scatterplot between the uploaded image and specified analysis. """
         dec = Decoding.query.filter_by(uuid=uuid).first()
         if dec is None: abort(404)
-        result = make_scatterplot.delay(dec.filename, feature, dec.uuid, outfile=outfile, x_lab=dec.name).wait()
+        result = make_scatterplot.delay(dec.filename, analysis, dec.uuid, outfile=outfile, x_lab=dec.name).wait()
         if not exists(outfile): abort(404)
     return send_file(outfile, as_attachment=False, 
             attachment_filename=basename(outfile))
