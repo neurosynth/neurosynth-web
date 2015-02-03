@@ -57,7 +57,6 @@ def get_images(val):
         'positiveThreshold': 0 if 'coactivation' in img.label else 0.2,
         'negativeThreshold': 0 if 'coactivation' in img.label else -0.2
     } for img in location.images if img.display]
-
     db.session.remove()
     return jsonify(data=images)
 
@@ -102,13 +101,11 @@ def get_features(val):
 def make_location(x, y, z):
 
     location = Location(x, y, z)
-    location.images = []
 
     # Add Neurosynth coactivation image if it exists
     filename = 'metaanalytic_coactivation_%d_%d_%d_pFgA_z_FDR_0.01.nii.gz' % (x, y, z)
     filename = join(settings.IMAGE_DIR, 'coactivation', filename)
     if not exists(filename):
-        print "Making new map!"
         result = make_coactivation_map.delay(x, y, z).wait()
     if exists(filename):
         location.images.append(LocationImage(

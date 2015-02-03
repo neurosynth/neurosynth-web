@@ -75,7 +75,7 @@ def scatter(x=None, y=None, gene=None, threshold_x=None, threshold_y=None, log_x
 
     for i, v in enumerate(np.unique(layers)):
         v = int(v)
-        color = list(palette[i-1]) if v else [0,0,0]
+        color = tuple(palette[i-1]) if v else (0,0,0)
         x_r, y_r = x[layers==v], y[layers==v]
         a = alpha if v else unlabeled_alpha
         

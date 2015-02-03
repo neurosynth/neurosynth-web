@@ -30,7 +30,7 @@ from nsweb.initializers import make_celery
 
 app=Flask('NSWeb', static_folder=settings.STATIC_FOLDER, template_folder=settings.TEMPLATE_FOLDER)
 app.config['SQLALCHEMY_POOL_RECYCLE'] = 1800
-manager = Manager(app)
+# manager = Manager(app)
 
 # Initialize celery
 celery = make_celery(app)
@@ -68,14 +68,14 @@ def create_app(debug=True):
 
     app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
     app.secret_key = "very_sekret"  # move this out of here eventually
-    app.test_request_context().push() #h ave to create a request context for flask-salalchemy
-    db.init_app(app)
 
     # Add slim support
     Flask.jinja_options['extensions'].append(SlimishExtension)
     
     # Initialize assets
     init_assets(app)
+
+    db.init_app(app)
     
     # Set up user management
     app.config['CSRF_ENABLED'] = True
