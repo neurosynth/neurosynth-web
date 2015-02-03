@@ -66,5 +66,10 @@ nsweb/static/.webassets-cache/
 #nsweb/static/css/main.min.css
 #nsweb/static/css/main.css
 
+migrations/versions/*.py
+
 TODO.txt
 running.txt
+log.txt
+.dropbox
+Icon*
