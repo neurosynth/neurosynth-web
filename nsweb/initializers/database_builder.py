@@ -1,23 +1,24 @@
 
-from nsweb.models.features import Feature
+from nsweb.models.analyses import TermAnalysis, TopicAnalysis, AnalysisSet
 from nsweb.models.locations import Location
 from nsweb.models.studies import Study
 from nsweb.models.peaks import Peak
 from nsweb.models.frequencies import Frequency
-from nsweb.models.images import FeatureImage, LocationImage, GeneImage
+from nsweb.models.images import TermAnalysisImage, LocationImage, GeneImage, TopicAnalysisImage
 from nsweb.models.genes import Gene
 from nsweb.initializers import settings
 import os
-from os.path import join, basename
+from os.path import join, basename, exists
 from os import makedirs
 from neurosynth.base.dataset import Dataset
 from neurosynth.base import transformations
+from neurosynth.analysis import meta
 import nibabel as nb
 import numpy as np
 import pandas as pd
 import random
 from glob import glob
-import simplejson as json
+import json
 from copy import deepcopy
 import re
 
@@ -28,7 +29,7 @@ class DatabaseBuilder:
 
     def __init__(self, db, dataset=None, studies=None, features=None, reset_db=False, reset_dataset=False):
         """ Initialize instance from a pickled Neurosynth Dataset instance or a 
-        pair of study and feature .txt files. 
+        pair of study and analysis .txt files. 
         Args:
             db: the SQLAlchemy database connection to use.
             dataset: an optional filename of a pickled neurosynth Dataset instance.
@@ -42,13 +43,13 @@ class DatabaseBuilder:
             reset_dataset: if True, will regenerate the pickled Neurosynth dataset.
         """
         if reset_db:
-            print "WARNING: RESETTTING DATABASE!!!"
+            print "WARNING: RESETTING DATABASE!!!"
 
         # Load or create Neurosynth Dataset instance
         if dataset is None or reset_dataset or (isinstance(dataset, basestring) and not os.path.exists(dataset)):
             print "\tInitializing a new Dataset..."
             if (studies is None) or (features is None):
-                raise ValueError("To generate a new Dataset instance, both studies and features must be provided.")
+                raise ValueError("To generate a new Dataset instance, both studies and analyses must be provided.")
             dataset = Dataset(studies)
             dataset.add_features(features)
             dataset.save(settings.PICKLE_DATABASE, keep_mappables=True)
@@ -71,124 +72,138 @@ class DatabaseBuilder:
         self.db.create_all()
 
 
-    # def add_features_to_database(self, features, image_dir=None, min_studies=50, 
+    # def add_analyses_to_database(self, analyses, image_dir=None, min_studies=50, 
     #                             threshold=0.001, generate_images=True, update_db=True):
-    #     """ Add new features to an existing Dataset and optionally update the 
-    #     Features, Studies, etc. in the database. """
+    #     """ Add new analyses to an existing Dataset and optionally update the 
+    #     Analysiss, Studies, etc. in the database. """
 
-    #     old_features = set(self.dataset.feature_table.data.columns)
+    #     old_analyses = set(self.dataset.feature_table.data.columns)
 
-    #     self.dataset.add_features(features, min_studies=min_studies, 
+    #     self.dataset.add_features(analyses, min_studies=min_studies, 
     #                 threshold=threshold, merge='left')
 
-    #     new_features = list(set(self.dataset.feature_table.data.columns) - old_features)
-    #     print "Adding %d new features." % len(new_features)
-    #     print new_features
+    #     new_analyses = list(set(self.dataset.feature_table.data.columns) - old_analyses)
+    #     print "Adding %d new analyses." % len(new_analyses)
+    #     print new_analyses
 
     #     if update_db:
-    #         self.add_features(new_features)
-    #         self.add_studies(new_features)
+    #         self.add_analyses(new_analyses)
+    #         self.add_studies(new_analyses)
 
     #     if generate_images:
-    #         self.generate_feature_images(image_dir, new_features, update_db)
+    #         self.generate_analysis_images(image_dir, new_analyses, update_db)
 
     #     self.dataset.save(settings.PICKLE_DATABASE, keep_mappables=True)
 
 
-    def add_features(self, features=None, add_images=False, image_dir=None, reset=False):
-        ''' Add Feature records to the DB. 
+    def add_analyses(self, analyses=None, add_images=False, image_dir=None, reset=False):
+        ''' Add Analysis records to the DB. 
         Args:
-            features: A list of feature names to add to the db. If None,  will use 
-                all features in the Dataset.
-            image_dir: folder to save generated feature images in. If None, do not 
+            analyses: A list of analysis names to add to the db. If None,  will use 
+                all analyses in the Dataset.
+            image_dir: folder to save generated analysis images in. If None, do not 
                 save any images.
         '''
         if reset:
-            Feature.query.delete()
+            Analysis.query.delete()
 
-        if features is None:
-            features = self._get_feature_names()
+        if analyses is None:
+            analyses = self._get_feature_names()
         else:
-            features = list(set(self._get_feature_names()) & set(features))
+            analyses = list(set(self._get_feature_names()) & set(analyses))
 
-        # Store features for faster counting of studies/activations
-        self.features = {}
+        # Store analyses for faster counting of studies/activations
+        self.analyses = {}
 
-        for f in features:
+        for f in analyses:
             
-            feature = Feature(name=f)
+            analysis = TermAnalysis(name=f)
 
-            # elements are the Feature instance, # of studies, and # of activations
-            self.features[f] = [feature, 0, 0]
+            # elements are the Analysis instance, # of studies, and # of activations
+            self.analyses[f] = [analysis, 0, 0]
 
             if add_images:
-                self.add_feature_images(feature, image_dir)
+                self.add_analysis_images(analysis, image_dir)
 
-            self.db.session.add(feature)
+            self.db.session.add(analysis)
 
         self.db.session.commit()
 
 
-    def add_feature_images(self, feature, image_dir=None, reset=True):
-        """ Create DB records for the reverse and forward meta-analysis images for the given feature. 
+    def add_analysis_images(self, analysis, image_dir=None, reset=True):
+        """ Create DB records for the reverse and forward meta-analysis images for the given analysis. 
         Args:
-            feature: Either a Feature instance or the (string) name of a feature to update. If a 
-                string, first check self.features, and only retrieve from DB if not found. 
+            analysis: Either a Analysis instance or the (string) name of a analysis to update. If a 
+                string, first check self.analyses, and only retrieve from DB if not found. 
             image_dir: Location to find images in
-            reset: If True, deletes any existing FeatureImages before adding new ones
+            reset: If True, deletes any existing AnalysisImages before adding new ones
         """
 
-        if image_dir is None:
-            image_dir = join(settings.IMAGE_DIR, 'features')
-
-        if isinstance(feature, basestring):
-            if hasattr(self, 'features') and feature in self.features:
-                feature = self.features[feature][0]
+        if isinstance(analysis, basestring):
+            if hasattr(self, 'analyses') and analysis in self.analyses:
+                analysis = self.analyses[analysis][0]
             else:
-                feature = Feature.query.filter_by(name=name).first()
-                if feature is None:
+                analyses = Analysis.query.filter_by(name=name).all()
+                if len(analyses) > 1:
+                    raise ValueError("More than 1 analysis has the name %s! Please resolve the "
+                        "conflict and try again." % name)
+                elif not analyses:
                     return
+                else:
+                    analysis = analyses[0]
 
-        if reset:
-            feature.images = []
+        analysis.images = []
 
-        name = feature.name
+        name = analysis.name
 
-        feature.images.extend([
-            FeatureImage(image_file=join(image_dir, name + '_pAgF_z_FDR_0.01.nii.gz'),
+        # Image class depends on the Analysis class
+        if hasattr(analysis, 'terms'):
+            image_class = TopicAnalysisImage
+            if image_dir is None:
+                image_dir = join(settings.IMAGE_DIR, 'topics')
+        else:
+            image_class = TermAnalysisImage
+            if image_dir is None:
+                image_dir = join(settings.IMAGE_DIR, 'analyses')
+
+        analysis.images.extend([
+            image_class(image_file=join(image_dir, name + '_pAgF_z_FDR_0.01.nii.gz'),
                 label='%s: forward inference' % name,
                 stat='z-score',
                 display=1,
                 download=1),
-            FeatureImage(image_file=join(image_dir, name + '_pFgA_z_FDR_0.01.nii.gz'),
+            image_class(image_file=join(image_dir, name + '_pFgA_z_FDR_0.01.nii.gz'),
                 label='%s: reverse inference' % name,
                 stat='z-score',
                 display=1,
                 download=1)
         ])
 
+        self.db.session.add(analysis)
+        self.db.session.commit()
 
-    def add_studies(self, features=None, threshold=0.001, limit=None, reset=False):
+
+    def add_studies(self, analyses=None, threshold=0.001, limit=None, reset=False):
         """ Add studies to the DB.
         Args:
-            features: list of names of features to map studies onto. If None, use all available.
-            threshold: Float or integer; minimum value in FeatureTable data array for inclusion.
+            analyses: list of names of analyses to map studies onto. If None, use all available.
+            threshold: Float or integer; minimum value in AnalysisTable data array for inclusion.
             limit: integer; maximum number of studies to add (order will be randomized).
             reset: Drop all existing records before populating.
         Notes:
             By default, will not create new Study records if an existing one matches. This ensures 
-            that we can gracefully add new feature associations without mucking up the DB.
+            that we can gracefully add new analysis associations without mucking up the DB.
             To explicitly replace old records, pass reset=True.
         """
         if reset:
             Study.query.delete()
 
-        # For efficiency, get all feature data up front, so we only need to densify array once
-        if features is None:
-            features = self._get_feature_names()
+        # For efficiency, get all analysis data up front, so we only need to densify array once
+        if analyses is None:
+            analyses = self._get_feature_names()
 
-        feature_data = self.dataset.get_feature_data(features=features)
-        feature_names = list(feature_data.columns)
+        feature_data = self.dataset.get_feature_data(features=analyses)
+        analysis_names = list(feature_data.columns)
 
         study_inds = range(len(self.dataset.mappables))
         if limit is not None:
@@ -220,19 +235,19 @@ class DatabaseBuilder:
                 study.peaks.extend(peaks)
                 self.db.session.add(study)
              
-            # Map features onto studies via a Frequency join table that also stores frequency info
-            pmid_frequencies = list(feature_data.ix[m.id,:])
+            # Map analyses onto studies via a Frequency join table that also stores frequency info
+            pmid_frequencies = list(feature_data.ix[m.id, :])
 
-            for (y, feature_name) in enumerate(feature_names):
+            for (y, analysis_name) in enumerate(analysis_names):
                 freq = pmid_frequencies[y]
                 if pmid_frequencies[y] >= threshold:
-                    freq_inst = Frequency(study=study, feature=self.features[feature_name][0], frequency=freq)
+                    freq_inst = Frequency(study=study, analysis=self.analyses[analysis_name][0], frequency=freq)
                     self.db.session.add(freq_inst)
 
-                    # Track number of studies and peaks so we can update Feature table more
+                    # Track number of studies and peaks so we can update Analysis table more
                     # efficiently later
-                    self.features[feature_name][1] += 1
-                    self.features[feature_name][2] += study.peaks.count()
+                    self.analyses[analysis_name][1] += 1
+                    self.analyses[analysis_name][2] += study.peaks.count()
 
          
         # Commit records in batches to conserve memory.
@@ -244,71 +259,68 @@ class DatabaseBuilder:
 
         self.db.session.commit()  # Commit any remaining studies
 
-        # Update all feature counts
-        self._update_feature_counts()
+        # Update all analysis counts
+        self._update_analysis_counts()
 
 
-    def _map_feature_to_studies(self, feature):
+    def _map_analysis_to_studies(self, analysis):
         pass
 
 
-    def _update_feature_counts(self):
-        """ Update the num_studies and num_activations fields for all features. """
-        for k, f in self.features.items():
-            f[0].num_studies = f[1]
-            f[0].num_activations = f[2]
+    def _update_analysis_counts(self):
+        """ Update the num_studies and num_activations fields for all analyses. """
+        for k, f in self.analyses.items():
+            f[0].n_studies = f[1]
+            f[0].n_activations = f[2]
 #            self.db.session.update(f) 
         self.db.session.commit()
 
 
-    def generate_feature_images(self, image_dir=None, features=None, add_to_db=True, 
+    def generate_analysis_images(self, image_dir=None, analyses=None, add_to_db=True, 
                     overwrite=True, **kwargs):
-        """ Create a full set of feature meta-analysis images via Neurosynth. 
+        """ Create a full set of analysis meta-analysis images via Neurosynth. 
         Args:
             image_dir: Folder in which to store images. If None, uses default 
                 location specified in SETTINGS.
-            features: Optional list of features to limit meta-analysis to.
-                If None, all available features are processed.
-            add_to_db: if True, will create new FeatureImage records, and associate 
-                them with the corresponding Feature record.
+            analyses: Optional list of analyses to limit meta-analysis to.
+                If None, all available analyses are processed.
+            add_to_db: if True, will create new AnalysisImage records, and associate 
+                them with the corresponding Analysis record.
             overwrite: if True, always generate new meta-analysis images. If False, 
-                will skip any features that already have images.
+                will skip any analyses that already have images.
             kwargs: optional keyword arguments to pass onto the Neurosynth meta-analysis.
         """
-        from neurosynth.analysis import meta
-
         # Set up defaults
         if image_dir is None:
-            image_dir = join(settings.IMAGE_DIR, 'features')
+            image_dir = join(settings.IMAGE_DIR, 'analyses')
             if not os.path.exists(image_dir):
                 os.makedirs(image_dir)
 
-        if features is None:
-            features = self._get_feature_names()
+        if analyses is None:
+            analyses = self._get_feature_names()
 
-        # Remove features that already exist
+        # Remove analyses that already exist
         if not overwrite:
-            files = glob(join(settings.IMAGE_DIR, 'features', '*_pFgA_z.nii.gz'))
+            files = glob(join(settings.IMAGE_DIR, 'analyses', '*_pFgA_z.nii.gz'))
             existing = [basename(f).split('_')[0] for f in files]
-            features = list(set(features) - set(existing))
-            print features
+            analyses = list(set(analyses) - set(existing))
 
         # Meta-analyze all images
-        meta.analyze_features(self.dataset, features, save=image_dir, q=0.01, **kwargs)
+        meta.analyze_features(self.dataset, analyses, save=image_dir, q=0.01, **kwargs)
 
-        # Create FeatureImage records
+        # Create AnalysisImage records
         if add_to_db:
-            for f in features:
-                self.add_feature_images(f, image_dir)
+            for f in analyses:
+                self.add_analysis_images(f, image_dir)
 
             self.db.session.commit()
 
 
-    def generate_location_features(self, feature_dir=None, output_dir=None, min_studies_at_voxel=50):
-        """ Create json files containing feature data for every point in the brain. """
+    def generate_location_analyses(self, analysis_dir=None, output_dir=None, min_studies_at_voxel=50):
+        """ Create json files containing analysis data for every point in the brain. """
 
-        if feature_dir is None:
-            feature_dir = join(settings.IMAGE_DIR, 'features')
+        if analysis_dir is None:
+            analysis_dir = join(settings.IMAGE_DIR, 'analyses')
         if output_dir is None:
             output_dir = settings.LOCATION_FEATURE_DIR
 
@@ -321,31 +333,26 @@ class DatabaseBuilder:
         # Save this for later
         ijk_reduced = np.array(v).squeeze()
 
-        # Only use images contained in Feature table--we don't want users being linked 
-        # to features that don't exist in cases where there are orphaned images.
-        features = self.db.session.query(Feature.name).all()
-        features = [i[0] for i in features]
-        n_features = len(features)
+        # Only use images contained in Analysis table--we don't want users being linked 
+        # to analyses that don't exist in cases where there are orphaned images.
+        analyses = self.db.session.query(Analysis.name).all()
+        analyses = [i[0] for i in analyses]
+        n_analyses = len(analyses)
 
         # Read in all rev inf z and posterior prob images
-        rev_inf_z = np.zeros((self.dataset.image_table.data.shape[0], n_features))
-        rev_inf_pp = np.zeros((self.dataset.image_table.data.shape[0], n_features))
-
-        print len(features)
+        rev_inf_z = np.zeros((self.dataset.image_table.data.shape[0], n_analyses))
+        rev_inf_pp = np.zeros((self.dataset.image_table.data.shape[0], n_analyses))
 
         print "Reading in images..."
-        for i, f in enumerate(features):
+        for i, f in enumerate(analyses):
 
             if (i+1) % 100 == 0:
-                print "Loaded feature #%d..." % (i+1)
+                print "Loaded analysis #%d..." % (i+1)
 
-            rev_inf_z[:,i] = masker.mask(join(feature_dir, f + '_pFgA_z.nii.gz'))
-            rev_inf_pp[:,i] = masker.mask(join(feature_dir, f + '_pFgA_given_pF=0.50.nii.gz'))
+            rev_inf_z[:,i] = masker.mask(join(analysis_dir, f + '_pFgA_z.nii.gz'))
+            rev_inf_pp[:,i] = masker.mask(join(analysis_dir, f + '_pFgA_given_pF=0.50.nii.gz'))
 
         print "Done loading..."
-        print len(ijk_reduced)
-        print ijk_reduced.shape
-        print ijk_reduced
         p_active = masker.unmask(p_active).squeeze()
         keep_vox = np.where(p_active >= min_studies_at_voxel)
         ijk = zip(*keep_vox)  # Exclude voxels with few studies
@@ -357,8 +364,8 @@ class DatabaseBuilder:
         for i, seed in enumerate(xyz):
 
             location_name = '_'.join(str(x) for x in seed)
-            featurefile = join(output_dir, '%s_features.txt' % location_name)
-            # if os.path.isfile(featurefile): continue
+            analysisfile = join(output_dir, '%s_analyses.txt' % location_name)
+            # if os.path.isfile(analysisfile): continue
             if (i+1) % 1000 == 0:
                 print "\nProcessing %d/%d..." % (i + 1, num_vox)
             ind = ijk_reduced[i]
@@ -369,9 +376,9 @@ class DatabaseBuilder:
             data = {
                 'data': []
             }
-            for j in range(n_features):
-                data['data'].append([features[j], z_scores[j], pp[j]])
-            json.dump(data, open(featurefile, 'w'))
+            for j in range(n_analyses):
+                data['data'].append([analyses[j], z_scores[j], pp[j]])
+            json.dump(data, open(analysisfile, 'w'))
 
 
     def generate_location_images(self, image_dir=None, add_to_db=False, min_studies=50, **kwargs):
@@ -531,22 +538,23 @@ class DatabaseBuilder:
             if i % 1000 == 0:
                 self.db.session.commit()
 
-    def generate_decoding_data(self, features=None):
-        """ Save image data for feature maps we use in decoding as a separate 
+    def generate_decoding_data(self, analyses=None):
+        """ Save image data for analysis maps we use in decoding as a separate 
         numpy array for rapid use. """
-        if features is None:
-            features = self._get_feature_names()
-        path = join(settings.IMAGE_DIR, 'features', '%s_pFgA_z.nii.gz')
-        images = [path % f for f in features]
-        features = [(f, images[i]) for (i, f) in enumerate(features) if os.path.exists(images[i])]
-        n_vox, n_features = self.dataset.image_table.data.shape[0], len(features)
-        data = np.zeros((n_vox, n_features))
-        for (i, (f, img)) in enumerate(features):
-            data[:,i] = self.dataset.masker.mask(img)
-        data = pd.DataFrame(data, columns=[f[0] for f in features])
+        if analyses is None:
+            analyses = self._get_feature_names()
+        path = join(settings.IMAGE_DIR, 'analyses', '%s_pFgA_z.nii.gz')
+        images = [path % f for f in analyses]
+        analyses = [(f, images[i]) for (i, f) in enumerate(analyses) if os.path.exists(images[i])]
+        n_vox, n_analyses = self.dataset.image_table.data.shape[0], len(analyses)
+        data = np.zeros((n_vox, n_analyses))
+        for (i, (f, img)) in enumerate(analyses):
+            data[:, i] = self.dataset.masker.mask(img)
+        data = pd.DataFrame(data, columns=[f[0] for f in analyses])
         data.to_msgpack(settings.DECODING_DATA)
 
-    def generate_topics(self, name, topic_keys, doc_topics, add_to_db=False, top_n=20):
+    # def generate_topics(self, name, topic_keys, doc_topics, add_to_db=False, top_n=20):
+    def add_topics(self, make_images=True, top_n=20):
         """ Seed the database with topics. 
         Args:
             name: name of topic (e.g., 'topic10')
@@ -555,43 +563,108 @@ class DatabaseBuilder:
             add_to_db: when True, adds new records to database_builder.py
             top_n: int; how many of the top-loading words to store
         """
-        # images = glob(join(settings.TOPIC_DIR, 'images', '*_p?g?_z.nii.gz'))
-        # temporarily store old FeatureTable while we analyze topics
-        ft = deepcopy(self.dataset.feature_table)
-        self.dataset.add_features(doc_topics)
+        topic_sets = glob(join(settings.TOPIC_DIR, '*.json'))
 
-        # Generate topic images
-        output_dir = join(settings.IMAGE_DIR, 'topics', name)
-        if not exists(output_dir):
-            makedirs(output_dir)
-        features = self.dataset.get_feature_names()
-        meta.analyze_features(self.dataset, features, save=image_dir, q=0.01, **kwargs)
+        # Temporarily store the existing AnalysisTable so we don't overwrite it
+        # feature_table = deepcopy(self.dataset.feature_table)
 
-        # Load top-loading terms
-        loadings = [' '.join(l.split()[2:(2+top_n)]) for l in open(topic_keys).read().splitlines()]
+        topic_image_dir = join(settings.IMAGE_DIR, 'topics')
 
-        # Add Topic and associated Images to DB
-        if add_to_db:
-            for (i, f) in enumerate(features):
-                topic = Topic(name=f, topic_set=name, terms=loadings[i])
-                self.add_feature_images(topic, image_dir=join(settings.IMAGE_DIR, 'topics'))
-                db.session.add(topic)
-                db.session.commit()
+        for ts in topic_sets:
+            data = json.load(open(ts))
+            n = int(data['n_topics'])
+
+            ts = AnalysisSet(name=data['name'], description=data['description'],
+                          n_analyses=n)
+            self.db.session.add(ts)
+
+            self.dataset.add_features(join(settings.TOPIC_DIR, 'analyses',
+                                      data['name'] + '.txt'), append=False)
+            key_data = open(join(settings.TOPIC_DIR, 'keys', data['name'] +
+                           '.txt')).read().splitlines()
+
+            topic_set_image_dir = join(topic_image_dir, data['name'])
+            if not exists(topic_set_image_dir):
+                os.makedirs(topic_set_image_dir)
+
+            # Generate full set of topic images
+            meta.analyze_features(self.dataset, self.dataset.get_feature_names(),
+                                  save=topic_set_image_dir, q=0.01)
+
+            feature_data = self.dataset.feature_table.data
+
+            # Get all valid Study ids for speed
+            study_ids = set(self.db.session.query(Study.pmid).all())
+
+            for i in range(n):
+
+                # Disable autoflush temporarily because it causes problems
+                with self.db.session.no_autoflush:
+                    terms = ', '.join(key_data.pop(0).split()[2:])
+                    topic = TopicAnalysis(name=data['name'] + '_' + str(i),
+                                          terms=terms, number=i)
+
+                    self.db.session.add(topic)
+                    self.db.session.commit()
+
+                    # Map onto studies
+                    freqs = feature_data['topic%d' % i]
+                    for s_id, f in freqs[freqs >= 0.05].iteritems():
+                        if s_id in study_ids:
+                            # study = Study.query.get(int(s_id))
+                            self.db.session.add(Frequency(
+                                pmid=int(s_id), analysis=topic, frequency=f))
+
+                    self.db.session.commit()
+
+                    if make_images:
+                        self.add_analysis_images(topic, topic_image_dir)
+
+                ts.analyses.append(topic)
+
+            self.db.session.commit()
+
+        # self.dataset.feature_table = feature_table
+
+
+
+        # # images = glob(join(settings.TOPIC_DIR, 'images', '*_p?g?_z.nii.gz'))
+        # # temporarily store old AnalysisTable while we analyze topics
+        # ft = deepcopy(self.dataset.feature_table)
+        # self.dataset.add_features(doc_topics)
+
+        # # Generate topic images
+        # output_dir = join(settings.IMAGE_DIR, 'topics', name)
+        # if not exists(output_dir):
+        #     makedirs(output_dir)
+        # analyses = self.dataset.get_feature_names()
+        # meta.analyze_features(self.dataset, analyses, save=image_dir, q=0.01, **kwargs)
+
+        # # Load top-loading terms
+        # loadings = [' '.join(l.split()[2:(2+top_n)]) for l in open(topic_keys).read().splitlines()]
+
+        # # Add Topic and associated Images to DB
+        # if add_to_db:
+        #     for (i, f) in enumerate(analyses):
+        #         topic = Topic(name=f, topic_set=name, terms=loadings[i])
+        #         self.add_analysis_images(topic, image_dir=join(settings.IMAGE_DIR, 'topics'))
+        #         db.session.add(topic)
+        #         db.session.commit()
 
         # Map to Studies
 
 
-        # Restore original features
-        self.dataset.feature_table = ft
+        # Restore original analyses
+        self.dataset.feature_table = feature_table
         
-    def _filter_features(self, features):
-        """ Remove any invalid feature names """
-        # Remove features that start with a number
-        features = [f for f in features if re.match('[a-zA-Z]+', f)]
-        return features
+    def _filter_analyses(self, analyses):
+        """ Remove any invalid analysis names """
+        # Remove analyses that start with a number
+        analyses = [f for f in analyses if re.match('[a-zA-Z]+', f)]
+        return analyses
 
     def _get_feature_names(self):
-        """ Return all (filtered) feature names in the Dataset instance """
-        return self._filter_features(self.dataset.get_feature_names())
+        """ Return all (filtered) analysis names in the Dataset instance """
+        return self._filter_analyses(self.dataset.get_feature_names())
 
 
