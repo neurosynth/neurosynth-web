@@ -27,16 +27,16 @@ $(document).ready ->
       window.loadImages(result.data)
       )
 
-  loadLocationFeatures = () ->
-    url = '/locations/' + getLocationString() + '/features'
-    $('#location_features_table').DataTable().ajax.url(url).load().order([1, 'desc'])
+  loadLocationAnalyses = () ->
+    url = '/locations/' + getLocationString() + '/analyses'
+    $('#location_analyses_table').DataTable().ajax.url(url).load().order([1, 'desc'])
 
     #TODO: IMPLEMENT MOVE CURSOR TO SEED
 
   update = ->
     loadLocationStudies()
     loadLocationImages()
-    loadLocationFeatures()
+    loadLocationAnalyses()
     base = window.location.href.split('?')[0]
     coords = { x: $('#x-in').val(), y: $('#y-in').val(), z: $('#z-in').val(), r: $('#rad-out').val()}
     xyz = [coords.x, coords.y, coords.z]
@@ -62,7 +62,7 @@ $(document).ready ->
     # orderClasses: false
   })
 
-  $('#location_features_table').dataTable({
+  $('#location_analyses_table').dataTable({
     paginationType: "full_numbers"
     displayLength: 10
     processing: true
@@ -71,7 +71,7 @@ $(document).ready ->
     columnDefs: [{
       targets: 0
       render: (data, type, row, meta) ->
-        '<a href="/features/'+ data + '">' + data + '</a>'
+        '<a href="/analyses/'+ data + '">' + data + '</a>'
     }]
   })
 

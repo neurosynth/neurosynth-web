@@ -20,8 +20,8 @@ $(document).ready ->
       $(last_row_selected).children('td').removeClass('highlight-table-row')
       $(row).children('td').addClass('highlight-table-row')
       last_row_selected = row
-      feature = $('td:eq(1)', row).text()
-      imgs = load_reverse_inference_image(feature)
+      analysis = $('td:eq(1)', row).text()
+      imgs = load_reverse_inference_image(analysis)
       viewer.loadImages(imgs)
       $(viewer).off('imagesLoaded')
       $(viewer).on('imagesLoaded', (e) ->
@@ -29,7 +29,7 @@ $(document).ready ->
       )
       # Load scatterplot
       $('#loading-message').show()
-      $('#scatterplot').html('<img src="/' + controller + '/' + image_id + '/scatter/' + feature + '.png" width="500px" style="display:none;">')
+      $('#scatterplot').html('<img src="/' + controller + '/' + image_id + '/scatter/' + analysis + '.png" width="500px" style="display:none;">')
       $('#scatterplot>img').load( ->
         $('#scatterplot>img').show()
         $('#loading-message').hide()

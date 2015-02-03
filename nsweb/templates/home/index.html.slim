@@ -14,8 +14,8 @@
       script type="text/javascript"
         |var options = {"panzoomEnabled":false}
         var settings = ['no-zoom', 'nav']
-        var feature = '{{ feature.name }}'
-      p {{ viewers.viewer(feature) }}
+        var analysis = '{{ analysis.name }}'
+      p {{ viewers.viewer(analysis) }}
   %hr.top-space40
   / .row
   /   .col-md-10.col-md-offset-1
@@ -34,7 +34,7 @@
         p
           |{{ stats['n_peaks'] }} activations reported in <a href="/studies" class="big-link">{{ stats['n_studies'] }} studies</a>
         p 
-          | Interactive, downloadable meta-analyses of <a href="/features" class="big-link">{{ stats['n_features'] }} features</a>
+          | Interactive, downloadable meta-analyses of <a href="/analyses" class="big-link">{{ stats['n_analyses'] }} analyses</a>
         p
           | Functional connectivity/coactivation maps for over <a href="/locations" class="big-link">150,000 brain locations</a>
         / p

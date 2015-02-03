@@ -1,115 +1,115 @@
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/home\.css\.scss}line{font-family:\000032}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/home\.css\.scss}line{font-family:\000032}}
 .home-viewer-left-two {
   float: left; }
 
-  @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/home\.css\.scss}line{font-family:\000036}}
+  @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/home\.css\.scss}line{font-family:\000036}}
   .home-viewer-right {
     float: left; }
 
-    @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/home\.css\.scss}line{font-family:\0000310}}
+    @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/home\.css\.scss}line{font-family:\0000310}}
     #view-sagittal.home {
       height: 250px; }
 
-      @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/home\.css\.scss}line{font-family:\0000314}}
+      @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/home\.css\.scss}line{font-family:\0000314}}
       #view-coronal.home {
         width: 240px; }
 
-        @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/home\.css\.scss}line{font-family:\0000318}}
+        @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/home\.css\.scss}line{font-family:\0000318}}
         .view.home {
           margin-left: 15px;
           margin-right: 30px; }
 
-          @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/home\.css\.scss}line{font-family:\0000323}}
+          @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/home\.css\.scss}line{font-family:\0000323}}
           .home-viewer-caption {
             text-align: center;
             font-size: 16px; }
 
-            @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/home\.css\.scss}line{font-family:\0000328}}
+            @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/home\.css\.scss}line{font-family:\0000328}}
             .faq-q {
               font-size: 16px;
               font-family: 'Computer Modern Bold'; }
 
-              @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/home\.css\.scss}line{font-family:\0000333}}
+              @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/home\.css\.scss}line{font-family:\0000333}}
               .faq-a {
                 margin-bottom: 25px;
                 font-size: 14px; }
 
-                @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/home\.css\.scss}line{font-family:\0000340}}
+                @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/home\.css\.scss}line{font-family:\0000340}}
                 #page-code p {
                   clear: left; }
-                  @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/home\.css\.scss}line{font-family:\0000344}}
+                  @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/home\.css\.scss}line{font-family:\0000344}}
                   #page-code .github-buttons {
                     float: left;
                     margin: 25px 0px 0px 20px;
                     clear: right; }
-                    @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/home\.css\.scss}line{font-family:\0000350}}
+                    @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/home\.css\.scss}line{font-family:\0000350}}
                     #page-code .code-group {
                       float: left;
                       clear: both; }
-                      @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/home\.css\.scss}line{font-family:\0000354}}
+                      @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/home\.css\.scss}line{font-family:\0000354}}
                       #page-code .code-group h3 {
                         float: left; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\000031}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\000031}}
 .viewer-left-col {
   width: 270px;
   margin-bottom: 10px;
   float: left; }
 
-  @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\000037}}
+  @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\000037}}
   .viewer-middle-col {
     width: 300px;
     margin-bottom: 20px;
     float: left; }
 
-    @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\0000313}}
+    @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\0000313}}
     .viewer-right-col {
       width: 320px;
       float: left; }
 
-      @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\0000318}}
+      @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\0000318}}
       #view-axial {
         width: 260px;
         height: 260px;
         margin-bottom: 10px; }
 
-        @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\0000336}}
+        @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\0000336}}
         #view-coronal {
           width: 260px;
           height: 220px;
           margin-bottom: 20px; }
 
-          @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\0000342}}
+          @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\0000342}}
           #view-sagittal {
             width: 264px;
             height: 260px; }
 
-            @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\0000347}}
+            @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\0000347}}
             .view {
               float: left; }
 
-              @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\0000351}}
+              @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\0000351}}
               .nav-slider-vertical {
                 height: 100%;
                 margin-left: 5px;
                 float: left; }
 
-                @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\0000357}}
+                @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\0000357}}
                 .nav-slider-horizontal {
                   width: 100%;
                   margin-top: 5px;
                   float: left; }
 
-                  @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\0000363}}
+                  @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\0000363}}
                   canvas {
                     float: left; }
 
-                    @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\0000367}}
+                    @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\0000367}}
                     #layer-panel {
                       width: 290px;
                       float: left; }
 
-                      @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\0000373}}
+                      @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\0000373}}
                       #layer-settings-panel {
                         font-size: 14px;
                         clear: left;
@@ -117,54 +117,54 @@
                         margin-top: 10px;
                         float: left; }
 
-                        @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\0000381}}
+                        @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\0000381}}
                         .layer-container-half-width {
                           width: 50%;
                           float: left; }
 
-                          @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\0000386}}
+                          @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\0000386}}
                           .layer-container-full-width {
                             width: 100%;
                             float: left; }
 
-                            @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\0000391}}
+                            @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\0000391}}
                             #checkbox-list {
                               float: left;
                               margin: 20px 0px 0px 30px; }
 
-                              @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\0000396}}
+                              @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\0000396}}
                               .checkbox_row {
                                 font-size: 14px;
                                 margin-bottom: 5px; }
-                                @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\0000399}}
+                                @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\0000399}}
                                 .checkbox_row > input {
                                   margin-right: 5px; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\00003104}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\00003104}}
 select.layer-settings {
   width: 120px; }
 
-  @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\00003108}}
+  @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\00003108}}
   #layer-list-panel {
     width: 285px;
     float: left; }
 
-    @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\00003113}}
+    @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\00003113}}
     #layer-list {
       width: 280px;
       float: left; }
 
-      @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\00003118}}
+      @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\00003118}}
       li.layer_list_item {
         line-height: 1.2em;
         height: 30px; }
 
-        @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\00003123}}
+        @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\00003123}}
         #layer_visible_list {
           width: 25px;
           float: left; }
 
-          @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\00003128}}
+          @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\00003128}}
           .visibility_icon {
             width: 30px;
             float: left;
@@ -174,7 +174,7 @@ select.layer-settings {
             border-left: 1px solid #999999;
             border-right: 1px solid #999999; }
 
-            @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\00003139}}
+            @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\00003139}}
             .deletion_icon {
               width: 30px;
               float: left;
@@ -184,7 +184,7 @@ select.layer-settings {
               border-left: 1px solid #999999;
               border-right: 1px solid #999999; }
 
-              @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\00003150}}
+              @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\00003150}}
               .download_icon {
                 width: 30px;
                 float: left;
@@ -194,37 +194,37 @@ select.layer-settings {
                 border-left: 1px solid #999999;
                 border-right: 1px solid #999999; }
 
-                @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\00003161}}
+                @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\00003161}}
                 #data-panel {
                   margin-top: 10px;
                   float: left;
                   font: 12px; }
 
-                  @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\00003167}}
+                  @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\00003167}}
                   #description {
                     float: left;
                     width: 264px;
                     display: none; }
 
-                    @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\00003173}}
+                    @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\00003173}}
                     .data-label {
                       width: 100px;
                       float: left;
                       margin-right: 5px;
                       padding-top: 5px; }
 
-                      @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\00003180}}
+                      @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\00003180}}
                       .data-value {
                         font-size: 24px;
                         float: left;
                         line-height: 1.2em; }
 
-                        @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\00003186}}
+                        @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\00003186}}
                         ul#layer-list {
                           margin: 0px;
                           padding: 0px;
                           list-style: none; }
-                          @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\00003187}}
+                          @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\00003187}}
                           ul#layer-list li {
                             border-width: 1px 1px 1px 1px;
                             border-style: solid;
@@ -235,7 +235,7 @@ select.layer-settings {
                             margin: 0px;
                             float: left; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\00003202}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\00003202}}
 #image-description {
   padding: 7px 5px;
   background: #eeeeee;
@@ -245,14 +245,14 @@ select.layer-settings {
   border-radius: 3px;
   -moz-border-radius: 3px; }
 
-  @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\00003212}}
+  @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\00003212}}
   .layer_label {
     float: left;
     width: 180px;
     background: #eeeeee;
     padding: 5px 3px;
     font-size: 12px; }
-    @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\00003218}}
+    @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\00003218}}
     .layer_label.selected {
       background: #9fafc7;
       -moz-box-sizing: border-box;
@@ -260,17 +260,17 @@ select.layer-settings {
       box-sizing: border-box;
       border: 1px ridge #666666; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\00003227}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\00003227}}
 .layer-settings-row {
   float: left;
   clear: both;
   margin-top: 8px;
   width: 100%; }
-  @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\00003232}}
+  @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\00003232}}
   .layer-settings-row .row-label {
     width: 100%; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\00003237}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\00003237}}
 .slider-text {
   width: 36px;
   float: left;
@@ -278,40 +278,40 @@ select.layer-settings {
   line-height: 1.2em;
   text-align: center; }
 
-  @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\00003245}}
+  @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\00003245}}
   .layer-settings-slider {
     width: 60px;
     margin: 3px 8px 0px 4px;
     float: left; }
 
-    @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\00003251}}
+    @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/viewer\.css\.scss}line{font-family:\00003251}}
     #threshold-zero {
       float: left;
       width: 24px;
       font-size: 12px;
       margin-left: 8px; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/features\.css\.scss}line{font-family:\000031}}
-#feature-viewer {
+@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/analyses\.css\.scss}line{font-family:\000031}}
+#analysis-viewer {
   float: left; }
 
-  @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/features\.css\.scss}line{font-family:\000039}}
-  .feature_search {
+  @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/analyses\.css\.scss}line{font-family:\000039}}
+  .analysis_search {
     margin-top: 20px; }
-    @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/features\.css\.scss}line{font-family:\0000312}}
-    .feature_search input {
+    @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/analyses\.css\.scss}line{font-family:\0000312}}
+    .analysis_search input {
       width: 300px; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/features\.css\.scss}line{font-family:\0000317}}
-#feature-image-selector {
+@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/analyses\.css\.scss}line{font-family:\0000317}}
+#analysis-image-selector {
   width: 300px;
   margin: 20px 15px 0px 0px;
   float: right; }
-  @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/features\.css\.scss}line{font-family:\0000322}}
-  #feature-image-selector select {
+  @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/analyses\.css\.scss}line{font-family:\0000322}}
+  #analysis-image-selector select {
     width: 260px; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/features\.css\.scss}line{font-family:\0000327}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/analyses\.css\.scss}line{font-family:\0000327}}
 .plane-pos-box {
   width: 87px;
   float: left;
@@ -319,7 +319,7 @@ select.layer-settings {
   vertical-align: middle;
   margin-right: 1px; }
 
-  @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/features\.css\.scss}line{font-family:\0000335}}
+  @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/analyses\.css\.scss}line{font-family:\0000335}}
   .plane-pos-label {
     float: left;
     vertical-align: middle;
@@ -327,12 +327,12 @@ select.layer-settings {
     padding-top: 10px;
     line-height: 1.2em; }
 
-    @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/features\.css\.scss}line{font-family:\0000343}}
+    @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/analyses\.css\.scss}line{font-family:\0000343}}
     .coordinate-info {
       width: 264px;
       float: left;
       margin-bottom: 10px; }
-      @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/features\.css\.scss}line{font-family:\0000348}}
+      @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/analyses\.css\.scss}line{font-family:\0000348}}
       .coordinate-info input {
         width: 60px;
         font-size: 20px;
@@ -342,19 +342,19 @@ select.layer-settings {
         text-align: center;
         vertical-align: middle;
         border-radius: 5px; }
-        @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/features\.css\.scss}line{font-family:\0000359}}
+        @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/analyses\.css\.scss}line{font-family:\0000359}}
         .coordinate-info input[type=number]::-webkit-inner-spin-button,
         .coordinate-info input[type=number]::-webkit-outer-spin-button {
           -webkit-appearance: none;
           margin: 0; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/features\.css\.scss}line{font-family:\0000366}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/analyses\.css\.scss}line{font-family:\0000366}}
 .coordinate-head {
   height: 52px;
   width: 100%;
   float: left; }
 
-  @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/features\.css\.scss}line{font-family:\0000372}}
+  @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/analyses\.css\.scss}line{font-family:\0000372}}
   .coordinate-title {
     float: left;
     width: 120px;
@@ -362,171 +362,178 @@ select.layer-settings {
     margin-top: 5px;
     line-height: 1.2em; }
 
-    @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/features\.css\.scss}line{font-family:\0000380}}
+    @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/analyses\.css\.scss}line{font-family:\0000380}}
     .layer-data-panel {
       width: 100%; }
 
-      @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/features\.css\.scss}line{font-family:\0000384}}
+      @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/analyses\.css\.scss}line{font-family:\0000384}}
       .intensity-info {
         width: 160px;
         padding-top: 5px;
         float: left; }
 
-        @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/features\.css\.scss}line{font-family:\0000390}}
+        @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/analyses\.css\.scss}line{font-family:\0000390}}
         .intensity-label {
           font-size: 16px;
           width: 70px;
           float: left;
           padding-top: 2px; }
 
-          @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/features\.css\.scss}line{font-family:\0000397}}
+          @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/analyses\.css\.scss}line{font-family:\0000397}}
           .intensity-value {
             font-size: 22px;
             width: 60px;
             float: left; }
 
-            @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/features\.css\.scss}line{font-family:\00003103}}
+            @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/analyses\.css\.scss}line{font-family:\00003103}}
             .whats-here-box {
               float: right; }
 
-              @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/features\.css\.scss}line{font-family:\00003115}}
-              .feature-search {
+              @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/analyses\.css\.scss}line{font-family:\00003115}}
+              .analysis-search {
                 padding-top: 30px;
                 float: right; }
 
+@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/studies\.css\.scss}line{font-family:\000031}}
 .row_label {
   font-weight: bold; }
 
+  @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/studies\.css\.scss}line{font-family:\0000310}}
   #show-study .dataTables_wrapper {
     font-size: 12px; }
+    @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/studies\.css\.scss}line{font-family:\0000314}}
     #show-study .dataTables_filter input {
       font-size: 12px;
       height: 1.1em;
       width: 60px; }
+      @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/studies\.css\.scss}line{font-family:\0000319}}
       #show-study .dataTables_filter label {
         font-size: 12px; }
+  @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/studies\.css\.scss}line{font-family:\0000323}}
   #show-study .dataTables_processing {
     font-size: 12px; }
+    @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/studies\.css\.scss}line{font-family:\0000327}}
     #show-study .dataTables_length select {
       font-size: 12px; }
+      @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/studies\.css\.scss}line{font-family:\0000330}}
       #show-study .dataTables_length label {
         font-size: 12px; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/locations\.css\.scss}line{font-family:\000031}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/locations\.css\.scss}line{font-family:\000031}}
 #locations .lead {
   float: left;
   clear: left; }
 
-  @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/locations\.css\.scss}line{font-family:\000036}}
+  @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/locations\.css\.scss}line{font-family:\000036}}
   #loc-view-axial {
     height: 195px;
     margin-bottom: 20px;
     margin-left: 20px; }
 
-    @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/locations\.css\.scss}line{font-family:\0000313}}
+    @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/locations\.css\.scss}line{font-family:\0000313}}
     #loc-view-coronal {
       height: 165px;
       margin-left: 20px; }
 
-      @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/locations\.css\.scss}line{font-family:\0000319}}
+      @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/locations\.css\.scss}line{font-family:\0000319}}
       #loc-view-sagittal {
         height: 200px; }
 
-        @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/locations\.css\.scss}line{font-family:\0000324}}
+        @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/locations\.css\.scss}line{font-family:\0000324}}
         .loc-viewer {
           margin-left: 20px; }
 
-          @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/locations\.css\.scss}line{font-family:\0000328}}
+          @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/locations\.css\.scss}line{font-family:\0000328}}
           #study-table {
             font-size: 13px; }
 
-            @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/locations\.css\.scss}line{font-family:\0000332}}
+            @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/locations\.css\.scss}line{font-family:\0000332}}
             #load-location-box {
               width: 300px;
               text-align: center;
               margin-top: 30px;
               float: left; }
 
-              @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/locations\.css\.scss}line{font-family:\0000339}}
+              @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/locations\.css\.scss}line{font-family:\0000339}}
               #rad-in {
                 width: 200px;
                 margin-top: 7px; }
 
-                @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/locations\.css\.scss}line{font-family:\0000344}}
+                @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/locations\.css\.scss}line{font-family:\0000344}}
                 .location-studies-head {
                   margin: 20px 0px 20px 0px; }
 
-                  @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/locations\.css\.scss}line{font-family:\0000348}}
+                  @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/locations\.css\.scss}line{font-family:\0000348}}
                   #current-location-info {
                     float: left;
                     font-size: 28px; }
 
-                    @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/locations\.css\.scss}line{font-family:\0000353}}
+                    @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/locations\.css\.scss}line{font-family:\0000353}}
                     .location-adjust-radius {
                       float: left;
                       height: 70px;
                       padding-top: 6px;
                       clear: left;
                       font-size: 18px; }
-                      @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/locations\.css\.scss}line{font-family:\0000360}}
+                      @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/locations\.css\.scss}line{font-family:\0000360}}
                       .location-adjust-radius .radius-element {
                         float: left;
                         height: 40px;
                         padding-right: 5px; }
-                        @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/locations\.css\.scss}line{font-family:\0000366}}
+                        @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/locations\.css\.scss}line{font-family:\0000366}}
                         .location-adjust-radius input {
                           float: left;
                           text-align: center; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/decode\.css\.scss}line{font-family:\000031}}
-.feature-list {
+@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/decode\.css\.scss}line{font-family:\000031}}
+.analysis-list {
   width: 150px;
   float: left;
   font-size: 12px; }
 
-  @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/decode\.css\.scss}line{font-family:\0000310}}
+  @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/decode\.css\.scss}line{font-family:\0000310}}
   .highlight-table-row {
     background-color: #666666 !important;
     color: white;
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
     box-sizing: border-box; }
-    @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/decode\.css\.scss}line{font-family:\0000313}}
+    @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/decode\.css\.scss}line{font-family:\0000313}}
     .highlight-table-row a {
       color: white; }
-      @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/decode\.css\.scss}line{font-family:\0000314}}
+      @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/decode\.css\.scss}line{font-family:\0000314}}
       .highlight-table-row a:hover {
         color: #dddddd !important; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/decode\.css\.scss}line{font-family:\0000320}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/decode\.css\.scss}line{font-family:\0000320}}
 .decoder-description {
   font-size: 18px;
   margin-top: 30px; }
 
-  @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/decode\.css\.scss}line{font-family:\0000325}}
+  @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/decode\.css\.scss}line{font-family:\0000325}}
   .decoder-options {
     width: 100%;
     position: relative;
     margin: 40px 0px 0px 15px; }
 
-    @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/decode\.css\.scss}line{font-family:\0000331}}
+    @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/decode\.css\.scss}line{font-family:\0000331}}
     .button-box {
       margin-right: 40px;
       float: left; }
 
-      @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/decode\.css\.scss}line{font-family:\0000336}}
+      @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/decode\.css\.scss}line{font-family:\0000336}}
       .btn-giant {
         font-size: 26px !important;
         line-height: 1.2em; }
 
-        @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/decode\.css\.scss}line{font-family:\0000341}}
+        @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/decode\.css\.scss}line{font-family:\0000341}}
         .decoder-or {
           float: left;
           vertical-align: middle;
           margin: 12px 10px 0px 0px;
           font-size: 20px; }
 
-          @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/decode\.css\.scss}line{font-family:\0000348}}
+          @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/decode\.css\.scss}line{font-family:\0000348}}
           .decoder-form {
             vertical-align: middle;
             float: left;
@@ -534,7 +541,7 @@ select.layer-settings {
             font-size: 20px;
             line-height: 1.4em; }
 
-            @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/decode\.css\.scss}line{font-family:\0000356}}
+            @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/decode\.css\.scss}line{font-family:\0000356}}
             #loading-message {
               font-size: 26px;
               width: 460px;
@@ -545,13 +552,14 @@ select.layer-settings {
               top: 200px;
               text-align: center; }
 
-              @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/decode\.css\.scss}line{font-family:\0000367}}
+              @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/decode\.css\.scss}line{font-family:\0000367}}
               #scatterplot {
                 position: relative; }
-                @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/decode\.css\.scss}line{font-family:\0000369}}
+                @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/decode\.css\.scss}line{font-family:\0000369}}
                 #scatterplot img {
                   position: absolute; }
 
+@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/genes\.css\.scss}line{font-family:\000031}}
 #page-genes input.plane-pos {
   width: 50px;
   font-size: 20px;
@@ -563,23 +571,29 @@ select.layer-settings {
   padding: 3px;
   border-radius: 3px; }
 
+  @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/genes\.css\.scss}line{font-family:\0000314}}
   #coordinates.data-row {
     text-align: center; }
 
+    @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/genes\.css\.scss}line{font-family:\0000318}}
     input[type=number]::-webkit-inner-spin-button,
     input[type=number]::-webkit-outer-spin-button {
       -webkit-appearance: none;
       margin: 0; }
 
+@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/jquery-ui-override\.css\.scss}line{font-family:\000031}}
 .ui-slider-range.ui-widget-header {
   background: white; }
 
+  @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/jquery-ui-override\.css\.scss}line{font-family:\000035}}
   .ui-slider {
     border-radius: 2px; }
 
+    @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/jquery-ui-override\.css\.scss}line{font-family:\000039}}
     .ui-slider-horizontal {
       height: 6px;
       top: 2px; }
+      @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/jquery-ui-override\.css\.scss}line{font-family:\0000312}}
       .ui-slider-horizontal .ui-slider-handle {
         height: 20px;
         top: -7px;
@@ -587,43 +601,45 @@ select.layer-settings {
         border-radius: 2px;
         width: 8px; }
 
+@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/jquery-ui-override\.css\.scss}line{font-family:\0000321}}
 .ui-slider-vertical {
   width: 6px;
   left: 4px; }
+  @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/jquery-ui-override\.css\.scss}line{font-family:\0000324}}
   .ui-slider-vertical .ui-slider-handle {
     width: 20px;
     height: 8px;
     margin-left: -2px;
     border-radius: 2px; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/style\.scss}line{font-family:\000031}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/style\.scss}line{font-family:\000031}}
 .option-bar {
   width: 200px;
   padding: 10px; }
 
-  @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/style\.scss}line{font-family:\000036}}
+  @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/style\.scss}line{font-family:\000036}}
   .form-group {
     width: 400px; }
 
-    @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/style\.scss}line{font-family:\0000310}}
+    @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/style\.scss}line{font-family:\0000310}}
     .huge-text {
 }
 
-      @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/style\.scss}line{font-family:\0000314}}
+      @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/style\.scss}line{font-family:\0000314}}
       @font-face {
         font-family: 'Computer Modern';
         src: url('/static/fonts/cmunss.otf'); }
 
-        @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/style\.scss}line{font-family:\0000319}}
+        @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/style\.scss}line{font-family:\0000319}}
         @font-face {
           font-family: 'Computer Modern Bold';
           src: url('/static/fonts/cmunsx.otf'); }
 
-          @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/style\.scss}line{font-family:\0000324}}
+          @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/style\.scss}line{font-family:\0000324}}
           .big-text {
             font-size: 36px;
             float: left; }
-            @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/style\.scss}line{font-family:\0000328}}
+            @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/style\.scss}line{font-family:\0000328}}
             .big-text input {
               width: 80px;
               font-size: 32px;
@@ -634,24 +650,24 @@ select.layer-settings {
               vertical-align: middle;
               padding: 0px 4px 0px 10px;
               border-radius: 5px; }
-              @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/style\.scss}line{font-family:\0000340}}
+              @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/style\.scss}line{font-family:\0000340}}
               .big-text input[type=number]::-webkit-inner-spin-button,
               .big-text input[type=number]::-webkit-outer-spin-button {
                 -webkit-appearance: none;
                 margin: 0; }
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/style\.scss}line{font-family:\0000347}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/style\.scss}line{font-family:\0000347}}
 .big-link {
   font-size: 24px; }
 
-  @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/style\.scss}line{font-family:\0000351}}
+  @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/style\.scss}line{font-family:\0000351}}
   .help {
     margin-top: 15px; }
 
-    @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/style\.scss}line{font-family:\0000355}}
+    @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/style\.scss}line{font-family:\0000355}}
     ul.nav-tabs, ul.nav-pills {
       font-size: 16px; }
 
-      @media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/tyarkoni\/Dropbox\/Code\/nsweb\/nsweb\/static\/scss\/style\.scss}line{font-family:\0000359}}
+      @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/style\.scss}line{font-family:\0000359}}
       ul.navbar-nav {
         font-size: 18px; }
