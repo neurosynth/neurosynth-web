@@ -342,9 +342,8 @@ make_scatterplot = function() {
 };
 
 $(document).ready(function() {
-  var SELECTED, getSelection, iDelay, redrawTableSelection, saveSelection, study, tbl, url, url_id;
-  console.log('hello world');
-  if (!$('#page-study').length) {
+  var SELECTED, getPMID, getSelection, iDelay, redrawTableSelection, saveSelection, study, tbl, url, url_id;
+  if (!$('.selectable-table').length) {
     return;
   }
   study = document.URL.split('/').slice(-2)[0];
@@ -412,9 +411,17 @@ $(document).ready(function() {
   saveSelection = function(selection) {
     return window.localStorage.setItem('selection', JSON.stringify(selection));
   };
-  $('#studies_table').on('click', 'tr', function() {
+  getPMID = function(tr) {
+    var href;
+    href = $(tr).find('a').first().attr('href');
+    if (href == null) {
+      return null;
+    }
+    return /(\d+)/.exec(href)[0];
+  };
+  $('.selectable-table').on('click', 'tr', function() {
     var pmid, selection;
-    pmid = $(this).find('a').last().text();
+    pmid = getPMID(this);
     selection = getSelection();
     if (pmid in selection) {
       delete selection[pmid];
@@ -429,7 +436,7 @@ $(document).ready(function() {
     selection = getSelection();
     return $('tbody').find('tr').each(function() {
       var pmid;
-      pmid = $(this).find('a').last().text();
+      pmid = getPMID(this);
       if (pmid in selection) {
         return $(this).addClass(SELECTED);
       } else {
@@ -437,7 +444,7 @@ $(document).ready(function() {
       }
     });
   };
-  $('#studies_table').on('draw.dt', function() {
+  $('.selectable-table').on('draw.dt', function() {
     return redrawTableSelection();
   });
   $('#select-all-btn').click(function() {
@@ -445,7 +452,7 @@ $(document).ready(function() {
     selection = getSelection();
     $('tbody').find('tr').each(function() {
       var pmid;
-      pmid = $(this).find('a').last().text();
+      pmid = getPMID(this);
       return selection[pmid] = 1;
     });
     saveSelection(selection);
@@ -456,7 +463,7 @@ $(document).ready(function() {
     selection = getSelection();
     $('tbody').find('tr').each(function() {
       var pmid;
-      pmid = $(this).find('a').last().text();
+      pmid = getPMID(this);
       return delete selection[pmid];
     });
     saveSelection(selection);

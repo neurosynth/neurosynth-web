@@ -45,7 +45,13 @@
                 input type="number" name="rad-out" id="rad-out" min="1" max="20" value="{{radius}}"
               .radius-element
                 input id="radius-submit" type="button" value="Go"
-          table#location_studies_table.table-striped.table-hover.table.table-condensed.small-datatable
+          br
+          br
+          button.bt.btn-primary#select-all-btn Select all studies on this page
+          button.bt.btn-primary#deselect-all-btn Deselect all studies on this page
+          br
+          br
+          table#location_studies_table.table-striped.table-hover.table.table-condensed.small-datatable.selectable-table
             thead
               tr
                 th Title

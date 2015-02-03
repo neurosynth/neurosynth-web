@@ -2,8 +2,7 @@
 # All this logic will automatically be available in application.js.
 # You can use CoffeeScript in this file: http://jashkenas.github.com/coffee-script/
 $(document).ready ->
-  console.log 'hello world'
-  return if not $('#page-study').length
+  return if not $('.selectable-table').length
 
   # Load the table layers
   study = document.URL.split('/').slice(-2)[0]
@@ -61,8 +60,15 @@ $(document).ready ->
   saveSelection = (selection) ->
     window.localStorage.setItem('selection', JSON.stringify(selection))
 
-  $('#studies_table').on 'click', 'tr', ->
-    pmid = $(this).find('a').last().text()
+  getPMID = (tr) ->
+    # Given tr DOM element parse the PMID
+    # Assumes the first column has a link of the form ..../<pmid>
+    href = $(tr).find('a').first().attr('href')
+    return null if not href?
+    return /(\d+)/.exec(href)[0]
+
+  $('.selectable-table').on 'click', 'tr', ->
+    pmid = getPMID(this)
     selection = getSelection()
     if pmid of selection
       delete selection[pmid]
@@ -74,19 +80,19 @@ $(document).ready ->
   redrawTableSelection = ->
     selection = getSelection()
     $('tbody').find('tr').each ->
-      pmid = $(this).find('a').last().text()
+      pmid = getPMID(this)
       if pmid of selection
         $(this).addClass(SELECTED)
       else
         $(this).removeClass(SELECTED)
 
-  $('#studies_table').on 'draw.dt', ->
+  $('.selectable-table').on 'draw.dt', ->
     redrawTableSelection()
 
   $('#select-all-btn').click ->
     selection = getSelection()
     $('tbody').find('tr').each ->
-      pmid = $(this).find('a').last().text()
+      pmid = getPMID(this)
       selection[pmid] = 1
     saveSelection(selection)
     redrawTableSelection()
@@ -94,7 +100,7 @@ $(document).ready ->
   $('#deselect-all-btn').click ->
     selection = getSelection()
     $('tbody').find('tr').each ->
-      pmid = $(this).find('a').last().text()
+      pmid = getPMID(this)
       delete selection[pmid]
     saveSelection(selection)
     redrawTableSelection()
