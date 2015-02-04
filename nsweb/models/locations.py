@@ -6,7 +6,7 @@ class Location(db.Model):
     x = db.Column(db.Float)
     y = db.Column(db.Float)
     z = db.Column(db.Float)
-    location_feature = association_proxy('location_feature', 'LocationFeature')
+    location_analysis = association_proxy('location_analysis', 'LocationAnalysis')
     images = db.relationship('LocationImage', backref=db.backref('location', lazy='joined'))
 
     def __init__(self,x,y,z):
@@ -14,14 +14,14 @@ class Location(db.Model):
         self.y=y
         self.z=z
         
-# class LocationFeature(db.Model):
-#     feature_id = db.Column(db.Integer, db.ForeignKey(Feature.id), primary_key=True)
+# class LocationAnalysis(db.Model):
+#     analysis_id = db.Column(db.Integer, db.ForeignKey(Analysis.id), primary_key=True)
 #     location_id = db.Column(db.Integer, db.ForeignKey(Location.id), primary_key=True)
 #     value = db.Column(db.Float)
-#     feature = db.relationship(Feature, backref=db.backref('location_feature',cascade='all, delete-orphan'))
-#     location = db.relationship(Location, backref=db.backref('location_feature',cascade='all, delete-orphan'))
+#     analysis = db.relationship(Analysis, backref=db.backref('location_analysis',cascade='all, delete-orphan'))
+#     location = db.relationship(Location, backref=db.backref('location_analysis',cascade='all, delete-orphan'))
      
-#     def __init__(self, location, feature, value):
+#     def __init__(self, location, analysis, value):
 #         self.location=location
-#         self.feature=feature
+#         self.analysis=analysis
 #         self.value=value

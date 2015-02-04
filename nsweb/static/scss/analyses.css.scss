@@ -1,12 +1,12 @@
-// Place all the styles related to the features controller here.
+// Place all the styles related to the analyses controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
-#feature-viewer {
+#analysis-viewer {
 	float: left;
 	// min-height: 800px;
 }
 
-.feature_search {
+.analysis_search {
 	margin-top: 20px;
 
 	input {
@@ -14,7 +14,7 @@
 	}
 }
 
-#feature-image-selector {
+#analysis-image-selector {
 	width: 300px;
 	margin: 20px 15px 0px 0px;
 	float: right;
@@ -112,7 +112,7 @@
 	// width: 80px;
 }
 
-.feature-search {
+.analysis-search {
 	padding-top: 30px;
 	float: right
 }

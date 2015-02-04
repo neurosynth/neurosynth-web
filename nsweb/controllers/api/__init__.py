@@ -4,7 +4,7 @@ from flask import Blueprint #, redirect, jsonify, url_for, request
 
 bp = Blueprint('apis',__name__,url_prefix='/api')
 
-from nsweb.controllers.api.features import *
+from nsweb.controllers.api.analyses import *
 from nsweb.controllers.api.studies import *
 from nsweb.controllers.api.locations import *
 

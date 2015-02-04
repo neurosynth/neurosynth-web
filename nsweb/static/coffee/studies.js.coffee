@@ -25,11 +25,11 @@ $(document).ready ->
   url_id=document.URL.split('/')
   url_id=url_id[url_id.length-2]
   
-  $('#study_features_table').dataTable
+  $('#study_analyses_table').dataTable
     paginationType: "full_numbers"
     displayLength: 10
     processing: true
-    ajax: '/api/studies/features/'+url_id+'/'
+    ajax: '/api/studies/analyses/'+url_id+'/'
     deferRender: true
     stateSave: true
     order: [[1, 'desc']]

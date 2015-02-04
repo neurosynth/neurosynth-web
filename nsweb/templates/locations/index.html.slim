@@ -1,7 +1,7 @@
 - set page_title = 'Neurosynth: (' + [x,y,z]|join(', ') + ')'
 - extends "layout/base.html"
 - block content
-  - import "macros/_feature_viewer.html.slim" as viewers
+  - import "macros/_analysis_viewer.html.slim" as viewers
   .row#page-location
     .col-md-12
       .big-text
@@ -15,7 +15,7 @@
         li.active
           a href="#maps" data-toggle="tab" Maps
         li
-          a href="#features" data-toggle="tab" Features
+          a href="#analyses" data-toggle="tab" Analyses
         li
           a href="#studies" data-toggle="tab" Studies
       #location-tab-content.tab-content
@@ -26,12 +26,12 @@
             var options = { panzoomEnabled: false, xyz: [{{x}}, {{y}}, {{z}}]}
             var settings = ['no-zoom', 'layers','nav','checkboxes']
           p {{viewers.viewer()|safe}}
-        #features.tab-pane
-          h3 Feature loadings (reverse inference)
-          table#location_features_table.table-striped.table-hover.table.table-condensed.small-datatable
+        #analyses.tab-pane
+          h3 Analysis loadings (reverse inference)
+          table#location_analyses_table.table-striped.table-hover.table.table-condensed.small-datatable
             thead
               tr
-                th Feature
+                th Analysis
                 th z-score
                 th post. prob.
         #studies.tab-pane

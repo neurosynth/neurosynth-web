@@ -1,4 +1,4 @@
-- macro viewer(feature)
+- macro viewer(analysis)
 
   .row
     .md-col-8.md-offset-1.viewer
@@ -11,7 +11,7 @@
           %canvas height="220" width="264"
           %#nav-xaxis.slider.nav-slider-horizontal
         .home-viewer-caption 
-          |An automated meta-analysis of {{ feature.num_studies }} studies of <a href="{{ url_for('features.show', val=feature.name) }}" style="font-size: 1.2em;">{{ feature.name }}</a>
+          |An automated meta-analysis of {{ analysis.n_studies }} studies of <a href="{{ url_for('analyses.show', val=analysis.name) }}" style="font-size: 1.2em;">{{ analysis.name }}</a>
 
       .home-viewer-right
         #view-axial.view.home

@@ -1,23 +1,23 @@
 
 $(document).ready ->
 
-  return if not $('#page-feature').length
+  return if not $('#page-analysis').length
 
-  feature = document.URL.split('/').slice(-2)[0]
+  analysis = document.URL.split('/').slice(-2)[0]
 
-  tbl=$('#features_table').dataTable
+  tbl=$('#analyses_table').dataTable
     PaginationType: "full_numbers"
-    displayLength: 10
+    displayLength: 25
     processing: true
     serverSide: true
-    ajax: '/api/features'
+    ajax: '/api/analyses'
     deferRender: true
     stateSave: true
     autoWidth: true
     orderClasses: false
   tbl.fnSetFilteringDelay(iDelay=400)
 
-  $('#feature_studies_table').dataTable
+  $('#analysis_studies_table').dataTable
     paginationType: "full_numbers"
     displayLength: 25
     processing: true
@@ -32,13 +32,13 @@ $(document).ready ->
     ]
 
     # autocomplete
-    $.get('/features/feature_names', (result) ->
+    $.get('/analyses/analysis_names', (result) ->
 
-      $('#feature-search').autocomplete( 
+      $('#analysis-search').autocomplete( 
         minLength: 2
         delay: 0
         select: (e, ui) -> 
-          window.location.href = '/features/' + ui.item.value
+          window.location.href = '/analyses/' + ui.item.value
         # only match words that start with string, and limit to 10
         source: (request, response) ->
           re = $.ui.autocomplete.escapeRegex(request.term)
@@ -50,34 +50,34 @@ $(document).ready ->
       )
     )
     
-  $('#feature-search').keyup((e) ->
-    text = $('#feature-search').val()
-    window.location.href = ('/features/' + text) if (e.keyCode == 13)
+  $('#analysis-search').keyup((e) ->
+    text = $('#analysis-search').val()
+    window.location.href = ('/analyses/' + text) if (e.keyCode == 13)
   )
 
-  loadFeatureStudies = () ->
-    url = '/features/' + feature + '/studies?dt=1'
-    $('#feature_studies_table').DataTable().ajax.url(url).load().order([3, 'desc'])
+  loadAnalysisStudies = () ->
+    url = '/analyses/' + analysis + '/studies?dt=1'
+    $('#analysis_studies_table').DataTable().ajax.url(url).load().order([3, 'desc'])
 
-  loadFeatureImages = () ->
-    url = '/features/' + feature  + '/images'
+  loadAnalysisImages = () ->
+    url = '/analyses/' + analysis  + '/images'
     $.get(url, (result) ->
       loadImages(result.data)
       )
 
   # Load state (e.g., which tab to display)
-  activeTab = window.cookie.get('featureTab')
-  $("#feature-menu li:eq(#{activeTab}) a").tab('show')
+  activeTab = window.cookie.get('analysisTab')
+  $("#analysis-menu li:eq(#{activeTab}) a").tab('show')
 
-  if feature?
-    loadFeatureStudies()
-    loadFeatureImages()
+  if analysis?
+    loadAnalysisStudies()
+    loadAnalysisImages()
 
   # Update cookie to reflect last tab user was on
-  $('#feature-menu a').click ((e) =>
+  $('#analysis-menu a').click ((e) =>
       e.preventDefault()
-      activeTab = $('#feature-menu a').index($(e.target))
-      window.cookie.set('featureTab', activeTab)
+      activeTab = $('#analysis-menu a').index($(e.target))
+      window.cookie.set('analysisTab', activeTab)
       $(e.target).tab('show')
       if activeTab == 0
           viewer.paint()

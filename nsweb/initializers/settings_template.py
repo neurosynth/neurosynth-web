@@ -18,8 +18,8 @@ PICKLE_DATABASE = join(ASSET_DIR, 'neurosynth_dataset.pkl')
 # Main image folder
 IMAGE_DIR = join(DATA_DIR, 'images')
 
-# Path to feature/location flat filies
-LOCATION_FEATURE_DIR = join(DATA_DIR, 'locations', 'test')
+# Path to analysis/location flat filies
+LOCATION_ANALYSIS_DIR = join(DATA_DIR, 'locations', 'analyses')
 
 # The root location of the app. Should not need to be changed.
 ROOT_DIR=os.path.realpath(join(join(os.path.dirname(__file__), os.path.pardir), os.path.pardir))
@@ -52,8 +52,8 @@ CACHE_DECODINGS = True
 
 
 ### CONTENT-SPECIFIC DIRECTORIES ###
+MASK_DIR = join(IMAGE_DIR, 'masks')
 TOPIC_DIR = join(DATA_DIR, 'topics')
-
 GENE_IMAGE_DIR = join(IMAGE_DIR, 'genes')
 
 

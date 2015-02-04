@@ -2,7 +2,7 @@ from nsweb.core import db
 from sqlalchemy.ext.associationproxy import association_proxy
 
 from users import *
-from features import *
+from analyses import *
 from studies import *
 from images import *
 from locations import *

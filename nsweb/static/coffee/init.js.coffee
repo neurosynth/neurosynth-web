@@ -3,7 +3,7 @@ class NSCookie
     constructor: (@contents = null) ->
         @contents ?= {
             locationTab: 0
-            featureTab: 0
+            analysisTab: 0
         }
         @save()
 
@@ -30,11 +30,11 @@ urlToParams = () ->
     JSON.parse "{\"" + decodeURI(search).replace(/"/g, "\"").replace(/&/g, "\",\"").replace(RegExp("=", "g"), "\":\"") + "\"}"
 window.urlToParams = urlToParams
 
-load_reverse_inference_image = (feature, fdr=false) ->
-  url = '/features/' + feature + '/images/reverseinference'
+load_reverse_inference_image = (analysis, fdr=false) ->
+  url = '/analyses/' + analysis + '/images/reverseinference'
   url += '?nofdr' if not fdr
   [{
-    name: feature + ' (reverse inference)'
+    name: analysis + ' (reverse inference)'
     url: url
     colorPalette: 'yellow'
     download: true
@@ -65,9 +65,9 @@ $(document).ready ->
           width: '20%'
         },
         { 
-          data: "feature"
+          data: "analysis"
           render: (data, type, row, meta) ->
-            '<a href="/features/'+ data + '">' + data + '</a>'
+            '<a href="/analyses/'+ data + '">' + data + '</a>'
           width: '%60%'
         }, 
         {

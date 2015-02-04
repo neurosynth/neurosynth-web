@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, redirect, url_for, request, jsonify, abort, send_file
-from nsweb.models import Feature, Gene
+from nsweb.models import Analysis, Gene
 from nsweb.core import add_blueprint
 from nsweb.tasks import decode_image, make_scatterplot
 from nsweb.initializers import settings
@@ -43,17 +43,17 @@ def get_data(val):
         result = decode_image.delay(gene.images[0].image_file).wait()  # decode image
     data = open(filename).read().splitlines()
     data = [x.split('\t') for x in data]
-    data = [{'feature': f, 'r': round(float(v), 3)} for (f, v) in data]
+    data = [{'analysis': f, 'r': round(float(v), 3)} for (f, v) in data]
     return jsonify(data=data)
     
-@bp.route('/<string:val>/scatter/<string:feature>.png')
-def get_scatter(val, feature):
-    outfile = join(settings.DECODING_SCATTERPLOTS_DIR, val + '_' + feature + '.png')
+@bp.route('/<string:val>/scatter/<string:analysis>.png')
+def get_scatter(val, analysis):
+    outfile = join(settings.DECODING_SCATTERPLOTS_DIR, val + '_' + analysis + '.png')
     if not exists(outfile):
-        """ Return .png of scatter plot between the uploaded image and specified feature. """
+        """ Return .png of scatter plot between the uploaded image and specified analysis. """
         gene = Gene.query.filter_by(symbol=val).first()
         if gene is None: abort(404)
-        result = make_scatterplot.delay(gene.images[0].image_file, feature, gene.symbol,
+        result = make_scatterplot.delay(gene.images[0].image_file, analysis, gene.symbol,
             x_lab='%s expression level' % gene.symbol, outfile=outfile, gene_masks=True).wait()
     return send_file(outfile, as_attachment=False, 
             attachment_filename=basename(outfile))

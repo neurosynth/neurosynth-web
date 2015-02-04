@@ -28,11 +28,11 @@ def get_study_list():
     return result
 
 # Begin client side APIs 
-@bp.route('/studies/features/<int:val>/')
-def get_study_features(val):
+@bp.route('/studies/analyses/<int:val>/')
+def get_study_analyses(val):
     data=Study.query.get(val)
 #     data=Frequency.query.filter_by(pmid=int(val))#attempted optimization. Join causes slower performance however
-    data = [ ['<a href={0}>{1}</a>'.format(url_for('features.show',val=f.feature_id), f.feature.name),
+    data = [ ['<a href={0}>{1}</a>'.format(url_for('analyses.show',val=f.analysis_id), f.analysis.name),
               round(f.frequency,3),
               ] for f in data.frequencies]
     data=jsonify(data=data)

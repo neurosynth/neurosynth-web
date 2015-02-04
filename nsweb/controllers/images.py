@@ -1,5 +1,5 @@
 from flask import send_from_directory, Blueprint, abort, request, jsonify, redirect, url_for, send_file
-from nsweb.models import Image, Feature, Location, Download
+from nsweb.models import Image, Analysis, Location, Download
 from nsweb.initializers.settings import IMAGE_DIR
 from nsweb.core import add_blueprint, db
 import os

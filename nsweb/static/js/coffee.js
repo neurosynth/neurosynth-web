@@ -7,7 +7,7 @@ NSCookie = (function() {
     if (this.contents == null) {
       this.contents = {
         locationTab: 0,
-        featureTab: 0
+        analysisTab: 0
       };
     }
     this.save();
@@ -59,18 +59,18 @@ urlToParams = function() {
 
 window.urlToParams = urlToParams;
 
-load_reverse_inference_image = function(feature, fdr) {
+load_reverse_inference_image = function(analysis, fdr) {
   var url;
   if (fdr == null) {
     fdr = false;
   }
-  url = '/features/' + feature + '/images/reverseinference';
+  url = '/analyses/' + analysis + '/images/reverseinference';
   if (!fdr) {
     url += '?nofdr';
   }
   return [
     {
-      name: feature + ' (reverse inference)',
+      name: analysis + ' (reverse inference)',
       url: url,
       colorPalette: 'yellow',
       download: true
@@ -97,9 +97,9 @@ $(document).ready(function() {
           defaultContent: '<button type="button" class="btn btn-xs btn-primary" style="line-height: 1em;"><span class="glyphicon glyphicon-arrow-left"></span></button>',
           width: '20%'
         }, {
-          data: "feature",
+          data: "analysis",
           render: function(data, type, row, meta) {
-            return '<a href="/features/' + data + '">' + data + '</a>';
+            return '<a href="/analyses/' + data + '">' + data + '</a>';
           },
           width: '%60%'
         }, {
@@ -365,11 +365,11 @@ $(document).ready(function() {
   window.tbl = tbl;
   url_id = document.URL.split('/');
   url_id = url_id[url_id.length - 2];
-  $('#study_features_table').dataTable({
+  $('#study_analyses_table').dataTable({
     paginationType: "full_numbers",
     displayLength: 10,
     processing: true,
-    ajax: '/api/studies/features/' + url_id + '/',
+    ajax: '/api/studies/analyses/' + url_id + '/',
     deferRender: true,
     stateSave: true,
     order: [[1, 'desc']],
@@ -472,24 +472,24 @@ $(document).ready(function() {
 });
 
 $(document).ready(function() {
-  var activeTab, feature, iDelay, loadFeatureImages, loadFeatureStudies, tbl;
-  if (!$('#page-feature').length) {
+  var activeTab, analysis, iDelay, loadAnalysisImages, loadAnalysisStudies, tbl;
+  if (!$('#page-analysis').length) {
     return;
   }
-  feature = document.URL.split('/').slice(-2)[0];
-  tbl = $('#features_table').dataTable({
+  analysis = document.URL.split('/').slice(-2)[0];
+  tbl = $('#analyses_table').dataTable({
     PaginationType: "full_numbers",
-    displayLength: 10,
+    displayLength: 25,
     processing: true,
     serverSide: true,
-    ajax: '/api/features',
+    ajax: '/api/analyses',
     deferRender: true,
     stateSave: true,
     autoWidth: true,
     orderClasses: false
   });
   tbl.fnSetFilteringDelay(iDelay = 400);
-  $('#feature_studies_table').dataTable({
+  $('#analysis_studies_table').dataTable({
     paginationType: "full_numbers",
     displayLength: 25,
     processing: true,
@@ -507,12 +507,12 @@ $(document).ready(function() {
         width: '7%'
       }
     ]
-  }, $.get('/features/feature_names', function(result) {
-    return $('#feature-search').autocomplete({
+  }, $.get('/analyses/analysis_names', function(result) {
+    return $('#analysis-search').autocomplete({
       minLength: 2,
       delay: 0,
       select: function(e, ui) {
-        return window.location.href = '/features/' + ui.item.value;
+        return window.location.href = '/analyses/' + ui.item.value;
       },
       source: function(request, response) {
         var filtered, matcher, re;
@@ -525,36 +525,36 @@ $(document).ready(function() {
       }
     });
   }));
-  $('#feature-search').keyup(function(e) {
+  $('#analysis-search').keyup(function(e) {
     var text;
-    text = $('#feature-search').val();
+    text = $('#analysis-search').val();
     if (e.keyCode === 13) {
-      return window.location.href = '/features/' + text;
+      return window.location.href = '/analyses/' + text;
     }
   });
-  loadFeatureStudies = function() {
+  loadAnalysisStudies = function() {
     var url;
-    url = '/features/' + feature + '/studies?dt=1';
-    return $('#feature_studies_table').DataTable().ajax.url(url).load().order([3, 'desc']);
+    url = '/analyses/' + analysis + '/studies?dt=1';
+    return $('#analysis_studies_table').DataTable().ajax.url(url).load().order([3, 'desc']);
   };
-  loadFeatureImages = function() {
+  loadAnalysisImages = function() {
     var url;
-    url = '/features/' + feature + '/images';
+    url = '/analyses/' + analysis + '/images';
     return $.get(url, function(result) {
       return loadImages(result.data);
     });
   };
-  activeTab = window.cookie.get('featureTab');
-  $("#feature-menu li:eq(" + activeTab + ") a").tab('show');
-  if (feature != null) {
-    loadFeatureStudies();
-    loadFeatureImages();
+  activeTab = window.cookie.get('analysisTab');
+  $("#analysis-menu li:eq(" + activeTab + ") a").tab('show');
+  if (analysis != null) {
+    loadAnalysisStudies();
+    loadAnalysisImages();
   }
-  $('#feature-menu a').click(((function(_this) {
+  $('#analysis-menu a').click(((function(_this) {
     return function(e) {
       e.preventDefault();
-      activeTab = $('#feature-menu a').index($(e.target));
-      window.cookie.set('featureTab', activeTab);
+      activeTab = $('#analysis-menu a').index($(e.target));
+      window.cookie.set('analysisTab', activeTab);
       $(e.target).tab('show');
       if (activeTab === 0) {
         return viewer.paint();
@@ -569,7 +569,7 @@ $(document).ready(function() {
 });
 
 $(document).ready(function() {
-  var activeTab, getLocationString, loadLocationFeatures, loadLocationImages, loadLocationStudies, moveTo, update;
+  var activeTab, getLocationString, loadLocationAnalyses, loadLocationImages, loadLocationStudies, moveTo, update;
   if (!$('#page-location').length) {
     return;
   }
@@ -593,16 +593,16 @@ $(document).ready(function() {
       return window.loadImages(result.data);
     });
   };
-  loadLocationFeatures = function() {
+  loadLocationAnalyses = function() {
     var url;
-    url = '/locations/' + getLocationString() + '/features';
-    return $('#location_features_table').DataTable().ajax.url(url).load().order([1, 'desc']);
+    url = '/locations/' + getLocationString() + '/analyses';
+    return $('#location_analyses_table').DataTable().ajax.url(url).load().order([1, 'desc']);
   };
   update = function() {
     var base, coords, map_info, study_info, xyz;
     loadLocationStudies();
     loadLocationImages();
-    loadLocationFeatures();
+    loadLocationAnalyses();
     base = window.location.href.split('?')[0];
     coords = {
       x: $('#x-in').val(),
@@ -634,7 +634,7 @@ $(document).ready(function() {
     processing: true,
     autoWidth: true
   });
-  $('#location_features_table').dataTable({
+  $('#location_analyses_table').dataTable({
     paginationType: "full_numbers",
     displayLength: 10,
     processing: true,
@@ -643,7 +643,7 @@ $(document).ready(function() {
       {
         targets: 0,
         render: function(data, type, row, meta) {
-          return '<a href="/features/' + data + '">' + data + '</a>';
+          return '<a href="/analyses/' + data + '">' + data + '</a>';
         }
       }
     ]
@@ -705,13 +705,13 @@ $(document).ready(function() {
     last_row_selected = null;
     $('#decoding_results_table').on('click', 'button', (function(_this) {
       return function(e) {
-        var feature, imgs, row;
+        var analysis, imgs, row;
         row = $(e.target).closest('tr');
         $(last_row_selected).children('td').removeClass('highlight-table-row');
         $(row).children('td').addClass('highlight-table-row');
         last_row_selected = row;
-        feature = $('td:eq(1)', row).text();
-        imgs = load_reverse_inference_image(feature);
+        analysis = $('td:eq(1)', row).text();
+        imgs = load_reverse_inference_image(analysis);
         viewer.loadImages(imgs);
         $(viewer).off('imagesLoaded');
         $(viewer).on('imagesLoaded', function(e) {
@@ -720,7 +720,7 @@ $(document).ready(function() {
           }
         });
         $('#loading-message').show();
-        $('#scatterplot').html('<img src="/' + controller + '/' + image_id + '/scatter/' + feature + '.png" width="500px" style="display:none;">');
+        $('#scatterplot').html('<img src="/' + controller + '/' + image_id + '/scatter/' + analysis + '.png" width="500px" style="display:none;">');
         return $('#scatterplot>img').load(function() {
           $('#scatterplot>img').show();
           return $('#loading-message').hide();
@@ -754,7 +754,7 @@ $(document).ready(function() {
   if (!$('#page-home').length) {
     return;
   }
-  url = '/features/' + feature + '/images';
+  url = '/analyses/' + analysis + '/images';
   return $.get(url, function(result) {
     return loadImages(result.data.slice(1, 2));
   });

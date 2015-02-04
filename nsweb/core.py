@@ -95,12 +95,12 @@ def register_blueprints():
     # creates and registers blueprints in nsweb.blueprints
     import nsweb.controllers.home
     import nsweb.controllers.studies
-    import nsweb.controllers.features
+    import nsweb.controllers.analyses
     import nsweb.controllers.locations
     import nsweb.controllers.api
     import nsweb.controllers.images
     import nsweb.controllers.decode
-    # import nsweb.controllers.genes
+    import nsweb.controllers.genes
     # import nsweb.controllers.analyze
     # import nsweb.controllers.topics
 
