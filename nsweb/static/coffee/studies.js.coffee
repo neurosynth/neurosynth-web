@@ -19,6 +19,8 @@ $(document).ready ->
     deferRender: true
     stateSave: true
     orderClasses: false
+    dom: 'T<"clear">lfrtip'
+    tableTools: { sSwfPath: "/static/swf/copy_csv_xls.swf" }
   tbl.fnSetFilteringDelay(iDelay=400)
   window.tbl = tbl
 
@@ -34,6 +36,8 @@ $(document).ready ->
     stateSave: true
     order: [[1, 'desc']]
     orderClasses: false
+    dom: 'T<"clear">lfrtip'
+    tableTools: { sSwfPath: "/static/swf/copy_csv_xls.swf" }
 
   $('#study_peaks_table').dataTable
     paginationType: "full_numbers"
@@ -44,6 +48,8 @@ $(document).ready ->
     stateSave: true
     order: [[0, 'asc'], [2, 'asc']]
     orderClasses: false
+    dom: 'T<"clear">lfrtip'
+    tableTools: { sSwfPath: "/static/swf/copy_csv_xls.swf" }
 
   $('#study_peaks_table').on('click', 'tr', (e) =>
     row = $(e.target).closest('tr')[0]

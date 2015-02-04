@@ -22,6 +22,7 @@ css_bundle = Bundle('css/jquery*.css',
                     css_nsweb,
                   'css/font-awesome.min.css',
                   'css/bootstrap*.min.css',
+                  'css/dataTables.tableTools.min.css',
                   'css/style.css',
                   filters='cssmin', output='css/main.min.css')
 
@@ -45,6 +46,7 @@ js_bundle = Bundle('js/lib/jquery.js',
                   'js/lib/jquery.dataTables.min.js',
                   'js/lib/bootstrap.js',
                   'js/lib/setfilterdelay.js',
+                  'js/lib/dataTables.tableTools.min.js',
                   'js/nsviewer/amplify.js',
                   'js/nsviewer/panzoom.js',
                   'js/nsviewer/rainbow.js',
@@ -53,7 +55,6 @@ js_bundle = Bundle('js/lib/jquery.js',
                   'js/nsviewer/viewer.js',
                   coffee_bundle,
                    filters='rjsmin', output='js/main.min.js')
-
 
 def init_assets(app):
     app.config['ASSETS_DEBUG'] = settings.DEBUG
