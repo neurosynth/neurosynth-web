@@ -6,9 +6,9 @@ $(document).ready ->
   return if not $('#page-study').length
 
   # Load the table layers
-  study = document.URL.split('/').slice(-2)[0]
-  url = '/studies/' + study  + '/tables'
-  $.get(url, (result) -> window.loadImages(result.data))
+  if study?
+    url = '/studies/' + study  + '/tables'
+    $.get(url, (result) -> window.loadImages(result.data))
 
   tbl=$('#studies_table').dataTable
     # "sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>",

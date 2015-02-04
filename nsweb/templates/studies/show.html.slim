@@ -2,6 +2,8 @@
 - extends "layout/base.html"
 - block content
   - import "macros/study_viewer.html.slim" as viewers
+  script type="text/javascript"
+    |var study = {{study.pmid}};
   .row#page-study
     .col-md-10.col-md-offset-1
       h2 {{study.title}}
