@@ -8,7 +8,7 @@ $(document).ready ->
     displayLength: 25
     processing: true
     serverSide: true
-    ajax: '/api/analyses'
+    ajax: '/api/terms'
     deferRender: true
     stateSave: true
     autoWidth: true
@@ -16,6 +16,20 @@ $(document).ready ->
     dom: 'T<"clear">lfrtip'
     tableTools: { sSwfPath: "/static/swf/copy_csv_xls.swf" }
   tbl.fnSetFilteringDelay(iDelay=400)
+
+  if topic_set?
+    tbl=$('#topic-set-table').dataTable
+      PaginationType: "full_numbers"
+      displayLength: 25
+      processing: true
+      ajax: '/api/topics/' + topic_set
+      deferRender: true
+      stateSave: true
+      autoWidth: true
+      orderClasses: false
+      dom: 'T<"clear">lfrtip'
+      tableTools: { sSwfPath: "/static/swf/copy_csv_xls.swf" }
+    tbl.fnSetFilteringDelay(iDelay=400)
 
   $('#analysis-studies-table').dataTable
     paginationType: "full_numbers"

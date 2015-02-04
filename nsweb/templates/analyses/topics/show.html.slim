@@ -1,11 +1,14 @@
-- set page_title = 'Neurosynth: ' + analysis
+- set page_title = 'Neurosynth: topic ' + (analysis.number|string)
 - extends "layout/base.html"
 - block content
   - import "macros/_analysis_viewer.html.slim" as viewers
+  script type="text/javascript"
+    |var analysis = "{{analysis.name}}";
   .row
     .col-md-8
-      h1.top-space0 {{analysis}}
-      .lead An automated meta-analysis of {{n_studies}} studies
+      h1.top-space0 Topic {{analysis.number}}
+      .lead An automated meta-analysis of {{analysis.n_studies}} studies
+      h4 Top terms: {{analysis.terms}}
     .col-md-2
       .analysis-search
         span Search for another analysis:
@@ -26,8 +29,8 @@
             var settings = ['no-zoom', 'layers','nav','checkboxes']
           p {{viewers.viewer()|safe}}
         #studies.tab-pane
-          h4 Studies associated with the variable "{{analysis}}"
-          table#analysis_studies_table.table-striped.table-hover.table.table-condensed.default-datatable
+          h4 Studies associated with Topic {{analysis.number}}
+          table#analysis-studies-table.table-striped.table-hover.table.table-condensed.default-datatable
             thead
               tr
                 th Title
@@ -36,11 +39,11 @@
                 th Loading
         #help.tab-pane
           h3 Neurosynth analyses: Help
-          p This page displays information for an automated Neurosynth meta-analysis of the analysis "{{analysis}}". The meta-analysis was performed by automatically identifying all studies in the Neurosynth database that loaded highly on the analysis, and then performing meta-analyses to identify brain regions that were consistently or preferentially reported in the tables of those studies.
+          p This page displays information for an automated Neurosynth meta-analysis of the analysis "{{analysis.name}}". The meta-analysis was performed by automatically identifying all studies in the Neurosynth database that loaded highly on the analysis, and then performing meta-analyses to identify brain regions that were consistently or preferentially reported in the tables of those studies.
           h4.help What do the "forward inference" and "reverse inference" maps mean?
           p
-            |For a detailed explanation, please see our <a href="http://pilab.psy.utexas.edu/publications/Yarkoni_NatureMethods_2011.pdf">Nature Methods paper</a>. In brief, the <u>forward inference map</u> displays brain regions that are <em>consistently</em> active in studies that load highly on the analysis "{{analysis}}". Regions with large z-scores are reported more often than one would expect them to be if activation anywhere in the brain was equally likely. Note that this is typically not so interesting, because it turns out that some brain regions are consistently reported in a lot of different kinds of studies (again, see <a href="http://pilab.psy.utexas.edu/publications/Yarkoni_NatureMethods_2011.pdf">our paper</a>). So as a general rule of thumb, we don't recommend paying much attention to forward inference maps.
-          p <u>Reverse inference maps</u> are, roughly, maps displaying brain regions that are <em>preferentially</em> related to the variable of interest (most commonly, a text-based feature that occurs in study abstracts). The reverse inference map for {{analysis}} displays regions that are reported more often in studies that load highly on the key variable than in studies that do not load highly on the variable. Most of the time this a much more useful way of thinking about things, since reverse inference maps tell you, in some sense, which brain regions are more diagnostic of the variable in question, and not just which regions are consistently activated in studies associated with that variable.
+            |For a detailed explanation, please see our <a href="http://pilab.psy.utexas.edu/publications/Yarkoni_NatureMethods_2011.pdf">Nature Methods paper</a>. In brief, the <u>forward inference map</u> displays brain regions that are <em>consistently</em> active in studies that load highly on "{{analysis.name}}". Regions with large z-scores are reported more often than one would expect them to be if activation anywhere in the brain was equally likely. Note that this is typically not so interesting, because it turns out that some brain regions are consistently reported in a lot of different kinds of studies (again, see <a href="http://pilab.psy.utexas.edu/publications/Yarkoni_NatureMethods_2011.pdf">our paper</a>). So as a general rule of thumb, we don't recommend paying much attention to forward inference maps.
+          p <u>Reverse inference maps</u> are, roughly, maps displaying brain regions that are <em>preferentially</em> related to the variable of interest (most commonly, a text-based feature that occurs in study abstracts). The reverse inference map for {{analysis.name}} displays regions that are reported more often in studies that load highly on the key variable than in studies that do not load highly on the variable. Most of the time this a much more useful way of thinking about things, since reverse inference maps tell you, in some sense, which brain regions are more diagnostic of the variable in question, and not just which regions are consistently activated in studies associated with that variable.
           h4.help How do you determine which studies to include in an analysis?
           p That depends on the kind of analysis. At present, most of the analyses on this website are term-based, meaning that the meta-analyses are based strictly on how frequently a term (in the present case, '{{analysis}}') was used in an article's abstract. By default, we use a threshold of 0.001, meaning that, in effect, we consider a study to be associated with a term if it uses that term at least once somewhere in the abstract.
           h4.help Are these maps corrected for multiple comparisons?
