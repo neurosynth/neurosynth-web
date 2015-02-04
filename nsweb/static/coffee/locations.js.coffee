@@ -60,7 +60,7 @@ $(document).ready ->
     processing: true
     autoWidth: true
     dom: 'T<"clear">lfrtip'
-    tableTools: { sSwfPath: "/static/swf/copy_csv_xls_pdf.swf" }
+    tableTools: { sSwfPath: "/static/swf/copy_csv_xls.swf" }
     # orderClasses: false
   })
 
@@ -70,7 +70,7 @@ $(document).ready ->
     processing: true
     autoWidth: true
     dom: 'T<"clear">lfrtip'
-    tableTools: { sSwfPath: "/static/swf/copy_csv_xls_pdf.swf" }
+    tableTools: { sSwfPath: "/static/swf/copy_csv_xls.swf" }
     # orderClasses: false
     columnDefs: [{
       targets: 0

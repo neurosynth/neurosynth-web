@@ -3,8 +3,6 @@ $(document).ready ->
 
   return if not $('#page-analysis').length
 
-  analysis = document.URL.split('/').slice(-2)[0]
-
   tbl=$('#term-analyses-table').dataTable
     PaginationType: "full_numbers"
     displayLength: 25
@@ -16,7 +14,7 @@ $(document).ready ->
     autoWidth: true
     orderClasses: false
     dom: 'T<"clear">lfrtip'
-    tableTools: { sSwfPath: "/static/swf/copy_csv_xls_pdf.swf" }
+    tableTools: { sSwfPath: "/static/swf/copy_csv_xls.swf" }
   tbl.fnSetFilteringDelay(iDelay=400)
 
   $('#analysis-studies-table').dataTable
@@ -27,7 +25,7 @@ $(document).ready ->
     stateSave: true
     orderClasses: false
     dom: 'T<"clear">lfrtip'
-    tableTools: { sSwfPath: "/static/swf/copy_csv_xls_pdf.swf" }    
+    tableTools: { sSwfPath: "/static/swf/copy_csv_xls.swf" }    
     columns: [
       { width: '40%' }
       { width: '38%' }

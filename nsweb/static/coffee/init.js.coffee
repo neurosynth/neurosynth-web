@@ -78,7 +78,7 @@ $(document).ready ->
       autoWidth: false
       order: [[2, 'desc']]
       dom: 'T<"clear">lfrtip'
-      tableTools: { sSwfPath: "/static/swf/copy_csv_xls_pdf.swf" }
+      tableTools: { sSwfPath: "/static/swf/copy_csv_xls.swf" }
       columns: [
         {
           data: null
