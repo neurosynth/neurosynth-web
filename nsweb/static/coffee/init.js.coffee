@@ -1,3 +1,22 @@
+# tabletools defaults for CSV/XLS export
+$.fn.dataTable.TableTools.defaults.aButtons = [
+    {
+      sExtends: 'copy'
+      sButtonText: 'Copy'
+      oSelectorOpts: page: 'current'
+    },
+    {
+      sExtends: 'csv'
+      sButtonText: 'CSV'
+      oSelectorOpts: page: 'current'
+    },
+    {
+      sExtends: 'xls'
+      sButtonText: 'XLS'
+      oSelectorOpts: page: 'current'
+    }
+   ]
+
 class NSCookie
 
     constructor: (@contents = null) ->
