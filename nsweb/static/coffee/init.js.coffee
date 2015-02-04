@@ -1,22 +1,3 @@
-# tabletools defaults for CSV/XLS export
-$.fn.dataTable.TableTools.defaults.aButtons = [
-    {
-      sExtends: 'copy'
-      sButtonText: 'Copy'
-      oSelectorOpts: page: 'current'
-    },
-    {
-      sExtends: 'csv'
-      sButtonText: 'CSV'
-      oSelectorOpts: page: 'current'
-    },
-    {
-      sExtends: 'xls'
-      sButtonText: 'XLS'
-      oSelectorOpts: page: 'current'
-    }
-   ]
-
 class NSCookie
 
     constructor: (@contents = null) ->
@@ -43,6 +24,49 @@ class NSCookie
         else
             new NSCookie(JSON.parse($.cookie('neurosynth')))
 
+
+### DATATABLES-RELATED CODE ###
+
+# tabletools defaults for CSV/XLS export
+$.fn.dataTable.TableTools.defaults.aButtons = [
+    {
+      sExtends: 'copy'
+      sButtonText: 'Copy'
+      oSelectorOpts: page: 'current'
+    },
+    {
+      sExtends: 'csv'
+      sButtonText: 'CSV'
+      oSelectorOpts: page: 'current'
+    },
+    {
+      sExtends: 'xls'
+      sButtonText: 'XLS'
+      oSelectorOpts: page: 'current'
+    }
+  ]
+
+createDataTable = (element, ajax=null, serverSide=false, displayLength=25,
+  columns=null, tableTools=true, filterDelay=true, orderClass=false) ->
+  opts = {
+    pagingType: "full_numbers"
+    serverSide: serverSide
+    displayLength: displayLength
+    stateSave: false
+    orderClasses: false
+    processing: true
+    dom: 'T<"clear">lfrtip'
+  }
+  if columns?
+    opts.autoWidth = false
+    opts.columns = columns
+  opts.tableTools = { sSwfPath: "/static/swf/copy_csv_xls.swf" } if tableTools
+  opts.ajax = ajax if ajax?
+  tbl = $(element).dataTable(opts)
+  tbl.fnSetFilteringDelay(iDelay=400) if filterDelay
+  tbl
+
+
 ### METHODS USED ON MORE THAN ONE PAGE ###
 urlToParams = () ->
     search = window.location.search.substring(1);
@@ -66,8 +90,6 @@ $(document).ready ->
 
   # Decoding results for pages that use it
   if $('#page-decode-show, #page-genes-show').length
-
-    console.log("Doing this...")
     
     tbl = $('#decoding_results_table').dataTable
       paginationType: "simple"
