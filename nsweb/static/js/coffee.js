@@ -1,6 +1,28 @@
 var NSCookie, Scatter, load_reverse_inference_image, make_scatterplot, runif, textToHTML, urlToParams,
   __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
+$.fn.dataTable.TableTools.defaults.aButtons = [
+  {
+    sExtends: 'copy',
+    sButtonText: 'Copy',
+    oSelectorOpts: {
+      page: 'current'
+    }
+  }, {
+    sExtends: 'csv',
+    sButtonText: 'CSV',
+    oSelectorOpts: {
+      page: 'current'
+    }
+  }, {
+    sExtends: 'xls',
+    sButtonText: 'XLS',
+    oSelectorOpts: {
+      page: 'current'
+    }
+  }
+];
+
 NSCookie = (function() {
   function NSCookie(contents) {
     this.contents = contents != null ? contents : null;
@@ -91,6 +113,10 @@ $(document).ready(function() {
       orderClasses: false,
       autoWidth: false,
       order: [[2, 'desc']],
+      dom: 'T<"clear">lfrtip',
+      tableTools: {
+        sSwfPath: "/static/swf/copy_csv_xls.swf"
+      },
       columns: [
         {
           data: null,
@@ -342,15 +368,16 @@ make_scatterplot = function() {
 };
 
 $(document).ready(function() {
-  var SELECTED, getPMID, getSelection, iDelay, redrawTableSelection, saveSelection, study, tbl, url, url_id;
+  var SELECTED, getPMID, getSelection, iDelay, redrawTableSelection, saveSelection, tbl, url, url_id;
   if (!$('.selectable-table').length) {
     return;
   }
-  study = document.URL.split('/').slice(-2)[0];
-  url = '/studies/' + study + '/tables';
-  $.get(url, function(result) {
-    return window.loadImages(result.data);
-  });
+  if (typeof study !== "undefined" && study !== null) {
+    url = '/studies/' + study + '/tables';
+    $.get(url, function(result) {
+      return window.loadImages(result.data);
+    });
+  }
   tbl = $('#studies_table').dataTable({
     paginationType: "full_numbers",
     displayLength: 10,
@@ -359,7 +386,11 @@ $(document).ready(function() {
     ajax: '/api/studies/',
     deferRender: true,
     stateSave: true,
-    orderClasses: false
+    orderClasses: false,
+    dom: 'T<"clear">lfrtip',
+    tableTools: {
+      sSwfPath: "/static/swf/copy_csv_xls.swf"
+    }
   });
   tbl.fnSetFilteringDelay(iDelay = 400);
   window.tbl = tbl;
@@ -373,7 +404,11 @@ $(document).ready(function() {
     deferRender: true,
     stateSave: true,
     order: [[1, 'desc']],
-    orderClasses: false
+    orderClasses: false,
+    dom: 'T<"clear">lfrtip',
+    tableTools: {
+      sSwfPath: "/static/swf/copy_csv_xls.swf"
+    }
   });
   $('#study_peaks_table').dataTable({
     paginationType: "full_numbers",
@@ -383,7 +418,11 @@ $(document).ready(function() {
     deferRender: true,
     stateSave: true,
     order: [[0, 'asc'], [2, 'asc']],
-    orderClasses: false
+    orderClasses: false,
+    dom: 'T<"clear">lfrtip',
+    tableTools: {
+      sSwfPath: "/static/swf/copy_csv_xls.swf"
+    }
   });
   $('#study_peaks_table').on('click', 'tr', (function(_this) {
     return function(e) {
@@ -472,30 +511,69 @@ $(document).ready(function() {
 });
 
 $(document).ready(function() {
-  var activeTab, analysis, iDelay, loadAnalysisImages, loadAnalysisStudies, tbl;
+  var activeTab, iDelay, loadAnalysisImages, loadAnalysisStudies, tbl;
   if (!$('#page-analysis').length) {
     return;
   }
-  analysis = document.URL.split('/').slice(-2)[0];
-  tbl = $('#analyses_table').dataTable({
+  tbl = $('#term-analyses-table').dataTable({
     PaginationType: "full_numbers",
     displayLength: 25,
     processing: true,
     serverSide: true,
-    ajax: '/api/analyses',
+    ajax: '/api/terms',
     deferRender: true,
     stateSave: true,
     autoWidth: true,
-    orderClasses: false
+    orderClasses: false,
+    dom: 'T<"clear">lfrtip',
+    tableTools: {
+      sSwfPath: "/static/swf/copy_csv_xls.swf"
+    }
   });
   tbl.fnSetFilteringDelay(iDelay = 400);
-  $('#analysis_studies_table').dataTable({
+  tbl = $('#topic-set-table').dataTable({
+    PaginationType: "full_numbers",
+    displayLength: 25,
+    processing: true,
+    ajax: '/api/topics',
+    deferRender: true,
+    stateSave: true,
+    autoWidth: true,
+    orderClasses: false,
+    dom: 'T<"clear">lfrtip',
+    tableTools: {
+      sSwfPath: "/static/swf/copy_csv_xls.swf"
+    }
+  });
+  tbl.fnSetFilteringDelay(iDelay = 400);
+  if (typeof topic_set !== "undefined" && topic_set !== null) {
+    tbl = $('#topic-set-table').dataTable({
+      PaginationType: "full_numbers",
+      displayLength: 25,
+      processing: true,
+      ajax: '/api/topics/' + topic_set,
+      deferRender: true,
+      stateSave: true,
+      autoWidth: true,
+      orderClasses: false,
+      dom: 'T<"clear">lfrtip',
+      tableTools: {
+        sSwfPath: "/static/swf/copy_csv_xls.swf"
+      }
+    });
+    tbl.fnSetFilteringDelay(iDelay = 400);
+  }
+  $('#analysis-studies-table').dataTable({
     paginationType: "full_numbers",
     displayLength: 25,
     processing: true,
     deferRender: true,
     stateSave: true,
     orderClasses: false,
+    dom: 'T<"clear">lfrtip',
+    tableTools: {
+      sSwfPath: "/static/swf/copy_csv_xls.swf"
+    },
     columns: [
       {
         width: '40%'
@@ -507,12 +585,12 @@ $(document).ready(function() {
         width: '7%'
       }
     ]
-  }, $.get('/analyses/analysis_names', function(result) {
-    return $('#analysis-search').autocomplete({
+  }, $.get('/analyses/term_names', function(result) {
+    return $('#term-analysis-search').autocomplete({
       minLength: 2,
       delay: 0,
       select: function(e, ui) {
-        return window.location.href = '/analyses/' + ui.item.value;
+        return window.location.href = '/analyses/terms/' + ui.item.value;
       },
       source: function(request, response) {
         var filtered, matcher, re;
@@ -525,17 +603,17 @@ $(document).ready(function() {
       }
     });
   }));
-  $('#analysis-search').keyup(function(e) {
+  $('#term-analysis-search').keyup(function(e) {
     var text;
-    text = $('#analysis-search').val();
+    text = $('#term-analysis-search').val();
     if (e.keyCode === 13) {
-      return window.location.href = '/analyses/' + text;
+      return window.location.href = '/analyses/terms/' + text;
     }
   });
   loadAnalysisStudies = function() {
     var url;
     url = '/analyses/' + analysis + '/studies?dt=1';
-    return $('#analysis_studies_table').DataTable().ajax.url(url).load().order([3, 'desc']);
+    return $('#analysis-studies-table').DataTable().ajax.url(url).load().order([3, 'desc']);
   };
   loadAnalysisImages = function() {
     var url;
@@ -546,7 +624,7 @@ $(document).ready(function() {
   };
   activeTab = window.cookie.get('analysisTab');
   $("#analysis-menu li:eq(" + activeTab + ") a").tab('show');
-  if (analysis != null) {
+  if (typeof analysis !== "undefined" && analysis !== null) {
     loadAnalysisStudies();
     loadAnalysisImages();
   }
@@ -632,13 +710,21 @@ $(document).ready(function() {
     paginationType: "full_numbers",
     displayLength: 10,
     processing: true,
-    autoWidth: true
+    autoWidth: true,
+    dom: 'T<"clear">lfrtip',
+    tableTools: {
+      sSwfPath: "/static/swf/copy_csv_xls.swf"
+    }
   });
   $('#location_analyses_table').dataTable({
     paginationType: "full_numbers",
     displayLength: 10,
     processing: true,
     autoWidth: true,
+    dom: 'T<"clear">lfrtip',
+    tableTools: {
+      sSwfPath: "/static/swf/copy_csv_xls.swf"
+    },
     columnDefs: [
       {
         targets: 0,
