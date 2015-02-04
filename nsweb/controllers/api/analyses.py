@@ -1,10 +1,9 @@
 from nsweb.controllers.api import bp
 from flask import request, jsonify, url_for
-from nsweb.models import TermAnalysis
+from nsweb.models.analyses import TermAnalysis, AnalysisSet, TopicAnalysis
 
-@bp.route('/analyses/')
-def get_analysis_list():
-    print "in analyses..."
+@bp.route('/terms/')
+def list_terms():
 
     results_per_page = int(request.args['length'])
     offset = int(request.args['start'])
@@ -29,12 +28,35 @@ def get_analysis_list():
     result['recordsFiltered'] = data.total
     result['data'] = [
         ['<a href={0}>{1}</a>'.format(
-            url_for('analyses.show', val=d.name), d.name),
+            url_for('analyses.show_term', term=d.name), d.name),
                             d.n_studies,
                             d.n_activations,
                             ] for d in data.items]
     result = jsonify(**result)
     return result
+
+@bp.route('/topics/')
+def list_topic_sets():
+    topic_sets = AnalysisSet.query.all()
+    data = [[
+        '<a href={0}>{1}</a>'.format(
+            url_for('analyses.show_topic_set', topic_set=ts.name),
+                    ts.name),
+        ts.description,
+        ts.n_analyses] for ts in topic_sets]
+    return jsonify(data=data)
+
+@bp.route('/topics/<string:val>/')
+def list_topics(val):
+    ts = AnalysisSet.query.filter_by(name=val).first()
+    data = [
+        ['<a href={0}>{1}</a>'.format(
+            url_for('analyses.show_topic', topic_set=ts.name,
+                    number=t.number), 'Topic %d' % t.number),
+         t.terms,
+         t.n_studies
+        ] for t in ts.analyses]
+    return jsonify(data=data)
 
 @bp.route('/analyses/<string:name>/')
 def find_api_analysis(name):

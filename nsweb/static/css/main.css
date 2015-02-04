@@ -394,6 +394,13 @@ select.layer-settings {
                 padding-top: 30px;
                 float: right; }
 
+                @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/analyses\.css\.scss}line{font-family:\00003120}}
+                ul.dropdown-menu {
+                  background-color: #999; }
+                  @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/analyses\.css\.scss}line{font-family:\00003122}}
+                  ul.dropdown-menu li {
+                    font-size: 1.2em; }
+
 @media -sass-debug-info{filename{font-family:file\:\/\/\/home\/nsweb\/Dropbox\/nsweb\/nsweb\/static\/scss\/studies\.css\.scss}line{font-family:\000031}}
 .row_label {
   font-weight: bold; }
