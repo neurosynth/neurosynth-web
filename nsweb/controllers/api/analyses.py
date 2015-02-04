@@ -35,8 +35,19 @@ def list_terms():
     result = jsonify(**result)
     return result
 
+@bp.route('/topics/')
+def list_topic_sets():
+    topic_sets = AnalysisSet.query.all()
+    data = [[
+        '<a href={0}>{1}</a>'.format(
+            url_for('analyses.show_topic_set', topic_set=ts.name),
+                    ts.name),
+        ts.description,
+        ts.n_analyses] for ts in topic_sets]
+    return jsonify(data=data)
+
 @bp.route('/topics/<string:val>/')
-def show_topic_set(val):
+def list_topics(val):
     ts = AnalysisSet.query.filter_by(name=val).first()
     data = [
         ['<a href={0}>{1}</a>'.format(
@@ -45,8 +56,7 @@ def show_topic_set(val):
          t.terms,
          t.n_studies
         ] for t in ts.analyses]
-    data = jsonify(data=data)
-    return data
+    return jsonify(data=data)
 
 @bp.route('/analyses/<string:name>/')
 def find_api_analysis(name):
