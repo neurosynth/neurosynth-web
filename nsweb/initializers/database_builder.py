@@ -4,6 +4,7 @@ from nsweb.models.locations import Location
 from nsweb.models.studies import Study
 from nsweb.models.peaks import Peak
 from nsweb.models.frequencies import Frequency
+from nsweb.models.decodings import DecodingSet
 from nsweb.models.images import TermAnalysisImage, LocationImage, GeneImage, TopicAnalysisImage
 from nsweb.models.genes import Gene
 from nsweb.initializers import settings
@@ -536,11 +537,14 @@ class DatabaseBuilder:
         if not exists(mm_dir):
             os.makedirs(mm_dir)
 
+        # For now let's just worry about term-based reverse inference maps
+        name = 'term'
+
         # Get all images and save labels
         images = [a.images[0] for a in TermAnalysis.query.all()]
         labels = [os.path.basename(img.image_file).split('_')[0] for img in images]
         # print term_labels
-        open(join(mm_dir, 'term_labels.txt'), 'w').write('\n'.join(labels))
+        open(join(mm_dir, '%s_labels.txt' % name), 'w').write('\n'.join(labels))
 
         # Get mask
         masker = Masker(join(settings.IMAGE_DIR, 'anatomical.nii.gz'))
@@ -548,11 +552,11 @@ class DatabaseBuilder:
         # Select random voxels and save for later
         n_vox = len(masker.mask(images[0].image_file))
         sampled_vox = np.random.choice(np.arange(n_vox), n_sampled, replace=False)
-        np.save(join(mm_dir, 'term_voxels.npy'), sampled_vox)
+        np.save(join(mm_dir, '%s_voxels.npy' % name), sampled_vox)
 
         # Initialize memmap
         n_images = len(images)
-        mm_file = join(mm_dir, 'term_images.dat')
+        mm_file = join(mm_dir, '%s_images.dat' % name)
         mm = np.memmap(mm_file, dtype='float32', mode='w+', shape=(n_sampled, n_images))
 
         # Populate with standardized image data
@@ -562,6 +566,13 @@ class DatabaseBuilder:
 
         # Flush
         del mm
+
+        # Create DB record
+
+        self.db.session.add(DecodingSet(name=name, n_images=n_images,
+                                        n_voxels=len(sampled_vox),
+                                        is_subsampled=True))
+        self.db.session.commit()
 
 
     def _filter_analyses(self, analyses):
