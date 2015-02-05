@@ -72,7 +72,7 @@ def show_term(term):
         return render_template('analyses/missing.html.slim', analysis=term)
     return render_template('analyses/terms/show.html.slim',
                            analysis=analysis,
-                           cog_atlas=json.loads(analysis.cog_atlas))
+                           cog_atlas=json.loads(analysis.cog_atlas or '{}'))
 
 ### TOPIC-SPECIFIC ROUTES ###
 @bp.route('/topics/')
