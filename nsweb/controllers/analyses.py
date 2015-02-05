@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, redirect, url_for, request, jsonif
 from nsweb.models.analyses import Analysis, AnalysisSet, TopicAnalysis, TermAnalysis
 from nsweb.core import add_blueprint
 from flask.helpers import url_for
-import simplejson as json
+import json
 import re
 
 bp = Blueprint('analyses',__name__,url_prefix='/analyses')
@@ -70,8 +70,9 @@ def show_term(term):
     analysis = find_analysis(term)
     if analysis is None:
         return render_template('analyses/missing.html.slim', analysis=term)
-    return render_template('analyses/terms/show.html.slim', 
-                           analysis=analysis)
+    return render_template('analyses/terms/show.html.slim',
+                           analysis=analysis,
+                           cog_atlas=json.loads(analysis.cog_atlas))
 
 ### TOPIC-SPECIFIC ROUTES ###
 @bp.route('/topics/')

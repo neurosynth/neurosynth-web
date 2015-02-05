@@ -45,6 +45,7 @@ class TermAnalysis(Analysis):
     id = db.Column(db.Integer, db.ForeignKey('analysis.id'), primary_key=True)
     images = db.relationship('TermAnalysisImage', backref=db.backref('analysis',
                              lazy='joined', cascade='all'))
+    cog_atlas = db.Column(db.Text, nullable=True)  # Cognitive Atlas RDF data
     __mapper_args__ = {
         'polymorphic_identity': 'term'
     }

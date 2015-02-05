@@ -644,6 +644,34 @@ class DatabaseBuilder:
         # Restore original features
         # self.dataset.feature_table = feature_table
 
+    def add_cognitive_atlas_nodes(self):
+        """ Store data from the Cognitive Atlas for all available nodes. """
+        RDF_PATH = join(settings.ASSET_DIR, 'misc')
+        rdf_files = glob(join(RDF_PATH, '*.rdf'))
+        if not rdf_files:
+            raise IOError("No RDF files found in %s. Please make sure to "
+                "place all .rdf dumps from the Cognitive Atlas in this "
+                "directory." % RDF_PATH)
+
+        nodes = {}
+        for f in rdf_files:
+            text = open(f).read()
+            patt = 'rdf:about="(.*?)">.*?' \
+                   '<skos:definition>(.*?)</skos.*?' \
+                   '<skos:prefLabel>(.*?)</skos:prefLabel>'
+            for m in re.findall(patt, text, re.S):
+                url, definition, name = m
+                nodes[name] = {
+                    'definition': definition.strip(),
+                    'url': url
+                    }
+
+        for ta in TermAnalysis.query.all():
+            if ta.name in nodes:
+                ta.cog_atlas = json.dumps(nodes[ta.name])
+                self.db.session.add(ta)
+        self.db.session.commit()
+
     def _filter_analyses(self, analyses):
         """ Remove any invalid analysis names """
         # Remove analyses that start with a number
