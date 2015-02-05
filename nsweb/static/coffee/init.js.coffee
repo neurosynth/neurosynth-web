@@ -32,17 +32,17 @@ $.fn.dataTable.TableTools.defaults.aButtons = [
     {
       sExtends: 'copy'
       sButtonText: 'Copy'
-      oSelectorOpts: page: 'current'
+      oSelectorOpts: page: 'filter'
     },
     {
       sExtends: 'csv'
       sButtonText: 'CSV'
-      oSelectorOpts: page: 'current'
+      oSelectorOpts: page: 'filter'
     },
     {
       sExtends: 'xls'
       sButtonText: 'XLS'
-      oSelectorOpts: page: 'current'
+      oSelectorOpts: page: 'filter'
     }
   ]
 
