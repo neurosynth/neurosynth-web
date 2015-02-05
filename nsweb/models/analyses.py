@@ -14,6 +14,7 @@ class AnalysisSet(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), unique=False)
     n_analyses = db.Column(db.Integer, default=0)
+    type = db.Column(db.String(50))
     description = db.Column(db.Text)
 
 
