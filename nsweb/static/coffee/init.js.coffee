@@ -110,7 +110,7 @@ $(document).ready ->
         { 
           data: "analysis"
           render: (data, type, row, meta) ->
-            '<a href="/analyses/'+ data + '">' + data + '</a>'
+            '<a href="/analyses/terms/'+ data + '">' + data + '</a>'
           width: '%60%'
         }, 
         {
