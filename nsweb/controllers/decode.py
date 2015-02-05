@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, redirect, url_for, request, jsonify, abort, send_file
-from nsweb.models import Decoding
+from nsweb.models.decodings import Decoding, DecodingSet
 from nsweb.core import app, add_blueprint, db
 from nsweb.initializers import settings
 from nsweb.tasks import decode_image, make_scatterplot
@@ -53,34 +53,46 @@ def decode_from_url(url, metadata={}, render=True):
     # Determine whether to decode or not
     run_decoder = True if dec is None or not settings.CACHE_DECODINGS else False
 
+    # Select DecodingSet--hardcoded for the moment
+    reference = DecodingSet.query.filter_by(name='term').first()
+
     if dec is None:
         name = metadata.get('name', basename(url))
         neurovault_id = metadata.get('id', None)
-        uid = uuid.uuid4().hex
-        filename = join(settings.DECODED_IMAGE_DIR, uid + ext.group(0))
+        unique_id = uuid.uuid4().hex
+        filename = join(settings.DECODED_IMAGE_DIR, unique_id + ext.group(0))
         modified = headers.get('last-modified', None)
         if modified is not None:
             modified = datetime(*parsedate(modified)[:6])
 
-
         dec = Decoding(url=url, neurovault_id=neurovault_id, filename=filename,
-                uuid=uid, name=name, display=1, download=0, ip=request.remote_addr,
-                image_modified_at=modified
-                )
+                       uuid=unique_id, name=name, display=1, download=0,
+                       ip=request.remote_addr, image_modified_at=modified,
+                       decoding_set=reference)
         dec.data = metadata
 
     if run_decoder:
         f = requests.get(url)
         with open(dec.filename, 'wb') as outfile:
             outfile.write(f.content)
-        os.chmod(dec.filename, 0666)  # Make sure celery worker has permission to overwrite
+        # Make sure celery worker has permission to overwrite
+        os.chmod(dec.filename, 0666)
 
-        result = decode_image.delay(dec.filename).wait()  # wait for decoder to finish
+        # Call the decoder in the background. We can't easily pass our own
+        # classes to celery, so pass a dict with relevant DecodingSet info.
+        ref = {
+            'name': reference.name,
+            'n_voxels': reference.n_voxels,
+            'n_images': reference.n_images,
+            'is_subsampled': reference.is_subsampled
+        }
+        result = decode_image.delay(
+            dec.filename, ref, unique_id).wait()  # wait for decoder to finish
 
         if result:
             dec.image_decoded_at = datetime.utcnow()
             db.session.add(dec)
-            db.session.commit()        
+            db.session.commit()
 
     if render:
         return show(dec, dec.uuid)
@@ -89,11 +101,10 @@ def decode_from_url(url, metadata={}, render=True):
 
 
 def decode_from_neurovault(id, render=True):
-
-    if not re.match('\d+$', id):
-        error_page("Invalid NeuroVault ID!")
     resp = requests.get('http://neurovault.org/api/images/%s/?format=json' % str(id))
     metadata = json.loads(resp.content)
+    if 'file' not in metadata:
+        return render_template('decode/missing.html.slim')
     return decode_from_url(metadata['file'], metadata, render=render)
 
 

@@ -1,5 +1,6 @@
 from celery import Task
 from nsweb.initializers import settings
+from neurosynth import Masker
 from neurosynth.base.dataset import Dataset
 from neurosynth.analysis import meta
 from celery.utils import cached_property
@@ -15,16 +16,17 @@ from nsweb.tasks.scatterplot import scatter
 import traceback
 
 
-def load_image(dataset, filename, save_resampled=True):
+def load_image(masker, filename, save_resampled=True):
     """ Load an image, resampling into MNI space if needed. """
     filename = join(settings.DECODED_IMAGE_DIR, filename)
     img = nb.load(filename)
     if img.shape[:3] != (91, 109, 91):
-        img = resample_img(img, target_affine=decode_image.anatomical.get_affine(), 
-                            target_shape=(91, 109, 91), interpolation='nearest')
+        img = resample_img(
+            img, target_affine=decode_image.anatomical.get_affine(),
+            target_shape=(91, 109, 91), interpolation='nearest')
         if save_resampled:
             img.to_filename(filename)
-    return dataset.masker.mask(img)
+    return masker.mask(img)
 
 def get_decoder_analysis_data(dd, analysis):
     """ Get analysis's data: check in the decoder DataFrame first, and if not found, 
@@ -41,6 +43,10 @@ class NeurosynthTask(Task):
     @cached_property
     def dataset(self):
         return Dataset.load(settings.PICKLE_DATABASE)
+
+    @cached_property
+    def masker(self):
+        return Masker(join(settings.IMAGE_DIR, 'anatomical.nii.gz'))
 
     @cached_property
     def dd(self):  # decoding data
@@ -76,27 +82,42 @@ def count_studies(analysis, threshold=0.001, **kwargs):
 @celery.task(base=NeurosynthTask)
 def save_uploaded_image(filename, **kwargs):
     pass
-    
+
 @celery.task(base=NeurosynthTask)
-def decode_image(filename, **kwargs):
-    """ Decode a retrieved image. """
+def decode_image(filename, reference, uuid, mask=None, **kwargs):
+    """ Decode an image file.
+    Args:
+        filename (str): the local path to the image
+        reference (dict): a dict containing key info from the corresponding
+            DecodingSet record. Must have 'name', 'n_images', and 'n_voxels'
+            keys.
+        uuid (str): a unique identifier to use when writing the file
+        mask (str): the name of an optional mask to use (e.g., 'subcortex')
+    """
+    mm_dir = settings.MEMMAP_DIR
     try:
         basefile = basename(filename)
-        # Need to fix this--should probably add a "decode_id" field storing a UUID for 
-        # any model that needs to be decoded but isn't an upload.
-        uuid = 'gene_' + basefile.split('_')[2] if basefile.startswith('gene') else basefile[:32]
-        dataset, dd = decode_image.dataset, decode_image.dd
-        data = load_image(dataset, filename)
+        # uuid = 'gene_' + basefile.split('_')[2] if basefile.startswith('gene') else basefile[:32]
+        mm_file = join(mm_dir, reference['name'] + '_images.dat')
+        mm_data = np.memmap(mm_file, dtype='float32', mode='r',
+                            shape=(reference['n_voxels'], reference['n_images']))
+        mm_labels = open(join(
+            mm_dir, reference['name'] + '_labels.txt')).read().splitlines()
 
-        # For genes, use only subcortical voxels
-        if basefile.startswith('gene'):
-            subcortex = decode_image.masks['subcortex'].astype(bool)
-            data = data[subcortex]
-            dd = dd.iloc[subcortex,:]
-            
-        r = np.corrcoef(data.T, dd.values.T)[0,1:]
+        # Load and standardize the target image
+        data = load_image(decode_image.masker, filename)
+        # Select voxels in sampling mask if it exists
+        if reference['is_subsampled']:
+            voxels = np.load(join(mm_dir, reference['name'] + '_voxels.npy'))
+            data = data[voxels]
+
+        # TODO: IMPLEMENT CUSTOM MASK HANDLING!!!
+
+        # standardize image and get correlation
+        data = (data - data.mean())/data.std()
+        r = np.dot(mm_data.T, data)/reference['n_voxels']
         outfile = join(settings.DECODING_RESULTS_DIR, uuid + '.txt')
-        pd.Series(r, index=dd.columns).to_csv(outfile, sep='\t')
+        pd.Series(r, index=mm_labels).to_csv(outfile, sep='\t')
         return True
     except Exception, e:
         print traceback.format_exc()
