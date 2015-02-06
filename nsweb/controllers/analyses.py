@@ -74,7 +74,7 @@ def show_term(term):
 ### TOPIC-SPECIFIC ROUTES ###
 @bp.route('/topics/')
 def list_topic_sets():
-    topic_sets = AnalysisSet.query.filter(AnalysisSet.name.like('topic%'))
+    topic_sets = AnalysisSet.query.filter_by(type='topics')
     return render_template('analyses/topics/index.html.slim',
                            topic_sets=topic_sets)
 
