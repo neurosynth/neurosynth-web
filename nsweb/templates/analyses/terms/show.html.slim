@@ -4,6 +4,7 @@
   - import "macros/_analysis_viewer.html.slim" as viewers
   script type="text/javascript"
     |var analysis = "{{analysis.name}}";
+    var rev_inf = {{analysis.reverse_inference_image.id}};
   .row
     .col-md-8
       h1.top-space0 {{analysis.name}}
@@ -19,6 +20,8 @@
           a href="#maps" data-toggle="tab" Maps
         li
           a href="#studies" data-toggle="tab" Studies
+        li
+          a href="#similarity" data-toggle="tab" Similarity
         - if cog_atlas
           li
             a href="#resources" data-toggle="tab" Resources
@@ -32,13 +35,20 @@
           p {{viewers.viewer()|safe}}
         #studies.tab-pane
           h4 Studies associated with the term "{{analysis.name}}"
-          table#analysis-studies-table.table-striped.table-hover.table.table-condensed.default-datatable
+          table#analysis-studies-table.table-striped.table-hover.table.table-condensed
             thead
               tr
                 th Title
                 th Authors
                 th Journal
                 th Loading
+        #similarity.tab-pane
+          h4 Most similar terms
+          table#analysis-similarity-table.table-striped.table-hover.table.table-condensed
+            thead
+              tr
+                th Term
+                th r
         - if cog_atlas
           #resources.tab-pane
             .resource-head
