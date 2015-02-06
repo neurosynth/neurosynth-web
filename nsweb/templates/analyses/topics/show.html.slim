@@ -1,12 +1,14 @@
-- set page_title = 'Neurosynth: topic ' + (analysis.number|string)
+- set topic_n = (analysis.number|string)
+- set page_title = 'Neurosynth: topic ' + topic_n
 - extends "layout/base.html"
 - block content
   - import "macros/_analysis_viewer.html.slim" as viewers
+  - import "macros/_datatables.html.slim" as datatables
   script type="text/javascript"
     |var analysis = "{{analysis.name}}";
   .row
     .col-md-8
-      h1.top-space0 Topic {{analysis.number}}
+      h1.top-space0 Topic {{topic_n}}
       .lead An automated meta-analysis of {{analysis.n_studies}} studies
       h4 Top terms: {{analysis.terms}}
     .col-md-2
@@ -28,15 +30,9 @@
             |var options = {"panzoomEnabled":false}
             var settings = ['no-zoom', 'layers','nav','checkboxes']
           p {{viewers.viewer()|safe}}
-        #studies.tab-pane
-          h4 Studies associated with Topic {{analysis.number}}
-          table#analysis-studies-table.table-striped.table-hover.table.table-condensed
-            thead
-              tr
-                th Title
-                th Authors
-                th Journal
-                th Loading
+
+        {{datatables.analysis_studies_table('Topic ' + topic_n)}}
+
         #help.tab-pane
           h3 Neurosynth analyses: Help
           p This page displays information for an automated Neurosynth meta-analysis of the analysis "{{analysis.name}}". The meta-analysis was performed by automatically identifying all studies in the Neurosynth database that loaded highly on the analysis, and then performing meta-analyses to identify brain regions that were consistently or preferentially reported in the tables of those studies.

@@ -33,15 +33,7 @@
             |var options = {"panzoomEnabled":false}
             var settings = ['no-zoom', 'layers','nav','checkboxes']
           p {{viewers.viewer()|safe}}
-        #studies.tab-pane
-          h4 Studies associated with the term "{{analysis.name}}"
-          table#analysis-studies-table.table-striped.table-hover.table.table-condensed
-            thead
-              tr
-                th Title
-                th Authors
-                th Journal
-                th Loading
+        {{datatables.analysis_studies_table(analysis.name)}}
         #similarity.tab-pane
           h4 Most similar terms
           table#analysis-similarity-table.table-striped.table-hover.table.table-condensed
