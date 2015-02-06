@@ -3,37 +3,29 @@
 - block content
   - import "macros/_analysis_viewer.html.slim" as viewers
   .row#page-location
-    .col-md-12
+    .col-md-10
       .big-text
         span Data for coordinates:
         input type="number" class="data-for-location" name="x-in" id="x-in" min="-90" max="90" value="{{x}}"
         input type="number" class="data-for-location" name="y-in" id="y-in" min="-72" max="108" value="{{y}}"
         input type="number" class="data-for-location" name="z-in" id="z-in" min="-106" max="90" value="{{z}}"
       %.row
-    .col-md-10.col-md-offset-1.top-space20
+    .col-md-10.top-space20
       ul#location-menu.nav.nav-pills
         li.active
           a href="#maps" data-toggle="tab" Maps
         li
-          a href="#analyses" data-toggle="tab" Analyses
-        li
           a href="#studies" data-toggle="tab" Studies
+        li
+          a href="#analyses" data-toggle="tab" Analysis
       #location-tab-content.tab-content
         #maps.tab-pane.active
-          %h3#current-location-maps
+          h3 Functional connectivity and coactivation maps
           script type="text/javascript"
             |
             var options = { panzoomEnabled: false, xyz: [{{x}}, {{y}}, {{z}}]}
             var settings = ['no-zoom', 'layers','nav','checkboxes']
           p {{viewers.viewer()|safe}}
-        #analyses.tab-pane
-          h3 Term loadings (reverse inference)
-          table#location_analyses_table.table-striped.table-hover.table.table-condensed.small-datatable
-            thead
-              tr
-                th Analysis
-                th z-score
-                th post. prob.
         #studies.tab-pane
           .location-studies-head
             %h3#current-location-studies
@@ -52,4 +44,12 @@
                 th Authors
                 th Journal
                 th Activations
+        #analyses.tab-pane
+          h3 Term loadings (reverse inference)
+          table#location_analyses_table.table-striped.table-hover.table.table-condensed.small-datatable
+            thead
+              tr
+                th Analysis
+                th z-score
+                th post. prob.
 

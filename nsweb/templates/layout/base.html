@@ -21,25 +21,14 @@
 	    s.parentNode.insertBefore(g,s)}(document,'script'));
     </script>
 </head>
-<body class="bs-docs-home">
-    <!--[if lt IE 7]>
-        <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
-    <![endif]-->
-    <a class="sr-only" href="#content">Skip to main content</a>
-
+<body>
 	<!-- Docs master nav -->    
-	<header class="navbar navbar-static-top navbar-inverse bs-docs-nav" id="top" role="banner">
+	<header class="navbar navbar-static-top navbar-inverse" id="top" role="banner">
 	    <div class="container">
 	        <div class="navbar-header">
-	            <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".bs-navbar-collapse">
-			        <span class="sr-only">Toggle navigation</span>
-			        <span class="icon-bar"></span>
-			        <span class="icon-bar"></span>
-			        <span class="icon-bar"></span>
-	            </button>
 	            <a href="../" class="navbar-brand">Neurosynth.org (beta)</a>
 	        </div>
-	        <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
+	        <nav class="collapse navbar-collapse" role="navigation">
 		        <ul class="nav navbar-nav">
 					<li class=""><a href="/">Home</a></li>
                     <li class="dropdown">
@@ -84,11 +73,11 @@
         <div id="content">
             {% block content %}{% endblock %}
         </div>
-        <hr class="top-space40">
         <div class="row" id="footer">
-            <div class="col-md-12">
+            <div class="col-md-10">
+                <hr class="top-space40">
                 <div class="row footer-buttons">
-                <div class="col-md-12">
+                <div class="col-md-10">
                 <iframe src="http://ghbtns.com/github-btn.html?user=neurosynth&repo=neurosynth&type=fork&count=true" allowtransparency="true" frameborder="0" scrolling="0" width="90" height="20"></iframe><iframe src="http://ghbtns.com/github-btn.html?user=neurosynth&repo=neurosynth&type=watch&count=true" allowtransparency="true" frameborder="0" scrolling="0" width="90" height="20"></iframe>
                 <a href="https://twitter.com/share" class="twitter-share-button" data-url="http://neurosynth.org" data-via="neurosynth">Tweet</a>
 <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>

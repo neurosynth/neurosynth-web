@@ -46,8 +46,6 @@ $(document).ready ->
     xyz = [coords.x, coords.y, coords.z]
     study_info = 'Studies reporting activation within ' + coords.r + ' mm of (' + xyz.join(', ') + ')'
     $('#current-location-studies') .text(study_info)
-    map_info = 'Functional connectivity and coactivation maps for (' + xyz.join(', ') + ')'
-    $('#current-location-maps').html(map_info)
     
     # TODO: IMPLEMENT ONPOPSTATE  
     # window.history.pushState(null, null, base + '?' + $.param(coords))

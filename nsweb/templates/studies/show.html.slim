@@ -5,7 +5,7 @@
   script type="text/javascript"
     |var study = {{study.pmid}};
   .row#page-study
-    .col-md-10.col-md-offset-1
+    .col-md-12
       h2 {{study.title}}
       table.table-striped.table-hover.table.table-condensed
         tbody
@@ -29,7 +29,7 @@
         li.active
           a href="#activations" data-toggle="tab" Activations
         li
-          a href="#analyses" data-toggle="tab" Analyses
+          a href="#terms" data-toggle="tab" Terms
       script type="text/javascript"
         |var options = {"panzoomEnabled":false}
         var settings = ['no-zoom', 'nav']
@@ -43,8 +43,8 @@
                 th x
                 th y
                 th z
-        #analyses.tab-pane
-          h3 Extracted analyses
+        #terms.tab-pane
+          h3 Extracted terms
           table#study_analyses_table.table.table-striped.table-hover.table-condensed.small-datatable
             thead
               tr
