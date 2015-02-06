@@ -1,11 +1,15 @@
 from flask import Blueprint, render_template, redirect, url_for
 from nsweb.core import add_blueprint
-from nsweb.models import Analysis
+from nsweb.models.analyses import TermAnalysis
+from nsweb.models.studies import Study
+from nsweb.models.locations import Location
+from nsweb.models.decodings import Decoding
+from nsweb.models.downloads import Download
+from nsweb.models.peaks import Peak
 import random
 import simplejson as json
 from nsweb.initializers import settings
 from os.path import join
-from nsweb.models import TermAnalysis, Study, Location, Decoding, Download, Peak
 from sqlalchemy import func, distinct
 from nsweb.core import db
 

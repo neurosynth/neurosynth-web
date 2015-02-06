@@ -5,7 +5,7 @@ from flask.helpers import url_for
 import json
 import re
 
-bp = Blueprint('analyses',__name__,url_prefix='/analyses')
+bp = Blueprint('analyses', __name__, url_prefix='/analyses')
  
 ### ROUTES COMMON TO ALL ANALYSES ###
 def find_analysis(val):
@@ -41,7 +41,6 @@ def get_reverse_inference_image(val):
 @bp.route('/<string:val>/studies')
 def get_studies(val):
     analysis = find_analysis(val)
-    print val, ", FOUND ANALYSIS:", analysis, analysis.frequencies.count()
     if 'dt' in request.args:
         data = []
         for f in analysis.frequencies:
@@ -49,9 +48,7 @@ def get_studies(val):
             link = '<a href={0}>{1}</a>'.format(url_for('studies.show',val=s.pmid),s.title)
             data.append([link, s.authors, s.journal, round(f.frequency, 3)])
         data = jsonify(data=data)
-        print data
     else:
-        print "NO DT MANG!"
         data = jsonify(studies=[s.pmid for s in analysis.studies])
     return data
 

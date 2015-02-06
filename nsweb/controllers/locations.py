@@ -1,6 +1,7 @@
 from nsweb.core import add_blueprint
 from flask import Blueprint, render_template, url_for, request, jsonify
-from nsweb.models import Location, LocationImage
+from nsweb.models.locations import Location
+from nsweb.models.images import LocationImage
 from nsweb.models.peaks import Peak
 import simplejson as json
 from flask_sqlalchemy import sqlalchemy

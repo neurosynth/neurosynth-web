@@ -1,6 +1,6 @@
 from nsweb.controllers.api import bp
 from flask import request, jsonify, url_for
-from nsweb.models import Study
+from nsweb.models.studies import Study
 
 # Begin server side APIs
 

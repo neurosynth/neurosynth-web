@@ -1,12 +1,8 @@
 from nsweb.core import db
 from sqlalchemy.ext.associationproxy import association_proxy
 import datetime
-# from nsweb.models.users import User
-# from nsweb.models.studies import Study
-# from nsweb.models.images import AnalysisImage
-from nsweb.models import *
-from sqlalchemy.ext.hybrid import hybrid_property
-import simplejson as json
+from nsweb.models.users import User
+from nsweb.models.frequencies import Frequency
 
 
 class AnalysisSet(db.Model):
@@ -39,16 +35,20 @@ class Analysis(db.Model):
         'polymorphic_on': type
     }
 
-
 class TermAnalysis(Analysis):
     __tablename__ = 'term_analysis'
     id = db.Column(db.Integer, db.ForeignKey('analysis.id'), primary_key=True)
     images = db.relationship('TermAnalysisImage', backref=db.backref('analysis',
-                             lazy='joined', cascade='all'))
+                             cascade='all'))
     cog_atlas = db.Column(db.Text, nullable=True)  # Cognitive Atlas RDF data
     __mapper_args__ = {
         'polymorphic_identity': 'term'
     }
+
+    @property
+    def reverse_inference_image(self):
+        """ Convenience method for accessing the reverse inference image. """
+        return self.images[1]
 
 
 class TopicAnalysis(Analysis):
@@ -58,10 +58,15 @@ class TopicAnalysis(Analysis):
     terms = db.Column(db.Text)
     number = db.Column(db.Integer)
     images = db.relationship('TopicAnalysisImage', backref=db.backref('analysis',
-                             lazy='joined'), cascade='all')
+                             cascade='all'))
     __mapper_args__ = {
         'polymorphic_identity': 'topic'
     }
+
+    @property
+    def reverse_inference_image(self):
+        """ Convenience method for accessing the reverse inference image. """
+        return self.images[1]
 
 
 class CustomAnalysis(Analysis):
@@ -71,7 +76,7 @@ class CustomAnalysis(Analysis):
     uuid = db.Column(db.String(32), unique=True)
     ip = db.Column(db.String(15))
     images = db.relationship('CustomAnalysisImage', backref=db.backref('analysis',
-                             lazy='joined', cascade='all'))
+                             cascade='all'))
     user_id = db.Column(db.Integer, db.ForeignKey(User.id))
     user = db.relationship(User, backref=db.backref('analyses',
                            cascade='all'))

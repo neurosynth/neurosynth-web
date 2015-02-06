@@ -1,13 +1,11 @@
-from flask import Blueprint, render_template, redirect, url_for, request, jsonify, abort, send_file
+from flask import Blueprint, render_template, request, abort, send_file, jsonify
 from nsweb.models.decodings import Decoding, DecodingSet
 from nsweb.models.images import Image
-from nsweb.core import app, add_blueprint, db
+from nsweb.core import add_blueprint, db
 from nsweb.initializers import settings
 from nsweb.tasks import decode_image, make_scatterplot
-from nsweb.controllers.images import send_nifti
-from flask.helpers import url_for
+from nsweb.controllers.helpers import send_nifti
 import simplejson as json
-from flask.ext.user import login_required, current_user
 import re
 import uuid
 import requests
@@ -86,6 +84,8 @@ def decode_analysis_image(image):
         }
 
         dec = run_decoder(**kwargs)
+
+    return dec
 
 
 def decode_url(url, metadata={}, render=True):

@@ -1,5 +1,5 @@
 from nsweb.core import db
-from sqlalchemy.ext.associationproxy
+from sqlalchemy.ext.associationproxy import association_proxy
 
 class Snapshot(db.Model):
 
