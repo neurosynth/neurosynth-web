@@ -4,6 +4,7 @@
   - import "macros/_analysis_viewer.html.slim" as viewers
   script type="text/javascript"
     |var analysis = "{{analysis.name}}";
+    var rev_inf = {{analysis.reverse_inference_image.id}};
   .row
     .col-md-8
       h1.top-space0 {{analysis.name}}
@@ -19,6 +20,11 @@
           a href="#maps" data-toggle="tab" Maps
         li
           a href="#studies" data-toggle="tab" Studies
+        li
+          a href="#similarity" data-toggle="tab" Similarity
+        - if cog_atlas
+          li
+            a href="#resources" data-toggle="tab" Resources
         li
           a href="#help" data-toggle="tab" Help
       #analysis-tab-content.tab-content
@@ -40,6 +46,25 @@
                 th Authors
                 th Journal
                 th Loading
+        #similarity.tab-pane
+          h4 Most similar terms
+          table#analysis-similarity-table.table-striped.table-hover.table.table-condensed
+            thead
+              tr
+                th Term
+                th r
+        - if cog_atlas
+          #resources.tab-pane
+            .resource-head
+              .left
+                h4
+                  |<a href="{{cog_atlas['url']}}">{{analysis.name}}</a> is in the <a href="http://cognitiveatlas.org">Cognitive Atlas</a>:
+            .resource-desc
+              .left
+                blockquote {{cog_atlas['definition']}}
+              .right
+                |<a href="http://cognitiveatlas.org"><img src="/static/images/cogatlas.png" height="80"></a>
+
         #help.tab-pane
           h3 Neurosynth analyses: Help
           p This page displays information for an automated Neurosynth meta-analysis of the analysis "{{analysis.name}}". The meta-analysis was performed by automatically identifying all studies in the Neurosynth database that loaded highly on the term, and then performing meta-analyses to identify brain regions that were consistently or preferentially reported in the tables of those studies.

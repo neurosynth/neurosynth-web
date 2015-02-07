@@ -4,12 +4,14 @@ from nsweb.models.locations import Location
 from nsweb.models.studies import Study
 from nsweb.models.peaks import Peak
 from nsweb.models.frequencies import Frequency
+from nsweb.models.decodings import DecodingSet
 from nsweb.models.images import TermAnalysisImage, LocationImage, GeneImage, TopicAnalysisImage
 from nsweb.models.genes import Gene
 from nsweb.initializers import settings
 import os
 from os.path import join, basename, exists
 from os import makedirs
+from neurosynth import Masker
 from neurosynth.base.dataset import Dataset
 from neurosynth.base import transformations
 from neurosynth.analysis import meta
@@ -72,31 +74,7 @@ class DatabaseBuilder:
         self.db.create_all()
 
 
-    # def add_analyses_to_database(self, analyses, image_dir=None, min_studies=50, 
-    #                             threshold=0.001, generate_images=True, update_db=True):
-    #     """ Add new analyses to an existing Dataset and optionally update the 
-    #     Analysiss, Studies, etc. in the database. """
-
-    #     old_analyses = set(self.dataset.feature_table.data.columns)
-
-    #     self.dataset.add_features(analyses, min_studies=min_studies, 
-    #                 threshold=threshold, merge='left')
-
-    #     new_analyses = list(set(self.dataset.feature_table.data.columns) - old_analyses)
-    #     print "Adding %d new analyses." % len(new_analyses)
-    #     print new_analyses
-
-    #     if update_db:
-    #         self.add_analyses(new_analyses)
-    #         self.add_studies(new_analyses)
-
-    #     if generate_images:
-    #         self.generate_analysis_images(image_dir, new_analyses, update_db)
-
-    #     self.dataset.save(settings.PICKLE_DATABASE, keep_mappables=True)
-
-
-    def add_analyses(self, analyses=None, add_images=False, image_dir=None, reset=False):
+    def add_term_analyses(self, analyses=None, add_images=False, image_dir=None, reset=False):
         ''' Add Analysis records to the DB. 
         Args:
             analyses: A list of analysis names to add to the db. If None,  will use 
@@ -105,13 +83,19 @@ class DatabaseBuilder:
                 save any images.
         '''
         if reset:
-            Analysis.query.delete()
+            for a in TermAnalysis.query.all():
+                db.session.delete(a)
+            for s in AnalysisSet.query.filter_by(type='terms').first():
+                db.session.delete(s)
 
         if analyses is None:
             analyses = self._get_feature_names()
         else:
             analyses = list(set(self._get_feature_names()) & set(analyses))
 
+        term_set = AnalysisSet(name='abstract terms', type='terms',
+            description='Term-based meta-analyses. Studies are identified for '
+            'inclusion based on the presence of terms in abstracts.')
         # Store analyses for faster counting of studies/activations
         self.analyses = {}
 
@@ -125,6 +109,7 @@ class DatabaseBuilder:
             if add_images:
                 self.add_analysis_images(analysis, image_dir)
 
+            term_set.analyses.append(analysis)
             self.db.session.add(analysis)
 
         self.db.session.commit()
@@ -156,15 +141,14 @@ class DatabaseBuilder:
 
         name = analysis.name
 
-        # Image class depends on the Analysis class
+        if image_dir is None:
+            image_dir = join(settings.IMAGE_DIR, 'analyses')
+
+        # Image class depends on Analysis class
         if hasattr(analysis, 'terms'):
             image_class = TopicAnalysisImage
-            if image_dir is None:
-                image_dir = join(settings.IMAGE_DIR, 'topics')
         else:
             image_class = TermAnalysisImage
-            if image_dir is None:
-                image_dir = join(settings.IMAGE_DIR, 'analyses')
 
         analysis.images.extend([
             image_class(image_file=join(image_dir, name + '_pAgF_z_FDR_0.01.nii.gz'),
@@ -251,8 +235,8 @@ class DatabaseBuilder:
 
          
         # Commit records in batches to conserve memory.
-        # This is very slow because we're relying on the declarative base. Ideally should replace 
-        # this with use of SQLAlchemy core, but probably not worth the trouble considering we 
+        # This is very slow because we're relying on the declarative base. Ideally should replace
+        # this with use of SQLAlchemy core, but probably not worth the trouble considering we
         # only re-create the DB once in a blue moon.
             if (i+1) % 100 == 0:
                 self.db.session.commit()
@@ -315,8 +299,9 @@ class DatabaseBuilder:
 
             self.db.session.commit()
 
-
-    def generate_location_analyses(self, analysis_dir=None, output_dir=None, min_studies_at_voxel=50):
+    def generate_location_loadings(self, analysis_dir=None, output_dir=None,
+                                   min_studies_at_voxel=50, voxel=True,
+                                   coactivation=True):
         """ Create json files containing analysis data for every point in the brain. """
 
         if analysis_dir is None:
@@ -339,175 +324,52 @@ class DatabaseBuilder:
         analyses = [i[0] for i in analyses]
         n_analyses = len(analyses)
 
-        # Read in all rev inf z and posterior prob images
-        rev_inf_z = np.zeros((self.dataset.image_table.data.shape[0], n_analyses))
-        rev_inf_pp = np.zeros((self.dataset.image_table.data.shape[0], n_analyses))
-
-        print "Reading in images..."
-        for i, f in enumerate(analyses):
-
-            if (i+1) % 100 == 0:
-                print "Loaded analysis #%d..." % (i+1)
-
-            rev_inf_z[:,i] = masker.mask(join(analysis_dir, f + '_pFgA_z.nii.gz'))
-            rev_inf_pp[:,i] = masker.mask(join(analysis_dir, f + '_pFgA_given_pF=0.50.nii.gz'))
-
-        print "Done loading..."
-        p_active = masker.unmask(p_active).squeeze()
-        keep_vox = np.where(p_active >= min_studies_at_voxel)
-        ijk = zip(*keep_vox)  # Exclude voxels with few studies
-        xyz = transformations.mat_to_xyz(np.array(ijk))[:, ::-1]
-
-        print "Processing voxels..."
-        num_vox = len(xyz)
-
-        for i, seed in enumerate(xyz):
-
-            location_name = '_'.join(str(x) for x in seed)
-            analysisfile = join(output_dir, '%s_analyses.txt' % location_name)
-            # if os.path.isfile(analysisfile): continue
-            if (i+1) % 1000 == 0:
-                print "\nProcessing %d/%d..." % (i + 1, num_vox)
-            ind = ijk_reduced[i]
-            z_scores = list(rev_inf_z[ind,:].ravel())
-            z_scores = ['%.2f' % x for x in z_scores]
-            pp = list(rev_inf_pp[ind,:].ravel())
-            pp = ['%.2f' % x for x in pp]
-            data = {
-                'data': []
-            }
-            for j in range(n_analyses):
-                data['data'].append([analyses[j], z_scores[j], pp[j]])
-            json.dump(data, open(analysisfile, 'w'))
+        if coactivation:
+            z = np.zeros((self.dataset.image_table.data.shape[0], n_analyses))
 
 
-    def generate_location_images(self, image_dir=None, add_to_db=False, min_studies=50, **kwargs):
-        """ Create a full set of location-based coactivation images via Neurosynth. 
-        Right now this isn't parallelized and will take a couple of days to run. 
-        Args:
-            min_studies: minimum number of active studies for a voxel to be processed
-        """
+        if voxel:
+            # Read in all rev inf z and posterior prob images
+            rev_inf_z = np.zeros((self.dataset.image_table.data.shape[0], n_analyses))
+            rev_inf_pp = np.zeros((self.dataset.image_table.data.shape[0], n_analyses))
 
-        from neurosynth.base import transformations
-        from neurosynth.analysis import meta
+            print "Reading in images..."
+            for i, f in enumerate(analyses):
 
-        if image_dir is None:
-            image_dir = join(settings.IMAGE_DIR, 'coactivation')
-            if not os.path.exists(image_dir):
-                os.makedirs(image_dir)
+                if (i+1) % 100 == 0:
+                    print "Loaded analysis #%d..." % (i+1)
 
-        study_ids = self.dataset.image_table.ids
+                rev_inf_z[:,i] = masker.mask(join(analysis_dir, f + '_pFgA_z.nii.gz'))
+                rev_inf_pp[:,i] = masker.mask(join(analysis_dir, f + '_pFgA_given_pF=0.50.nii.gz'))
 
-        # Identify all voxels we want to generate images for
-        # imgs = np.array(self.dataset.image_table.data.todense())   # Make array dense
-        imgs = self.dataset.image_table.data
-        p_active = imgs.sum(1)   # Compute number of studies active at each voxel
+            print "Done loading..."
+            p_active = masker.unmask(p_active).squeeze()
+            keep_vox = np.where(p_active >= min_studies_at_voxel)
+            ijk = zip(*keep_vox)  # Exclude voxels with few studies
+            xyz = transformations.mat_to_xyz(np.array(ijk))[:, ::-1]
 
-        # Get array indices of all valid voxels--we'll need this later
-        ijk_reduced = np.array(np.where(p_active >= min_studies)[0]).squeeze()
+            print "Processing voxels..."
+            num_vox = len(xyz)
 
-        # Project the voxel counts back into the original MNI space so we can look up coordinates
-        p_active = self.dataset.masker.unmask(p_active).squeeze()
+            for i, seed in enumerate(xyz):
 
-        # Keep only voxels with enough studies, and save coordinates as list of (i,j,k) tuples
-        ijk = zip(*np.where(p_active >= min_studies))
+                location_name = '_'.join(str(x) for x in seed)
+                analysisfile = join(output_dir, '%s_analyses.txt' % location_name)
+                # if os.path.isfile(analysisfile): continue
+                if (i+1) % 1000 == 0:
+                    print "\nProcessing %d/%d..." % (i + 1, num_vox)
+                ind = ijk_reduced[i]
+                z_scores = list(rev_inf_z[ind,:].ravel())
+                z_scores = ['%.2f' % x for x in z_scores]
+                pp = list(rev_inf_pp[ind,:].ravel())
+                pp = ['%.2f' % x for x in pp]
+                data = {
+                    'data': []
+                }
+                for j in range(n_analyses):
+                    data['data'].append([analyses[j], z_scores[j], pp[j]])
+                json.dump(data, open(analysisfile, 'w'))
 
-        # Transform image-space coordinates into world-space coordinates
-        xyz = transformations.mat_to_xyz(np.array(ijk))[:,::-1]
-
-        num_vox = len(xyz)
-
-        # Loop over valid voxels and generate coactivation images
-        for i, seed in enumerate(xyz):
-
-            voxel_index = ijk[i]
-            num_active = p_active[voxel_index]
-
-            # Get the right row by looking up index in the array we vectorized earlier
-            vi = ijk_reduced[i]
-            row = imgs[vi,:]
-
-            # Get the ids of the studies that activate at this voxel
-            study_inds = np.where(row.toarray())[1]
-            studies = [study_ids[s] for s in study_inds]
-
-            # Filename based on (x,y,z) joined by underscore
-            seed = seed.tolist()
-            name = '_'.join(str(x) for x in seed)
-
-            # Call Neurosynth to do the heavy lifting
-            # network.coactivation(self.dataset, [seed], threshold=0.1, outroot=outroot)
-            ma = meta.MetaAnalysis(self.dataset, studies, **kwargs)
-            imgs_to_keep = ['pFgA_z_FDR_0.01']  # Just the reverse inference
-            ma.save_results(output_dir=image_dir, prefix=name, image_list=imgs_to_keep)
-
-            # Create a new Location record and add LocationImage
-            if add_to_db:
-                self.add_location_images(self, image_dir)
-
-
-    def add_location_images(self, image_dir=None, search=None, limit=None, overwrite=False, reset=False):
-        """ Filter all the images in the passed directory and add records. """
-        
-        if reset:
-            Location.query.delete()
-
-        if image_dir is None:
-            image_dir = join(settings.IMAGE_DIR, 'coactivation')
-
-        if search is None:
-            # search = '*_pFgA_z.nii.gz'
-            search = "functional_connectivity_*.nii.gz"
-
-        extra_assets = [
-            {
-                'name': 'YeoBucknerFCMRI',
-                'path': join(settings.IMAGE_DIR, 'fcmri', 'functional_connectivity_%d_%d_%d.nii.gz'),
-                'label': 'Functional connectivity',
-                'stat': 'correlation (r)',
-                'description': "This image displays resting-state functional connectivity for the seed region in a sample of 1,000 subjects. To reduce blurring of signals across cerebro-cerebellar and cerebro-striatal boundaries, fMRI signals from adjacent cerebral cortex were regressed from the cerebellum and striatum. For details, see <a href='http://jn.physiology.org/content/106/3/1125.long'>Yeo et al (2011)</a>, <a href='http://jn.physiology.org/cgi/pmidlookup?view=long&pmid=21795627'>Buckner et al (2011)</a>, and <a href='http://jn.physiology.org/cgi/pmidlookup?view=long&pmid=22832566'>Choi et al (2012)</a>.",
-            }
-        ]
-        
-        images = glob(join(image_dir, search))
-        print "Found %d images to add." % len(images)
-
-        if limit is None:
-            limit = len(images)
-
-        for ind, img in enumerate(images[:limit]):
-
-            x, y, z = [int(i) for i in basename(img).split('.')[0].split('_')[2:5]]
-            if (not overwrite) and self.db.session.query(Location).filter_by(x=x, y=y, z=z).count():
-                continue
-            location = Location(x=x, y=y, z=z)
-            location.images = [LocationImage(
-                image_file=img,
-                label='Meta-analytic coactivation (%s, %s, %s)' % (x, y, z),
-                stat='z-score',
-                display=1,
-                download=1,
-                description='This image displays regions coactivated with the seed region across all studies in the Neurosynth database. It represents meta-analytic coactivation rather than time series-based connectivity.'
-                )
-            ]
-            
-            # Add any additional assets
-            for xtra in extra_assets:
-                xtra_path = xtra['path'] % (x, y, z)
-                if os.path.exists(xtra_path):
-                    location.images.append(LocationImage(
-                        image_file = xtra_path,
-                        label = xtra['label'],
-                        display = 1,
-                        download = 1,
-                        description = xtra['description'],
-                        stats=xtra['stat']
-                        ))
-
-            self.db.session.add(location)
-
-            if not ((ind+1) % 1000):
-                self.db.session.commit()
 
     def add_genes(self, gene_dir=None, reset=False):
         """ Add records for genes, working from a directory containing gene images. """
@@ -554,15 +416,18 @@ class DatabaseBuilder:
         data.to_msgpack(settings.DECODING_DATA)
 
     # def generate_topics(self, name, topic_keys, doc_topics, add_to_db=False, top_n=20):
-    def add_topics(self, make_images=True, top_n=20):
+    def add_topics(self, generate_images=True, add_images=True, top_n=20):
         """ Seed the database with topics. 
         Args:
-            name: name of topic (e.g., 'topic10')
-            topic_keys: filename of topic key file
-            doc_topics: filename of document topic loadings
-            add_to_db: when True, adds new records to database_builder.py
-            top_n: int; how many of the top-loading words to store
+            generate_images (bool): if True, generates meta-analysis images for all topics.
+            add_images (bool): if True, adds records for all images to the database.
+            top_n: number of top-loading words to save.
         """
+        for t in TopicAnalysis.query.all():
+            self.db.session.delete(t)
+        for ts in AnalysisSet.query.filter_by(type='topics').all():
+            self.db.session.delete(ts)
+ 
         topic_sets = glob(join(settings.TOPIC_DIR, '*.json'))
 
         # Temporarily store the existing AnalysisTable so we don't overwrite it
@@ -575,7 +440,7 @@ class DatabaseBuilder:
             n = int(data['n_topics'])
 
             ts = AnalysisSet(name=data['name'], description=data['description'],
-                          n_analyses=n)
+                          n_analyses=n, type='topics')
             self.db.session.add(ts)
 
             self.dataset.add_features(join(settings.TOPIC_DIR, 'analyses',
@@ -588,20 +453,22 @@ class DatabaseBuilder:
                 os.makedirs(topic_set_image_dir)
 
             # Generate full set of topic images
-            meta.analyze_features(self.dataset, self.dataset.get_feature_names(),
-                                  save=topic_set_image_dir, q=0.01)
+            if generate_images:
+                meta.analyze_features(
+                    self.dataset, self.dataset.get_feature_names(),
+                    output_dir=topic_set_image_dir, threshold=0.05, q=0.01)
 
             feature_data = self.dataset.feature_table.data
 
             # Get all valid Study ids for speed
-            study_ids = set(self.db.session.query(Study.pmid).all())
+            study_ids = [x[0] for x in set(self.db.session.query(Study.pmid).all())]
 
             for i in range(n):
 
                 # Disable autoflush temporarily because it causes problems
                 with self.db.session.no_autoflush:
-                    terms = ', '.join(key_data.pop(0).split()[2:])
-                    topic = TopicAnalysis(name=data['name'] + '_' + str(i),
+                    terms = ', '.join(key_data.pop(0).split()[2:][:top_n])
+                    topic = TopicAnalysis(name='topic%d' % i,
                                           terms=terms, number=i)
 
                     self.db.session.add(topic)
@@ -609,54 +476,105 @@ class DatabaseBuilder:
 
                     # Map onto studies
                     freqs = feature_data['topic%d' % i]
-                    for s_id, f in freqs[freqs >= 0.05].iteritems():
+                    above_thresh = freqs[freqs >= 0.05]
+                    srsly = 0
+                    for s_id, f in above_thresh.iteritems():
+                        s_id = int(s_id)
                         if s_id in study_ids:
-                            # study = Study.query.get(int(s_id))
+                            srsly += 1
                             self.db.session.add(Frequency(
-                                pmid=int(s_id), analysis=topic, frequency=f))
+                                pmid=s_id, analysis=topic, frequency=f))
+
+                    # Update counts
+                    topic.n_studies = len(above_thresh)
 
                     self.db.session.commit()
 
-                    if make_images:
-                        self.add_analysis_images(topic, topic_image_dir)
+                    if add_images:
+                        self.add_analysis_images(topic, topic_set_image_dir)
 
                 ts.analyses.append(topic)
 
             self.db.session.commit()
 
+        # Restore original features
         # self.dataset.feature_table = feature_table
 
+    def add_cognitive_atlas_nodes(self):
+        """ Store data from the Cognitive Atlas for all available nodes. """
+        RDF_PATH = join(settings.ASSET_DIR, 'misc')
+        rdf_files = glob(join(RDF_PATH, '*.rdf'))
+        if not rdf_files:
+            raise IOError("No RDF files found in %s. Please make sure to "
+                "place all .rdf dumps from the Cognitive Atlas in this "
+                "directory." % RDF_PATH)
+
+        nodes = {}
+        for f in rdf_files:
+            text = open(f).read()
+            patt = 'rdf:about="(.*?)">.*?' \
+                   '<skos:definition>(.*?)</skos.*?' \
+                   '<skos:prefLabel>(.*?)</skos:prefLabel>'
+            for m in re.findall(patt, text, re.S):
+                url, definition, name = m
+                nodes[name] = {
+                    'definition': definition.strip(),
+                    'url': url
+                    }
+
+        for ta in TermAnalysis.query.all():
+            if ta.name in nodes:
+                ta.cog_atlas = json.dumps(nodes[ta.name])
+                self.db.session.add(ta)
+        self.db.session.commit()
 
 
-        # # images = glob(join(settings.TOPIC_DIR, 'images', '*_p?g?_z.nii.gz'))
-        # # temporarily store old AnalysisTable while we analyze topics
-        # ft = deepcopy(self.dataset.feature_table)
-        # self.dataset.add_features(doc_topics)
+    def memory_map_images(self, sets=None, n_sampled=20000):
+        """ Create memory-mapped arrays containing all image data for one or
+        more AnalysisSets. """
 
-        # # Generate topic images
-        # output_dir = join(settings.IMAGE_DIR, 'topics', name)
-        # if not exists(output_dir):
-        #     makedirs(output_dir)
-        # analyses = self.dataset.get_feature_names()
-        # meta.analyze_features(self.dataset, analyses, save=image_dir, q=0.01, **kwargs)
+        mm_dir = settings.MEMMAP_DIR
+        if not exists(mm_dir):
+            os.makedirs(mm_dir)
 
-        # # Load top-loading terms
-        # loadings = [' '.join(l.split()[2:(2+top_n)]) for l in open(topic_keys).read().splitlines()]
+        # For now let's just worry about term-based reverse inference maps
+        name = 'term'
 
-        # # Add Topic and associated Images to DB
-        # if add_to_db:
-        #     for (i, f) in enumerate(analyses):
-        #         topic = Topic(name=f, topic_set=name, terms=loadings[i])
-        #         self.add_analysis_images(topic, image_dir=join(settings.IMAGE_DIR, 'topics'))
-        #         db.session.add(topic)
-        #         db.session.commit()
+        # Get all images and save labels
+        images = [a.images[0] for a in TermAnalysis.query.all()]
+        labels = [os.path.basename(img.image_file).split('_')[0] for img in images]
+        # print term_labels
+        open(join(mm_dir, '%s_labels.txt' % name), 'w').write('\n'.join(labels))
 
-        # Map to Studies
+        # Get mask
+        masker = Masker(join(settings.IMAGE_DIR, 'anatomical.nii.gz'))
+
+        # Select random voxels and save for later
+        n_vox = len(masker.mask(images[0].image_file))
+        sampled_vox = np.random.choice(np.arange(n_vox), n_sampled, replace=False)
+        np.save(join(mm_dir, '%s_voxels.npy' % name), sampled_vox)
+
+        # Initialize memmap
+        n_images = len(images)
+        mm_file = join(mm_dir, '%s_images.dat' % name)
+        mm = np.memmap(mm_file, dtype='float32', mode='w+', shape=(n_sampled, n_images))
+
+        # Populate with standardized image data
+        for i, img in enumerate(images):
+            img_data = masker.mask(img.image_file)[sampled_vox]
+            mm[:, i] = (img_data - img_data.mean())/img_data.std()
+
+        # Flush
+        del mm
+
+        # Create DB record
+
+        self.db.session.add(DecodingSet(name=name, n_images=n_images,
+                                        n_voxels=len(sampled_vox),
+                                        is_subsampled=True))
+        self.db.session.commit()
 
 
-        # Restore original analyses
-        self.dataset.feature_table = feature_table
-        
     def _filter_analyses(self, analyses):
         """ Remove any invalid analysis names """
         # Remove analyses that start with a number

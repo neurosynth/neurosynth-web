@@ -1,5 +1,4 @@
 from nsweb.core import db
-from nsweb.models.images import *
 
 class Gene(db.Model):
 

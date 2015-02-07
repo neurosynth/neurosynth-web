@@ -124,3 +124,21 @@ ul.dropdown-menu {
 	}
 
 }
+
+.resource-head {
+	width: 100%;
+	float: left;
+	margin-top: 30px;
+}
+
+.resource-desc {
+	float: left;
+	.left {
+		float: left;
+		width: 70%;
+	}
+	.right {
+		padding-top: 20px;
+		float: left;
+	}
+}

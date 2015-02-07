@@ -1,14 +1,15 @@
 from nsweb.core import add_blueprint
-from flask import Blueprint, render_template, redirect, url_for, request, jsonify
-from nsweb.models import Location, LocationImage
+from flask import Blueprint, render_template, url_for, request, jsonify
+from nsweb.models.locations import Location
+from nsweb.models.images import LocationImage
 from nsweb.models.peaks import Peak
 import simplejson as json
 from flask_sqlalchemy import sqlalchemy
 from nsweb.initializers import settings
 from os.path import join, exists
 from nsweb.tasks import make_coactivation_map
-from nsweb.controllers.images import send_nifti
 from nsweb.core import db
+from nsweb.controllers.decode import decode_analysis_image
 
 bp = Blueprint('locations',__name__,url_prefix='/locations')
 
@@ -92,11 +93,13 @@ def get_studies(val):
         data = jsonify(data=data)
     return data
 
+
 @bp.route('/<string:val>/analyses')
 def get_analyses(val):
     x, y, z, radius = get_params(val)
     f = join(settings.LOCATION_FEATURE_DIR, '%d_%d_%d_analyses.txt' % (x,y,z))
     return open(f).read() if exists(f) else '{"data":[]}'
+
 
 def make_location(x, y, z):
 
@@ -108,31 +111,37 @@ def make_location(x, y, z):
     if not exists(filename):
         result = make_coactivation_map.delay(x, y, z).wait()
     if exists(filename):
-        location.images.append(LocationImage(
-            name = 'Meta-analytic coactivation for seed (%d, %d, %d)' % (x, y, z),
-            image_file = filename,
-            label = 'Meta-analytic coactivation',
-            stat = 'z-score',
-            display = 1,
-            download = 1,
-            description = 'This image displays regions coactivated with the seed region across all studies in the Neurosynth database. It represents meta-analytic coactivation rather than time series-based connectivity.'
-        ))
+        ma_image = LocationImage(
+            name='Meta-analytic coactivation for seed (%d, %d, %d)' % (x, y, z),
+            image_file=filename,
+            label='Meta-analytic coactivation',
+            stat='z-score',
+            display=1,
+            download=1,
+            description='This image displays regions coactivated with the seed region across all studies in the Neurosynth database. It represents meta-analytic coactivation rather than time series-based connectivity.'
+        )
+        location.images.append(ma_image)
 
     # Add Yeo FC image if it exists
     filename = join(settings.IMAGE_DIR, 'fcmri', 'functional_connectivity_%d_%d_%d.nii.gz' % (x, y, z))
     if exists(filename):
-        location.images.append(LocationImage(
+        fc_image = LocationImage(
             name='YeoBucknerFCMRI for seed (%d, %d, %d)' % (x, y, z),
-            image_file = filename,
-            label = 'Functional connectivity',
-            stat = 'corr. (r)',
-            description = "This image displays resting-state functional connectivity for the seed region in a sample of 1,000 subjects. To reduce blurring of signals across cerebro-cerebellar and cerebro-striatal boundaries, fMRI signals from adjacent cerebral cortex were regressed from the cerebellum and striatum. For details, see <a href='http://jn.physiology.org/content/106/3/1125.long'>Yeo et al (2011)</a>, <a href='http://jn.physiology.org/cgi/pmidlookup?view=long&pmid=21795627'>Buckner et al (2011)</a>, and <a href='http://jn.physiology.org/cgi/pmidlookup?view=long&pmid=22832566'>Choi et al (2012)</a>.",
-            display = 1,
-            download = 1
-        ))
+            image_file=filename,
+            label='Functional connectivity',
+            stat='corr. (r)',
+            description="This image displays resting-state functional connectivity for the seed region in a sample of 1,000 subjects. To reduce blurring of signals across cerebro-cerebellar and cerebro-striatal boundaries, fMRI signals from adjacent cerebral cortex were regressed from the cerebellum and striatum. For details, see <a href='http://jn.physiology.org/content/106/3/1125.long'>Yeo et al (2011)</a>, <a href='http://jn.physiology.org/cgi/pmidlookup?view=long&pmid=21795627'>Buckner et al (2011)</a>, and <a href='http://jn.physiology.org/cgi/pmidlookup?view=long&pmid=22832566'>Choi et al (2012)</a>.",
+            display=1,
+            download=1
+        )
+        location.images.append(fc_image)
 
     db.session.add(location)
     db.session.commit()
+
+    # Decode the FC image
+    decode_analysis_image(fc_image.id)
+
     return location
 
 add_blueprint(bp)

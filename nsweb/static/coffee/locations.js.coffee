@@ -12,25 +12,29 @@ $(document).ready ->
 
   return if not $('#page-location').length
 
-  getLocationString = () ->
+  getLocationString = ->
     coords = [$('#x-in').val(), $('#y-in').val(), $('#z-in').val(), $('#rad-out').val()]
     coords[3] = 20 if coords[3] > 20
     coords.join('_')
 
-  loadLocationStudies = () ->
+  loadLocationStudies = ->
     url = '/locations/' + getLocationString() + '/studies?dt=1'
     $('#location_studies_table').DataTable().ajax.url(url).load().order([3, 'desc'])
 
-  loadLocationImages = () ->
+  loadLocationImages = ->
     url = '/locations/' + getLocationString()  + '/images'
     $.get(url, (result) ->
       window.loadImages(result.data)
+      loadLocationSimilarity(result.data[0].id)
       )
 
-  loadLocationAnalyses = () ->
+  loadLocationAnalyses = ->
     url = '/locations/' + getLocationString() + '/analyses'
     $('#location_analyses_table').DataTable().ajax.url(url).load().order([1, 'desc'])
 
+  loadLocationSimilarity = (id) ->
+    url = '/images/' + id + '/decode'
+    $('#analysis-similarity-table').DataTable().ajax.url(url).load().order([1, 'desc'])
     #TODO: IMPLEMENT MOVE CURSOR TO SEED
 
   update = ->

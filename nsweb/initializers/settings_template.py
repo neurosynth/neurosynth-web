@@ -50,6 +50,9 @@ DECODING_SCATTERPLOTS_DIR = join(DATA_DIR, 'decoding', 'scatterplots')
 # last decoding; when False, will re-run the decoder every time.
 CACHE_DECODINGS = True
 
+# Path to memory-mapped arrays of image data
+MEMMAP_DIR = join(DATA_DIR, 'memmaps')
+
 
 ### CONTENT-SPECIFIC DIRECTORIES ###
 MASK_DIR = join(IMAGE_DIR, 'masks')

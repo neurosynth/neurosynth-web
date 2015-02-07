@@ -1,6 +1,7 @@
 from nsweb.controllers.api import bp
 from flask import request, jsonify, url_for
-from nsweb.models import Location, Peak
+from nsweb.models.locations import Location
+from nsweb.models.peaks import Peak
 
 # @bp.route('/locations/')
 # def get_location_list():

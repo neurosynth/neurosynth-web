@@ -2,10 +2,10 @@ from flask import Blueprint, render_template, redirect, url_for, request, jsonif
 from nsweb.models.analyses import Analysis, AnalysisSet, TopicAnalysis, TermAnalysis
 from nsweb.core import add_blueprint
 from flask.helpers import url_for
-import simplejson as json
+import json
 import re
 
-bp = Blueprint('analyses',__name__,url_prefix='/analyses')
+bp = Blueprint('analyses', __name__, url_prefix='/analyses')
  
 ### ROUTES COMMON TO ALL ANALYSES ###
 def find_analysis(val):
@@ -41,7 +41,6 @@ def get_reverse_inference_image(val):
 @bp.route('/<string:val>/studies')
 def get_studies(val):
     analysis = find_analysis(val)
-    print val, ", FOUND ANALYSIS:", analysis, analysis.frequencies.count()
     if 'dt' in request.args:
         data = []
         for f in analysis.frequencies:
@@ -49,9 +48,7 @@ def get_studies(val):
             link = '<a href={0}>{1}</a>'.format(url_for('studies.show',val=s.pmid),s.title)
             data.append([link, s.authors, s.journal, round(f.frequency, 3)])
         data = jsonify(data=data)
-        print data
     else:
-        print "NO DT MANG!"
         data = jsonify(studies=[s.pmid for s in analysis.studies])
     return data
 
@@ -70,8 +67,9 @@ def show_term(term):
     analysis = find_analysis(term)
     if analysis is None:
         return render_template('analyses/missing.html.slim', analysis=term)
-    return render_template('analyses/terms/show.html.slim', 
-                           analysis=analysis)
+    return render_template('analyses/terms/show.html.slim',
+                           analysis=analysis,
+                           cog_atlas=json.loads(analysis.cog_atlas or '{}'))
 
 ### TOPIC-SPECIFIC ROUTES ###
 @bp.route('/topics/')

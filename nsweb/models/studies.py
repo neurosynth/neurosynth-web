@@ -1,4 +1,5 @@
-from nsweb.models import *
+from nsweb.core import db
+from sqlalchemy.ext.associationproxy import association_proxy
 
 class Study(db.Model):
 

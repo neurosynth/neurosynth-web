@@ -32,17 +32,17 @@ $.fn.dataTable.TableTools.defaults.aButtons = [
     {
       sExtends: 'copy'
       sButtonText: 'Copy'
-      oSelectorOpts: page: 'current'
+      oSelectorOpts: filter: 'applied'
     },
     {
       sExtends: 'csv'
       sButtonText: 'CSV'
-      oSelectorOpts: page: 'current'
+      oSelectorOpts: filter: 'applied'
     },
     {
       sExtends: 'xls'
       sButtonText: 'XLS'
-      oSelectorOpts: page: 'current'
+      oSelectorOpts: filter: 'applied'
     }
   ]
 
@@ -110,7 +110,7 @@ $(document).ready ->
         { 
           data: "analysis"
           render: (data, type, row, meta) ->
-            '<a href="/analyses/'+ data + '">' + data + '</a>'
+            '<a href="/analyses/terms/'+ data + '">' + data + '</a>'
           width: '%60%'
         }, 
         {

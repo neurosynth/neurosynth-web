@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, redirect, url_for, request, jsonify, abort, send_file
-from nsweb.models import Analysis, AnalysisImage
+from nsweb.models.analyses import Analysis, AnalysisImage
 from nsweb.core import app, add_blueprint, db
 from nsweb.initializers import settings
 from nsweb.tasks import run_metaanalysis

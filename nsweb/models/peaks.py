@@ -1,9 +1,9 @@
-from nsweb.models import *
+from nsweb.core import db
 
 class Peak(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
-    pmid = db.Column(db.Integer,db.ForeignKey(Study.pmid))
+    pmid = db.Column(db.Integer,db.ForeignKey('study.pmid'))
     table = db.Column(db.String(10))
     x = db.Column(db.Float)
     y = db.Column(db.Float)
