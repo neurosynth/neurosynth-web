@@ -21,8 +21,8 @@
           a href="#maps" data-toggle="tab" Maps
         li
           a href="#studies" data-toggle="tab" Studies
-        li
-          a href="#similarity" data-toggle="tab" Similarity
+        / li
+        /   a href="#similarity" data-toggle="tab" Similarity
         - if cog_atlas
           li
             a href="#resources" data-toggle="tab" Resources
@@ -35,13 +35,13 @@
             var settings = ['no-zoom', 'layers','nav','checkboxes']
           p {{viewers.viewer()|safe}}
         {{datatables.analysis_studies_table(analysis.name)}}
-        #similarity.tab-pane
-          h4 Most similar terms
-          table#analysis-similarity-table.table-striped.table-hover.table.table-condensed
-            thead
-              tr
-                th Term
-                th r
+        / #similarity.tab-pane
+        /   h4 Most similar terms
+        /   table#analysis-similarity-table.table-striped.table-hover.table.table-condensed
+        /     thead
+        /       tr
+        /         th Term
+        /         th r
         - if cog_atlas
           #resources.tab-pane
             .resource-head

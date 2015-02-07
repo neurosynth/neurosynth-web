@@ -65,7 +65,7 @@ $(document).ready ->
   if analysis?
     loadAnalysisStudies()
     loadAnalysisImages()
-    loadAnalysisSimilarity()
+    # loadAnalysisSimilarity()
 
 
   # Update cookie to reflect last tab user was on
