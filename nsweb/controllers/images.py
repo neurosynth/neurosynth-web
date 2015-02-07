@@ -26,23 +26,16 @@ def download(val, fdr=True):
 
 
 @bp.route('/<int:image>/decode/')
-def get_decoding_data(image):
+def get_decoding_data(image, get_json=True):
 
     dec = decode_analysis_image(image)
-    # # Fix this ugly-ass query...
-    # dec = db.session.query(Decoding)\
-    #     .filter(Decoding.decoding_set_id == DecodingSet.id,
-    #             DecodingSet.name == reference,
-    #             Decoding.image_id == int(image)).first()
-
     if dec is None:
         abort(404)
     data = open(os.path.join(settings.DECODING_RESULTS_DIR,
                              dec.uuid + '.txt')).read().splitlines()
     data = [x.split('\t') for x in data]
-    # data = [{'term': f, 'r': round(float(v), 3)} for (f, v) in data]
     data = [[f, round(float(v), 3)] for (f, v) in data]
-    return jsonify(data=data)
+    return jsonify(data=data) if get_json else data
 
 
 @bp.route('/anatomical')

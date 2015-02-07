@@ -28,8 +28,8 @@ $(document).ready ->
       loadLocationSimilarity(result.data[0].id)
       )
 
-  loadLocationAnalyses = ->
-    url = '/locations/' + getLocationString() + '/analyses'
+  loadLocationComparisons = ->
+    url = '/locations/' + getLocationString() + '/compare'
     $('#location_analyses_table').DataTable().ajax.url(url).load().order([1, 'desc'])
 
   loadLocationSimilarity = (id) ->
@@ -40,7 +40,7 @@ $(document).ready ->
   update = ->
     loadLocationStudies()
     loadLocationImages()
-    loadLocationAnalyses()
+    loadLocationComparisons()
     base = window.location.href.split('?')[0]
     coords = { x: $('#x-in').val(), y: $('#y-in').val(), z: $('#z-in').val(), r: $('#rad-out').val()}
     xyz = [coords.x, coords.y, coords.z]
@@ -52,8 +52,8 @@ $(document).ready ->
 
   moveTo = ->
     base = window.location.href.split('?')[0]
-    coords = { x: $('#x-in').val(), y: $('#y-in').val(), z: $('#z-in').val(), r: $('#rad-out').val()}
-    url = base + '?' + $.param(coords)
+    coords = [$('#x-in').val(), $('#y-in').val(), $('#z-in').val(), $('#rad-out').val()]
+    url = '/locations/' + coords.join('_')
     window.location.href = url
   
   $('#location_studies_table').dataTable({

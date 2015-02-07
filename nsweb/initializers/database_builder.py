@@ -85,7 +85,7 @@ class DatabaseBuilder:
         if reset:
             for a in TermAnalysis.query.all():
                 db.session.delete(a)
-            for s in AnalysisSet.query.filter_by(type='terms').first():
+            for s in AnalysisSet.query.filter_by(type='terms').all():
                 db.session.delete(s)
 
         if analyses is None:
@@ -112,6 +112,7 @@ class DatabaseBuilder:
             term_set.analyses.append(analysis)
             self.db.session.add(analysis)
 
+        term_set.n_analyses = len(term_set.analyses)
         self.db.session.commit()
 
 
@@ -529,50 +530,100 @@ class DatabaseBuilder:
         self.db.session.commit()
 
 
-    def memory_map_images(self, sets=None, n_sampled=20000):
+    def memory_map_images(self, include=['terms', 'topics', 'genes']):
         """ Create memory-mapped arrays containing all image data for one or
-        more AnalysisSets. """
+        more AnalysisSets.
+        """
 
         mm_dir = settings.MEMMAP_DIR
         if not exists(mm_dir):
             os.makedirs(mm_dir)
 
-        # For now let's just worry about term-based reverse inference maps
-        name = 'term'
-
-        # Get all images and save labels
-        images = [a.images[0] for a in TermAnalysis.query.all()]
-        labels = [os.path.basename(img.image_file).split('_')[0] for img in images]
-        # print term_labels
-        open(join(mm_dir, '%s_labels.txt' % name), 'w').write('\n'.join(labels))
-
         # Get mask
         masker = Masker(join(settings.IMAGE_DIR, 'anatomical.nii.gz'))
+        mask_voxels = np.sum(masker.get_current_mask())
 
-        # Select random voxels and save for later
-        n_vox = len(masker.mask(images[0].image_file))
-        sampled_vox = np.random.choice(np.arange(n_vox), n_sampled, replace=False)
-        np.save(join(mm_dir, '%s_voxels.npy' % name), sampled_vox)
+        def save_memmap(name, analysis_set, images, labels, voxels=None):
+            # print term_labels
+            open(join(mm_dir, '%s_labels.txt' % name), 'w') \
+                .write('\n'.join(labels))
 
-        # Initialize memmap
-        n_images = len(images)
-        mm_file = join(mm_dir, '%s_images.dat' % name)
-        mm = np.memmap(mm_file, dtype='float32', mode='w+', shape=(n_sampled, n_images))
+            sampled_vox = np.arange(mask_voxels)
+            if voxels is not None:
+                # Either randomly select voxels, or use what was passed
+                # TODO: sample uniformly from a 3D grid instead of randomly
+                if isinstance(voxels, int):
+                    sampled_vox = np.random.choice(sampled_vox, voxels,
+                                                   replace=False)
+                else:
+                    sampled_vox = voxels
+                np.save(join(mm_dir, '%s_voxels.npy' % name), sampled_vox)
 
-        # Populate with standardized image data
-        for i, img in enumerate(images):
-            img_data = masker.mask(img.image_file)[sampled_vox]
-            mm[:, i] = (img_data - img_data.mean())/img_data.std()
+            # Initialize memmap
+            n_images = len(images)
+            mm_file = join(mm_dir, '%s_images.dat' % name)
+            mm = np.memmap(mm_file, dtype='float32', mode='w+',
+                           shape=(len(sampled_vox), n_images))
 
-        # Flush
-        del mm
+            # Populate with standardized image data
+            for i, img in enumerate(images):
+                img_data = masker.mask(img.image_file)[sampled_vox]
+                mm[:, i] = (img_data - img_data.mean())/img_data.std()
 
-        # Create DB record
+            # Flush
+            del mm
 
-        self.db.session.add(DecodingSet(name=name, n_images=n_images,
-                                        n_voxels=len(sampled_vox),
-                                        is_subsampled=True))
-        self.db.session.commit()
+            # Create DB record
+            self.db.session.add(
+                DecodingSet(name=name, n_images=n_images,
+                            n_voxels=len(sampled_vox), is_subsampled=True,
+                            analysis_set=analysis_set))
+            self.db.session.commit()
+
+        ### TERMS ###
+        if 'terms' in include:
+
+            analysis_set = AnalysisSet.query \
+                .filter_by(type='terms').first()
+
+            # Get all images and save labels
+            images = [a.images[0] for a in analysis_set.analyses]
+            labels = [a.name for a in analysis_set.analyses]
+
+            # save both full and 20k voxel arrays
+            save_memmap('terms_full', analysis_set, images, labels)
+            save_memmap('terms_20k', analysis_set, images, labels, 20000)
+
+        ### TOPICS ###
+        if 'topics' in include:
+
+            analysis_set = AnalysisSet.query \
+                .filter_by(name='v3-topics-200').first()
+
+            # Get all images and save labels
+            images = [a.images[0] for a in analysis_set.analyses]
+            labels = [a.name for a in analysis_set.analyses]
+
+            # save both full and 20k voxel arrays
+            save_memmap('topics_full', analysis_set, images, labels)
+            save_memmap('topics_20k', analysis_set, images, labels, 20000)
+
+        ### GENES ###
+        if 'genes' in include:
+
+            analysis_set = AnalysisSet.query \
+                .filter_by(name='genes').first()
+
+            # Get all images and save labels
+            images = [a.images[0] for a in analysis_set.analyses]
+            labels = [a.name for a in analysis_set.analyses]
+
+            # save only voxels where there were originally microarrays
+            sample_img = join(settings.IMAGE_DIR, 'sample_locations.nii.gz')
+            voxels = masker.mask(sample_img)
+            voxels = np.nonzero(voxels)[0]
+            save_memmap('genes', analysis_set, images, labels, voxels)
+           
 
 
     def _filter_analyses(self, analyses):

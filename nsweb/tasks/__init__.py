@@ -14,6 +14,7 @@ from nsweb.core import celery
 from os.path import join, basename, exists
 from nsweb.tasks.scatterplot import scatter
 import traceback
+from glob import glob
 
 
 def load_image(masker, filename, save_resampled=True):
@@ -28,15 +29,22 @@ def load_image(masker, filename, save_resampled=True):
             img.to_filename(filename)
     return masker.mask(img)
 
-def get_decoder_analysis_data(dd, analysis):
-    """ Get analysis's data: check in the decoder DataFrame first, and if not found, 
-    read from file (updating the in-memory DF). """
-    if analysis not in dd.columns:
-            target_file = join(settings.IMAGE_DIR, 'analyses', analysis + '_pFgA_z.nii.gz')
-            if not exists(target_file):
-                return False
-            dd[analysis] = load_image(make_scatterplot.dataset, target_file)
-    return dd[analysis].values
+def xyz_to_mat(foci):
+    """ Convert an N x 3 array of XYZ coordinates to matrix indices. """
+    foci = np.hstack((foci, np.ones((foci.shape[0], 1))))
+    mat = np.array([[-0.5, 0, 0, 45], [0, 0.5, 0, 63], [0, 0, 0.5, 36]]).T
+    result = np.dot(foci, mat)  # multiply
+    return np.round_(result).astype(int)  # need to round indices to ints
+
+# def get_decoder_analysis_data(dd, analysis):
+#     """ Get analysis's data: check in the decoder DataFrame first, and if not found, 
+#     read from file (updating the in-memory DF). """
+#     if analysis not in dd.columns:
+#             target_file = join(settings.IMAGE_DIR, 'analyses', analysis + '_pFgA_z.nii.gz')
+#             if not exists(target_file):
+#                 return False
+#             dd[analysis] = load_image(make_scatterplot.dataset, target_file)
+#     return dd[analysis].values
 
 class NeurosynthTask(Task):
 
@@ -48,9 +56,16 @@ class NeurosynthTask(Task):
     def masker(self):
         return Masker(join(settings.IMAGE_DIR, 'anatomical.nii.gz'))
 
-    @cached_property
-    def dd(self):  # decoding data
-        return pd.read_msgpack(settings.DECODING_DATA)
+    # @cached_property
+    # def memmaps(self, name):
+    #     """ For efficiency, hold a handle open to all the memmaps. """
+    #     mm_files = glob(join(settings.MEMMAP_DIR, '*_images.dat'))
+    #     for mm in mm_files:
+
+
+    # @cached_property
+    # def dd(self):  # decoding data
+    #     return pd.read_msgpack(settings.DECODING_DATA)
 
     @cached_property
     def anatomical(self):
@@ -96,7 +111,6 @@ def decode_image(filename, reference, uuid, mask=None, **kwargs):
     """
     mm_dir = settings.MEMMAP_DIR
     try:
-        basefile = basename(filename)
         # uuid = 'gene_' + basefile.split('_')[2] if basefile.startswith('gene') else basefile[:32]
         mm_file = join(mm_dir, reference['name'] + '_images.dat')
         mm_data = np.memmap(mm_file, dtype='float32', mode='r',
@@ -108,8 +122,10 @@ def decode_image(filename, reference, uuid, mask=None, **kwargs):
         data = load_image(decode_image.masker, filename)
         # Select voxels in sampling mask if it exists
         if reference['is_subsampled']:
-            voxels = np.load(join(mm_dir, reference['name'] + '_voxels.npy'))
-            data = data[voxels]
+            index_file = join(mm_dir, reference['name'] + '_voxels.npy')
+            if exists(index_file):
+                voxels = np.load(index_file)
+                data = data[voxels]
 
         # TODO: IMPLEMENT CUSTOM MASK HANDLING!!!
 
@@ -122,6 +138,32 @@ def decode_image(filename, reference, uuid, mask=None, **kwargs):
     except Exception, e:
         print traceback.format_exc()
         return False
+
+@celery.task(base=NeurosynthTask)
+def get_voxel_data(reference, x, y, z):
+    """ Return a voxel slice through the specified memory mapped numpy array.
+    Typically used to identify the values at a given voxel for all images in a
+    given DecodingSet--e.g., get z-score values of all term-based analyses.
+    """
+    mm_dir = settings.MEMMAP_DIR
+    try:
+        # uuid = 'gene_' + basefile.split('_')[2] if basefile.startswith('gene') else basefile[:32]
+        mm_file = join(mm_dir, reference['name'] + '_images.dat')
+        mm_data = np.memmap(mm_file, dtype='float32', mode='r',
+                            shape=(reference['n_voxels'], reference['n_images']))
+        mm_labels = open(join(
+            mm_dir, reference['name'] + '_labels.txt')).read().splitlines()
+
+        ijk = xyz_to_mat(np.array([[x, y, z]]))
+        space = np.zeros((91, 109, 91))
+        space[tuple(ijk[0])] = 1
+        ind = np.nonzero(get_voxel_data.masker.mask(space))[0]
+        vals = mm_data[ind, :]
+        return pd.Series(vals.ravel(), index=mm_labels, dtype='float64')
+
+    except Exception, e:
+        print traceback.format_exc()
+        return False       
 
 @celery.task(base=NeurosynthTask)
 def make_coactivation_map(x, y, z, r=6, min_studies=0.01):

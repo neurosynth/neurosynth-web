@@ -1,9 +1,9 @@
 from flask import Blueprint, render_template, request, abort, send_file, jsonify
 from nsweb.models.decodings import Decoding, DecodingSet
 from nsweb.models.images import Image
-from nsweb.core import add_blueprint, db
+from nsweb.core import add_blueprint, db, cache
 from nsweb.initializers import settings
-from nsweb.tasks import decode_image, make_scatterplot
+from nsweb import tasks
 from nsweb.controllers.helpers import send_nifti
 import simplejson as json
 import re
@@ -16,6 +16,7 @@ from email.utils import parsedate
 from nsweb.controllers import error_page
 
 bp = Blueprint('decode', __name__, url_prefix='/decode')
+
 
 @bp.route('/', methods=['GET'])
 def index():
@@ -31,17 +32,32 @@ def index():
     return render_template('decode/index.html.slim')
 
 
-def get_decoding(**kwargs):
+@cache.memoize(timeout=3600)
+def get_voxel_data(x, y, z, reference='terms_full', get_json=True):
+    """ Return the value at the specified voxel for all images in the named
+    DecodingSet. x, y, z are MNI coordinates. """
+    reference = DecodingSet.query.filter_by(name=reference).first()
+    ref = {
+        'name': reference.name,
+        'n_voxels': reference.n_voxels,
+        'n_images': reference.n_images,
+        'is_subsampled': reference.is_subsampled
+    }
+    result = tasks.get_voxel_data.delay(ref, x, y, z).wait()
+    return result.to_json() if get_json else result
+
+
+def _get_decoding(**kwargs):
     """ Check if a Decoding matching the passed criteria already exists. """
-    name = request.args.get('set', 'term')
+    name = request.args.get('set', 'terms_20k')
     return Decoding.query.filter_by(**kwargs).join(DecodingSet) \
         .filter(DecodingSet.name == name).first()
 
 
-def run_decoder(**kwargs):
+def _run_decoder(**kwargs):
 
     kwargs['uuid'] = kwargs.get('uuid', uuid.uuid4().hex)
-    ds_name = request.args.get('set', 'term')
+    ds_name = request.args.get('set', 'terms_20k')
     reference = DecodingSet.query.filter_by(name=ds_name).first()
     dec = Decoding(display=1, download=0, ip=request.remote_addr,
                    decoding_set=reference, **kwargs)
@@ -56,7 +72,7 @@ def run_decoder(**kwargs):
     }
 
     # run decoder and wait for it to terminate
-    result = decode_image.delay(dec.filename, ref, dec.uuid).wait()
+    result = tasks.decode_image.delay(dec.filename, ref, dec.uuid).wait()
 
     if result:
         dec.image_decoded_at = datetime.utcnow()
@@ -70,7 +86,7 @@ def decode_analysis_image(image):
 
     image = int(image)
 
-    dec = get_decoding(image_id=image)
+    dec = _get_decoding(image_id=image)
 
     if dec is None or not settings.CACHE_DECODINGS:
 
@@ -83,7 +99,7 @@ def decode_analysis_image(image):
             'image_id': image.id
         }
 
-        dec = run_decoder(**kwargs)
+        dec = _run_decoder(**kwargs)
 
     return dec
 
@@ -108,7 +124,7 @@ def decode_url(url, metadata={}, render=True):
         return error_page("The requested Nifti image is too large. Files must "
                           "be under 4 MB in size.")
 
-    dec = get_decoding(url=url)
+    dec = _get_decoding(url=url)
 
     if dec is None or not settings.CACHE_DECODINGS:
 
@@ -133,7 +149,7 @@ def decode_url(url, metadata={}, render=True):
             'filename': filename
         }
 
-        dec = run_decoder(**kwargs)
+        dec = _run_decoder(**kwargs)
 
         dec.data = metadata
         db.session.add(dec)
@@ -199,7 +215,7 @@ def get_scatter(uuid, analysis):
         """ Return .png of scatterplot between the uploaded image and specified analysis. """
         dec = Decoding.query.filter_by(uuid=uuid).first()
         if dec is None: abort(404)
-        result = make_scatterplot.delay(dec.filename, analysis, dec.uuid, outfile=outfile, x_lab=dec.name).wait()
+        result = tasks.make_scatterplot.delay(dec.filename, analysis, dec.uuid, outfile=outfile, x_lab=dec.name).wait()
         if not exists(outfile): abort(404)
     return send_file(outfile, as_attachment=False, 
             attachment_filename=basename(outfile))

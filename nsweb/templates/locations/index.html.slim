@@ -17,7 +17,7 @@
         li
           a href="#studies" data-toggle="tab" Studies
         li
-          a href="#analyses" data-toggle="tab" Analysis
+          a href="#associations" data-toggle="tab" Associations
       #location-tab-content.tab-content
         #maps.tab-pane.active
           h3 Functional connectivity and coactivation maps
@@ -44,12 +44,13 @@
                 th Authors
                 th Journal
                 th Activations
-        #analyses.tab-pane
-          h3 Term loadings (reverse inference)
+        #associations.tab-pane
+          h3 Associations with other maps
           table#location_analyses_table.table-striped.table-hover.table.table-condensed.small-datatable
             thead
               tr
-                th Analysis
-                th z-score
-                th post. prob.
+                th Feature name
+                th Coactivation corr. (r)
+                th Func. conn. corr. (r)
+                th Point association (z)
 
