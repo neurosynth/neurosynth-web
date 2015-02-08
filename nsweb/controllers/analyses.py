@@ -52,6 +52,14 @@ def get_studies(val):
         data = jsonify(studies=[s.pmid for s in analysis.studies])
     return data
 
+
+### TOP INDEX ###
+@bp.route('/')
+def list_analyses():
+    n_terms = TermAnalysis.query.count()
+    return render_template('analyses/index.html.slim', n_terms=n_terms)
+
+
 ### TERM-SPECIFIC ROUTES ###
 @bp.route('/term_names/')
 def get_term_names():
