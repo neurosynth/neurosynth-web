@@ -77,7 +77,7 @@ $(document).ready ->
     columnDefs: [{
       targets: 0
       render: (data, type, row, meta) ->
-        '<a href="/analyses/'+ data + '">' + data + '</a>'
+        '<a href="/analyses/terms/'+ data + '">' + data + '</a>'
     }]
   })
 
