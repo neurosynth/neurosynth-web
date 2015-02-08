@@ -36,6 +36,10 @@ def index():
 def get_voxel_data(x, y, z, reference='terms_full', get_json=True):
     """ Return the value at the specified voxel for all images in the named
     DecodingSet. x, y, z are MNI coordinates. """
+    # Make sure users don't request illegal sets
+    valid_references = ['terms_full', 'topics_full']
+    if reference not in valid_references:
+        reference = valid_references[0]
     reference = DecodingSet.query.filter_by(name=reference).first()
     ref = {
         'name': reference.name,

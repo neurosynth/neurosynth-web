@@ -70,18 +70,24 @@ def get_images(val):
 
 
 @bp.route('/<string:val>/compare/')
-@bp.route('/<string:val>/compare/<reference>')
-@cache.memoize(timeout=3600)
-def compare_location(val, reference='terms_20k', decimals=2):
+@cache.memoize(timeout=3)
+def compare_location(val, decimals=2):
     x, y, z, radius = get_params(val)
     location = get_params(val, location=True) or make_location(x, y, z)
     ma = zip(*get_decoding_data(location.images[0].id, get_json=False))
     fc = zip(*get_decoding_data(location.images[1].id, get_json=False))
     ma = pd.Series(ma[1], index=ma[0])
     fc = pd.Series(fc[1], index=fc[0])
-    vals = get_voxel_data(x, y, z, 'terms_full', get_json=False)
+    # too many gene maps to slice into, so return NAs
+    ref_type = request.args.get('set', 'terms_20k').split('_')[0]
+    if ref_type != 'genes':
+        vals = get_voxel_data(x, y, z, '%s_full' % ref_type, get_json=False)
+    else:
+        vals = pd.Series([np.nan])
+
     data = pd.concat([ma, fc, vals], axis=1)
     data = data.apply(lambda x: np.round(x, decimals)).reset_index()
+    data = data.fillna('-')
     return jsonify(data=data.values.tolist())
 
 
