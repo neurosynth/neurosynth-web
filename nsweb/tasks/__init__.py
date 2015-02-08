@@ -25,6 +25,7 @@ def load_image(masker, filename, save_resampled=True):
         img = resample_img(
             img, target_affine=decode_image.anatomical.get_affine(),
             target_shape=(91, 109, 91), interpolation='nearest')
+        print "MIN/MAX:", img.get_data().min(), img.get_data().max()
         if save_resampled:
             img.to_filename(filename)
     return masker.mask(img)
@@ -99,7 +100,8 @@ def save_uploaded_image(filename, **kwargs):
     pass
 
 @celery.task(base=NeurosynthTask)
-def decode_image(filename, reference, uuid, mask=None, **kwargs):
+def decode_image(filename, reference, uuid, mask=None, drop_zeros=False,
+                 **kwargs):
     """ Decode an image file.
     Args:
         filename (str): the local path to the image
@@ -108,6 +110,8 @@ def decode_image(filename, reference, uuid, mask=None, **kwargs):
             keys.
         uuid (str): a unique identifier to use when writing the file
         mask (str): the name of an optional mask to use (e.g., 'subcortex')
+        drop_zeros (bool): if True, only non-zero, non-NA voxels in the input
+            map are used in the comparison.
     """
     mm_dir = settings.MEMMAP_DIR
     try:
@@ -127,11 +131,15 @@ def decode_image(filename, reference, uuid, mask=None, **kwargs):
                 voxels = np.load(index_file)
                 data = data[voxels]
 
-        # TODO: IMPLEMENT CUSTOM MASK HANDLING!!!
+        # Drop voxels with zeros or NaN in input image
+        voxels = np.arange(len(data))
+        if drop_zeros:
+            voxels = np.where((data != 0) & np.isfinite(data))[0]
+            data = data[voxels]
 
         # standardize image and get correlation
         data = (data - data.mean())/data.std()
-        r = np.dot(mm_data.T, data)/reference['n_voxels']
+        r = np.dot(mm_data[voxels].T, data)/reference['n_voxels']
         outfile = join(settings.DECODING_RESULTS_DIR, uuid + '.txt')
         pd.Series(r, index=mm_labels).to_csv(outfile, sep='\t')
         return True
