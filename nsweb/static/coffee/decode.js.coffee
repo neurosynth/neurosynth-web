@@ -6,13 +6,12 @@ $(document).ready ->
 
   if $('#page-decode-show').length or $('#page-genes-show').length
 
-    controller = if $('#page-decode-show').length then 'decode' else 'genes'
-    console.log(controller)
-
+    # controller = if $('#page-decode-show').length then 'decode' else 'genes'
     loadImages()
 
     tbl = $('#decoding_results_table').DataTable()
-    tbl.ajax.url('/' + controller + '/' + image_id + '/data').load()
+    # tbl.ajax.url('/' + controller + '/' + image_id + '/data').load()
+    tbl.ajax.url('/decode/' + image_id + '/data').load()
 
     last_row_selected = null
     $('#decoding_results_table').on('click', 'button', (e) =>

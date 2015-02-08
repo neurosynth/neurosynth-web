@@ -1,4 +1,5 @@
-from flask import Blueprint, render_template, request, abort, send_file, jsonify
+from flask import (Blueprint, render_template, request, abort, send_file,
+                   jsonify)
 from nsweb.models.decodings import Decoding, DecodingSet
 from nsweb.models.images import Image
 from nsweb.core import add_blueprint, db, cache
@@ -124,7 +125,8 @@ def decode_url(url, metadata={}, render=True):
     if head.status_code not in [200, 301, 302]:
         return error_page("No image was found at the provided URL.")
     headers = head.headers
-    if 'content-length' in headers and int(headers['content-length']) > 4000000 and render:
+    if 'content-length' in headers and \
+            int(headers['content-length']) > 4000000 and render:
         return error_page("The requested Nifti image is too large. Files must "
                           "be under 4 MB in size.")
 
@@ -166,7 +168,8 @@ def decode_url(url, metadata={}, render=True):
 
 
 def decode_neurovault(id, render=True):
-    resp = requests.get('http://neurovault.org/api/images/%s/?format=json' % str(id))
+    resp = requests.get('http://neurovault.org/api/images/%s/?format=json'
+                        % str(id))
     metadata = json.loads(resp.content)
     if 'file' not in metadata:
         return render_template('decode/missing.html.slim')
@@ -178,7 +181,8 @@ def show(decoding=None, uuid=None):
     if uuid is not None:
         decoding = Decoding.query.filter_by(uuid=uuid).first()
 
-    if decoding is None: abort(404)
+    if decoding is None:
+        abort(404)
 
     images = [{
         'id': decoding.uuid,
@@ -188,14 +192,17 @@ def show(decoding=None, uuid=None):
         'url': '/decode/%s/image' % decoding.uuid,
         'download': '/decode/%s/image' % decoding.uuid
     }]
-    return render_template('decode/show.html.slim', decoding=decoding, images=json.dumps(images))
+    return render_template('decode/show.html.slim', image_id=decoding.uuid,
+                           images=json.dumps(images))
 
 
 @bp.route('/<string:uuid>/data')
 def get_data(uuid):
     dec = Decoding.query.filter_by(uuid=uuid).first()
-    if dec is None: abort(404)
-    data = open(join(settings.DECODING_RESULTS_DIR, dec.uuid + '.txt')).read().splitlines()
+    if dec is None:
+        abort(404)
+    data = open(join(settings.DECODING_RESULTS_DIR,
+                     dec.uuid + '.txt')).read().splitlines()
     data = [x.split('\t') for x in data]
     data = [{'analysis': f, 'r': round(float(v), 3)} for (f, v) in data]
     return jsonify(data=data)
@@ -203,28 +210,38 @@ def get_data(uuid):
 
 @bp.route('/<string:uuid>/image')
 def get_image(uuid):
-    """ Return an uploaded image. These are handled separately from Neurosynth-generated
-    images in order to prevent public access based on sequential IDs, as all access to 
-    uploads must be via UUIDs. """
+    """ Return an uploaded image. These are handled separately from
+    Neurosynth-generated images in order to prevent public access based on
+    sequential IDs, as all access to uploads must be via UUIDs. """
     dec = Decoding.query.filter_by(uuid=uuid).first()
-    if dec is None: abort(404)
-    return send_nifti(join(settings.DECODED_IMAGE_DIR, dec.filename), basename(dec.filename))
+    if dec is None:
+        abort(404)
+    return send_nifti(join(settings.DECODED_IMAGE_DIR, dec.filename),
+                      basename(dec.filename))
 
 
 @bp.route('/<string:uuid>/scatter/<string:analysis>.png')
 @bp.route('/<string:uuid>/scatter/<string:analysis>')
 def get_scatter(uuid, analysis):
-    outfile = join(settings.DECODING_SCATTERPLOTS_DIR, uuid + '_' + analysis + '.png')
+    outfile = join(settings.DECODING_SCATTERPLOTS_DIR,
+                   uuid + '_' + analysis + '.png')
     if not exists(outfile):
-        """ Return .png of scatterplot between the uploaded image and specified analysis. """
+        """ Return .png of scatterplot between the uploaded image and specified
+        analysis. """
         dec = Decoding.query.filter_by(uuid=uuid).first()
-        if dec is None: abort(404)
-        result = tasks.make_scatterplot.delay(dec.filename, analysis, dec.uuid, outfile=outfile, x_lab=dec.name).wait()
-        if not exists(outfile): abort(404)
-    return send_file(outfile, as_attachment=False, 
-            attachment_filename=basename(outfile))
+        if dec is None:
+            abort(404)
+        result = tasks.make_scatterplot.delay(
+            dec.filename, analysis, dec.uuid, outfile=outfile,
+            x_lab=dec.name).wait()
+        if not exists(outfile):
+            abort(404)
+    return send_file(
+        outfile, as_attachment=False, attachment_filename=basename(outfile))
 
 ### API ROUTES ###
+
+
 @bp.route('/data/')
 def get_data_api():
     if 'url' in request.args:
@@ -234,4 +251,3 @@ def get_data_api():
     return get_data(id)
 
 add_blueprint(bp)
-
