@@ -56,30 +56,29 @@ $(document).ready ->
     url = '/locations/' + coords.join('_')
     window.location.href = url
   
-  $('#location_studies_table').dataTable({
-    paginationType: "full_numbers"
-    displayLength: 10
-    processing: true
-    autoWidth: true
-    dom: 'T<"clear">lfrtip'
-    tableTools: { sSwfPath: "/static/swf/copy_csv_xls.swf" }
-    # orderClasses: false
-  })
+  createDataTable('#location_studies_table', {
+      pageLength: 10
+      columns: [
+        { width: '40%' }
+        { width: '38%' }
+        { width: '15%' }
+        { width: '7%' }
+      ]})
 
-  $('#location_analyses_table').dataTable({
-    paginationType: "full_numbers"
-    displayLength: 10
-    processing: true
-    autoWidth: true
-    dom: 'T<"clear">lfrtip'
-    tableTools: { sSwfPath: "/static/swf/copy_csv_xls.swf" }
-    # orderClasses: false
-    columnDefs: [{
-      targets: 0
-      render: (data, type, row, meta) ->
-        '<a href="/analyses/terms/'+ data + '">' + data + '</a>'
-    }]
-  })
+  createDataTable('#location_analyses_table', {
+    pageLength: 10
+    autoWidth: false
+    columns: [
+      {
+        width: '28%'
+        render: (data, type, row, meta) ->
+          '<a href="/analyses/terms/'+ data + '">' + data + '</a>'
+      }
+      { width: '18%' }
+      { width: '18%' }
+      { width: '18%' }
+      { width: '18%' }
+    ]})
 
   # Load state (e.g., which tab to display)
   activeTab = window.cookie.get('locationTab')

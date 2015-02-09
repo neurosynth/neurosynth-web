@@ -10,46 +10,21 @@ $(document).ready ->
     url = '/studies/' + study  + '/tables'
     $.get(url, (result) -> window.loadImages(result.data))
 
-  tbl=$('#studies_table').dataTable
-    # "sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
-    paginationType: "full_numbers"
-    displayLength: 10
-    processing: true
-    serverSide: true
-    ajax: '/api/studies/'
-    deferRender: true
-    stateSave: true
-    orderClasses: false
-    dom: 'T<"clear">lfrtip'
-    tableTools: { sSwfPath: "/static/swf/copy_csv_xls.swf" }
-  tbl.fnSetFilteringDelay(iDelay=400)
+  createDataTable('#studies_table', { ajax: '/api/studies/', serverSide: true })
 
   url_id=document.URL.split('/')
   url_id=url_id[url_id.length-2]
-  
-  $('#study_analyses_table').dataTable
-    paginationType: "full_numbers"
-    displayLength: 10
-    processing: true
-    ajax: '/api/studies/analyses/'+url_id+'/'
-    deferRender: true
-    stateSave: true
-    order: [[1, 'desc']]
-    orderClasses: false
-    dom: 'T<"clear">lfrtip'
-    tableTools: { sSwfPath: "/static/swf/copy_csv_xls.swf" }
 
-  $('#study_peaks_table').dataTable
-    paginationType: "full_numbers"
-    displayLength: 10
-    processing: true
+  createDataTable('#study_analyses_table', {
+    ajax: '/api/studies/analyses/'+url_id+'/'
+    order: [[1, 'desc']]
+      })
+
+  createDataTable('#study_peaks_table', {
     ajax: '/api/studies/peaks/'+url_id+'/'
-    deferRender: true
-    stateSave: true
     order: [[0, 'asc'], [2, 'asc']]
-    orderClasses: false
-    dom: 'T<"clear">lfrtip'
-    tableTools: { sSwfPath: "/static/swf/copy_csv_xls.swf" }
+      })
+
 
   $('#study_peaks_table').on('click', 'tr', (e) =>
     row = $(e.target).closest('tr')[0]
