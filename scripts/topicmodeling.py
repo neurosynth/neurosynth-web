@@ -122,17 +122,18 @@ class TopicFactory(object):
             os.makedirs(key_dir)
 
         for n in n_topics:
-            key_file = os.path.join(key_dir, 'topics_%d.txt' % n)
+
+            name = 'v3-topics-%d' % int(n)
+
+            key_file = os.path.join(key_dir, name + '.txt')
             self.mallet.train_topics(
                 'texts.mallet', num_topics=n, num_top_words=100,
                 output_topic_keys=key_file, num_iterations=1000)
             topics = self.mallet.parse_doc_topics(prefix='topic')
-            topic_file = os.path.join(analysis_dir,
-                                      'topics_%d.txt' % n)
+            topic_file = os.path.join(analysis_dir, name + '.txt')
             topics.to_csv(topic_file, sep='\t', index_label='id')
 
             # Write json file
-            name = 'v3-topics-%d' % int(n)
             metadata = {
                 'name': name,
                 'description': 'A set of %d topics extracted with LDA from '

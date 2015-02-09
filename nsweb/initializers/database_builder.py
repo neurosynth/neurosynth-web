@@ -292,7 +292,8 @@ class DatabaseBuilder:
             analyses = list(set(analyses) - set(existing))
 
         # Meta-analyze all images
-        meta.analyze_features(self.dataset, analyses, save=image_dir, q=0.01, **kwargs)
+        meta.analyze_features(self.dataset, analyses, output_dir=image_dir,
+                              q=0.01, **kwargs)
 
         # Create AnalysisImage records
         if add_to_db:
@@ -418,11 +419,12 @@ class DatabaseBuilder:
             reset: if True, drops all existing TopicSets and TopicAnalysis
                 records before repopulating.
         """
-        for ts in AnalysisSet.query.filter_by(type='topics').all():
-            self.db.session.delete(ts)
-        for t in TopicAnalysis.query.all():
-            self.db.session.delete(t)
- 
+        if reset:
+            for ts in AnalysisSet.query.filter_by(type='topics').all():
+                self.db.session.delete(ts)
+            for t in TopicAnalysis.query.all():
+                self.db.session.delete(t)
+
         topic_sets = glob(join(settings.TOPIC_DIR, '*.json'))
 
         # Temporarily store the existing AnalysisTable so we don't overwrite it
@@ -451,7 +453,8 @@ class DatabaseBuilder:
             if generate_images:
                 meta.analyze_features(
                     self.dataset, self.dataset.get_feature_names(),
-                    output_dir=topic_set_image_dir, threshold=0.05, q=0.01)
+                    output_dir=topic_set_image_dir, threshold=0.05, q=0.01,
+                    prefix=ts.name)
 
             feature_data = self.dataset.feature_table.data
 
@@ -463,7 +466,7 @@ class DatabaseBuilder:
                 # Disable autoflush temporarily because it causes problems
                 with self.db.session.no_autoflush:
                     terms = ', '.join(key_data.pop(0).split()[2:][:top_n])
-                    topic = TopicAnalysis(name='v3-topic-%d' % i,
+                    topic = TopicAnalysis(name=ts.name + '_topic%d' % i,
                                           terms=terms, number=i)
 
                     self.db.session.add(topic)
@@ -573,7 +576,7 @@ class DatabaseBuilder:
             # Populate with standardized image data
             for i, img in enumerate(images):
                 # Use unthresholded maps when possible
-                img_file = re.sub('_FDR.*nii.gz', '.nii.gz', img)
+                img_file = re.sub('_FDR_*nii.gz', '.nii.gz', img)
                 data = masker.mask(img_file)[sampled_vox]
                 std, mean = data.std(), data.mean()
                 mm[:, i] = (data - mean)/std
