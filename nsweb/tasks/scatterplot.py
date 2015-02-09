@@ -3,12 +3,14 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import nibabel as nb
 
-def scatter(x=None, y=None, gene=None, threshold_x=None, threshold_y=None, log_x=None, log_y=None, 
-                        filter_x=None, filter_y=None, spatial_masks=None, region_masks=None, 
-                        outfile=None, coef_font_size=10, axis_lab_size=24, 
-                        x_lab='Gene expression (z)', y_lab='', mask_labels=None, lab_size=16, alpha=1.0,
-                        unlabeled_alpha=1.0, fig_size=(8,8), min_samples=4, voxel_count_mask=None,
-                        unlabeled_color='0.3', palette='Set1', marginals=True, savefile=None):
+def scatter(x=None, y=None, gene=None, threshold_x=None, threshold_y=None,
+            log_x=None, log_y=None, filter_x=None, filter_y=None,
+            spatial_masks=None, region_masks=None, outfile=None,
+            coef_font_size=10, axis_lab_size=24, x_lab='Gene expression (z)',
+            y_lab='', mask_labels=None, lab_size=16, alpha=1.0,
+            unlabeled_alpha=1.0, fig_size=(8,8), min_samples=4,
+            voxel_count_mask=None, unlabeled_color='0.3', palette='Set1',
+            marginals=True, savefile=None):
 
     # vectorize image data.
     x_data = x

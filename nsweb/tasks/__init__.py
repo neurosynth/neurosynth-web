@@ -15,6 +15,9 @@ from os.path import join, basename, exists
 from nsweb.tasks.scatterplot import scatter
 import traceback
 from glob import glob
+import re
+import json
+from collections import OrderedDict
 
 
 def load_image(masker, filename, save_resampled=True):
@@ -25,7 +28,6 @@ def load_image(masker, filename, save_resampled=True):
         img = resample_img(
             img, target_affine=decode_image.anatomical.get_affine(),
             target_shape=(91, 109, 91), interpolation='nearest')
-        print "MIN/MAX:", img.get_data().min(), img.get_data().max()
         if save_resampled:
             img.to_filename(filename)
     return masker.mask(img)
@@ -37,15 +39,25 @@ def xyz_to_mat(foci):
     result = np.dot(foci, mat)  # multiply
     return np.round_(result).astype(int)  # need to round indices to ints
 
-# def get_decoder_analysis_data(dd, analysis):
-#     """ Get analysis's data: check in the decoder DataFrame first, and if not found, 
-#     read from file (updating the in-memory DF). """
-#     if analysis not in dd.columns:
-#             target_file = join(settings.IMAGE_DIR, 'analyses', analysis + '_pFgA_z.nii.gz')
-#             if not exists(target_file):
-#                 return False
-#             dd[analysis] = load_image(make_scatterplot.dataset, target_file)
-#     return dd[analysis].values
+
+class Reference(object):
+
+    def __init__(self, name, n_voxels, n_images, is_subsampled):
+
+        self.name = name
+        self.n_voxels = n_voxels
+        self.n_images = n_images
+        self.is_subsampled = is_subsampled
+
+        # Link to memmap data
+        mm_file = join(settings.MEMMAP_DIR, name + '_images.dat')
+        self.data = np.memmap(mm_file, dtype='float32', mode='r',
+                              shape=(n_voxels, n_images))
+        # Link to labels
+        lab_file = join(settings.MEMMAP_DIR, name + '_labels.txt')
+        _labels = open(lab_file).read().splitlines()
+        self.labels = OrderedDict(zip(_labels, range(len(_labels))))
+
 
 class NeurosynthTask(Task):
 
@@ -57,16 +69,14 @@ class NeurosynthTask(Task):
     def masker(self):
         return Masker(join(settings.IMAGE_DIR, 'anatomical.nii.gz'))
 
-    # @cached_property
-    # def memmaps(self, name):
-    #     """ For efficiency, hold a handle open to all the memmaps. """
-    #     mm_files = glob(join(settings.MEMMAP_DIR, '*_images.dat'))
-    #     for mm in mm_files:
-
-
-    # @cached_property
-    # def dd(self):  # decoding data
-    #     return pd.read_msgpack(settings.DECODING_DATA)
+    @cached_property
+    def references(self):
+        """ For efficiency, cache indices of all labels in all memmaps."""
+        memmaps = {}
+        for f in glob(join(settings.MEMMAP_DIR, '*_metadata.json')):
+            md = json.load(open(f))
+            memmaps[md['name']] = Reference(**md)
+        return memmaps
 
     @cached_property
     def anatomical(self):
@@ -86,14 +96,8 @@ class NeurosynthTask(Task):
             'min4': join(settings.MASK_DIR, 'voxel_counts_r6.nii.gz')
         }
         for m, img in maps.items():
-            maps[m] = load_image(self.dataset, img)
+            maps[m] = load_image(self.masker, img)
         return maps
-
-@celery.task(base=NeurosynthTask)
-def count_studies(analysis, threshold=0.001, **kwargs):
-    """ Count the number of studies in the Dataset for a given analysis. """
-    ids = count_studies.dataset.get_studies(features=str(analysis), frequency_threshold=threshold)
-    return len(ids)
 
 @celery.task(base=NeurosynthTask)
 def save_uploaded_image(filename, **kwargs):
@@ -105,9 +109,7 @@ def decode_image(filename, reference, uuid, mask=None, drop_zeros=False,
     """ Decode an image file.
     Args:
         filename (str): the local path to the image
-        reference (dict): a dict containing key info from the corresponding
-            DecodingSet record. Must have 'name', 'n_images', and 'n_voxels'
-            keys.
+        reference (dict): the name of the memmapped image set to compare with
         uuid (str): a unique identifier to use when writing the file
         mask (str): the name of an optional mask to use (e.g., 'subcortex')
         drop_zeros (bool): if True, only non-zero, non-NA voxels in the input
@@ -115,18 +117,13 @@ def decode_image(filename, reference, uuid, mask=None, drop_zeros=False,
     """
     mm_dir = settings.MEMMAP_DIR
     try:
-        # uuid = 'gene_' + basefile.split('_')[2] if basefile.startswith('gene') else basefile[:32]
-        mm_file = join(mm_dir, reference['name'] + '_images.dat')
-        mm_data = np.memmap(mm_file, dtype='float32', mode='r',
-                            shape=(reference['n_voxels'], reference['n_images']))
-        mm_labels = open(join(
-            mm_dir, reference['name'] + '_labels.txt')).read().splitlines()
+        ref = decode_image.references[reference]
 
         # Load and standardize the target image
         data = load_image(decode_image.masker, filename)
         # Select voxels in sampling mask if it exists
-        if reference['is_subsampled']:
-            index_file = join(mm_dir, reference['name'] + '_voxels.npy')
+        if ref.is_subsampled:
+            index_file = join(mm_dir, ref.name + '_voxels.npy')
             if exists(index_file):
                 voxels = np.load(index_file)
                 data = data[voxels]
@@ -139,39 +136,41 @@ def decode_image(filename, reference, uuid, mask=None, drop_zeros=False,
 
         # standardize image and get correlation
         data = (data - data.mean())/data.std()
-        r = np.dot(mm_data[voxels].T, data)/reference['n_voxels']
+        r = np.dot(ref.data[voxels].T, data)/ref.n_voxels
         outfile = join(settings.DECODING_RESULTS_DIR, uuid + '.txt')
-        pd.Series(r, index=mm_labels).to_csv(outfile, sep='\t')
+        labels = ref.labels.keys()
+        pd.Series(r, index=labels).to_csv(outfile, sep='\t')
         return True
     except Exception, e:
         print traceback.format_exc()
         return False
 
 @celery.task(base=NeurosynthTask)
-def get_voxel_data(reference, x, y, z):
+def get_voxel_data(reference, x, y, z, get_pp=True):
     """ Return a voxel slice through the specified memory mapped numpy array.
     Typically used to identify the values at a given voxel for all images in a
     given DecodingSet--e.g., get z-score values of all term-based analyses.
     """
-    mm_dir = settings.MEMMAP_DIR
     try:
-        # uuid = 'gene_' + basefile.split('_')[2] if basefile.startswith('gene') else basefile[:32]
-        mm_file = join(mm_dir, reference['name'] + '_images.dat')
-        mm_data = np.memmap(mm_file, dtype='float32', mode='r',
-                            shape=(reference['n_voxels'], reference['n_images']))
-        mm_labels = open(join(
-            mm_dir, reference['name'] + '_labels.txt')).read().splitlines()
-
+        x, y, z = int(x), int(y), int(z)
         ijk = xyz_to_mat(np.array([[x, y, z]]))
         space = np.zeros((91, 109, 91))
         space[tuple(ijk[0])] = 1
         ind = np.nonzero(get_voxel_data.masker.mask(space))[0]
-        vals = mm_data[ind, :]
-        return pd.Series(vals.ravel(), index=mm_labels, dtype='float64')
 
-    except Exception, e:
+        ref = get_voxel_data.references[reference + '_full']
+        labels = ref.labels.keys()
+        result = pd.Series(ref.data[ind, :].ravel(), index=labels, name='z')
+        # Can get posterior probs as well
+        if get_pp:
+            ref = get_voxel_data.references[reference + '_pp']
+            _pp = pd.Series(ref.data[ind, :].ravel(), index=labels, name='pp')
+            result = pd.concat([result, _pp], axis=1)
+        return result
+
+    except Exception:
         print traceback.format_exc()
-        return False       
+        return False
 
 @celery.task(base=NeurosynthTask)
 def make_coactivation_map(x, y, z, r=6, min_studies=0.01):
@@ -179,7 +178,8 @@ def make_coactivation_map(x, y, z, r=6, min_studies=0.01):
     try:
         dataset = make_coactivation_map.dataset
         ids = dataset.get_studies(peaks=[[x, y, z]], r=r)
-        if len(ids) < 50: return False
+        if len(ids) < 50:
+            return False
         ma = meta.MetaAnalysis(dataset, ids, min_studies=min_studies)
         outdir = join(settings.IMAGE_DIR, 'coactivation')
         prefix = 'metaanalytic_coactivation_%s_%s_%s' % (str(x), str(y), str(z))
@@ -190,28 +190,33 @@ def make_coactivation_map(x, y, z, r=6, min_studies=0.01):
         return False
 
 @celery.task(base=NeurosynthTask)
-def make_scatterplot(filename, analysis, base_id, outfile=None, n_voxels=None, allow_nondecoder_analyses=False, 
-                    x_lab="Uploaded Image", y_lab=None, gene_masks=False):
-    """ Generate a scatter plot displaying relationship between two images (typically a 
-        Neurosynth meta-analysis map and a retrieved image), where each voxel is an observation. 
+def make_scatterplot(filename, analysis, base_id, reference='terms_full', outfile=None, n_voxels=None,
+                     x_lab="Uploaded Image", y_lab=None, gene_masks=False):
+    """ Generate a scatter plot displaying relationship between two images
+    (typically a Neurosynth meta-analysis map and a retrieved image), where
+    each voxel is an observation.
     Args:
-        filename (string): the local path to the retrieved image to plot on x axis
-        analysis (string): the name of the Neurosynth analysis to plot on y axis
+        filename (string): local path to the retrieved image to plot on x axis
+        analysis (string): name of the Neurosynth analysis to plot on y axis
+        reference (string): the reference memmap image to use--e.g., terms,
+            topics, etc.
         base_id (string): the UUID to base the output filename on
         outfile (string): if provided, the output file name
-        n_voxels (int): if provided, the number of voxels to randomly sample (if None, 
-            all voxels are used)
-        allow_nondecoder_analyses (boolean): whether to allow non-preloaded analyses 
-            (not currently implemented)
+        n_voxels (int): if provided, the number of voxels to randomly sample
+            (if None, all voxels are used)
+        allow_nondecoder_analyses (boolean): whether to allow non-preloaded
+            analyses (not currently implemented)
         x_lab (string): x axis label
         y_lab (string): y axis label
-        gene_masks (boolean): when True, uses predetermined subcortical ROIs as masks; 
-            otherwise uses cortex vs. subcortex
+        gene_masks (boolean): when True, uses predetermined subcortical ROIs as
+            masks; otherwise uses cortex vs. subcortex
     """
     try:
         # Get the data
-        x = load_image(make_scatterplot.dataset, filename)
-        y = get_decoder_analysis_data(make_scatterplot.dd, analysis)
+        x = load_image(make_scatterplot.masker, filename)
+        # y = get_decoder_analysis_data(make_scatterplot.dd, analysis)
+        ref = make_scatterplot.references[reference]
+        y = ref.data[:, ref.labels[analysis]]
 
         # Subsample random voxels
         if n_voxels is not None:
@@ -220,11 +225,12 @@ def make_scatterplot(filename, analysis, base_id, outfile=None, n_voxels=None, a
 
         # Set filename if needed
         if outfile is None:
-            outfile = join(settings.DECODING_SCATTERPLOTS_DIR, base_id + '_' + analysis + '.png')
+            outfile = join(settings.DECODING_SCATTERPLOTS_DIR, base_id + '_' +
+                           analysis + '.png')
 
         # Generate and save scatterplot
         if y_lab is None:
-            y_lab='%s meta-analysis (z-score)' % analysis
+            y_lab = '%s meta-analysis (z-score)' % analysis
         masks = make_scatterplot.masks
         
         if gene_masks:
@@ -238,28 +244,30 @@ def make_scatterplot(filename, analysis, base_id, outfile=None, n_voxels=None, a
 
         region_masks = [masks[l] for l in region_labels]
 
-        scatter(x, y, region_masks=region_masks, mask_labels=region_labels, unlabeled_alpha=0.15,
-                        alpha=0.5, fig_size=(12,12), palette='Set1', x_lab=x_lab, 
-                        y_lab=y_lab, savefile=outfile, spatial_masks=spatial_masks,
-                        voxel_count_mask=voxel_count_mask)
+        scatter(x, y, region_masks=region_masks, mask_labels=region_labels,
+                unlabeled_alpha=0.15, alpha=0.5, fig_size=(12,12),
+                palette='Set1', x_lab=x_lab, y_lab=y_lab, savefile=outfile,
+                spatial_masks=spatial_masks, voxel_count_mask=voxel_count_mask)
 
     except Exception, e:
         print e
         print e.message
         return False
 
+
 @celery.task(base=NeurosynthTask)
 def run_metaanalysis(ids, name):
     """ Run a user-defined meta-analysis.
     Args:
-        ids (list): list of PMIDs identifying studies to include in the meta-analysis
+        ids (list): list of PMIDs identifying studies to include in the
+            meta-analysis
         name (string): name of the analysis; used in filename of output images
     """
     try:
         ma = meta.MetaAnalysis(run_metaanalysis.dataset, ids)
         outdir = join(settings.IMAGE_DIR, 'analyses')
-        ma.save_results(outdir, name, image_list=['pFgA_z_FDR_0.01', 'pAgF_z_FDR_0.01'])
+        ma.save_results(outdir, name, image_list=['pFgA_z_FDR_0.01',
+                        'pAgF_z_FDR_0.01'])
         return True
     except Exception, e:
         return False
-
