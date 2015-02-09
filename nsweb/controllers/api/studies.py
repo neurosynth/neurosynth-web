@@ -40,16 +40,13 @@ def get_study_list():
     result = jsonify(**result)
     return result
 
+
 # Begin client side APIs
-
-
 @bp.route('/studies/analyses/<int:val>/')
 def get_study_analyses(val):
     data = Study.query.get(val)
-# data=Frequency.query.filter_by(pmid=int(val))#attempted optimization.
-# Join causes slower performance however
     data = [['<a href={0}>{1}</a>'.format(
-        url_for('analyses.show_term', term=f.analysis_id), f.analysis.name),
+        url_for('analyses.show_analysis', id=f.analysis_id), f.analysis.name),
         round(f.frequency, 3),
     ] for f in data.frequencies]
     data = jsonify(data=data)
