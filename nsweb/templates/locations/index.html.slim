@@ -49,8 +49,13 @@
           table#location_analyses_table.table-striped.table-hover.table.table-condensed.small-datatable
             thead
               tr
+                %th
+                th colspan="2" Individual voxel
+                th colspan="2" Seed-based network
+              tr
                 th Feature name
-                th Coactivation corr. (r)
-                th Func. conn. corr. (r)
-                th Point association (z)
+                th Reverse inference z-score
+                th Posterior probability
+                th Functional connectivity
+                th Meta-analytic coactivation
 

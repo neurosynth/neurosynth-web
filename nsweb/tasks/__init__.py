@@ -58,6 +58,10 @@ class Reference(object):
         _labels = open(lab_file).read().splitlines()
         self.labels = OrderedDict(zip(_labels, range(len(_labels))))
 
+        # Image stats
+        stat_file = join(settings.MEMMAP_DIR, name + '_stats.txt')
+        self.stats = pd.read_csv(stat_file, sep='\t')
+
 
 class NeurosynthTask(Task):
 
@@ -161,10 +165,13 @@ def get_voxel_data(reference, x, y, z, get_pp=True):
         ref = get_voxel_data.references[reference + '_full']
         labels = ref.labels.keys()
         result = pd.Series(ref.data[ind, :].ravel(), index=labels, name='z')
+        result = result * ref.stats['std'].values + ref.stats['mean'].values
+
         # Can get posterior probs as well
         if get_pp:
             ref = get_voxel_data.references[reference + '_pp']
             _pp = pd.Series(ref.data[ind, :].ravel(), index=labels, name='pp')
+            _pp = _pp * ref.stats['std'].values + ref.stats['mean'].values
             result = pd.concat([result, _pp], axis=1)
         return result
 

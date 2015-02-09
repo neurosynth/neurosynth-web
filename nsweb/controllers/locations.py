@@ -47,6 +47,7 @@ def show(val=None):
 
 
 @bp.route('/<string:val>/images')
+@cache.memoize(timeout=3600)
 def get_images(val):
     location = get_params(val, location=True)
     if location is None:
@@ -70,28 +71,35 @@ def get_images(val):
 
 
 @bp.route('/<string:val>/compare/')
-@cache.memoize(timeout=3)
+@cache.memoize(timeout=3600)
 def compare_location(val, decimals=2):
+    """ Compare this voxel to various image sets using various approaches.
+    Currently returns correlations between the coactivation/functional
+    connectivity maps seeded at this voxel and all images in a given term set,
+    plus activation data at this location.
+    """
     x, y, z, radius = get_params(val)
     location = get_params(val, location=True) or make_location(x, y, z)
     ma = zip(*get_decoding_data(location.images[0].id, get_json=False))
     fc = zip(*get_decoding_data(location.images[1].id, get_json=False))
-    ma = pd.Series(ma[1], index=ma[0])
-    fc = pd.Series(fc[1], index=fc[0])
+    ma = pd.Series(ma[1], index=ma[0], name='ma')
+    fc = pd.Series(fc[1], index=fc[0], name='fc')
     # too many gene maps to slice into, so return NAs
     ref_type = request.args.get('set', 'terms_20k').split('_')[0]
     if ref_type != 'genes':
-        vals = get_voxel_data(x, y, z, '%s_full' % ref_type, get_json=False)
+        vals = get_voxel_data(x, y, z, ref_type, get_json=False)
     else:
         vals = pd.Series([np.nan])
 
     data = pd.concat([ma, fc, vals], axis=1)
     data = data.apply(lambda x: np.round(x, decimals)).reset_index()
     data = data.fillna('-')
+    data = data[['index', 'z', 'pp', 'fc', 'ma']]
     return jsonify(data=data.values.tolist())
 
 
 @bp.route('/<string:val>/studies')
+@cache.memoize(timeout=3600)
 def get_studies(val):
     x, y, z, radius = get_params(val)
     points = Peak.closestPeaks(radius, x, y, z)
@@ -112,13 +120,6 @@ def get_studies(val):
         data = [{'pmid': p[0].study.pmid, 'peaks':p[1]} for p in points]
         data = jsonify(data=data)
     return data
-
-
-# @bp.route('/<string:val>/analyses')
-# def get_analyses(val):
-#     x, y, z, radius = get_params(val)
-#     f = join(settings.LOCATION_FEATURE_DIR, '%d_%d_%d_analyses.txt' % (x,y,z))
-#     return open(f).read() if exists(f) else '{"data":[]}'
 
 
 def make_location(x, y, z):
@@ -164,7 +165,7 @@ def make_location(x, y, z):
             'details, see '
             '<a href="http://jn.physiology.org/content/106/3/1125.long">Yeo et'
             'al (2011)</a>, <a href="http://jn.physiology.org/cgi/pmidlookup?'
-            'view=long&pmid=21795627>Buckner et al (2011)</a>, and '
+            'view=long&pmid=21795627">Buckner et al (2011)</a>, and '
             '<a href="http://jn.physiology.org/cgi/pmidlookup?view=long&'
             'pmid=22832566">Choi et al (2012)</a>.',
             display=1,

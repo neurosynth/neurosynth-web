@@ -34,21 +34,23 @@ def index():
 
 
 @cache.memoize(timeout=3600)
-def get_voxel_data(x, y, z, reference='terms_full', get_json=True):
+def get_voxel_data(x, y, z, reference='terms', get_json=True, get_pp=True):
     """ Return the value at the specified voxel for all images in the named
-    DecodingSet. x, y, z are MNI coordinates. """
+    DecodingSet. x, y, z are MNI coordinates.
+    Args:
+        x, y, z (int): x, y, z coordinates
+        reference (str): the name of the reference memmapped image set to use
+        get_json (bool): when True, returns jsonized data. when False, returns
+            a pandas Series or DataFrame.
+        get_pp (bool): if True, returns posterior probabilities too (in
+            addition to reverse inference z-scores).
+    """
     # Make sure users don't request illegal sets
-    valid_references = ['terms_full', 'topics_full']
+    valid_references = ['terms', 'topics']
     if reference not in valid_references:
         reference = valid_references[0]
-    reference = DecodingSet.query.filter_by(name=reference).first()
-    ref = {
-        'name': reference.name,
-        'n_voxels': reference.n_voxels,
-        'n_images': reference.n_images,
-        'is_subsampled': reference.is_subsampled
-    }
-    result = tasks.get_voxel_data.delay(ref, x, y, z).wait()
+    result = tasks.get_voxel_data.delay(
+        reference, x, y, z, get_pp).wait()
     return result.to_json() if get_json else result
 
 
@@ -67,17 +69,9 @@ def _run_decoder(**kwargs):
     dec = Decoding(display=1, download=0, ip=request.remote_addr,
                    decoding_set=reference, **kwargs)
 
-    # Call the decoder in the background. We can't easily pass our own
-    # classes to celery, so pass a dict with relevant DecodingSet info.
-    ref = {
-        'name': reference.name,
-        'n_voxels': reference.n_voxels,
-        'n_images': reference.n_images,
-        'is_subsampled': reference.is_subsampled
-    }
-
     # run decoder and wait for it to terminate
-    result = tasks.decode_image.delay(dec.filename, ref, dec.uuid).wait()
+    result = tasks.decode_image.delay(dec.filename, reference.name,
+                                      dec.uuid).wait()
 
     if result:
         dec.image_decoded_at = datetime.utcnow()
@@ -157,9 +151,9 @@ def decode_url(url, metadata={}, render=True):
 
         dec = _run_decoder(**kwargs)
 
-        dec.data = metadata
-        db.session.add(dec)
-        db.session.commit()
+        # dec.data = metadata
+        # db.session.add(dec)
+        # db.session.commit()
 
     if render:
         return show(dec, dec.uuid)
