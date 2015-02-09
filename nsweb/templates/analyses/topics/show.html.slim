@@ -10,22 +10,25 @@
     .col-md-8
       h1.top-space0 Topic {{topic_n}}
       .lead An automated meta-analysis of {{analysis.n_studies}} studies
-      h4 Top terms: {{analysis.terms}}
     .col-md-2
       .analysis-search
         span Search for another analysis:
         input type="text" id="analysis-search"
   .row#page-analysis
     .col-md-10.content
+      h4 Top-loading terms for this topic:
+      h5 {{analysis.terms}}
+      hr
       ul#analysis-menu.nav.nav-pills
         li.active
           a href="#maps" data-toggle="tab" Maps
         li
           a href="#studies" data-toggle="tab" Studies
         li
-          a href="#help" data-toggle="tab" Help
+          a href="#faq" data-toggle="tab" FAQs
       #analysis-tab-content.tab-content
         #maps.tab-pane.active
+          h3 Forward and reverse inference meta-analysis maps
           script type="text/javascript"
             |var options = {"panzoomEnabled":false}
             var settings = ['no-zoom', 'layers','nav','checkboxes']
@@ -33,15 +36,20 @@
 
         {{datatables.analysis_studies_table('Topic ' + topic_n)}}
 
-        #help.tab-pane
-          h3 Neurosynth analyses: Help
-          p This page displays information for an automated Neurosynth meta-analysis of the analysis "{{analysis.name}}". The meta-analysis was performed by automatically identifying all studies in the Neurosynth database that loaded highly on the analysis, and then performing meta-analyses to identify brain regions that were consistently or preferentially reported in the tables of those studies.
+        #faq.tab-pane
+          h3 Topic-based meta-analyses: Frequently Asked Questions
+          h4.help What is a "topic" in Neurosynth?
+          p
+            |Topics reflect an effort to move beyond individual term-based analyses by modeling the covariance between different terms in article abstracts. Instead of generating separate maps for, say, "working memory" and "cognitive control", a topic modeling approach might extract a single topic that assigns a large weight to each of these closely-related terms (as well as many others). You can effectively think of a Neurosynth topic is a cluster of semantically-related words that tend to occur together in article abstracts. A meta-analysis is then performed to identify the neural correlates of each topic by searching for brain regions that are consistently more activated in articles that load highly on each topic than in articles that do not load highly on a topic. For further details, please see <a href="http://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1002707">Poldrack et al (2012)</a>.
+
           h4.help What do the "forward inference" and "reverse inference" maps mean?
           p
-            |For a detailed explanation, please see our <a href="http://pilab.psy.utexas.edu/publications/Yarkoni_NatureMethods_2011.pdf">Nature Methods paper</a>. In brief, the <u>forward inference map</u> displays brain regions that are <em>consistently</em> active in studies that load highly on "{{analysis.name}}". Regions with large z-scores are reported more often than one would expect them to be if activation anywhere in the brain was equally likely. Note that this is typically not so interesting, because it turns out that some brain regions are consistently reported in a lot of different kinds of studies (again, see <a href="http://pilab.psy.utexas.edu/publications/Yarkoni_NatureMethods_2011.pdf">our paper</a>). So as a general rule of thumb, we don't recommend paying much attention to forward inference maps.
-          p <u>Reverse inference maps</u> are, roughly, maps displaying brain regions that are <em>preferentially</em> related to the variable of interest (most commonly, a text-based feature that occurs in study abstracts). The reverse inference map for {{analysis.name}} displays regions that are reported more often in studies that load highly on the key variable than in studies that do not load highly on the variable. Most of the time this a much more useful way of thinking about things, since reverse inference maps tell you, in some sense, which brain regions are more diagnostic of the variable in question, and not just which regions are consistently activated in studies associated with that variable.
+            |For a detailed explanation, please see <a href="http://pilab.psy.utexas.edu/publications/Yarkoni_NatureMethods_2011.pdf">Yarkoni et al (2011)</a>. In brief, the <u>forward inference map</u> displays brain regions that are <em>consistently</em> active in studies that load highly on Topic "{{analysis.number}}". Regions with large z-scores are reported more often than one would expect them to be if activation anywhere in the brain was equally likely. Note that this is typically not so interesting, because it turns out that some brain regions are consistently reported in a lot of different kinds of studies (again, see <a href="http://pilab.psy.utexas.edu/publications/Yarkoni_NatureMethods_2011.pdf">our paper for discussion</a>). So as a general rule of thumb, we don't recommend paying much attention to forward inference maps.
+          p <u>Reverse inference maps</u> are, roughly, maps displaying brain regions that are <em>preferentially</em> related to a particular topic. The reverse inference map for Topic {{analysis.number}} displays regions that are reported more often in studies that load highly on this topic than in studies that do not load highly on the topic. Most of the time this a much more useful way of thinking about things, since reverse inference maps tell you, in some sense, which brain regions are more diagnostic of the variable in question, and not just which regions are consistently activated in studies associated with that variable.
+
           h4.help How do you determine which studies to include in an analysis?
-          p That depends on the kind of analysis. At present, most of the analyses on this website are term-based, meaning that the meta-analyses are based strictly on how frequently a term (in the present case, '{{analysis}}') was used in an article's abstract. By default, we use a threshold of 0.001, meaning that, in effect, we consider a study to be associated with a term if it uses that term at least once somewhere in the abstract.
+          p We use a predefined binary cut-off. For all topic-based meta-analyses, we treat all studies with a loading > 0.05 as "active" for a given topic, and all other studies as inactive. Although the choice of threshold is relatively arbitrary, in practice, varying it within a fairly broad range of values has minimal influence on the results. Adopting a continuous approach instead of dichotomizing the dataset also has a negligible effect.
+
           h4.help Are these maps corrected for multiple comparisons?
           p Yes, they're corrected using a false discovery rate (FDR) approach, with an expected FDR of 0.01.
           h4.help I need more details! How exactly were these maps and data generated?
