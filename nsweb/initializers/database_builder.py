@@ -400,7 +400,7 @@ class DatabaseBuilder:
                 label="AHBA gene expression levels for " + symbol,
                 stat="z-score",
                 display=1,
-                download=0
+                download=1
                 )]
 
             self.db.session.add(gene)
