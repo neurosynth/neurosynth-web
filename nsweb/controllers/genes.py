@@ -26,7 +26,6 @@ def show(name):
     # Run decoder if it hasn't been run before
     dec = decode_analysis_image(image.id)
     url = '/images/%s' % image.id
-    print "\n", url, image.id, type(image.id), dec, dec.uuid, "\n"
     images = [{
         'id': image.id,
         'name': name,

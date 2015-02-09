@@ -406,7 +406,8 @@ class DatabaseBuilder:
             if i % 1000 == 0:
                 self.db.session.commit()
 
-    def add_topics(self, generate_images=True, add_images=True, top_n=20):
+    def add_topics(self, generate_images=True, add_images=True, top_n=20,
+                   reset=False):
         """ Seed the database with topics.
         Args:
             generate_images (bool): if True, generates meta-analysis images for
@@ -414,6 +415,8 @@ class DatabaseBuilder:
             add_images (bool): if True, adds records for all images to the
                 database.
             top_n: number of top-loading words to save.
+            reset: if True, drops all existing TopicSets and TopicAnalysis
+                records before repopulating.
         """
         for ts in AnalysisSet.query.filter_by(type='topics').all():
             self.db.session.delete(ts)
