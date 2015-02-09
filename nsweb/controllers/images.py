@@ -4,6 +4,7 @@ from nsweb.models.downloads import Download
 from nsweb.initializers import settings
 from nsweb.initializers.settings import IMAGE_DIR
 from nsweb.core import add_blueprint, db
+from nsweb.controllers import error_page
 from nsweb.controllers.decode import decode_analysis_image
 from nsweb.controllers.helpers import send_nifti
 import os
@@ -28,13 +29,17 @@ def download(val, fdr=True):
 @bp.route('/<int:image>/decode/')
 def get_decoding_data(image, get_json=True):
 
+    if Image.query.get(image) is None:
+        return error_page("Invalid image requested for decoding. Please check"
+                          " to make sure there is a valid image with id=%d." %
+                          image)
     dec = decode_analysis_image(image)
-    if dec is None:
-        abort(404)
-    data = open(os.path.join(settings.DECODING_RESULTS_DIR,
-                             dec.uuid + '.txt')).read().splitlines()
+    df = os.path.join(settings.DECODING_RESULTS_DIR, dec.uuid + '.txt')
+    if not os.path.exists(df):
+        return error_page("An unspecified error occurred during decoding.")
+    data = open(df).read().splitlines()
     data = [x.split('\t') for x in data]
-    data = [[f, round(float(v), 3)] for (f, v) in data]
+    data = [[f, round(float(v or '0'), 3)] for (f, v) in data]
     return jsonify(data=data) if get_json else data
 
 
