@@ -5,7 +5,8 @@ from nsweb.models.studies import Study
 from nsweb.models.peaks import Peak
 from nsweb.models.frequencies import Frequency
 from nsweb.models.decodings import DecodingSet
-from nsweb.models.images import TermAnalysisImage, LocationImage, GeneImage, TopicAnalysisImage
+from nsweb.models.images import (Image, TermAnalysisImage, LocationImage,
+                                 GeneImage, TopicAnalysisImage)
 from nsweb.models.genes import Gene
 from nsweb.initializers import settings
 import os
@@ -84,9 +85,9 @@ class DatabaseBuilder:
         '''
         if reset:
             for a in TermAnalysis.query.all():
-                db.session.delete(a)
-            for s in AnalysisSet.query.filter_by(type='terms').first():
-                db.session.delete(s)
+                self.db.session.delete(a)
+            for s in AnalysisSet.query.filter_by(type='terms').all():
+                self.db.session.delete(s)
 
         if analyses is None:
             analyses = self._get_feature_names()
@@ -112,6 +113,7 @@ class DatabaseBuilder:
             term_set.analyses.append(analysis)
             self.db.session.add(analysis)
 
+        term_set.n_analyses = len(term_set.analyses)
         self.db.session.commit()
 
 
@@ -290,7 +292,8 @@ class DatabaseBuilder:
             analyses = list(set(analyses) - set(existing))
 
         # Meta-analyze all images
-        meta.analyze_features(self.dataset, analyses, save=image_dir, q=0.01, **kwargs)
+        meta.analyze_features(self.dataset, analyses, output_dir=image_dir,
+                              q=0.01, **kwargs)
 
         # Create AnalysisImage records
         if add_to_db:
@@ -371,12 +374,16 @@ class DatabaseBuilder:
                 json.dump(data, open(analysisfile, 'w'))
 
 
-    def add_genes(self, gene_dir=None, reset=False):
+    def add_genes(self, gene_dir=None, reset=True):
         """ Add records for genes, working from a directory containing gene images. """
+
         if reset:
-            Gene.query.delete()
+            for g in Gene.query.all():
+                Gene.query.delete(g)
+
         if gene_dir is None:
             gene_dir = settings.GENE_IMAGE_DIR
+
         genes = glob(join(gene_dir, "*.nii.gz"))
         print "Adding %d genes..." % len(genes)
         found = {}
@@ -389,45 +396,35 @@ class DatabaseBuilder:
             if gene is None:
                 gene = Gene(name=symbol, symbol=symbol)
             gene.images = [GeneImage(
-                image_file = g,
-                label = "AHBA gene expression levels for " + symbol,
-                stat = "z-score",
+                image_file=g,
+                label="AHBA gene expression levels for " + symbol,
+                stat="z-score",
                 display=1,
-                download=0
+                download=1
                 )]
 
             self.db.session.add(gene)
             if i % 1000 == 0:
                 self.db.session.commit()
 
-    def generate_decoding_data(self, analyses=None):
-        """ Save image data for analysis maps we use in decoding as a separate 
-        numpy array for rapid use. """
-        if analyses is None:
-            analyses = self._get_feature_names()
-        path = join(settings.IMAGE_DIR, 'analyses', '%s_pFgA_z.nii.gz')
-        images = [path % f for f in analyses]
-        analyses = [(f, images[i]) for (i, f) in enumerate(analyses) if os.path.exists(images[i])]
-        n_vox, n_analyses = self.dataset.image_table.data.shape[0], len(analyses)
-        data = np.zeros((n_vox, n_analyses))
-        for (i, (f, img)) in enumerate(analyses):
-            data[:, i] = self.dataset.masker.mask(img)
-        data = pd.DataFrame(data, columns=[f[0] for f in analyses])
-        data.to_msgpack(settings.DECODING_DATA)
-
-    # def generate_topics(self, name, topic_keys, doc_topics, add_to_db=False, top_n=20):
-    def add_topics(self, generate_images=True, add_images=True, top_n=20):
-        """ Seed the database with topics. 
+    def add_topics(self, generate_images=True, add_images=True, top_n=20,
+                   reset=False):
+        """ Seed the database with topics.
         Args:
-            generate_images (bool): if True, generates meta-analysis images for all topics.
-            add_images (bool): if True, adds records for all images to the database.
+            generate_images (bool): if True, generates meta-analysis images for
+                all topics.
+            add_images (bool): if True, adds records for all images to the
+                database.
             top_n: number of top-loading words to save.
+            reset: if True, drops all existing TopicSets and TopicAnalysis
+                records before repopulating.
         """
-        for t in TopicAnalysis.query.all():
-            self.db.session.delete(t)
-        for ts in AnalysisSet.query.filter_by(type='topics').all():
-            self.db.session.delete(ts)
- 
+        if reset:
+            for ts in AnalysisSet.query.filter_by(type='topics').all():
+                self.db.session.delete(ts)
+            for t in TopicAnalysis.query.all():
+                self.db.session.delete(t)
+
         topic_sets = glob(join(settings.TOPIC_DIR, '*.json'))
 
         # Temporarily store the existing AnalysisTable so we don't overwrite it
@@ -456,7 +453,8 @@ class DatabaseBuilder:
             if generate_images:
                 meta.analyze_features(
                     self.dataset, self.dataset.get_feature_names(),
-                    output_dir=topic_set_image_dir, threshold=0.05, q=0.01)
+                    output_dir=topic_set_image_dir, threshold=0.05, q=0.01,
+                    prefix=ts.name)
 
             feature_data = self.dataset.feature_table.data
 
@@ -468,7 +466,7 @@ class DatabaseBuilder:
                 # Disable autoflush temporarily because it causes problems
                 with self.db.session.no_autoflush:
                     terms = ', '.join(key_data.pop(0).split()[2:][:top_n])
-                    topic = TopicAnalysis(name='topic%d' % i,
+                    topic = TopicAnalysis(name=ts.name + '_topic%d' % i,
                                           terms=terms, number=i)
 
                     self.db.session.add(topic)
@@ -528,52 +526,146 @@ class DatabaseBuilder:
                 self.db.session.add(ta)
         self.db.session.commit()
 
-
-    def memory_map_images(self, sets=None, n_sampled=20000):
+    def memory_map_images(self, include=['terms', 'topics', 'genes'],
+                          reset=False):
         """ Create memory-mapped arrays containing all image data for one or
-        more AnalysisSets. """
+        more AnalysisSets.
+        """
 
         mm_dir = settings.MEMMAP_DIR
         if not exists(mm_dir):
             os.makedirs(mm_dir)
 
-        # For now let's just worry about term-based reverse inference maps
-        name = 'term'
-
-        # Get all images and save labels
-        images = [a.images[0] for a in TermAnalysis.query.all()]
-        labels = [os.path.basename(img.image_file).split('_')[0] for img in images]
-        # print term_labels
-        open(join(mm_dir, '%s_labels.txt' % name), 'w').write('\n'.join(labels))
-
         # Get mask
         masker = Masker(join(settings.IMAGE_DIR, 'anatomical.nii.gz'))
+        mask_voxels = np.sum(masker.get_current_mask())
 
-        # Select random voxels and save for later
-        n_vox = len(masker.mask(images[0].image_file))
-        sampled_vox = np.random.choice(np.arange(n_vox), n_sampled, replace=False)
-        np.save(join(mm_dir, '%s_voxels.npy' % name), sampled_vox)
+        def save_memmap(name, analysis_set, images, labels, voxels=None):
 
-        # Initialize memmap
-        n_images = len(images)
-        mm_file = join(mm_dir, '%s_images.dat' % name)
-        mm = np.memmap(mm_file, dtype='float32', mode='w+', shape=(n_sampled, n_images))
+            # Delete old versions
+            if reset:
+                dec = DecodingSet.query.filter_by(name=name).all()
+                for ds in dec:
+                    self.db.session.delete(ds)
 
-        # Populate with standardized image data
-        for i, img in enumerate(images):
-            img_data = masker.mask(img.image_file)[sampled_vox]
-            mm[:, i] = (img_data - img_data.mean())/img_data.std()
+            # print term_labels
+            open(join(mm_dir, '%s_labels.txt' % name), 'w') \
+                .write('\n'.join(labels))
 
-        # Flush
-        del mm
+            sampled_vox = np.arange(mask_voxels)
+            is_subsampled = (voxels is not None)
+            if voxels is not None:
+                # Either randomly select voxels, or use what was passed
+                # TODO: sample uniformly from a 3D grid instead of randomly
+                if isinstance(voxels, int):
+                    sampled_vox = np.random.choice(sampled_vox, voxels,
+                                                   replace=False)
+                else:
+                    sampled_vox = voxels
+                np.save(join(mm_dir, '%s_voxels.npy' % name), sampled_vox)
 
-        # Create DB record
+            # Initialize memmap
+            n_images = len(images)
+            mm_file = join(mm_dir, '%s_images.dat' % name)
+            mm = np.memmap(mm_file, dtype='float32', mode='w+',
+                           shape=(len(sampled_vox), n_images))
 
-        self.db.session.add(DecodingSet(name=name, n_images=n_images,
-                                        n_voxels=len(sampled_vox),
-                                        is_subsampled=True))
-        self.db.session.commit()
+            # Save key image stats--will need these to reconstruct raw values
+            stats = np.zeros((n_images, 4))
 
+            # Populate with standardized image data
+            for i, img in enumerate(images):
+                # Use unthresholded maps when possible
+                img_file = re.sub('_FDR_*nii.gz', '.nii.gz', img)
+                data = masker.mask(img_file)[sampled_vox]
+                std, mean = data.std(), data.mean()
+                mm[:, i] = (data - mean)/std
+                stats[i, :] = [data.min(), data.max(), mean, std]
+
+            stats = pd.DataFrame(stats, index=labels,
+                                 columns=['min', 'max', 'mean', 'std'])
+            stats.to_csv(join(mm_dir, '%s_stats.txt' % name), sep='\t')
+
+            # Write metadata
+            metadata = {
+                'name': name,
+                'n_voxels': len(sampled_vox),
+                'n_images': n_images,
+                'is_subsampled': is_subsampled
+            }
+            md_file = join(mm_dir, '%s_metadata.json' % name)
+            open(md_file, 'w').write(json.dumps(metadata))
+
+            # Flush
+            del mm
+
+            # Create DB record
+            self.db.session.add(
+                DecodingSet(name=name, n_images=n_images,
+                            n_voxels=len(sampled_vox),
+                            is_subsampled=is_subsampled,
+                            analysis_set=analysis_set))
+            self.db.session.commit()
+
+        ### TERMS ###
+        if 'terms' in include:
+
+            print "\tCreating memmap of term image data..."
+
+            analysis_set = AnalysisSet.query \
+                .filter_by(type='terms').first()
+
+            # Get all images and save labels
+            images = [a.images[1].image_file for a in analysis_set.analyses]
+            labels = [a.name for a in analysis_set.analyses]
+
+            print "\t\tFound %d images." % len(images)
+
+            # save both full and 20k voxel arrays
+            save_memmap('terms_full', analysis_set, images, labels)
+            save_memmap('terms_20k', analysis_set, images, labels, 20000)
+            # also save posterior probability images
+            images = [img.replace('_pFgA_z_FDR_0.01', '_pFgA_given_pF=0.50')
+                      for img in images]
+            save_memmap('terms_pp', analysis_set, images, labels)
+
+        ### TOPICS ###
+        if 'topics' in include:
+
+            print "\tCreating memmap of topic image data..."
+
+            analysis_set = AnalysisSet.query \
+                .filter_by(name='v3-topics-200').first()
+
+            # Get all images and save labels
+            images = [a.images[1].image_file for a in analysis_set.analyses]
+            labels = [a.name for a in analysis_set.analyses]
+
+            print "\t\tFound %d images." % len(images)
+
+            # save both full and 20k voxel arrays
+            save_memmap('topics_full', analysis_set, images, labels)
+            save_memmap('topics_20k', analysis_set, images, labels, 20000)
+            # also save posterior probability images
+            images = [img.replace('_pFgA_z_FDR_0.01', '_pFgA_given_pF=0.50') for
+                      img in images]
+            save_memmap('topics_pp', analysis_set, images, labels)
+
+        ### GENES ###
+        if 'genes' in include:
+
+            print "\tCreating memmap of gene image data..."
+
+            # Get all images and save labels
+            genes = Gene.query.all()
+            images = [g.images[0].image_file for g in genes]
+            labels = [g.name for g in genes]
+
+            # save only voxels where there were originally microarrays
+            sample_img = join(settings.IMAGE_DIR, 'sample_locations.nii.gz')
+            voxels = masker.mask(sample_img)
+            voxels = np.nonzero(voxels)[0]
+            save_memmap('genes', None, images, labels, voxels)
 
     def _filter_analyses(self, analyses):
         """ Remove any invalid analysis names """
@@ -584,5 +676,3 @@ class DatabaseBuilder:
     def _get_feature_names(self):
         """ Return all (filtered) analysis names in the Dataset instance """
         return self._filter_analyses(self.dataset.get_feature_names())
-
-

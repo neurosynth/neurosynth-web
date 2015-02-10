@@ -8,7 +8,7 @@ from flask.ext.user import UserManager, SQLAlchemyAdapter
 from flask.ext.script import Manager
 from flask.ext.migrate import Migrate, MigrateCommand
 from slimish_jinja import SlimishExtension
-
+from flask.ext.cache import Cache
 from nsweb.initializers import settings
 from nsweb.initializers.assets import init_assets
 from nsweb.initializers import make_celery
@@ -31,6 +31,9 @@ from nsweb.initializers import make_celery
 app=Flask('NSWeb', static_folder=settings.STATIC_FOLDER, template_folder=settings.TEMPLATE_FOLDER)
 app.config['SQLALCHEMY_POOL_RECYCLE'] = 1800
 # manager = Manager(app)
+
+# Caching
+cache = Cache(config={'CACHE_TYPE': 'simple'})
 
 # Initialize celery
 celery = make_celery(app)
@@ -76,6 +79,7 @@ def create_app(debug=True):
     init_assets(app)
 
     db.init_app(app)
+    cache.init_app(app)
     
     # Set up user management
     app.config['CSRF_ENABLED'] = True

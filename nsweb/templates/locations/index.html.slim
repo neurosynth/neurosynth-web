@@ -3,37 +3,32 @@
 - block content
   - import "macros/_analysis_viewer.html.slim" as viewers
   .row#page-location
-    .col-md-12
+    .col-md-10
       .big-text
         span Data for coordinates:
         input type="number" class="data-for-location" name="x-in" id="x-in" min="-90" max="90" value="{{x}}"
         input type="number" class="data-for-location" name="y-in" id="y-in" min="-72" max="108" value="{{y}}"
         input type="number" class="data-for-location" name="z-in" id="z-in" min="-106" max="90" value="{{z}}"
       %.row
-    .col-md-10.col-md-offset-1.top-space20
+    .col-md-10.top-space20
+      hr
       ul#location-menu.nav.nav-pills
         li.active
           a href="#maps" data-toggle="tab" Maps
         li
-          a href="#analyses" data-toggle="tab" Analyses
-        li
           a href="#studies" data-toggle="tab" Studies
+        li
+          a href="#associations" data-toggle="tab" Associations
+        li
+          a href="#faq" data-toggle="tab" FAQs
       #location-tab-content.tab-content
         #maps.tab-pane.active
-          %h3#current-location-maps
+          h3 Functional connectivity and coactivation maps
           script type="text/javascript"
             |
             var options = { panzoomEnabled: false, xyz: [{{x}}, {{y}}, {{z}}]}
             var settings = ['no-zoom', 'layers','nav','checkboxes']
           p {{viewers.viewer()|safe}}
-        #analyses.tab-pane
-          h3 Term loadings (reverse inference)
-          table#location_analyses_table.table-striped.table-hover.table.table-condensed.small-datatable
-            thead
-              tr
-                th Analysis
-                th z-score
-                th post. prob.
         #studies.tab-pane
           .location-studies-head
             %h3#current-location-studies
@@ -58,4 +53,46 @@
                 th Authors
                 th Journal
                 th Activations
+        #associations.tab-pane
+          h3 Associations with meta-analysis maps
+          table#location_analyses_table.table-striped.table-hover.table.table-condensed.small-datatable
+            thead
+              tr
+                %th
+                th colspan="2" Individual voxel
+                th colspan="2" Seed-based network
+              tr
+                th Name
+                th z-score
+                th Posterior prob.
+                th Func. conn. (r)
+                th Meta-analytic coact. (r)
+        #faq.tab-pane
+          h3 Location-based analyses: Frequently Asked Questions
+          h4.help What is a "location" in Neurosynth?
+          p A location is just a particular point in the brain, as indexed in MNI152 space using X/Y/Z coordinates. The locations interface displays information about the relationship between activation at this location and various other data in the Neurosynth database, enabling a user to interpret the cognitive function of specific regions in a somewhat more quantitative manner than qualitative analyses can support.
+
+          h4.help What's the difference between the functional connectivity and meta-analytic coactivation image layers?
+          p
+            |The functional connectivity map that's displayed by default when you first load a new location was not generated using Neurosynth data. It is provided courtesy of Thomas Yeo, Randy Buckner, and the <a href="https://thedata.harvard.edu/dvn/dv/GSP">Brain Genomics Superstruct Project</a>. The map represents a resting-state functional connectivity analysis performed on 1,000 human subjects, with the seed placed at the currently selected location. Thus, it displays brain regions that are coactivated across the resting-state fMRI time series with the seed voxel. Values are pearson correlations (r). To reduce blurring of signals across cerebro-cerebellar and cerebro-striatal boundaries, fMRI signals from adjacent cerebral cortex are regressed from the cerebellum and striatum. For further details, see <a href="http://jn.physiology.org/content/106/3/1125.long">Yeo et al (2011)</a>, <a href="http://jn.physiology.org/cgi/pmidlookup?view=long&pmid=21795627">Buckner et al (2011)</a>, and <a href="http://jn.physiology.org/cgi/pmidlookup?view=long&pmid=22832566">Choi et al (2012)</a>.
+          p
+            |The meta-analytic coactivation map (which is hidden by default, but can be activated by clicking on the corresponding eye icon [<i class='fa fa-eye fa-lg'></i>]) is a kind of meta-analytic analog of the functional connectivity map. It reflects coactivation of brain regions across studies in the Neurosynth database rather than across a single fMRI time series. The analysis is seeded with a 6 mm hard sphere centered on the currently selected location. Thus, high values in the map indicate voxels that are likely to be activated in similar studies as the seed voxel. Values represent z-scores quantifying the strength of association between the presence or absence of activation in each voxel in relation to the presence or absence of activation in the seed voxel.
+
+          h4.help Are these maps corrected for multiple comparisons?
+          p The meta-analytic coactivation map is FDR-corrected, but the functional connectivity map is uncorrected. However, we don't think correction for multiple comparisons is a particularly useful concept in this context. Both the Brain Superstruct Project dataset and the Neurosynth dataset are sufficiently large that effects are estimated relatively precisely. We would encourage users to focus on the relative strength of associations rather than statistical significance in this case.
+
+          h4.help What are all the different association metrics, and why are there so many of them?
+          p The Associations table provides information about the relationship between activation at the current voxel and other types of information available in Neurosynth. Currently, the metrics displayed include (in order):
+          ul
+            li <strong>z-score</strong>: This is the z-score value obtained at the current voxel in the reverse inference meta-analysis map for the corresponding term.
+            li
+              p
+                |<b>Posterior probability</b>: This is the conditional probability of a term being used in a study conditional on activation being present at this voxel. For example, a posterior probability of 0.8 for 'emotion' would mean that 80% of studies that report activation at the current voxel also use the term 'emotion' in their abstracts. <b>However</b>, it's important to note two things about this metric. First, the estimate reflects an assumed uniform prior. That is, it's the probability that we would get if we naively assumed that absent any information about brain activity, a study was equally like to use or to not use the target term. (We make this assumption because otherwise, the probabilities are completely dominated by the empirical distribution of terms--that is, if a term is very rare, then its probability conditional on activation being present will also be very rare. In effect, the uniform prior is a means of normalizing terms and making them directly comparable to one another.)
+              p
+                |Second, the posterior probability estimates ignore the role of uncertainty. When a term has relatively few associated studies, the variance will be high, which means that one can paradoxically obtain seemingly very high (or very low) probabilities in cases where the evidence for an association is actually quite weak. For this reason, we recommend paying more attention to the z-scores than to the posterior probabilities.
+            li <b>Functional connectivity (r)</b>: This is the pearson correlation coefficient between the whole-brain (uncorrected) reverse-inference map for each term, and the functional connectivity map seeded at the current location. In other words, it tells you how similar the functional connectivity network defined by the current seed is to every term in the Neurosynth database. A high value implies that the network of regions connected to the current seed is, collectively, very similar to the set of regions that tend to be associated with a particular term in the Neurosynth database. This provides a different way of thinking about what it is that a region does, since instead of thinking of only the local effect at the current voxel, we're taking into account what other regions the current voxel tends to talk to.
+            li <b>Meta-analytic coactivation (r)</b>:Exactly the same as the preceding analysis, but estimated using the Neurosynth meta-analytic coactivation map for the current location rather than functional connectivity map.
+
+          p As to why we provide multiple association metrics: because there are no easy answers when it comes to brain-cognition associations! Rather than try to reduce the set of cognitive associations for a given brain location to one metric, we prefer to provide a variety of metrics that each offers a somewhat different view. Of course, the current set of metrics is still quite limited, and our goal is to add new ones as time goes on.
+
 

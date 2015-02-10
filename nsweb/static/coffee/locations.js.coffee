@@ -28,8 +28,8 @@ $(document).ready ->
       loadLocationSimilarity(result.data[0].id)
       )
 
-  loadLocationAnalyses = ->
-    url = '/locations/' + getLocationString() + '/analyses'
+  loadLocationComparisons = ->
+    url = '/locations/' + getLocationString() + '/compare'
     $('#location_analyses_table').DataTable().ajax.url(url).load().order([1, 'desc'])
 
   loadLocationSimilarity = (id) ->
@@ -40,48 +40,45 @@ $(document).ready ->
   update = ->
     loadLocationStudies()
     loadLocationImages()
-    loadLocationAnalyses()
+    loadLocationComparisons()
     base = window.location.href.split('?')[0]
     coords = { x: $('#x-in').val(), y: $('#y-in').val(), z: $('#z-in').val(), r: $('#rad-out').val()}
     xyz = [coords.x, coords.y, coords.z]
     study_info = 'Studies reporting activation within ' + coords.r + ' mm of (' + xyz.join(', ') + ')'
     $('#current-location-studies') .text(study_info)
-    map_info = 'Functional connectivity and coactivation maps for (' + xyz.join(', ') + ')'
-    $('#current-location-maps').html(map_info)
     
     # TODO: IMPLEMENT ONPOPSTATE  
     # window.history.pushState(null, null, base + '?' + $.param(coords))
 
   moveTo = ->
     base = window.location.href.split('?')[0]
-    coords = { x: $('#x-in').val(), y: $('#y-in').val(), z: $('#z-in').val(), r: $('#rad-out').val()}
-    url = base + '?' + $.param(coords)
+    coords = [$('#x-in').val(), $('#y-in').val(), $('#z-in').val(), $('#rad-out').val()]
+    url = '/locations/' + coords.join('_')
     window.location.href = url
   
-  $('#location_studies_table').dataTable({
-    paginationType: "full_numbers"
-    displayLength: 10
-    processing: true
-    autoWidth: true
-    dom: 'T<"clear">lfrtip'
-    tableTools: { sSwfPath: "/static/swf/copy_csv_xls.swf" }
-    # orderClasses: false
-  })
+  createDataTable('#location_studies_table', {
+      pageLength: 10
+      columns: [
+        { width: '40%' }
+        { width: '38%' }
+        { width: '15%' }
+        { width: '7%' }
+      ]})
 
-  $('#location_analyses_table').dataTable({
-    paginationType: "full_numbers"
-    displayLength: 10
-    processing: true
-    autoWidth: true
-    dom: 'T<"clear">lfrtip'
-    tableTools: { sSwfPath: "/static/swf/copy_csv_xls.swf" }
-    # orderClasses: false
-    columnDefs: [{
-      targets: 0
-      render: (data, type, row, meta) ->
-        '<a href="/analyses/'+ data + '">' + data + '</a>'
-    }]
-  })
+  createDataTable('#location_analyses_table', {
+    pageLength: 10
+    autoWidth: false
+    columns: [
+      {
+        width: '28%'
+        render: (data, type, row, meta) ->
+          '<a href="/analyses/terms/'+ data + '">' + data + '</a>'
+      }
+      { width: '18%' }
+      { width: '18%' }
+      { width: '18%' }
+      { width: '18%' }
+    ]})
 
   # Load state (e.g., which tab to display)
   activeTab = window.cookie.get('locationTab')

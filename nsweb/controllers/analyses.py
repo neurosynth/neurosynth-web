@@ -52,6 +52,13 @@ def get_studies(val):
         data = jsonify(studies=[s.pmid for s in analysis.studies])
     return data
 
+
+### TOP INDEX ###
+@bp.route('/')
+def list_analyses():
+    n_terms = TermAnalysis.query.count()
+    return render_template('analyses/index.html.slim', n_terms=n_terms)
+
 ### TERM-SPECIFIC ROUTES ###
 @bp.route('/term_names/')
 def get_term_names():
@@ -74,7 +81,7 @@ def show_term(term):
 ### TOPIC-SPECIFIC ROUTES ###
 @bp.route('/topics/')
 def list_topic_sets():
-    topic_sets = AnalysisSet.query.filter(AnalysisSet.name.like('topic%'))
+    topic_sets = AnalysisSet.query.filter_by(type='topics')
     return render_template('analyses/topics/index.html.slim',
                            topic_sets=topic_sets)
 
@@ -99,5 +106,17 @@ def show_topic(topic_set, number):
     topic.terms = ', '.join(map(map_url, top))
     return render_template('analyses/topics/show.html.slim',
                            analysis_set=topic.analysis_set, analysis=topic)
+
+### FALLBACK GENERIC ROUTE ###
+@bp.route('/<string:id>/')
+def show_analysis(id):
+    analysis = find_analysis(id)
+    if analysis is None:
+        return render_template('analyses/missing.html.slim', analysis=id)
+    if analysis.type == 'term':
+        return redirect(url_for('analyses.show_term', term=analysis.name))
+    elif analysis.type == 'topic':
+        return redirect(url_for('analyses.show_topic', number=analysis.number,
+                                topic_set=analysis.analysis_set.name))
 
 add_blueprint(bp)

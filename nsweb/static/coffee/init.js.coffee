@@ -46,24 +46,23 @@ $.fn.dataTable.TableTools.defaults.aButtons = [
     }
   ]
 
-createDataTable = (element, ajax=null, serverSide=false, displayLength=25,
-  columns=null, tableTools=true, filterDelay=true, orderClass=false) ->
-  opts = {
+createDataTable = (element, options) ->
+
+  # Set defaults and overwrite with the passed object
+  _opts = {
     pagingType: "full_numbers"
-    serverSide: serverSide
-    displayLength: displayLength
-    stateSave: false
-    orderClasses: false
+    pageLength: 25
+    stateSave: true
+    orderClasses: true
     processing: true
     dom: 'T<"clear">lfrtip'
+    tableTools: { sSwfPath: "/static/swf/copy_csv_xls.swf" } 
+    filterDelay: true
   }
-  if columns?
-    opts.autoWidth = false
-    opts.columns = columns
-  opts.tableTools = { sSwfPath: "/static/swf/copy_csv_xls.swf" } if tableTools
-  opts.ajax = ajax if ajax?
-  tbl = $(element).dataTable(opts)
-  tbl.fnSetFilteringDelay(iDelay=400) if filterDelay
+  console.log(_opts.columns)
+  $.extend(_opts, options)
+  tbl = $(element).dataTable(_opts)
+  tbl.fnSetFilteringDelay(iDelay=400) if _opts.filterDelay
   tbl
 
 
@@ -91,16 +90,14 @@ $(document).ready ->
   # Decoding results for pages that use it
   if $('#page-decode-show, #page-genes-show').length
     
-    tbl = $('#decoding_results_table').dataTable
-      paginationType: "simple"
+    createDataTable('#decoding_results_table', {
+      pagingType: "simple"
       displayLength: 10
       processing: true
       stateSave: false
       orderClasses: false
       autoWidth: false
       order: [[2, 'desc']]
-      dom: 'T<"clear">lfrtip'
-      tableTools: { sSwfPath: "/static/swf/copy_csv_xls.swf" }
       columns: [
         {
           data: null
@@ -118,4 +115,5 @@ $(document).ready ->
           width: '20%'
           },
         ]
+      })
 

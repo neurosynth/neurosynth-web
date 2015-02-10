@@ -66,7 +66,6 @@ class Mallet:
         the columns are topics in natural order. '''
         if input is not None:
             self.doc_topics = input
-
         docs = open(self.doc_topics).readlines()[1::]
 
         n_topics = len(docs[0].strip().split('\t'))/2 - 1
@@ -123,20 +122,23 @@ class TopicFactory(object):
             os.makedirs(key_dir)
 
         for n in n_topics:
-            key_file = os.path.join(key_dir, 'topics_%d.txt' % n)
+
+            name = 'v3-topics-%d' % int(n)
+
+            key_file = os.path.join(key_dir, name + '.txt')
             self.mallet.train_topics(
                 'texts.mallet', num_topics=n, num_top_words=100,
-                output_topic_keys=key_file, num_iterations=100)
+                output_topic_keys=key_file, num_iterations=1000)
             topics = self.mallet.parse_doc_topics(prefix='topic')
-            topic_file = os.path.join(analysis_dir,
-                                      'topics_%d.txt' % n)
+            topic_file = os.path.join(analysis_dir, name + '.txt')
             topics.to_csv(topic_file, sep='\t', index_label='id')
 
             # Write json file
-            name = 'topics_%d' % int(n)
             metadata = {
                 'name': name,
-                'description': 'Placeholder description.',
+                'description': 'A set of %d topics extracted with LDA from '
+                'the abstracts of all articles in the Neurosynth database as of'
+                ' February 2015 (10,903 articles).' % n,
                 'n_topics': n
             }
             json_file = os.path.join(settings.TOPIC_DIR, name + '.json')
@@ -144,4 +146,4 @@ class TopicFactory(object):
 
 if __name__ == '__main__':
     tf = TopicFactory()
-    tf.make_topics(100)
+    tf.make_topics([50, 100, 200])

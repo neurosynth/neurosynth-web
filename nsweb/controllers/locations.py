@@ -1,4 +1,4 @@
-from nsweb.core import add_blueprint
+from nsweb.core import add_blueprint, cache
 from flask import Blueprint, render_template, url_for, request, jsonify
 from nsweb.models.locations import Location
 from nsweb.models.images import LocationImage
@@ -9,9 +9,13 @@ from nsweb.initializers import settings
 from os.path import join, exists
 from nsweb.tasks import make_coactivation_map
 from nsweb.core import db
-from nsweb.controllers.decode import decode_analysis_image
+from nsweb.controllers.decode import decode_analysis_image, get_voxel_data
+from nsweb.controllers.images import get_decoding_data
+import pandas as pd
+import numpy as np
 
-bp = Blueprint('locations',__name__,url_prefix='/locations')
+
+bp = Blueprint('locations', __name__, url_prefix='/locations')
 
 
 def get_params(val=None, location=False):
@@ -23,23 +27,27 @@ def get_params(val=None, location=False):
         radius = int(request.args.get('r', 6))
     else:
         params = [int(e) for e in val.split('_')]
-        if len(params) == 3: params.append(6)
+        if len(params) == 3:
+            params.append(6)
         x, y, z, radius = params
-        
-    if radius > 20: radius = 20
+
+    if radius > 20:
+        radius = 20
     if location:
-        return Location.query.filter_by(x=x,y=y,z=z).first()
+        return Location.query.filter_by(x=x, y=y, z=z).first()
     return (x, y, z, radius)
 
 
 @bp.route('/')
-@bp.route('/<string:val>')
+@bp.route('/<string:val>/')
 def show(val=None):
     x, y, z, radius = get_params(val)
-    return render_template('locations/index.html.slim', radius=radius, x=x, y=y, z=z)
+    return render_template('locations/index.html.slim', radius=radius, x=x,
+                           y=y, z=z)
 
 
 @bp.route('/<string:val>/images')
+@cache.memoize(timeout=3600)
 def get_images(val):
     location = get_params(val, location=True)
     if location is None:
@@ -62,43 +70,56 @@ def get_images(val):
     return jsonify(data=images)
 
 
-# @bp.route('/<string:val>/coactivation')
-# def get_coactivation_image(val):
-#     x, y, z, r = get_params(val)
-#     filename = 'metaanalytic_coactivation_%s_%s_%s_pFgA_z.nii.gz' % (str(x), str(y), str(z))
-#     filename = join(settings.IMAGE_DIR, 'locations', 'coactivation', filename)
-#     if not exists(filename):
-#         result = make_coactivation_map.delay(int(x), int(y), int(z)).wait()
-#     if exists(filename):
-#         return send_nifti(filename)
-#     return abort(404)
+@bp.route('/<string:val>/compare/')
+@cache.memoize(timeout=3600)
+def compare_location(val, decimals=2):
+    """ Compare this voxel to various image sets using various approaches.
+    Currently returns correlations between the coactivation/functional
+    connectivity maps seeded at this voxel and all images in a given term set,
+    plus activation data at this location.
+    """
+    x, y, z, radius = get_params(val)
+    location = get_params(val, location=True) or make_location(x, y, z)
+    ma = zip(*get_decoding_data(location.images[0].id, get_json=False))
+    fc = zip(*get_decoding_data(location.images[1].id, get_json=False))
+    ma = pd.Series(ma[1], index=ma[0], name='ma')
+    fc = pd.Series(fc[1], index=fc[0], name='fc')
+    # too many gene maps to slice into, so return NAs
+    ref_type = request.args.get('set', 'terms_20k').split('_')[0]
+    if ref_type != 'genes':
+        vals = get_voxel_data(x, y, z, ref_type, get_json=False)
+    else:
+        vals = pd.Series([np.nan])
+
+    data = pd.concat([ma, fc, vals], axis=1)
+    data = data.apply(lambda x: np.round(x, decimals)).reset_index()
+    data = data.fillna('-')
+    data = data[['index', 'z', 'pp', 'fc', 'ma']]
+    return jsonify(data=data.values.tolist())
 
 
 @bp.route('/<string:val>/studies')
+@cache.memoize(timeout=3600)
 def get_studies(val):
     x, y, z, radius = get_params(val)
-    points = Peak.closestPeaks(radius,x,y,z)
-    points = points.group_by(Peak.pmid) #prevents duplicate studies
-    points = points.add_columns(sqlalchemy.func.count(Peak.id)) #counts duplicate peaks
-    
+    points = Peak.closestPeaks(radius, x, y, z)
+    # prevents duplicate studies
+    points = points.group_by(Peak.pmid)
+    # counts duplicate peaks
+    points = points.add_columns(sqlalchemy.func.count(Peak.id))
+
     if 'dt' in request.args:
         data = []
         for p in points:
             s = p[0].study
-            link = '<a href={0}>{1}</a>'.format(url_for('studies.show',val=s.pmid),s.title)
-            data.append([link, s.authors, s.journal,p[1]])
+            link = '<a href={0}>{1}</a>'.format(url_for('studies.show',
+                                                        val=s.pmid), s.title)
+            data.append([link, s.authors, s.journal, p[1]])
         data = jsonify(data=data)
     else:
-        data = [{'pmid':p[0].study.pmid,'peaks':p[1] } for p in points]
+        data = [{'pmid': p[0].study.pmid, 'peaks':p[1]} for p in points]
         data = jsonify(data=data)
     return data
-
-
-@bp.route('/<string:val>/analyses')
-def get_analyses(val):
-    x, y, z, radius = get_params(val)
-    f = join(settings.LOCATION_FEATURE_DIR, '%d_%d_%d_analyses.txt' % (x,y,z))
-    return open(f).read() if exists(f) else '{"data":[]}'
 
 
 def make_location(x, y, z):
@@ -106,31 +127,47 @@ def make_location(x, y, z):
     location = Location(x, y, z)
 
     # Add Neurosynth coactivation image if it exists
-    filename = 'metaanalytic_coactivation_%d_%d_%d_pFgA_z_FDR_0.01.nii.gz' % (x, y, z)
+    filename = 'metaanalytic_coactivation_%d_%d_%d_pFgA_z_FDR_0.01.nii.gz' % (
+        x, y, z)
     filename = join(settings.IMAGE_DIR, 'coactivation', filename)
     if not exists(filename):
         result = make_coactivation_map.delay(x, y, z).wait()
     if exists(filename):
         ma_image = LocationImage(
-            name='Meta-analytic coactivation for seed (%d, %d, %d)' % (x, y, z),
+            name='Meta-analytic coactivation for seed (%d, %d, %d)' % (
+                x, y, z),
             image_file=filename,
             label='Meta-analytic coactivation',
             stat='z-score',
             display=1,
             download=1,
-            description='This image displays regions coactivated with the seed region across all studies in the Neurosynth database. It represents meta-analytic coactivation rather than time series-based connectivity.'
+            description='This image displays regions coactivated with the seed'
+            ' region across all studies in the Neurosynth database. It '
+            'represents meta-analytic coactivation rather than time '
+            'series-based connectivity.'
         )
         location.images.append(ma_image)
 
     # Add Yeo FC image if it exists
-    filename = join(settings.IMAGE_DIR, 'fcmri', 'functional_connectivity_%d_%d_%d.nii.gz' % (x, y, z))
+    filename = join(settings.IMAGE_DIR, 'fcmri',
+                    'functional_connectivity_%d_%d_%d.nii.gz' % (x, y, z))
     if exists(filename):
         fc_image = LocationImage(
             name='YeoBucknerFCMRI for seed (%d, %d, %d)' % (x, y, z),
             image_file=filename,
             label='Functional connectivity',
             stat='corr. (r)',
-            description="This image displays resting-state functional connectivity for the seed region in a sample of 1,000 subjects. To reduce blurring of signals across cerebro-cerebellar and cerebro-striatal boundaries, fMRI signals from adjacent cerebral cortex were regressed from the cerebellum and striatum. For details, see <a href='http://jn.physiology.org/content/106/3/1125.long'>Yeo et al (2011)</a>, <a href='http://jn.physiology.org/cgi/pmidlookup?view=long&pmid=21795627'>Buckner et al (2011)</a>, and <a href='http://jn.physiology.org/cgi/pmidlookup?view=long&pmid=22832566'>Choi et al (2012)</a>.",
+            description='This image displays resting-state functional '
+            'connectivity for the seed region in a sample of 1,000 subjects. '
+            'To reduce blurring of signals across cerebro-cerebellar and '
+            'cerebro-striatal boundaries, fMRI signals from adjacent cerebral '
+            'cortex were regressed from the cerebellum and striatum. For '
+            'details, see '
+            '<a href="http://jn.physiology.org/content/106/3/1125.long">Yeo et'
+            'al (2011)</a>, <a href="http://jn.physiology.org/cgi/pmidlookup?'
+            'view=long&pmid=21795627">Buckner et al (2011)</a>, and '
+            '<a href="http://jn.physiology.org/cgi/pmidlookup?view=long&'
+            'pmid=22832566">Choi et al (2012)</a>.',
             display=1,
             download=1
         )
@@ -139,7 +176,8 @@ def make_location(x, y, z):
     db.session.add(location)
     db.session.commit()
 
-    # Decode the FC image
+    # Decode both images
+    decode_analysis_image(ma_image.id)
     decode_analysis_image(fc_image.id)
 
     return location

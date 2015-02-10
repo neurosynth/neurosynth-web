@@ -4,6 +4,7 @@ Flask>=0.10.1
 Flask-Assets
 Flask-Babel
 Flask-Cake>=0.2.1
+Flask-Cache
 Flask-Mail
 Flask-Migrate
 Flask-Restless>=0.12

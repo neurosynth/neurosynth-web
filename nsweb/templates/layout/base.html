@@ -21,25 +21,14 @@
 	    s.parentNode.insertBefore(g,s)}(document,'script'));
     </script>
 </head>
-<body class="bs-docs-home">
-    <!--[if lt IE 7]>
-        <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
-    <![endif]-->
-    <a class="sr-only" href="#content">Skip to main content</a>
-
+<body>
 	<!-- Docs master nav -->    
-	<header class="navbar navbar-static-top navbar-inverse bs-docs-nav" id="top" role="banner">
+	<header class="navbar navbar-static-top navbar-inverse" id="top" role="banner">
 	    <div class="container">
 	        <div class="navbar-header">
-	            <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".bs-navbar-collapse">
-			        <span class="sr-only">Toggle navigation</span>
-			        <span class="icon-bar"></span>
-			        <span class="icon-bar"></span>
-			        <span class="icon-bar"></span>
-	            </button>
 	            <a href="../" class="navbar-brand">Neurosynth.org (beta)</a>
 	        </div>
-	        <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
+	        <nav class="collapse navbar-collapse" role="navigation">
 		        <ul class="nav navbar-nav">
 					<li class=""><a href="/">Home</a></li>
                     <li class="dropdown">
@@ -93,42 +82,41 @@
         <div id="content">
             {% block content %}{% endblock %}
         </div>
-        <hr class="top-space40">
         <div class="row" id="footer">
-            <div class="col-md-12">
-                <div class="row footer-buttons">
-                <div class="col-md-12">
-                <iframe src="http://ghbtns.com/github-btn.html?user=neurosynth&repo=neurosynth&type=fork&count=true" allowtransparency="true" frameborder="0" scrolling="0" width="90" height="20"></iframe><iframe src="http://ghbtns.com/github-btn.html?user=neurosynth&repo=neurosynth&type=watch&count=true" allowtransparency="true" frameborder="0" scrolling="0" width="90" height="20"></iframe>
-                <a href="https://twitter.com/share" class="twitter-share-button" data-url="http://neurosynth.org" data-via="neurosynth">Tweet</a>
-<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
-<a href="https://twitter.com/neurosynth" class="twitter-follow-button" data-show-count="true">Follow @neurosynth</a>
-<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
-                </div></div>
+            <div class="col-md-10">
+                <hr class="top-space40">
+                <div class="row">
+                    <div class="col-md-7 col-md-offset-2">
+                        <iframe src="http://ghbtns.com/github-btn.html?user=neurosynth&repo=neurosynth&type=fork&count=true" allowtransparency="true" frameborder="0" scrolling="0" width="90" height="20"></iframe><iframe src="http://ghbtns.com/github-btn.html?user=neurosynth&repo=neurosynth&type=watch&count=true" allowtransparency="true" frameborder="0" scrolling="0" width="90" height="20"></iframe>
+                        <a href="https://twitter.com/share" class="twitter-share-button" data-url="http://neurosynth.org" data-via="neurosynth">Tweet</a>
+                        <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+                        <a href="https://twitter.com/neurosynth" class="twitter-follow-button" data-show-count="true">Follow @neurosynth</a>
+                        <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+                    </div>
+                </div>
                 <div class="row footer-info">
-                <div class="col-md-3 col-md-offset-4" style="padding-top: 20px;">Created and maintained by <a href="http://talyarkoni.org">Tal Yarkoni</a><br />Supported by NIH award R01MH096906<br />
-                </div>
-                <div class="col-md-2 support">
-                <img src="{{ url_for('static', filename='images/nimh-logo.png')}}" width="100px">
-                </div>
+                    <div class="col-md-4 col-md-offset-3" style="padding-top: 20px;">Created and maintained by <a href="http://talyarkoni.org">Tal Yarkoni</a><br />Supported by NIH award R01MH096906<br />
+                    </div>
+                    <div class="col-md-2 support">
+                        <a href="http://nimh.nih.gov"><img src="{{ url_for('static', filename='images/nimh-logo.png')}}" width="100px"></a>
+                    </div>
                 </div>
                 <div class="row footer-links">
-                <div class="col-md-6 col-md-offset-3">
-                <ul>
-      <li><a href="https://github.com/neurosynth/neurosynth">GitHub</a></li>
-<!--       <li>&middot;</li>
-      <li><a href="/about">About</a></li> -->
-      <li>&middot;</li>
-      <li><a href="/faq">FAQ</a></li>
-      <li>&middot;</li>
-      <li><a href="http://neurovault.org">NeuroVault</a></li>
-      <li>&middot;</li>
-      <li><a href="https://groups.google.com/d/forum/neurosynthlist">Mailing list</a></li>
-    </ul></div></div>
+                    <div class="col-md-6 col-md-offset-3">
+                    <ul>
+                        <li><a href="https://github.com/neurosynth/neurosynth">GitHub</a></li>
+                        <li>&middot;</li>
+                        <li><a href="/faq">FAQ</a></li>
+                        <li>&middot;</li>
+                        <li><a href="http://neurovault.org">NeuroVault</a></li>
+                        <li>&middot;</li>
+                        <li><a href="https://groups.google.com/d/forum/neurosynthlist">Mailing list</a></li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
     <div class="top-space40"></div>
-    </div>
 
     
     {% assets "js" -%}

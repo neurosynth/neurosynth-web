@@ -17,7 +17,7 @@ def main():
         studies=os.path.join(settings.ASSET_DIR, 'studies.txt'),
         features=os.path.join(settings.ASSET_DIR, 'features.txt'),
         # reset_db=True, reset_dataset=True)
-        reset_db=True, reset_dataset=False)
+        reset_db=False, reset_dataset=False)
 
 
     print "Adding analyses..."
@@ -26,52 +26,33 @@ def main():
                     'attention', 'sensory']
     else:
         analyses = None
-    
-    builder.add_analyses(analyses=analyses, add_images=True)
+
+    builder.add_term_analyses(analyses=analyses, add_images=True, reset=True)
 
     print "Adding studies..."
     if settings.PROTOTYPE:
-        builder.add_studies(analyses=analyses, limit=1000)
+        builder.add_studies(analyses=analyses, limit=500)
     else:
         builder.add_studies(analyses=analyses)
-    
+
     print "Adding feature-based meta-analysis images..."
     builder.generate_analysis_images(
         analyses=analyses, add_to_db=False, overwrite=True)
 
-    # print "Adding location-based coactivation images..."
-    # builder.generate_location_images(min_studies=500, add_to_db=True)
-    # builder.add_location_images('/data/neurosynth/data/locations/images', reset=True)
+    print "Adding topic sets..."
+    builder.add_topics(generate_images=True, add_images=True, top_n=40)
 
-    # print "Generating location analysis data..."
-    # builder.generate_location_analyses()
+    print "Adding cognitive atlas information for available terms..."
+    builder.add_cognitive_atlas_nodes()
 
-    # print "Save decoding data for rapid analysis..."
-    analyses = ['working memory', 'visual', 'cognitive control', 'perception', 'sensory'
-        'motor', 'social', 'language', 'learning', 'semantic', 'recognition', 'words',
-        'number', 'emotion', 'hand', 'encoding', 'retrieval', 'faces', 'object',
-        'attention', 'verbal', 'somatosensory', 'reward', 'decision making', 'cues', 'executive',
-        'sensorimotor', 'risk', 'action', 'pictures', 'body', 'pain', 'emotion regulation',
-        'reading', 'episodic', 'monitoring', 'depression', 'motion', 'error', 'rest', 
-        'default mode', 'comprehension', 'execution', 'evaluation', 'sex', 'phonological',
-        'anxiety', 'ratings', 'judgments', 'alzheimer', 'category', 'interference', 'person',
-        'sentences', 'stress', 'imagery', 'response inhibition', 'spatial', 'personality', 'sounds',
-        'visuospatial', 'awareness', 'placebo', 'sequence', 'biological', 'associative',
-        'repetition', 'arousal', 'switching', 'mirror', 'anticipation', 'drug', 'planning',
-        'listening', 'salience', 'color', 'motor control', 'strategy', 'tactile', 'fear', 'recall',
-        'autism', 'priming', 'stroop', 'social cognition', 'happy', 'timing', 'identity', 'iq',
-        'parkinson', 'spatial attention', 'music', 'self', 'auditory', 'speech production',
-        'speech perception']
-
-    builder.generate_decoding_data(analyses)
+    print "Memory-mapping key image sets..."
+    builder.memory_map_images(include=['terms'], reset=True)
 
     print "Adding genes..."
-    # builder.add_genes()
+    builder.add_genes()
 
-    print "Adding topic sets..."
-    builder.add_topics()
+    builder.memory_map_images(include=['terms', 'topics', 'genes'])
 
 
 if __name__ == '__main__':
     main()
-

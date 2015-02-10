@@ -30,7 +30,6 @@ def get_tables(val):
                 }
             }
         tables[p.table]['data']['peaks'].append({"x": p.x,"y":p.y,"z":p.z})
-    # print [[t['name'], t['colorPalette']] for t in tables.values()]
     return jsonify(data=tables.values())
 
 add_blueprint(bp)

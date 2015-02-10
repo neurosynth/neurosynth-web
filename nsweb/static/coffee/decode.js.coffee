@@ -6,13 +6,10 @@ $(document).ready ->
 
   if $('#page-decode-show').length or $('#page-genes-show').length
 
-    controller = if $('#page-decode-show').length then 'decode' else 'genes'
-    console.log(controller)
-
     loadImages()
 
     tbl = $('#decoding_results_table').DataTable()
-    tbl.ajax.url('/' + controller + '/' + image_id + '/data').load()
+    tbl.ajax.url('/decode/' + image_id + '/data').load()
 
     last_row_selected = null
     $('#decoding_results_table').on('click', 'button', (e) =>
@@ -29,7 +26,7 @@ $(document).ready ->
       )
       # Load scatterplot
       $('#loading-message').show()
-      $('#scatterplot').html('<img src="/' + controller + '/' + image_id + '/scatter/' + analysis + '.png" width="500px" style="display:none;">')
+      $('#scatterplot').html('<img src="/decode/' + image_id + '/scatter/' + analysis + '.png" width="500px" style="display:none;">')
       $('#scatterplot>img').load( ->
         $('#scatterplot>img').show()
         $('#loading-message').hide()

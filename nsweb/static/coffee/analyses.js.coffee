@@ -3,20 +3,20 @@ $(document).ready ->
 
   return if not $('#page-analysis').length
 
-  createDataTable('#term-analyses-table', '/api/terms', true)
-  createDataTable('#topic-set-list-table', '/api/topics', true)
-  createDataTable('#analysis-studies-table', null, false, 25, columns)
-  createDataTable('#analysis-similarity-table')
-
-  if topic_set?
-    createDataTable('#topic-set-table', '/api/topics/' + topic_set)
-
+  # Initialize DataTables
+  createDataTable('#term-analyses-table', {ajax: '/api/terms', serverSide: true})
+  createDataTable('#topic-set-list-table', {ajax: '/api/topics', serverSide: true})
   columns = [
     { width: '40%' }
     { width: '38%' }
     { width: '15%' }
     { width: '7%' }
   ]
+  createDataTable('#analysis-studies-table', {columns: columns})
+  createDataTable('#analysis-similarity-table')
+
+  if topic_set?
+    createDataTable('#topic-set-table', {ajax: '/api/topics/' + topic_set})
 
 
   # autocomplete
@@ -65,7 +65,7 @@ $(document).ready ->
   if analysis?
     loadAnalysisStudies()
     loadAnalysisImages()
-    loadAnalysisSimilarity()
+    # loadAnalysisSimilarity()
 
 
   # Update cookie to reflect last tab user was on
