@@ -9,9 +9,9 @@
     <title>{% block title %}{{ page_title|default(('Neurosynth')) }}{% endblock %}</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    {% assets "css" -%}
+    {% assets "css" %}
       <link rel="stylesheet" href="{{ ASSET_URL }}">
-    {%- endassets %}
+    {% endassets %}
     {% block css_style %}
     {% endblock %}
     <script>
@@ -116,10 +116,11 @@
             </div>
         </div>
     </div>
+    </div>
     <div class="top-space40"></div>
 
     
-    {% assets "js" -%}
+    {% assets "js" %}
       <script src="{{ ASSET_URL }}"></script>
     {% endassets %}
 </body>
