@@ -1,7 +1,11 @@
 - macro analysis_studies_table(title, elem_id='analysis-studies-table')
     #studies.tab-pane
       h3 Studies associated with {{title}}
-      table.table-striped.table-hover.table.table-condensed id='{{elem_id}}'
+      button.bt.btn-primary#select-all-btn Select all studies on this page
+      button.bt.btn-primary#deselect-all-btn Deselect all studies on this page
+      br
+      br
+      table.table-striped.table-hover.table.table-condensed.selectable-table id='{{elem_id}}'
         thead
           tr
             th Title
