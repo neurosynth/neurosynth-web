@@ -2,6 +2,7 @@ from nsweb.core import db
 from sqlalchemy.ext.associationproxy import association_proxy
 import datetime
 from nsweb.models.users import User
+from nsweb.models.studies import Study
 from nsweb.models.frequencies import Frequency
 
 
@@ -19,7 +20,7 @@ class Analysis(db.Model):
     __tablename__ = 'analysis'
     id = db.Column(db.Integer, primary_key=True)
     analysis_set_id = db.Column(db.Integer, db.ForeignKey(AnalysisSet.id))
-    name = db.Column(db.String(100) ,unique=False)
+    name = db.Column(db.String(100), unique=False)
     n_studies = db.Column(db.Integer, default=0)
     n_activations = db.Column(db.Integer, default=0)
     description = db.Column(db.Text)
@@ -84,3 +85,5 @@ class CustomAnalysis(Analysis):
     __mapper_args__ = {
         'polymorphic_identity': 'custom'
     }
+
+
