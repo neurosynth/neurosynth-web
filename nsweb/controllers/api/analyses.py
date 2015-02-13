@@ -1,6 +1,13 @@
 from nsweb.controllers.api import bp
 from flask import request, jsonify, url_for
-from nsweb.models.analyses import TermAnalysis, AnalysisSet, TopicAnalysis
+from nsweb.models.analyses import TermAnalysis, AnalysisSet, TopicAnalysis, CustomAnalysis
+from nsweb.models.studies import Study
+from nsweb.models.frequencies import Frequency
+from nsweb.core import db
+from flask.ext.login import current_user
+from flask.ext.user import login_required
+import json
+import uuid
 
 @bp.route('/terms/')
 def list_terms():
@@ -77,3 +84,82 @@ def analyses_api(val):
               ] for f in data.frequencies]
     data = jsonify(aaData=data)
     return data
+
+
+@bp.route('/custom/save/', methods=['POST', 'GET'])
+@login_required
+def save_custom_analysis():
+    """
+    Expects a JSON object called 'data' with the following schema:
+        'uuid': (optional) uuid of existing to save the object to
+        'studies': List of PMIDs
+    :return:
+    """
+    data = json.loads(request.form['data'])
+    pmids = (int(x) for x in data['studies'])
+
+    # Verify that all requested pmids are in the database
+    for pmid in pmids:
+        study = Study.query.filter_by(pmid=pmid).first()
+        if not study:
+            return jsonify(dict(result='error', error='Invalid PMID: %s' % pmid))
+
+    if 'uuid' in data:
+        custom_analysis = CustomAnalysis.query.filter_by(uuid=uuid).first()
+        if not custom_analysis:
+            return jsonify(dict(result='error', error='No matching analysis found.'))
+    else:
+        # create new custom analysis
+        u = unicode(uuid.uuid4())[:18]
+        custom_analysis = CustomAnalysis(uuid=u, user_id=current_user.id)
+        db.session.add(custom_analysis)
+        db.session.commit()
+
+    for pmid in pmids:
+        freq = Frequency(analysis_id=custom_analysis.id, pmid=pmid)
+        db.session.add(freq)
+        db.session.commit
+
+    return jsonify(dict(result='success', uuid=u))
+
+@bp.route('/custom/get/<string:uuid>/', methods=['GET'])
+def get_custom_analysis(uuid):
+    """
+    Given a uuid return JSON blob representing the custom analysis information
+    and a list of its associated studies
+
+    We're assuming that the user doesn't have to be logged in and that anyone
+    can access the analysis if they know its uuid. This makes it easy for users to
+    share links to their cusotm analyses.
+    """
+    return jsonify(dict(result='not implemented'))
+
+
+@bp.route('/custom/run/<string:uuid>/', methods=['POST'])
+def run_custom_analysis(uuid):
+    """
+    Given a uuid, kick off the analysis run and redirect the user to the results page once
+    the analysis is complete.
+    """
+    return jsonify(dict(result='not implemented'))
+
+
+@bp.route('/custom/copy/<string:uuid>/', methods=['POST'])
+def copy_custom_analysis(uuid):
+    """
+    Given a uuid of an existing analysis, create a clone of the analysis with a new uuid
+    :param uuid:
+    :return: JSON blob including the new uuid
+    """
+    return jsonify(dict(result='not implemented'))
+
+
+@bp.route('/custom/<string:uuid>/', methods=['DELETE'])
+def delete_custom_analysis(uuid):
+    """
+    Given a uuid of an existing analysis, delete it.
+
+    :param uuid:
+    :return:
+    """
+    return jsonify(dict(result='not implemented'))
