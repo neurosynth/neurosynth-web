@@ -1,6 +1,6 @@
 from nsweb.controllers.api import bp
 from flask import request, jsonify, url_for, abort
-from nsweb.models.analyses import TermAnalysis, AnalysisSet, TopicAnalysis, CustomAnalysis
+from nsweb.models.analyses import TermAnalysis, AnalysisSet, TopicAnalysis, CustomAnalysis, Analysis
 from nsweb.models.studies import Study
 from nsweb.models.frequencies import Frequency
 from nsweb.core import db
@@ -129,7 +129,7 @@ def save_custom_analysis():
 
     return jsonify(dict(result='success', uuid=uid))
 
-@bp.route('/custom/get/<string:uid>/', methods=['GET'])
+@bp.route('/custom/<string:uid>/', methods=['GET'])
 def get_custom_analysis(uid):
     """
     Given a uuid return JSON blob representing the custom analysis information
@@ -157,16 +157,32 @@ def run_custom_analysis(uid):
 
 
 @bp.route('/custom/copy/<string:uid>/', methods=['POST'])
+@login_required
 def copy_custom_analysis(uid):
     """
     Given a uuid of an existing analysis, create a clone of the analysis with a new uuid
     :param uuid:
     :return: JSON blob including the new uuid
     """
-    return jsonify(dict(result='not implemented'))
+    custom = CustomAnalysis.query.filter_by(uuid=uid).first()
+    if not custom:
+        abort(404)
+
+    uid = unicode(uuid.uuid4())[:18]
+    new_custom = CustomAnalysis(uuid=uid, user_id=current_user.id, name=custom.name)
+    db.session.add(new_custom)
+    db.session.commit()
+
+    for freq in custom.frequencies.all():
+        new_freq = Frequency(analysis_id=new_custom.id, pmid=freq.pmid)
+        db.session.add(new_freq)
+    db.session.commit()
+
+    response = dict(uuid=uid, result="success")
+    return jsonify(response)
 
 
-@bp.route('/custom/<string:uuid>/', methods=['DELETE'])
+@bp.route('/custom/<string:uid>/', methods=['DELETE'])
 @login_required
 def delete_custom_analysis(uid):
     """
@@ -175,4 +191,11 @@ def delete_custom_analysis(uid):
     :param uuid:
     :return:
     """
-    return jsonify(dict(result='not implemented'))
+    custom = CustomAnalysis.query.filter_by(uuid=uid).first()
+    if not custom:
+        abort(404)
+    if custom.user_id != current_user.id:
+        abort(403)
+    db.session.delete(custom)  # TODO: instead of deleting, consider setting a deleted flag instead
+    db.session.commit()
+    return jsonify(dict(result='success'))
