@@ -1,5 +1,5 @@
 from nsweb.controllers.api import bp
-from flask import request, jsonify, url_for
+from flask import request, jsonify, url_for, abort
 from nsweb.models.analyses import TermAnalysis, AnalysisSet, TopicAnalysis, CustomAnalysis
 from nsweb.models.studies import Study
 from nsweb.models.frequencies import Frequency
@@ -91,12 +91,15 @@ def analyses_api(val):
 def save_custom_analysis():
     """
     Expects a JSON object called 'data' with the following schema:
-        'uuid': (optional) uuid of existing to save the object to
+        'uuid': (optional) uuid of existing analysis to update
+        'name': (optional) name of analysis
         'studies': List of PMIDs
     :return:
     """
     data = json.loads(request.form['data'])
-    pmids = (int(x) for x in data['studies'])
+    name = data.get('name')
+    uid = data.get('uuid')
+    pmids = [int(x) for x in data['studies']]
 
     # Verify that all requested pmids are in the database
     for pmid in pmids:
@@ -104,26 +107,30 @@ def save_custom_analysis():
         if not study:
             return jsonify(dict(result='error', error='Invalid PMID: %s' % pmid))
 
-    if 'uuid' in data:
-        custom_analysis = CustomAnalysis.query.filter_by(uuid=uuid).first()
+    if uid:
+        custom_analysis = CustomAnalysis.query.filter_by(uuid=uid, user_id=current_user.id).first()
         if not custom_analysis:
             return jsonify(dict(result='error', error='No matching analysis found.'))
+        if name:
+            custom_analysis.name = name
     else:
         # create new custom analysis
-        u = unicode(uuid.uuid4())[:18]
-        custom_analysis = CustomAnalysis(uuid=u, user_id=current_user.id)
+        uid = unicode(uuid.uuid4())[:18]
+        custom_analysis = CustomAnalysis(uuid=uid, name=name, user_id=current_user.id)
         db.session.add(custom_analysis)
-        db.session.commit()
+    db.session.commit()
 
     for pmid in pmids:
-        freq = Frequency(analysis_id=custom_analysis.id, pmid=pmid)
-        db.session.add(freq)
-        db.session.commit
+        freq = Frequency.query.filter_by(analysis_id=custom_analysis.id, pmid=pmid).first()
+        if not freq:
+            freq = Frequency(analysis_id=custom_analysis.id, pmid=pmid)
+            db.session.add(freq)
+    db.session.commit()
 
-    return jsonify(dict(result='success', uuid=u))
+    return jsonify(dict(result='success', uuid=uid))
 
-@bp.route('/custom/get/<string:uuid>/', methods=['GET'])
-def get_custom_analysis(uuid):
+@bp.route('/custom/get/<string:uid>/', methods=['GET'])
+def get_custom_analysis(uid):
     """
     Given a uuid return JSON blob representing the custom analysis information
     and a list of its associated studies
@@ -132,11 +139,16 @@ def get_custom_analysis(uuid):
     can access the analysis if they know its uuid. This makes it easy for users to
     share links to their cusotm analyses.
     """
-    return jsonify(dict(result='not implemented'))
+    custom = CustomAnalysis.query.filter_by(uuid=uid).first()
+    if not custom:
+        abort(404)
+    freqs = Frequency.query.filter_by(analysis_id=custom.id)
+    response = dict(uuid=uid, name=custom.name, studies=[f.pmid for f in freqs])
+    return jsonify(response)
 
 
-@bp.route('/custom/run/<string:uuid>/', methods=['POST'])
-def run_custom_analysis(uuid):
+@bp.route('/custom/run/<string:uid>/', methods=['POST'])
+def run_custom_analysis(uid):
     """
     Given a uuid, kick off the analysis run and redirect the user to the results page once
     the analysis is complete.
@@ -144,8 +156,8 @@ def run_custom_analysis(uuid):
     return jsonify(dict(result='not implemented'))
 
 
-@bp.route('/custom/copy/<string:uuid>/', methods=['POST'])
-def copy_custom_analysis(uuid):
+@bp.route('/custom/copy/<string:uid>/', methods=['POST'])
+def copy_custom_analysis(uid):
     """
     Given a uuid of an existing analysis, create a clone of the analysis with a new uuid
     :param uuid:
@@ -155,7 +167,8 @@ def copy_custom_analysis(uuid):
 
 
 @bp.route('/custom/<string:uuid>/', methods=['DELETE'])
-def delete_custom_analysis(uuid):
+@login_required
+def delete_custom_analysis(uid):
     """
     Given a uuid of an existing analysis, delete it.
 
