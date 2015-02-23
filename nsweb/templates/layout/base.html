@@ -37,6 +37,8 @@
                             <li><a href="{{url_for('analyses.list_terms')}}">Terms</a></li>
                             <li class="divider"></li>
                             <li><a href="{{url_for('analyses.list_topic_sets')}}">Topics</a></li>
+                            <li class="divider"></li>
+                            <li><a href="{{url_for('analyses.custom_analyses')}}">Custom</a></li>
                         </ul>
                     </li>
 					<!-- <li class=""><a href="/analyses/">Analyses</a></li> -->
@@ -119,7 +121,7 @@
     </div>
     <div class="top-space40"></div>
 
-    
+{#    <script src="http://fb.me/react-0.12.2.js"></script>#}
     {% assets "js" %}
       <script src="{{ ASSET_URL }}"></script>
     {% endassets %}

@@ -86,4 +86,7 @@ class CustomAnalysis(Analysis):
         'polymorphic_identity': 'custom'
     }
 
+    def serialize(self):
+        return dict(uuid=self.uuid, name=self.name, studies=[f.pmid for f in self.studies])
+
 

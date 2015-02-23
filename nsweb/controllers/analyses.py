@@ -119,5 +119,8 @@ def show_analysis(id):
         return redirect(url_for('analyses.show_topic', number=analysis.number,
                                 topic_set=analysis.analysis_set.name))
 
+@bp.route('/custom/')
+def custom_analyses():
+    return render_template('analyses/custom/index.html.slim')
 
 add_blueprint(bp)

@@ -85,6 +85,8 @@ def analyses_api(val):
     data = jsonify(aaData=data)
     return data
 
+def serialize_custom_analysis():
+    pass
 
 @bp.route('/custom/save/', methods=['POST', 'GET'])
 @login_required
@@ -139,13 +141,25 @@ def get_custom_analysis(uid):
     can access the analysis if they know its uuid. This makes it easy for users to
     share links to their cusotm analyses.
     """
+    print "hello"
     custom = CustomAnalysis.query.filter_by(uuid=uid).first()
     if not custom:
         abort(404)
-    freqs = Frequency.query.filter_by(analysis_id=custom.id)
-    response = dict(uuid=uid, name=custom.name, studies=[f.pmid for f in freqs])
-    return jsonify(response)
+    # response = custom.serialize()
+    # freqs = Frequency.query.filter_by(analysis_id=custom.id)
+    # response = dict(uuid=uid, name=custom.name, studies=[f.pmid for f in freqs])
+    return jsonify(custom.serialize())
 
+@bp.route('/custom/all/', methods=['GET'])
+@login_required
+def get_custom_analyses():
+    """
+    :return: All stored custom analyses for the requesting user
+    """
+    response = {
+        'analyses': [custom.serialize() for custom in CustomAnalysis.query.filter_by(user_id=current_user.id)]
+    }
+    return jsonify(response)
 
 @bp.route('/custom/run/<string:uid>/', methods=['POST'])
 def run_custom_analysis(uid):

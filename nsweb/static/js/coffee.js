@@ -1,4 +1,4 @@
-var NSCookie, Scatter, createDataTable, load_reverse_inference_image, make_scatterplot, runif, textToHTML, urlToParams,
+var AnalysisList, AnalysisListItem, NSCookie, Scatter, SelectedAnalysis, a, button, ce, createDataTable, div, form, h1, h2, h5, hr, input, li, load_reverse_inference_image, make_scatterplot, p, runif, span, textToHTML, ul, urlToParams, _ref,
   __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
 NSCookie = (function() {
@@ -799,3 +799,79 @@ $(document).ready(function() {
     return loadImages(result.data.slice(1, 2));
   });
 });
+
+_ref = React.DOM, div = _ref.div, ul = _ref.ul, li = _ref.li, a = _ref.a, p = _ref.p, h1 = _ref.h1, h2 = _ref.h2, h5 = _ref.h5, span = _ref.span, form = _ref.form, input = _ref.input, button = _ref.button, hr = _ref.hr;
+
+ce = React.createElement;
+
+AnalysisListItem = React.createClass({
+  loadHandler: function() {
+    return console.log('Load button clicked');
+  },
+  render: function() {
+    console.log('Rendering list item');
+    return div({}, ul({
+      className: 'list-unstyled'
+    }, li({}, "uuid: " + this.props.uuid), li({}, "name: " + this.props.name)), button({
+      className: 'btn btn-primary btn-sm',
+      onClick: this.loadHandler
+    }, 'Load'), button({
+      className: 'btn btn-info btn-sm'
+    }, 'Copy'), button({
+      className: 'btn btn-danger btn-sm'
+    }, 'Delete'), hr({}));
+  }
+});
+
+AnalysisList = React.createClass({
+  refresh: function() {
+    console.log('Refreshing...');
+    return $.ajax({
+      dataType: 'json',
+      type: 'GET',
+      url: this.props.url,
+      success: (function(_this) {
+        return function(data) {
+          return _this.setState({
+            analyses: data.analyses
+          });
+        };
+      })(this),
+      error: (function(_this) {
+        return function(xhr, status, err) {
+          return console.error(_this.props.url, status, err.toString());
+        };
+      })(this)
+    });
+  },
+  componentDidMount: function() {
+    return this.refresh();
+  },
+  getInitialState: function() {
+    return {
+      analyses: []
+    };
+  },
+  render: function() {
+    console.log('Rendering....');
+    return div({
+      className: 'analysis-list'
+    }, this.state.analyses.map(function(analysis) {
+      return ce(AnalysisListItem, {
+        key: analysis.uuid,
+        uuid: analysis.uuid,
+        name: analysis.name
+      });
+    }));
+  }
+});
+
+SelectedAnalysis = React.createClass({
+  render: function() {
+    return this.props.studies;
+  }
+});
+
+React.render(ce(AnalysisList, {
+  url: '/api/custom/all/'
+}), document.getElementById('custom-list-container'));
