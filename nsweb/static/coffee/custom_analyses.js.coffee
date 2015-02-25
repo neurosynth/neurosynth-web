@@ -1,4 +1,4 @@
-{div, ul, li, a, p, h1, h2, h5, span, form, input, button, hr} = React.DOM
+{div, br, ul, li, a, p, h1, h2, h4, h5, span, form, input, button, hr} = React.DOM
 ce = React.createElement
 
 app =
@@ -21,14 +21,13 @@ app =
       type: 'DELETE'
       url: @props.deleteURL + uuid.toString() + '/'
       success: (response) =>
-        console.log 'Delete request successful'
-        console.log response
         @fetchAll()
 
-  saveActiveAnalysis: ->
+  saveActiveAnalysis: (name) ->
+    @state.activeAnalysis.name = name
     data =
       studies: @state.activeAnalysis.studies
-      name: 'Bueno'
+      name: name
       uuid: @state.activeAnalysis.uuid
     $.ajax
       dataType: 'json'
@@ -37,12 +36,9 @@ app =
         data: JSON.stringify(data)
       url: @props.saveURL
       success: (data) =>
-        console.log 'Save successful'
-        console.log data
         @state.activeAnalysis.uuid = data.uuid
         saveToLocalStorage('ns-uuid', data.uuid)
-        @render()
-    @render()
+        @fetchAll()
 
   fetchAll: ->
     $.ajax
@@ -61,18 +57,23 @@ app =
     If so, create a new analysis
     ###
     studies = getFromLocalStorage('ns-selection')
+    uuid = getFromLocalStorage('ns-uuid')
     if studies
       studies = Object.keys(studies)
     else
       studies = []
-    @state.activeAnalysis =
-      studies: studies
-      uuid: getFromLocalStorage('ns-uuid')
-#      studies: Object.keys(getSelectedStudies())
+
+    @state.activeAnalysis = {}
+    if uuid
+      @state.activeAnalysis =
+        studies: studies
+        uuid: getFromLocalStorage('ns-uuid')
+
     @fetchAll()
 
   render: ->
-    React.render(ce(AnalysisList, {analyses:@state.analyses}), document.getElementById('custom-list-container'))
+    React.render ce(AnalysisList, {analyses:@state.analyses, selected_uuid:@state.activeAnalysis.uuid}),
+      document.getElementById('custom-list-container')
     React.render(ce(ActiveAnalysis, {analysis: @state.activeAnalysis}), document.getElementById('active-analysis-container'))
 
 AnalysisListItem = React.createClass
@@ -83,7 +84,7 @@ AnalysisListItem = React.createClass
     app.deleteAnalysis(@props.uuid)
 
   render: ->
-    div {},
+    div {className: "#{ if @props.selected then 'bg-info' else ''}"},
       ul {className:'list-unstyled'},
         li {}, "uuid: #{ @props.uuid }"
         li {}, "name: #{ @props.name }"
@@ -94,25 +95,39 @@ AnalysisListItem = React.createClass
 
 AnalysisList = React.createClass
   render: ->
-    div {className:'analysis-list'},
-      @props.analyses.map (analysis) ->
-        ce AnalysisListItem, {key: analysis.uuid, uuid: analysis.uuid, name:analysis.name}
+    div {className:'custom-analysis-list'},
+      h4 {}, "Your saved custom analyses (#{ @props.analyses.length })"
+      hr {}, ''
+      @props.analyses.map (analysis) =>
+        selected = if @props.selected_uuid is analysis.uuid then true else false
+        ce AnalysisListItem, {key: analysis.uuid, uuid: analysis.uuid, name:analysis.name, selected: selected}
 
 
 ActiveAnalysis = React.createClass
-  save: -> app.saveActiveAnalysis()
+  save: ->
+    app.saveActiveAnalysis @refs.name.getDOMNode().value
 
   render: ->
     uuid = @props.analysis.uuid
     studies = @props.analysis.studies
+    if uuid # previously saved analysis
+      panel = div {},
+        h4 {}, @props.analysis.name
+        p {}, "uuid: #{ uuid }"
+    else # headless (without uuid) analysis only present in browser's local storage
+      panel = div {},
+        input {type: 'text', className: 'form-control', placeholder: 'Enter name for this analysis', ref: 'name'}
+        br {}, ''
+        button {className:'btn btn-primary', onClick: @save}, 'Save selection as new custom analysis'
     div {},
       div {className:'row'},
         div {className: 'col-md-4'},
           p {}, "#{ studies.length } studies selected"
-        div {className: 'col-md-8'},
-          if uuid? then p {}, "uuid: #{ uuid }" else button {className:'btn btn-default', onClick: @save}, 'Save selection as new custom analysis'
-        @props.analysis.studies.map (study) ->
-          p {}, study
+        div {className: 'col-md-8'}, panel
+      div {className:'row'},
+        div {className: 'col-md-12'},
+          @props.analysis.studies.map (study) ->
+            p {}, study
 
 #app.init()
 
@@ -125,6 +140,7 @@ getSelectedStudies = ->
 
 saveSelection = (selection) ->
   window.localStorage.setItem('ns-selection', JSON.stringify(selection))
+  window.localStorage.setItem('ns-uuid', null)
 
 saveToLocalStorage = (key, value) ->
   window.localStorage.setItem(key, JSON.stringify(value))

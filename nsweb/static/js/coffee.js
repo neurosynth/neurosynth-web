@@ -1,4 +1,4 @@
-var ActiveAnalysis, AnalysisList, AnalysisListItem, NSCookie, SELECTED, Scatter, a, app, button, ce, createDataTable, div, form, getFromLocalStorage, getPMID, getSelectedStudies, h1, h2, h5, hr, input, li, load_reverse_inference_image, make_scatterplot, p, runif, saveSelection, saveToLocalStorage, span, textToHTML, ul, urlToParams, _ref,
+var ActiveAnalysis, AnalysisList, AnalysisListItem, NSCookie, SELECTED, Scatter, a, app, br, button, ce, createDataTable, div, form, getFromLocalStorage, getPMID, getSelectedStudies, h1, h2, h4, h5, hr, input, li, load_reverse_inference_image, make_scatterplot, p, runif, saveSelection, saveToLocalStorage, span, textToHTML, ul, urlToParams, _ref,
   __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
 NSCookie = (function() {
@@ -734,7 +734,7 @@ $(document).ready(function() {
   });
 });
 
-_ref = React.DOM, div = _ref.div, ul = _ref.ul, li = _ref.li, a = _ref.a, p = _ref.p, h1 = _ref.h1, h2 = _ref.h2, h5 = _ref.h5, span = _ref.span, form = _ref.form, input = _ref.input, button = _ref.button, hr = _ref.hr;
+_ref = React.DOM, div = _ref.div, br = _ref.br, ul = _ref.ul, li = _ref.li, a = _ref.a, p = _ref.p, h1 = _ref.h1, h2 = _ref.h2, h4 = _ref.h4, h5 = _ref.h5, span = _ref.span, form = _ref.form, input = _ref.input, button = _ref.button, hr = _ref.hr;
 
 ce = React.createElement;
 
@@ -768,14 +768,15 @@ app = {
       })(this)
     });
   },
-  saveActiveAnalysis: function() {
+  saveActiveAnalysis: function(name) {
     var data;
+    this.state.activeAnalysis.name = name;
     data = {
       studies: this.state.activeAnalysis.studies,
-      name: 'Bueno',
+      name: name,
       uuid: this.state.activeAnalysis.uuid
     };
-    $.ajax({
+    return $.ajax({
       dataType: 'json',
       type: 'POST',
       data: {
@@ -788,11 +789,10 @@ app = {
           console.log(data);
           _this.state.activeAnalysis.uuid = data.uuid;
           saveToLocalStorage('ns-uuid', data.uuid);
-          return _this.render();
+          return _this.fetchAll();
         };
       })(this)
     });
-    return this.render();
   },
   fetchAll: function() {
     return $.ajax({
@@ -818,22 +818,27 @@ app = {
     See if there are any selected studies in localStorage.
     If so, create a new analysis
      */
-    var studies;
+    var studies, uuid;
     studies = getFromLocalStorage('ns-selection');
+    uuid = getFromLocalStorage('ns-uuid');
     if (studies) {
       studies = Object.keys(studies);
     } else {
       studies = [];
     }
-    this.state.activeAnalysis = {
-      studies: studies,
-      uuid: getFromLocalStorage('ns-uuid')
-    };
+    this.state.activeAnalysis = {};
+    if (uuid) {
+      this.state.activeAnalysis = {
+        studies: studies,
+        uuid: getFromLocalStorage('ns-uuid')
+      };
+    }
     return this.fetchAll();
   },
   render: function() {
     React.render(ce(AnalysisList, {
-      analyses: this.state.analyses
+      analyses: this.state.analyses,
+      selected_uuid: this.state.activeAnalysis.uuid
     }), document.getElementById('custom-list-container'));
     return React.render(ce(ActiveAnalysis, {
       analysis: this.state.activeAnalysis
@@ -849,7 +854,9 @@ AnalysisListItem = React.createClass({
     return app.deleteAnalysis(this.props.uuid);
   },
   render: function() {
-    return div({}, ul({
+    return div({
+      className: "" + (this.props.selected ? 'bg-info' : '')
+    }, ul({
       className: 'list-unstyled'
     }, li({}, "uuid: " + this.props.uuid), li({}, "name: " + this.props.name)), button({
       className: 'btn btn-primary btn-sm',
@@ -866,37 +873,56 @@ AnalysisListItem = React.createClass({
 AnalysisList = React.createClass({
   render: function() {
     return div({
-      className: 'analysis-list'
-    }, this.props.analyses.map(function(analysis) {
-      return ce(AnalysisListItem, {
-        key: analysis.uuid,
-        uuid: analysis.uuid,
-        name: analysis.name
-      });
-    }));
+      className: 'custom-analysis-list'
+    }, h4({}, "Your saved custom analyses (" + this.props.analyses.length + ")"), hr({}, ''), this.props.analyses.map((function(_this) {
+      return function(analysis) {
+        var selected;
+        selected = _this.props.selected_uuid === analysis.uuid ? true : false;
+        return ce(AnalysisListItem, {
+          key: analysis.uuid,
+          uuid: analysis.uuid,
+          name: analysis.name,
+          selected: selected
+        });
+      };
+    })(this)));
   }
 });
 
 ActiveAnalysis = React.createClass({
   save: function() {
-    return app.saveActiveAnalysis();
+    return app.saveActiveAnalysis(this.refs.name.getDOMNode().value);
   },
   render: function() {
-    var studies, uuid;
+    var panel, studies, uuid;
     uuid = this.props.analysis.uuid;
     studies = this.props.analysis.studies;
+    if (uuid) {
+      panel = div({}, h4({}, this.props.analysis.name), p({}, "uuid: " + uuid));
+    } else {
+      panel = div({}, input({
+        type: 'text',
+        className: 'form-control',
+        placeholder: 'Enter name for this analysis',
+        ref: 'name'
+      }), br({}, ''), button({
+        className: 'btn btn-primary',
+        onClick: this.save
+      }, 'Save selection as new custom analysis'));
+    }
     return div({}, div({
       className: 'row'
     }, div({
       className: 'col-md-4'
     }, p({}, "" + studies.length + " studies selected")), div({
       className: 'col-md-8'
-    }, uuid != null ? p({}, "uuid: " + uuid) : button({
-      className: 'btn btn-default',
-      onClick: this.save
-    }, 'Save selection as new custom analysis')), this.props.analysis.studies.map(function(study) {
+    }, panel)), div({
+      className: 'row'
+    }, div({
+      className: 'col-md-12'
+    }, this.props.analysis.studies.map(function(study) {
       return p({}, study);
-    })));
+    }))));
   }
 });
 
@@ -908,7 +934,8 @@ getSelectedStudies = function() {
 };
 
 saveSelection = function(selection) {
-  return window.localStorage.setItem('ns-selection', JSON.stringify(selection));
+  window.localStorage.setItem('ns-selection', JSON.stringify(selection));
+  return window.localStorage.setItem('ns-uuid', null);
 };
 
 saveToLocalStorage = function(key, value) {
