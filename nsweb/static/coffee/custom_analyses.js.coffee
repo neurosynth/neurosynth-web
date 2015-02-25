@@ -5,14 +5,25 @@ app =
   props:
     fetchAllURL: '/api/custom/all/'
     saveURL: '/api/custom/save/'
+    deleteURL: '/api/custom/'
 
   state: # All mutable app state must be contained here
     activeAnalysis: null
     analyses: []
 
   setActiveAnalysis: (uuid) ->
-    @state.activeAnalysis = uuid
+    @state.activeAnalysis = @state.analyses.filter((a) -> a.uuid is uuid)[0]
     @render()
+
+  deleteAnalysis: (uuid) ->
+    $.ajax
+      dataType: 'json'
+      type: 'DELETE'
+      url: @props.deleteURL + uuid.toString() + '/'
+      success: (response) =>
+        console.log 'Delete request successful'
+        console.log response
+        @fetchAll()
 
   saveActiveAnalysis: ->
     data =
@@ -66,7 +77,10 @@ app =
 
 AnalysisListItem = React.createClass
   loadHandler: ->
-    console.log 'Load button clicked'
+    app.setActiveAnalysis(@props.uuid)
+
+  deleteHandler: ->
+    app.deleteAnalysis(@props.uuid)
 
   render: ->
     div {},
@@ -75,7 +89,7 @@ AnalysisListItem = React.createClass
         li {}, "name: #{ @props.name }"
       button {className:'btn btn-primary btn-sm', onClick: @loadHandler}, 'Load'
       button {className: 'btn btn-info btn-sm'}, 'Copy'
-      button {className: 'btn btn-danger btn-sm'}, 'Delete'
+      button {className: 'btn btn-danger btn-sm', onClick: @deleteHandler}, 'Delete'
       hr {}
 
 AnalysisList = React.createClass

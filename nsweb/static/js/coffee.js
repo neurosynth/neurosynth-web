@@ -741,15 +741,32 @@ ce = React.createElement;
 app = {
   props: {
     fetchAllURL: '/api/custom/all/',
-    saveURL: '/api/custom/save/'
+    saveURL: '/api/custom/save/',
+    deleteURL: '/api/custom/'
   },
   state: {
     activeAnalysis: null,
     analyses: []
   },
   setActiveAnalysis: function(uuid) {
-    this.state.activeAnalysis = uuid;
+    this.state.activeAnalysis = this.state.analyses.filter(function(a) {
+      return a.uuid === uuid;
+    })[0];
     return this.render();
+  },
+  deleteAnalysis: function(uuid) {
+    return $.ajax({
+      dataType: 'json',
+      type: 'DELETE',
+      url: this.props.deleteURL + uuid.toString() + '/',
+      success: (function(_this) {
+        return function(response) {
+          console.log('Delete request successful');
+          console.log(response);
+          return _this.fetchAll();
+        };
+      })(this)
+    });
   },
   saveActiveAnalysis: function() {
     var data;
@@ -826,7 +843,10 @@ app = {
 
 AnalysisListItem = React.createClass({
   loadHandler: function() {
-    return console.log('Load button clicked');
+    return app.setActiveAnalysis(this.props.uuid);
+  },
+  deleteHandler: function() {
+    return app.deleteAnalysis(this.props.uuid);
   },
   render: function() {
     return div({}, ul({
@@ -837,7 +857,8 @@ AnalysisListItem = React.createClass({
     }, 'Load'), button({
       className: 'btn btn-info btn-sm'
     }, 'Copy'), button({
-      className: 'btn btn-danger btn-sm'
+      className: 'btn btn-danger btn-sm',
+      onClick: this.deleteHandler
     }, 'Delete'), hr({}));
   }
 });
