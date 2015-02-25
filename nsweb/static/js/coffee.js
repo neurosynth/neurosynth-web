@@ -1,4 +1,4 @@
-var AnalysisList, AnalysisListItem, NSCookie, Scatter, SelectedAnalysis, a, button, ce, createDataTable, div, form, h1, h2, h5, hr, input, li, load_reverse_inference_image, make_scatterplot, p, runif, span, textToHTML, ul, urlToParams, _ref,
+var ActiveAnalysis, AnalysisList, AnalysisListItem, NSCookie, SELECTED, Scatter, a, app, button, ce, createDataTable, div, form, getFromLocalStorage, getPMID, getSelectedStudies, h1, h2, h5, hr, input, li, load_reverse_inference_image, make_scatterplot, p, runif, saveSelection, saveToLocalStorage, span, textToHTML, ul, urlToParams, _ref,
   __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
 NSCookie = (function() {
@@ -388,7 +388,7 @@ make_scatterplot = function() {
 };
 
 $(document).ready(function() {
-  var SELECTED, getPMID, getSelection, redrawTableSelection, saveSelection, url, url_id;
+  var url, url_id;
   if (!$('.selectable-table').length) {
     return;
   }
@@ -414,7 +414,7 @@ $(document).ready(function() {
     ajax: '/api/studies/peaks/' + url_id + '/',
     order: [[0, 'asc'], [2, 'asc']]
   });
-  $('#study_peaks_table').on('click', 'tr', (function(_this) {
+  return $('#study_peaks_table').on('click', 'tr', (function(_this) {
     return function(e) {
       var data, i, row;
       row = $(e.target).closest('tr')[0];
@@ -432,72 +432,6 @@ $(document).ready(function() {
       return viewer.moveToAtlasCoords(data);
     };
   })(this));
-  SELECTED = 'info';
-  getSelection = function() {
-    var selection;
-    return selection = JSON.parse(window.localStorage.getItem('selection') || "{}");
-  };
-  saveSelection = function(selection) {
-    return window.localStorage.setItem('selection', JSON.stringify(selection));
-  };
-  getPMID = function(tr) {
-    var href;
-    href = $(tr).find('a').first().attr('href');
-    if (href == null) {
-      return null;
-    }
-    return /(\d+)/.exec(href)[0];
-  };
-  $('.selectable-table').on('click', 'tr', function() {
-    var pmid, selection;
-    pmid = getPMID(this);
-    selection = getSelection();
-    if (pmid in selection) {
-      delete selection[pmid];
-    } else {
-      selection[pmid] = 1;
-    }
-    saveSelection(selection);
-    return $(this).toggleClass(SELECTED);
-  });
-  redrawTableSelection = function() {
-    var selection;
-    selection = getSelection();
-    return $('tbody').find('tr').each(function() {
-      var pmid;
-      pmid = getPMID(this);
-      if (pmid in selection) {
-        return $(this).addClass(SELECTED);
-      } else {
-        return $(this).removeClass(SELECTED);
-      }
-    });
-  };
-  $('.selectable-table').on('draw.dt', function() {
-    return redrawTableSelection();
-  });
-  $('#select-all-btn').click(function() {
-    var selection;
-    selection = getSelection();
-    $('tbody').find('tr').each(function() {
-      var pmid;
-      pmid = getPMID(this);
-      return selection[pmid] = 1;
-    });
-    saveSelection(selection);
-    return redrawTableSelection();
-  });
-  return $('#deselect-all-btn').click(function() {
-    var selection;
-    selection = getSelection();
-    $('tbody').find('tr').each(function() {
-      var pmid;
-      pmid = getPMID(this);
-      return delete selection[pmid];
-    });
-    saveSelection(selection);
-    return redrawTableSelection();
-  });
 });
 
 $(document).ready(function() {
@@ -804,12 +738,97 @@ _ref = React.DOM, div = _ref.div, ul = _ref.ul, li = _ref.li, a = _ref.a, p = _r
 
 ce = React.createElement;
 
+app = {
+  props: {
+    fetchAllURL: '/api/custom/all/',
+    saveURL: '/api/custom/save/'
+  },
+  state: {
+    activeAnalysis: null,
+    analyses: []
+  },
+  setActiveAnalysis: function(uuid) {
+    this.state.activeAnalysis = uuid;
+    return this.render();
+  },
+  saveActiveAnalysis: function() {
+    var data;
+    data = {
+      studies: this.state.activeAnalysis.studies,
+      name: 'Bueno',
+      uuid: this.state.activeAnalysis.uuid
+    };
+    $.ajax({
+      dataType: 'json',
+      type: 'POST',
+      data: {
+        data: JSON.stringify(data)
+      },
+      url: this.props.saveURL,
+      success: (function(_this) {
+        return function(data) {
+          console.log('Save successful');
+          console.log(data);
+          _this.state.activeAnalysis.uuid = data.uuid;
+          saveToLocalStorage('ns-uuid', data.uuid);
+          return _this.render();
+        };
+      })(this)
+    });
+    return this.render();
+  },
+  fetchAll: function() {
+    return $.ajax({
+      dataType: 'json',
+      type: 'GET',
+      url: this.props.fetchAllURL,
+      success: (function(_this) {
+        return function(data) {
+          _this.state.analyses = data.analyses;
+          return _this.render();
+        };
+      })(this),
+      error: (function(_this) {
+        return function(xhr, status, err) {
+          return console.error(_this.props.url, status, err.toString());
+        };
+      })(this)
+    });
+  },
+  init: function() {
+
+    /*
+    See if there are any selected studies in localStorage.
+    If so, create a new analysis
+     */
+    var studies;
+    studies = getFromLocalStorage('ns-selection');
+    if (studies) {
+      studies = Object.keys(studies);
+    } else {
+      studies = [];
+    }
+    this.state.activeAnalysis = {
+      studies: studies,
+      uuid: getFromLocalStorage('ns-uuid')
+    };
+    return this.fetchAll();
+  },
+  render: function() {
+    React.render(ce(AnalysisList, {
+      analyses: this.state.analyses
+    }), document.getElementById('custom-list-container'));
+    return React.render(ce(ActiveAnalysis, {
+      analysis: this.state.activeAnalysis
+    }), document.getElementById('active-analysis-container'));
+  }
+};
+
 AnalysisListItem = React.createClass({
   loadHandler: function() {
     return console.log('Load button clicked');
   },
   render: function() {
-    console.log('Rendering list item');
     return div({}, ul({
       className: 'list-unstyled'
     }, li({}, "uuid: " + this.props.uuid), li({}, "name: " + this.props.name)), button({
@@ -824,39 +843,10 @@ AnalysisListItem = React.createClass({
 });
 
 AnalysisList = React.createClass({
-  refresh: function() {
-    console.log('Refreshing...');
-    return $.ajax({
-      dataType: 'json',
-      type: 'GET',
-      url: this.props.url,
-      success: (function(_this) {
-        return function(data) {
-          return _this.setState({
-            analyses: data.analyses
-          });
-        };
-      })(this),
-      error: (function(_this) {
-        return function(xhr, status, err) {
-          return console.error(_this.props.url, status, err.toString());
-        };
-      })(this)
-    });
-  },
-  componentDidMount: function() {
-    return this.refresh();
-  },
-  getInitialState: function() {
-    return {
-      analyses: []
-    };
-  },
   render: function() {
-    console.log('Rendering....');
     return div({
       className: 'analysis-list'
-    }, this.state.analyses.map(function(analysis) {
+    }, this.props.analyses.map(function(analysis) {
       return ce(AnalysisListItem, {
         key: analysis.uuid,
         uuid: analysis.uuid,
@@ -866,12 +856,114 @@ AnalysisList = React.createClass({
   }
 });
 
-SelectedAnalysis = React.createClass({
+ActiveAnalysis = React.createClass({
+  save: function() {
+    return app.saveActiveAnalysis();
+  },
   render: function() {
-    return this.props.studies;
+    var studies, uuid;
+    uuid = this.props.analysis.uuid;
+    studies = this.props.analysis.studies;
+    return div({}, div({
+      className: 'row'
+    }, div({
+      className: 'col-md-4'
+    }, p({}, "" + studies.length + " studies selected")), div({
+      className: 'col-md-8'
+    }, uuid != null ? p({}, "uuid: " + uuid) : button({
+      className: 'btn btn-default',
+      onClick: this.save
+    }, 'Save selection as new custom analysis')), this.props.analysis.studies.map(function(study) {
+      return p({}, study);
+    })));
   }
 });
 
-React.render(ce(AnalysisList, {
-  url: '/api/custom/all/'
-}), document.getElementById('custom-list-container'));
+SELECTED = 'info';
+
+getSelectedStudies = function() {
+  var selection;
+  return selection = JSON.parse(window.localStorage.getItem('ns-selection') || "{}");
+};
+
+saveSelection = function(selection) {
+  return window.localStorage.setItem('ns-selection', JSON.stringify(selection));
+};
+
+saveToLocalStorage = function(key, value) {
+  return window.localStorage.setItem(key, JSON.stringify(value));
+};
+
+getFromLocalStorage = function(key) {
+  var val;
+  val = window.localStorage.getItem(key);
+  if (val === null) {
+    return val;
+  } else {
+    return JSON.parse(val);
+  }
+};
+
+getPMID = function(tr) {
+  var href;
+  href = $(tr).find('a').first().attr('href');
+  if (href == null) {
+    return null;
+  }
+  return /(\d+)/.exec(href)[0];
+};
+
+$(document).ready(function() {
+  var redrawTableSelection;
+  $('.selectable-table').on('click', 'tr', function() {
+    var pmid, selection;
+    pmid = getPMID(this);
+    selection = getSelectedStudies();
+    if (pmid in selection) {
+      delete selection[pmid];
+    } else {
+      selection[pmid] = 1;
+    }
+    saveSelection(selection);
+    return $(this).toggleClass(SELECTED);
+  });
+  redrawTableSelection = function() {
+    var selection;
+    selection = getSelectedStudies();
+    return $('tbody').find('tr').each(function() {
+      var pmid;
+      pmid = getPMID(this);
+      if (pmid in selection) {
+        return $(this).addClass(SELECTED);
+      } else {
+        return $(this).removeClass(SELECTED);
+      }
+    });
+  };
+  $('.selectable-table').on('draw.dt', function() {
+    return redrawTableSelection();
+  });
+  $('#select-all-btn').click(function() {
+    var selection;
+    selection = getSelectedStudies();
+    $('tbody').find('tr').each(function() {
+      var pmid;
+      pmid = getPMID(this);
+      return selection[pmid] = 1;
+    });
+    saveSelection(selection);
+    return redrawTableSelection();
+  });
+  $('#deselect-all-btn').click(function() {
+    var selection;
+    selection = getSelectedStudies();
+    $('tbody').find('tr').each(function() {
+      var pmid;
+      pmid = getPMID(this);
+      return delete selection[pmid];
+    });
+    saveSelection(selection);
+    return redrawTableSelection();
+  });
+  return app.init();
+});

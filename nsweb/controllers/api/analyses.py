@@ -92,7 +92,8 @@ def serialize_custom_analysis():
 @login_required
 def save_custom_analysis():
     """
-    Expects a JSON object called 'data' with the following schema:
+    Expects a JSON string with the following schema:
+      'data':
         'uuid': (optional) uuid of existing analysis to update
         'name': (optional) name of analysis
         'studies': List of PMIDs
@@ -101,7 +102,8 @@ def save_custom_analysis():
     data = json.loads(request.form['data'])
     name = data.get('name')
     uid = data.get('uuid')
-    pmids = [int(x) for x in data['studies']]
+    studies = data.get('studies', [])
+    pmids = [int(x) for x in studies]
 
     # Verify that all requested pmids are in the database
     for pmid in pmids:
@@ -141,7 +143,6 @@ def get_custom_analysis(uid):
     can access the analysis if they know its uuid. This makes it easy for users to
     share links to their cusotm analyses.
     """
-    print "hello"
     custom = CustomAnalysis.query.filter_by(uuid=uid).first()
     if not custom:
         abort(404)
