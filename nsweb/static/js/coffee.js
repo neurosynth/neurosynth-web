@@ -761,8 +761,6 @@ app = {
       url: this.props.deleteURL + uuid.toString() + '/',
       success: (function(_this) {
         return function(response) {
-          console.log('Delete request successful');
-          console.log(response);
           return _this.fetchAll();
         };
       })(this)
@@ -785,8 +783,6 @@ app = {
       url: this.props.saveURL,
       success: (function(_this) {
         return function(data) {
-          console.log('Save successful');
-          console.log(data);
           _this.state.activeAnalysis.uuid = data.uuid;
           saveToLocalStorage('ns-uuid', data.uuid);
           return _this.fetchAll();
@@ -827,10 +823,10 @@ app = {
       studies = [];
     }
     this.state.activeAnalysis = {};
-    if (uuid) {
+    if (uuid === null) {
       this.state.activeAnalysis = {
         studies: studies,
-        uuid: getFromLocalStorage('ns-uuid')
+        uuid: uuid
       };
     }
     return this.fetchAll();
@@ -858,12 +854,12 @@ AnalysisListItem = React.createClass({
       className: "" + (this.props.selected ? 'bg-info' : '')
     }, ul({
       className: 'list-unstyled'
-    }, li({}, "uuid: " + this.props.uuid), li({}, "name: " + this.props.name)), button({
-      className: 'btn btn-primary btn-sm',
+    }, li({}, "Name: " + this.props.name), li({}, "uuid: " + this.props.uuid)), button({
+      className: "btn btn-primary btn-sm " + (this.props.selected ? 'hide' : ''),
       onClick: this.loadHandler
-    }, 'Load'), button({
+    }, 'Load'), span({}, ' '), button({
       className: 'btn btn-info btn-sm'
-    }, 'Copy'), button({
+    }, 'Copy'), span({}, ' '), button({
       className: 'btn btn-danger btn-sm',
       onClick: this.deleteHandler
     }, 'Delete'), hr({}));
@@ -903,7 +899,7 @@ ActiveAnalysis = React.createClass({
       panel = div({}, input({
         type: 'text',
         className: 'form-control',
-        placeholder: 'Enter name for this analysis',
+        placeholder: 'Enter a name for this analysis',
         ref: 'name'
       }), br({}, ''), button({
         className: 'btn btn-primary',

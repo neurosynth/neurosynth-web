@@ -64,10 +64,10 @@ app =
       studies = []
 
     @state.activeAnalysis = {}
-    if uuid
+    if uuid is null
       @state.activeAnalysis =
         studies: studies
-        uuid: getFromLocalStorage('ns-uuid')
+        uuid: uuid
 
     @fetchAll()
 
@@ -86,10 +86,12 @@ AnalysisListItem = React.createClass
   render: ->
     div {className: "#{ if @props.selected then 'bg-info' else ''}"},
       ul {className:'list-unstyled'},
+        li {}, "Name: #{ @props.name }"
         li {}, "uuid: #{ @props.uuid }"
-        li {}, "name: #{ @props.name }"
-      button {className:'btn btn-primary btn-sm', onClick: @loadHandler}, 'Load'
+      button {className:"btn btn-primary btn-sm #{ if @props.selected then 'hide' else ''}", onClick: @loadHandler}, 'Load'
+      span {}, ' '
       button {className: 'btn btn-info btn-sm'}, 'Copy'
+      span {}, ' '
       button {className: 'btn btn-danger btn-sm', onClick: @deleteHandler}, 'Delete'
       hr {}
 
@@ -116,7 +118,7 @@ ActiveAnalysis = React.createClass
         p {}, "uuid: #{ uuid }"
     else # headless (without uuid) analysis only present in browser's local storage
       panel = div {},
-        input {type: 'text', className: 'form-control', placeholder: 'Enter name for this analysis', ref: 'name'}
+        input {type: 'text', className: 'form-control', placeholder: 'Enter a name for this analysis', ref: 'name'}
         br {}, ''
         button {className:'btn btn-primary', onClick: @save}, 'Save selection as new custom analysis'
     div {},
