@@ -1,4 +1,4 @@
-{div, br, ul, li, a, p, h1, h2, h4, h5, span, form, input, button, hr} = React.DOM
+{div, br, ul, li, a, p, h1, h2, h4, h5, span, form, input, button, hr, table, thead, tr, th, td} = React.DOM
 ce = React.createElement
 
 app =
@@ -6,6 +6,7 @@ app =
     fetchAllURL: '/api/custom/all/'
     saveURL: '/api/custom/save/'
     deleteURL: '/api/custom/'
+    studiesTableURL: '/api/analyses/' # /api/analyses/<analysis id>/ (to be consumed by DataTable)
 
   state: # All mutable app state must be contained here
     activeAnalysis: null
@@ -128,10 +129,35 @@ ActiveAnalysis = React.createClass
         div {className: 'col-md-8'}, panel
       div {className:'row'},
         div {className: 'col-md-12'},
-          @props.analysis.studies.map (study) ->
-            p {}, study
+          ce StudiesTable, {analysis: @props.analysis}
+#          @props.analysis.studies.map (study) ->
+#            p {}, study
 
-#app.init()
+StudiesTable = React.createClass
+  componentDidMount: ->
+    $('#custom-studies-table').dataTable
+      pageLength: 10
+      serverSide: true
+      ajax: app.props.studiesTableURL + @props.analysis.id + '/'
+      order: [[1, 'desc']]
+
+  componentDidUpdate: ->
+    if not @props.analysis.id
+      return
+    url = app.props.studiesTableURL + @props.analysis.id + '/'
+    studyTable = $('#custom-studies-table').DataTable()
+    studyTable.ajax.url(url)
+    studyTable.ajax.reload()
+
+  render: ->
+    table {className:'table table-hover', id: 'custom-studies-table'},
+      thead {},
+        tr {},
+          th {}, 'Title '
+          th {}, 'Authors'
+          th {}, 'Journal'
+          th {}, 'Year'
+          th {}, 'PMID'
 
 SELECTED = 'info' # CSS class to apply to selected rows
 
