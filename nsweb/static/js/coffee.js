@@ -1,4 +1,4 @@
-var ActiveAnalysis, AnalysisList, AnalysisListItem, NSCookie, SELECTED, Scatter, a, app, br, button, ce, createDataTable, div, form, getFromLocalStorage, getPMID, getSelectedStudies, h1, h2, h4, h5, hr, input, li, load_reverse_inference_image, make_scatterplot, p, runif, saveSelection, saveToLocalStorage, span, textToHTML, ul, urlToParams, _ref,
+var ActiveAnalysis, AnalysisList, AnalysisListItem, NSCookie, SELECTED, Scatter, StudiesTable, a, app, br, button, ce, createDataTable, div, form, getFromLocalStorage, getPMID, getSelectedStudies, h1, h2, h4, h5, hr, input, li, load_reverse_inference_image, make_scatterplot, p, runif, saveSelection, saveToLocalStorage, span, table, td, textToHTML, th, thead, tr, ul, urlToParams, _ref,
   __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
 NSCookie = (function() {
@@ -734,7 +734,7 @@ $(document).ready(function() {
   });
 });
 
-_ref = React.DOM, div = _ref.div, br = _ref.br, ul = _ref.ul, li = _ref.li, a = _ref.a, p = _ref.p, h1 = _ref.h1, h2 = _ref.h2, h4 = _ref.h4, h5 = _ref.h5, span = _ref.span, form = _ref.form, input = _ref.input, button = _ref.button, hr = _ref.hr;
+_ref = React.DOM, div = _ref.div, br = _ref.br, ul = _ref.ul, li = _ref.li, a = _ref.a, p = _ref.p, h1 = _ref.h1, h2 = _ref.h2, h4 = _ref.h4, h5 = _ref.h5, span = _ref.span, form = _ref.form, input = _ref.input, button = _ref.button, hr = _ref.hr, table = _ref.table, thead = _ref.thead, tr = _ref.tr, th = _ref.th, td = _ref.td;
 
 ce = React.createElement;
 
@@ -742,7 +742,8 @@ app = {
   props: {
     fetchAllURL: '/api/custom/all/',
     saveURL: '/api/custom/save/',
-    deleteURL: '/api/custom/'
+    deleteURL: '/api/custom/',
+    studiesTableURL: '/api/analyses/'
   },
   state: {
     activeAnalysis: null,
@@ -916,9 +917,36 @@ ActiveAnalysis = React.createClass({
       className: 'row'
     }, div({
       className: 'col-md-12'
-    }, this.props.analysis.studies.map(function(study) {
-      return p({}, study);
+    }, ce(StudiesTable, {
+      analysis: this.props.analysis
     }))));
+  }
+});
+
+StudiesTable = React.createClass({
+  componentDidMount: function() {
+    return $('#custom-studies-table').dataTable({
+      pageLength: 10,
+      serverSide: true,
+      ajax: app.props.studiesTableURL + this.props.analysis.id + '/',
+      order: [[1, 'desc']]
+    });
+  },
+  componentDidUpdate: function() {
+    var studyTable, url;
+    if (!this.props.analysis.id) {
+      return;
+    }
+    url = app.props.studiesTableURL + this.props.analysis.id + '/';
+    studyTable = $('#custom-studies-table').DataTable();
+    studyTable.ajax.url(url);
+    return studyTable.ajax.reload();
+  },
+  render: function() {
+    return table({
+      className: 'table table-hover',
+      id: 'custom-studies-table'
+    }, thead({}, tr({}, th({}, 'Title '), th({}, 'Authors'), th({}, 'Journal'), th({}, 'Year'), th({}, 'PMID'))));
   }
 });
 

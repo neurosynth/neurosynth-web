@@ -72,6 +72,8 @@ TODO.txt
 running.txt
 
 .idea
+*.ipynb
+.ipynb_checkpoints
 
 log.txt
 .dropbox
