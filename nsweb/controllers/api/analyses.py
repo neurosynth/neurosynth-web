@@ -80,6 +80,7 @@ def analyses_api(val):
     data = [['<a href={0}>{1}</a>'.format(url_for('studies.show', val=f.pmid) , f.study.title),
               f.study.authors,
               f.study.journal,
+              f.study.year,
               round(f.frequency, 3),
               ] for f in data.frequencies]
     data = jsonify(aaData=data)

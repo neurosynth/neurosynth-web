@@ -852,18 +852,18 @@ AnalysisListItem = React.createClass({
   },
   render: function() {
     return div({
-      className: "" + (this.props.selected ? 'bg-info' : '')
+      className: "row " + (this.props.selected ? 'bg-info' : '')
+    }, div({
+      className: "col-md-12"
     }, ul({
       className: 'list-unstyled'
     }, li({}, "Name: " + this.props.name), li({}, "uuid: " + this.props.uuid)), button({
       className: "btn btn-primary btn-sm " + (this.props.selected ? 'hide' : ''),
       onClick: this.loadHandler
     }, 'Load'), span({}, ' '), button({
-      className: 'btn btn-info btn-sm'
-    }, 'Copy'), span({}, ' '), button({
       className: 'btn btn-danger btn-sm',
       onClick: this.deleteHandler
-    }, 'Delete'), hr({}));
+    }, 'Delete'), hr({})));
   }
 });
 
@@ -891,13 +891,32 @@ ActiveAnalysis = React.createClass({
     return app.saveActiveAnalysis(this.refs.name.getDOMNode().value);
   },
   render: function() {
-    var panel, studies, uuid;
+    var header, studies, studiesSection, uuid;
     uuid = this.props.analysis.uuid;
     studies = this.props.analysis.studies;
     if (uuid) {
-      panel = div({}, h4({}, this.props.analysis.name), p({}, "uuid: " + uuid));
+      header = div({}, div({
+        className: 'row'
+      }, div({
+        className: 'col-md-6'
+      }, h4({}, this.props.analysis.name), p({}, "uuid: " + uuid)), div({
+        className: 'col-md-6'
+      }, p({}, "" + studies.length + " studies in this analysis"), button({
+        className: 'btn btn-info btn-sm'
+      }, 'Clone this Analyis'))), div({
+        className: 'row'
+      }, div({
+        className: 'col-md-12'
+      }, hr({}, ''))));
+      studiesSection = ce(StudiesTable, {
+        analysis: this.props.analysis
+      });
     } else {
-      panel = div({}, input({
+      header = div({}, div({
+        className: 'row'
+      }, div({
+        className: 'col-md-4'
+      }, input({
         type: 'text',
         className: 'form-control',
         placeholder: 'Enter a name for this analysis',
@@ -905,21 +924,22 @@ ActiveAnalysis = React.createClass({
       }), br({}, ''), button({
         className: 'btn btn-primary',
         onClick: this.save
-      }, 'Save selection as new custom analysis'));
+      }, 'Save selection as new custom analysis')), div({
+        className: 'col-md-6'
+      }, p({}, "" + studies.length + " studies selected"))), div({
+        className: 'row'
+      }, div({
+        className: 'col-md-12'
+      }, hr({}, ''))));
+      studiesSection = div({}, p({}, 'Below are the PMIDs of the studies you have selected but not yet saved. Save this analysis to see the study details. You can always delete or clone it.'), this.props.analysis.studies.map(function(x) {
+        return p({}, x.toString());
+      }));
     }
-    return div({}, div({
-      className: 'row'
-    }, div({
-      className: 'col-md-4'
-    }, p({}, "" + studies.length + " studies selected")), div({
-      className: 'col-md-8'
-    }, panel)), div({
+    return div({}, header, div({
       className: 'row'
     }, div({
       className: 'col-md-12'
-    }, ce(StudiesTable, {
-      analysis: this.props.analysis
-    }))));
+    }, studiesSection)));
   }
 });
 

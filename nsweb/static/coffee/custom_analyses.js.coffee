@@ -85,16 +85,17 @@ AnalysisListItem = React.createClass
     app.deleteAnalysis(@props.uuid)
 
   render: ->
-    div {className: "#{ if @props.selected then 'bg-info' else ''}"},
-      ul {className:'list-unstyled'},
-        li {}, "Name: #{ @props.name }"
-        li {}, "uuid: #{ @props.uuid }"
-      button {className:"btn btn-primary btn-sm #{ if @props.selected then 'hide' else ''}", onClick: @loadHandler}, 'Load'
-      span {}, ' '
-      button {className: 'btn btn-info btn-sm'}, 'Copy'
-      span {}, ' '
-      button {className: 'btn btn-danger btn-sm', onClick: @deleteHandler}, 'Delete'
-      hr {}
+    div {className: "row #{ if @props.selected then 'bg-info' else ''}"},
+      div {className: "col-md-12"},
+        ul {className:'list-unstyled'},
+          li {}, "Name: #{ @props.name }"
+          li {}, "uuid: #{ @props.uuid }"
+        button {className:"btn btn-primary btn-sm #{ if @props.selected then 'hide' else ''}", onClick: @loadHandler}, 'Load'
+        span {}, ' '
+  #      button {className: 'btn btn-info btn-sm'}, 'Copy'
+  #      span {}, ' '
+        button {className: 'btn btn-danger btn-sm', onClick: @deleteHandler}, 'Delete'
+        hr {}
 
 AnalysisList = React.createClass
   render: ->
@@ -114,24 +115,41 @@ ActiveAnalysis = React.createClass
     uuid = @props.analysis.uuid
     studies = @props.analysis.studies
     if uuid # previously saved analysis
-      panel = div {},
-        h4 {}, @props.analysis.name
-        p {}, "uuid: #{ uuid }"
+      header = div {},
+        div {className:'row'},
+          div {className: 'col-md-6'},
+            h4 {}, @props.analysis.name
+            p {}, "uuid: #{ uuid }"
+          div {className: 'col-md-6'},
+            p {}, "#{ studies.length } studies in this analysis"
+            button {className: 'btn btn-info btn-sm'}, 'Clone this Analyis'
+        div {className:'row'},
+          div {className: 'col-md-12'},
+            hr {}, ''
+      studiesSection = ce StudiesTable, {analysis: @props.analysis}
     else # headless (without uuid) analysis only present in browser's local storage
-      panel = div {},
-        input {type: 'text', className: 'form-control', placeholder: 'Enter a name for this analysis', ref: 'name'}
-        br {}, ''
-        button {className:'btn btn-primary', onClick: @save}, 'Save selection as new custom analysis'
-    div {},
-      div {className:'row'},
-        div {className: 'col-md-4'},
-          p {}, "#{ studies.length } studies selected"
-        div {className: 'col-md-8'}, panel
+      header = div {},
+        div {className: 'row'},
+          div {className: 'col-md-4'},
+            input {type: 'text', className: 'form-control', placeholder: 'Enter a name for this analysis', ref: 'name'}
+            br {}, ''
+            button {className:'btn btn-primary', onClick: @save}, 'Save selection as new custom analysis'
+          div {className: 'col-md-6'},
+            p {}, "#{ studies.length } studies selected"
+        div {className:'row'},
+          div {className: 'col-md-12'},
+            hr {}, ''
+      studiesSection = div {},
+        p {}, 'Below are the PMIDs of the studies you have selected but not yet saved. Save this analysis to see the study details. You can always delete or clone it.'
+        @props.analysis.studies.map (x) ->
+          p {}, x.toString()
+
+    return div {},
+      header,
       div {className:'row'},
         div {className: 'col-md-12'},
-          ce StudiesTable, {analysis: @props.analysis}
-#          @props.analysis.studies.map (study) ->
-#            p {}, study
+          studiesSection
+#          ce StudiesTable, {analysis: @props.analysis}
 
 StudiesTable = React.createClass
   componentDidMount: ->
