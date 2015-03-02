@@ -16,12 +16,22 @@ app =
     @state.activeAnalysis = @state.analyses.filter((a) -> a.uuid is uuid)[0]
     @render()
 
+  cloneActiveAnalysis: ->
+    selection = {}
+    @state.activeAnalysis.studies.forEach (study) ->
+      selection[study] = 1
+    saveSelection(selection)
+    @state.activeAnalysis.uuid = null
+    @state.activeAnalysis.id = null
+    @render()
+
   deleteAnalysis: (uuid) ->
     $.ajax
       dataType: 'json'
       type: 'DELETE'
       url: @props.deleteURL + uuid.toString() + '/'
       success: (response) =>
+        @state.activeAnalysis = {}
         @init()
 #        @fetchAll()
 
@@ -83,25 +93,18 @@ AnalysisListItem = React.createClass
   loadHandler: ->
     app.setActiveAnalysis(@props.uuid)
 
-#  deleteHandler: ->
-#    app.deleteAnalysis(@props.uuid)
-#
   render: ->
-    div {className: "row #{ if @props.selected then 'bg-info' else ''}"},
+    div {className: "row bs-callout panel #{ if @props.selected then 'bs-callout-info' else ''}"},
       div {className: "col-md-8"},
         ul {className:'list-unstyled'},
           li {}, "Name: #{ @props.name }"
           li {}, "uuid: #{ @props.uuid }"
       div {className: "col-md-4"},
-        button {className:"btn btn-primary btn-sm #{ if @props.selected then 'hide' else ''}", onClick: @loadHandler}, 'Load'
-  #      button {className: 'btn btn-info btn-sm'}, 'Copy'
-  #      span {}, ' '
-#        button {className: 'btn btn-danger btn-sm', onClick: @deleteHandler}, 'Delete'
-#        hr {}
+        button {className:"btn btn-primary btn-sm #{ if @props.selected then 'disabled' else ''}", onClick: @loadHandler}, 'Load'
 
 AnalysisList = React.createClass
   render: ->
-    div {className:'custom-analysis-list'},
+    div {className:'custom-analysis-list panel'},
       h4 {}, "Your saved custom analyses (#{ @props.analyses.length })"
       hr {}, ''
       @props.analyses.map (analysis) =>
@@ -116,9 +119,13 @@ ActiveAnalysis = React.createClass
   deleteHandler: ->
     app.deleteAnalysis(@props.analysis.uuid)
 
+  cloneHandler: ->
+    app.cloneActiveAnalysis()
+
   render: ->
+    if Object.keys(@props.analysis).length is 0
+      return div {}, 'No analyis loaded.'
     uuid = @props.analysis.uuid
-    console.log 'Rendering active analysis with uuid = ', uuid
     studies = @props.analysis.studies
     if uuid # previously saved analysis
       header = div {},
@@ -128,7 +135,7 @@ ActiveAnalysis = React.createClass
             p {}, "uuid: #{ uuid }"
           div {className: 'col-md-6'},
             p {}, "#{ studies.length } studies in this analysis"
-            button {className: 'btn btn-info btn-sm'}, 'Clone Analyis'
+            button {className: 'btn btn-info btn-sm', onClick: @cloneHandler}, 'Clone Analyis'
             span {}, ' '
             button {className: 'btn btn-danger btn-sm', onClick: @deleteHandler}, 'Delete Analysis'
         div {className:'row'},
@@ -161,7 +168,6 @@ ActiveAnalysis = React.createClass
 
 StudiesTable = React.createClass
   componentDidMount: ->
-    console.log 'table mounted with analysis id = ', @props.analysis.id
     $('#custom-studies-table').dataTable
       pageLength: 10
       serverSide: true
@@ -169,7 +175,6 @@ StudiesTable = React.createClass
       order: [[1, 'desc']]
 
   componentDidUpdate: ->
-    console.log 'table updated with analysis id = ', @props.analysis.id
     if not @props.analysis.id
       return
     url = app.props.studiesTableURL + @props.analysis.id + '/'
@@ -188,7 +193,6 @@ StudiesTable = React.createClass
           th {}, 'PMID'
 
 SELECTED = 'info' # CSS class to apply to selected rows
-
 
 # Local Storage Helper Functions
 getSelectedStudies = ->
@@ -216,6 +220,8 @@ getPMID = (tr) ->
 $(document).ready ->
   $('.selectable-table').on 'click', 'tr', ->
     pmid = getPMID(this)
+    if not pmid?
+      return
     selection = getSelectedStudies()
     if pmid of selection
       delete selection[pmid]

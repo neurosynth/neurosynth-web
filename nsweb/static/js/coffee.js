@@ -755,6 +755,17 @@ app = {
     })[0];
     return this.render();
   },
+  cloneActiveAnalysis: function() {
+    var selection;
+    selection = {};
+    this.state.activeAnalysis.studies.forEach(function(study) {
+      return selection[study] = 1;
+    });
+    saveSelection(selection);
+    this.state.activeAnalysis.uuid = null;
+    this.state.activeAnalysis.id = null;
+    return this.render();
+  },
   deleteAnalysis: function(uuid) {
     return $.ajax({
       dataType: 'json',
@@ -762,6 +773,7 @@ app = {
       url: this.props.deleteURL + uuid.toString() + '/',
       success: (function(_this) {
         return function(response) {
+          _this.state.activeAnalysis = {};
           return _this.init();
         };
       })(this)
@@ -850,7 +862,7 @@ AnalysisListItem = React.createClass({
   },
   render: function() {
     return div({
-      className: "row " + (this.props.selected ? 'bg-info' : '')
+      className: "row bs-callout panel " + (this.props.selected ? 'bs-callout-info' : '')
     }, div({
       className: "col-md-8"
     }, ul({
@@ -858,7 +870,7 @@ AnalysisListItem = React.createClass({
     }, li({}, "Name: " + this.props.name), li({}, "uuid: " + this.props.uuid))), div({
       className: "col-md-4"
     }, button({
-      className: "btn btn-primary btn-sm " + (this.props.selected ? 'hide' : ''),
+      className: "btn btn-primary btn-sm " + (this.props.selected ? 'disabled' : ''),
       onClick: this.loadHandler
     }, 'Load')));
   }
@@ -867,7 +879,7 @@ AnalysisListItem = React.createClass({
 AnalysisList = React.createClass({
   render: function() {
     return div({
-      className: 'custom-analysis-list'
+      className: 'custom-analysis-list panel'
     }, h4({}, "Your saved custom analyses (" + this.props.analyses.length + ")"), hr({}, ''), this.props.analyses.map((function(_this) {
       return function(analysis) {
         var selected;
@@ -890,10 +902,15 @@ ActiveAnalysis = React.createClass({
   deleteHandler: function() {
     return app.deleteAnalysis(this.props.analysis.uuid);
   },
+  cloneHandler: function() {
+    return app.cloneActiveAnalysis();
+  },
   render: function() {
     var header, studies, studiesSection, uuid;
+    if (Object.keys(this.props.analysis).length === 0) {
+      return div({}, 'No analyis loaded.');
+    }
     uuid = this.props.analysis.uuid;
-    console.log('Rendering active analysis with uuid = ', uuid);
     studies = this.props.analysis.studies;
     if (uuid) {
       header = div({}, div({
@@ -903,7 +920,8 @@ ActiveAnalysis = React.createClass({
       }, h4({}, this.props.analysis.name), p({}, "uuid: " + uuid)), div({
         className: 'col-md-6'
       }, p({}, "" + studies.length + " studies in this analysis"), button({
-        className: 'btn btn-info btn-sm'
+        className: 'btn btn-info btn-sm',
+        onClick: this.cloneHandler
       }, 'Clone Analyis'), span({}, ' '), button({
         className: 'btn btn-danger btn-sm',
         onClick: this.deleteHandler
@@ -949,7 +967,6 @@ ActiveAnalysis = React.createClass({
 
 StudiesTable = React.createClass({
   componentDidMount: function() {
-    console.log('table mounted with analysis id = ', this.props.analysis.id);
     return $('#custom-studies-table').dataTable({
       pageLength: 10,
       serverSide: true,
@@ -959,7 +976,6 @@ StudiesTable = React.createClass({
   },
   componentDidUpdate: function() {
     var studyTable, url;
-    console.log('table updated with analysis id = ', this.props.analysis.id);
     if (!this.props.analysis.id) {
       return;
     }
@@ -1016,6 +1032,9 @@ $(document).ready(function() {
   $('.selectable-table').on('click', 'tr', function() {
     var pmid, selection;
     pmid = getPMID(this);
+    if (pmid == null) {
+      return;
+    }
     selection = getSelectedStudies();
     if (pmid in selection) {
       delete selection[pmid];
