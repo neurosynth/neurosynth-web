@@ -132,7 +132,7 @@ def save_custom_analysis():
             db.session.add(freq)
     db.session.commit()
 
-    return jsonify(dict(result='success', uuid=uid))
+    return jsonify(dict(result='success', uuid=uid, id=custom_analysis.id))
 
 @bp.route('/custom/<string:uid>/', methods=['GET'])
 def get_custom_analysis(uid):

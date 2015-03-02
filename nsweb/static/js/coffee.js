@@ -762,7 +762,7 @@ app = {
       url: this.props.deleteURL + uuid.toString() + '/',
       success: (function(_this) {
         return function(response) {
-          return _this.fetchAll();
+          return _this.init();
         };
       })(this)
     });
@@ -785,6 +785,7 @@ app = {
       success: (function(_this) {
         return function(data) {
           _this.state.activeAnalysis.uuid = data.uuid;
+          _this.state.activeAnalysis.id = data.id;
           saveToLocalStorage('ns-uuid', data.uuid);
           return _this.fetchAll();
         };
@@ -847,23 +848,19 @@ AnalysisListItem = React.createClass({
   loadHandler: function() {
     return app.setActiveAnalysis(this.props.uuid);
   },
-  deleteHandler: function() {
-    return app.deleteAnalysis(this.props.uuid);
-  },
   render: function() {
     return div({
       className: "row " + (this.props.selected ? 'bg-info' : '')
     }, div({
-      className: "col-md-12"
+      className: "col-md-8"
     }, ul({
       className: 'list-unstyled'
-    }, li({}, "Name: " + this.props.name), li({}, "uuid: " + this.props.uuid)), button({
+    }, li({}, "Name: " + this.props.name), li({}, "uuid: " + this.props.uuid))), div({
+      className: "col-md-4"
+    }, button({
       className: "btn btn-primary btn-sm " + (this.props.selected ? 'hide' : ''),
       onClick: this.loadHandler
-    }, 'Load'), span({}, ' '), button({
-      className: 'btn btn-danger btn-sm',
-      onClick: this.deleteHandler
-    }, 'Delete'), hr({})));
+    }, 'Load')));
   }
 });
 
@@ -890,9 +887,13 @@ ActiveAnalysis = React.createClass({
   save: function() {
     return app.saveActiveAnalysis(this.refs.name.getDOMNode().value);
   },
+  deleteHandler: function() {
+    return app.deleteAnalysis(this.props.analysis.uuid);
+  },
   render: function() {
     var header, studies, studiesSection, uuid;
     uuid = this.props.analysis.uuid;
+    console.log('Rendering active analysis with uuid = ', uuid);
     studies = this.props.analysis.studies;
     if (uuid) {
       header = div({}, div({
@@ -903,7 +904,10 @@ ActiveAnalysis = React.createClass({
         className: 'col-md-6'
       }, p({}, "" + studies.length + " studies in this analysis"), button({
         className: 'btn btn-info btn-sm'
-      }, 'Clone this Analyis'))), div({
+      }, 'Clone Analyis'), span({}, ' '), button({
+        className: 'btn btn-danger btn-sm',
+        onClick: this.deleteHandler
+      }, 'Delete Analysis'))), div({
         className: 'row'
       }, div({
         className: 'col-md-12'
@@ -945,6 +949,7 @@ ActiveAnalysis = React.createClass({
 
 StudiesTable = React.createClass({
   componentDidMount: function() {
+    console.log('table mounted with analysis id = ', this.props.analysis.id);
     return $('#custom-studies-table').dataTable({
       pageLength: 10,
       serverSide: true,
@@ -954,6 +959,7 @@ StudiesTable = React.createClass({
   },
   componentDidUpdate: function() {
     var studyTable, url;
+    console.log('table updated with analysis id = ', this.props.analysis.id);
     if (!this.props.analysis.id) {
       return;
     }

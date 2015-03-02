@@ -22,7 +22,8 @@ app =
       type: 'DELETE'
       url: @props.deleteURL + uuid.toString() + '/'
       success: (response) =>
-        @fetchAll()
+        @init()
+#        @fetchAll()
 
   saveActiveAnalysis: (name) ->
     @state.activeAnalysis.name = name
@@ -38,6 +39,7 @@ app =
       url: @props.saveURL
       success: (data) =>
         @state.activeAnalysis.uuid = data.uuid
+        @state.activeAnalysis.id = data.id
         saveToLocalStorage('ns-uuid', data.uuid)
         @fetchAll()
 
@@ -81,21 +83,21 @@ AnalysisListItem = React.createClass
   loadHandler: ->
     app.setActiveAnalysis(@props.uuid)
 
-  deleteHandler: ->
-    app.deleteAnalysis(@props.uuid)
-
+#  deleteHandler: ->
+#    app.deleteAnalysis(@props.uuid)
+#
   render: ->
     div {className: "row #{ if @props.selected then 'bg-info' else ''}"},
-      div {className: "col-md-12"},
+      div {className: "col-md-8"},
         ul {className:'list-unstyled'},
           li {}, "Name: #{ @props.name }"
           li {}, "uuid: #{ @props.uuid }"
+      div {className: "col-md-4"},
         button {className:"btn btn-primary btn-sm #{ if @props.selected then 'hide' else ''}", onClick: @loadHandler}, 'Load'
-        span {}, ' '
   #      button {className: 'btn btn-info btn-sm'}, 'Copy'
   #      span {}, ' '
-        button {className: 'btn btn-danger btn-sm', onClick: @deleteHandler}, 'Delete'
-        hr {}
+#        button {className: 'btn btn-danger btn-sm', onClick: @deleteHandler}, 'Delete'
+#        hr {}
 
 AnalysisList = React.createClass
   render: ->
@@ -111,8 +113,12 @@ ActiveAnalysis = React.createClass
   save: ->
     app.saveActiveAnalysis @refs.name.getDOMNode().value
 
+  deleteHandler: ->
+    app.deleteAnalysis(@props.analysis.uuid)
+
   render: ->
     uuid = @props.analysis.uuid
+    console.log 'Rendering active analysis with uuid = ', uuid
     studies = @props.analysis.studies
     if uuid # previously saved analysis
       header = div {},
@@ -122,7 +128,9 @@ ActiveAnalysis = React.createClass
             p {}, "uuid: #{ uuid }"
           div {className: 'col-md-6'},
             p {}, "#{ studies.length } studies in this analysis"
-            button {className: 'btn btn-info btn-sm'}, 'Clone this Analyis'
+            button {className: 'btn btn-info btn-sm'}, 'Clone Analyis'
+            span {}, ' '
+            button {className: 'btn btn-danger btn-sm', onClick: @deleteHandler}, 'Delete Analysis'
         div {className:'row'},
           div {className: 'col-md-12'},
             hr {}, ''
@@ -153,6 +161,7 @@ ActiveAnalysis = React.createClass
 
 StudiesTable = React.createClass
   componentDidMount: ->
+    console.log 'table mounted with analysis id = ', @props.analysis.id
     $('#custom-studies-table').dataTable
       pageLength: 10
       serverSide: true
@@ -160,6 +169,7 @@ StudiesTable = React.createClass
       order: [[1, 'desc']]
 
   componentDidUpdate: ->
+    console.log 'table updated with analysis id = ', @props.analysis.id
     if not @props.analysis.id
       return
     url = app.props.studiesTableURL + @props.analysis.id + '/'
