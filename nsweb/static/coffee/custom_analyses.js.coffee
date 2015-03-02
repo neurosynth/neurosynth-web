@@ -25,6 +25,11 @@ app =
     @state.activeAnalysis.id = null
     @render()
 
+  discardSelection: ->
+    saveSelection({})
+    @state.activeAnalysis = {}
+    @render()
+
   deleteAnalysis: (uuid) ->
     $.ajax
       dataType: 'json'
@@ -77,7 +82,7 @@ app =
       studies = []
 
     @state.activeAnalysis = {}
-    if uuid is null
+    if uuid is null and studies.length > 0
       @state.activeAnalysis =
         studies: studies
         uuid: uuid
@@ -122,6 +127,9 @@ ActiveAnalysis = React.createClass
   cloneHandler: ->
     app.cloneActiveAnalysis()
 
+  discardHandler: ->
+    app.discardSelection()
+
   render: ->
     if Object.keys(@props.analysis).length is 0
       return div {}, 'No analyis loaded.'
@@ -145,11 +153,13 @@ ActiveAnalysis = React.createClass
     else # headless (without uuid) analysis only present in browser's local storage
       header = div {},
         div {className: 'row'},
-          div {className: 'col-md-4'},
+          div {className: 'col-md-8'},
             input {type: 'text', className: 'form-control', placeholder: 'Enter a name for this analysis', ref: 'name'}
             br {}, ''
             button {className:'btn btn-primary', onClick: @save}, 'Save selection as new custom analysis'
-          div {className: 'col-md-6'},
+            span {}, ' '
+            button {className:'btn btn-danger', onClick: @discardHandler}, 'Discard current selection'
+          div {className: 'col-md-4'},
             p {}, "#{ studies.length } studies selected"
         div {className:'row'},
           div {className: 'col-md-12'},

@@ -766,6 +766,11 @@ app = {
     this.state.activeAnalysis.id = null;
     return this.render();
   },
+  discardSelection: function() {
+    saveSelection({});
+    this.state.activeAnalysis = {};
+    return this.render();
+  },
   deleteAnalysis: function(uuid) {
     return $.ajax({
       dataType: 'json',
@@ -837,7 +842,7 @@ app = {
       studies = [];
     }
     this.state.activeAnalysis = {};
-    if (uuid === null) {
+    if (uuid === null && studies.length > 0) {
       this.state.activeAnalysis = {
         studies: studies,
         uuid: uuid
@@ -905,6 +910,9 @@ ActiveAnalysis = React.createClass({
   cloneHandler: function() {
     return app.cloneActiveAnalysis();
   },
+  discardHandler: function() {
+    return app.discardSelection();
+  },
   render: function() {
     var header, studies, studiesSection, uuid;
     if (Object.keys(this.props.analysis).length === 0) {
@@ -937,7 +945,7 @@ ActiveAnalysis = React.createClass({
       header = div({}, div({
         className: 'row'
       }, div({
-        className: 'col-md-4'
+        className: 'col-md-8'
       }, input({
         type: 'text',
         className: 'form-control',
@@ -946,8 +954,11 @@ ActiveAnalysis = React.createClass({
       }), br({}, ''), button({
         className: 'btn btn-primary',
         onClick: this.save
-      }, 'Save selection as new custom analysis')), div({
-        className: 'col-md-6'
+      }, 'Save selection as new custom analysis'), span({}, ' '), button({
+        className: 'btn btn-danger',
+        onClick: this.discardHandler
+      }, 'Discard current selection')), div({
+        className: 'col-md-4'
       }, p({}, "" + studies.length + " studies selected"))), div({
         className: 'row'
       }, div({
