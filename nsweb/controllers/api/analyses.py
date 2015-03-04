@@ -1,13 +1,20 @@
 from nsweb.controllers.api import bp
-from flask import request, jsonify, url_for, abort
-from nsweb.models.analyses import TermAnalysis, AnalysisSet, TopicAnalysis, CustomAnalysis, Analysis
+from nsweb.controllers import error_page
+from flask import request, jsonify, url_for, abort, redirect
+from nsweb.models.analyses import (TermAnalysis, AnalysisSet, CustomAnalysis,
+                                   Analysis)
+from nsweb.models.images import CustomAnalysisImage
 from nsweb.models.studies import Study
 from nsweb.models.frequencies import Frequency
+from nsweb.initializers import settings
 from nsweb.core import db
 from flask.ext.login import current_user
 from flask.ext.user import login_required
 import json
 import uuid
+from os.path import join, exists
+from nsweb import tasks
+
 
 @bp.route('/terms/')
 def list_terms():
@@ -121,7 +128,8 @@ def save_custom_analysis():
     else:
         # create new custom analysis
         uid = unicode(uuid.uuid4())[:18]
-        custom_analysis = CustomAnalysis(uuid=uid, name=name, user_id=current_user.id)
+        custom_analysis = CustomAnalysis(uuid=uid, name=name,
+            user_id=current_user.id, n_studies=len(pmids))
         db.session.add(custom_analysis)
     db.session.commit()
 
@@ -163,13 +171,50 @@ def get_custom_analyses():
     }
     return jsonify(response)
 
-@bp.route('/custom/run/<string:uid>/', methods=['POST'])
+@bp.route('/custom/run/<string:uid>/', methods=['GET', 'POST'])
+@login_required
 def run_custom_analysis(uid):
     """
     Given a uuid, kick off the analysis run and redirect the user to the results page once
     the analysis is complete.
     """
-    return jsonify(dict(result='not implemented'))
+    custom = CustomAnalysis.query.filter_by(uuid=uid).first()
+
+    if not custom or not custom.studies:
+        abort(404)
+
+    ids = [s.pmid for s in custom.studies]
+    if tasks.run_metaanalysis.delay(ids, custom.uuid).wait():
+        # Update analysis record
+        rev_inf = '%s_pFgA_z_FDR_0.01.nii.gz' % custom.uuid
+        rev_inf = join(settings.IMAGE_DIR, 'custom', rev_inf)
+        fwd_inf = '%s_pAgF_z_FDR_0.01.nii.gz' % custom.uuid
+        fwd_inf = join(settings.IMAGE_DIR, 'custom', fwd_inf)
+        if exists(rev_inf):
+            images = [
+                CustomAnalysisImage(
+                    name='%s (forward inference)' % custom.name,
+                    image_file=fwd_inf,
+                    label='%s (forward inference)' % custom.name,
+                    stat='z-score',
+                    display=1,
+                    download=1
+                ),
+                CustomAnalysisImage(
+                    name='%s (reverse inference)' % custom.name,
+                    image_file=rev_inf,
+                    label='%s (reverse inference)' % custom.name,
+                    stat='z-score',
+                    display=1,
+                    download=1
+                )
+            ]
+            custom.images = images
+            db.session.add(custom)
+            db.session.commit()
+            return redirect(url_for('analyses.show_custom_analysis', uid=uid))
+    return error_page("An unspecified error occurred while trying to run "
+                      "the custom meta-analysis. Please try again.")
 
 
 @bp.route('/custom/copy/<string:uid>/', methods=['POST'])
