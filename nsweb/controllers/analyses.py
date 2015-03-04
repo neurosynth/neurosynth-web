@@ -68,7 +68,7 @@ def get_term_names():
 @bp.route('/terms/')
 def list_terms():
     return render_template('analyses/terms/index.html.slim')
-    
+
 @bp.route('/terms/<string:term>/')
 def show_term(term):
     analysis = find_analysis(term)
@@ -107,6 +107,15 @@ def show_topic(topic_set, number):
     return render_template('analyses/topics/show.html.slim',
                            analysis_set=topic.analysis_set, analysis=topic)
 
+### CUSTOM ANALYSIS ROUTES ###
+@bp.route('/custom/<string:uid>/')
+def show_custom_analysis(uid):
+    custom = CustomAnalysis.query.filter_by(uuid=uid).first()
+    if custom is None:
+        return render_template('analyses/missing.html.slim', analysis=uid)
+    return render_template('analyses/custom/show.html.slim', analysis=custom)
+
+
 ### FALLBACK GENERIC ROUTE ###
 @bp.route('/<string:id>/')
 def show_analysis(id):
@@ -120,7 +129,7 @@ def show_analysis(id):
                                 topic_set=analysis.analysis_set.name))
 
 @bp.route('/custom/')
-def custom_analyses():
+def list_custom_analyses():
     return render_template('analyses/custom/index.html.slim')
 
 add_blueprint(bp)
