@@ -36,6 +36,12 @@ class Analysis(db.Model):
         'polymorphic_on': type
     }
 
+    @property
+    def reverse_inference_image(self):
+        """ Convenience method for accessing the reverse inference image. """
+        return self.images[1]
+
+
 class TermAnalysis(Analysis):
     __tablename__ = 'term_analysis'
     id = db.Column(db.Integer, db.ForeignKey('analysis.id'), primary_key=True)
@@ -45,11 +51,6 @@ class TermAnalysis(Analysis):
     __mapper_args__ = {
         'polymorphic_identity': 'term'
     }
-
-    @property
-    def reverse_inference_image(self):
-        """ Convenience method for accessing the reverse inference image. """
-        return self.images[1]
 
 
 class TopicAnalysis(Analysis):
