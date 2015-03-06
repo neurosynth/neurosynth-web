@@ -5,7 +5,10 @@
   - import "macros/_scatterplot.html.slim" as scatterplot
   .row#page-decode-show
     .col-md-12
-      h2 Decoding results
+      h2
+        span Decoding results
+        - if decoding.neurovault_id
+          | for image <a href="http://neurovault.org/images/{{decoding.neurovault_id}}">{{decoding.name}}</a>
       .decode-viewer style="width: 580px; float: left;"
         ul#decode-menu.nav.nav-pills
           li.active
