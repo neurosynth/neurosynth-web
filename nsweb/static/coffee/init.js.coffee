@@ -92,7 +92,7 @@ $(document).ready ->
     
     createDataTable('#decoding_results_table', {
       pagingType: "simple"
-      displayLength: 10
+      pageLength: 10
       processing: true
       stateSave: false
       orderClasses: false
