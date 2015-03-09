@@ -11,5 +11,5 @@ class Study(db.Model):
     year = db.Column(db.Integer)
     space = db.Column(db.String(10))
     peaks = db.relationship('Peak', backref=db.backref('study', lazy='joined'), lazy='dynamic')
-    analyses = association_proxy('frequencies', 'analyses')
+    analyses = association_proxy('frequencies', 'analysis')
     # analyses = association_proxy('inclusions', 'analysis')

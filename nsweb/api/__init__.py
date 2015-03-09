@@ -4,6 +4,8 @@ from flask_swagger import swagger
 
 bp = Blueprint('apis', __name__, url_prefix='/api')
 
+from nsweb.api.studies import *
+
 add_blueprint(bp)
 
 @bp.route('/')
