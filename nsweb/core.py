@@ -9,6 +9,7 @@ from flask.ext.babel import Babel
 from flask.ext.user import UserManager, SQLAlchemyAdapter
 from slimish_jinja import SlimishExtension
 from flask.ext.cache import Cache
+from flask.ext.marshmallow import Marshmallow
 from nsweb.initializers import settings
 from nsweb.initializers.assets import init_assets
 from nsweb.initializers import make_celery
@@ -25,9 +26,11 @@ cache = Cache(config={'CACHE_TYPE': 'simple'})
 # Initialize celery
 celery = make_celery(app)
 
-# db=UnlockedAlchemy()
 db = SQLAlchemy()
 _blueprints = []
+
+# API-related stuff
+marshmallow = Marshmallow()
 
 
 def setup_logging(logging_path, level):
@@ -78,6 +81,9 @@ def create_app(debug=True):
     # i18n support
     Babel(app)
 
+    # API
+    marshmallow.init_app(app)
+
     # Set up user management
     app.config['CSRF_ENABLED'] = True
     app.config['USER_ENABLE_EMAIL'] = False
@@ -99,7 +105,8 @@ def register_blueprints():
     import nsweb.controllers.studies
     import nsweb.controllers.analyses
     import nsweb.controllers.locations
-    import nsweb.controllers.api
+    # import nsweb.controllers.api
+    import nsweb.api
     import nsweb.controllers.images
     import nsweb.controllers.decode
     import nsweb.controllers.genes
