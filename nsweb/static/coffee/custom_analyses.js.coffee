@@ -3,10 +3,12 @@ ce = React.createElement
 
 app =
   props:
-    fetchAllURL: '/api/custom/all/'
+    fetchAllAnalysesURL: '/api/custom/all/'
+    fetchAllStudiesURL: '/api/studies/all/'
     saveURL: '/api/custom/save/'
     deleteURL: '/api/custom/'
     studiesTableURL: '/api/analyses/' # /api/analyses/<analysis id>/ (to be consumed by DataTable)
+    getFullAnalysisURL: '/api/analyses/full/' # /api/analyses/full/ 
 
   state: # All mutable app state must be contained here
     activeAnalysis: null
@@ -38,7 +40,7 @@ app =
       success: (response) =>
         @state.activeAnalysis = {}
         @init()
-#        @fetchAll()
+#        @fetchAllAnalyses()
 
   saveActiveAnalysis: (name) ->
     @state.activeAnalysis.name = name
@@ -56,15 +58,26 @@ app =
         @state.activeAnalysis.uuid = data.uuid
         @state.activeAnalysis.id = data.id
         saveToLocalStorage('ns-uuid', data.uuid)
-        @fetchAll()
+        @fetchAllAnalyses()
 
-  fetchAll: ->
+  fetchAllAnalyses: ->
     $.ajax
       dataType: 'json'
       type: 'GET'
-      url: @props.fetchAllURL
+      url: @props.fetchAllAnalysesURL
       success: (data) =>
         @state.analyses = data.analyses
+        @render()
+      error: (xhr, status, err) =>
+        console.error @props.url, status, err.toString()
+
+  fetchAllStudies: ->
+    $.ajax
+      dataType: 'json'
+      type: 'GET'
+      url: @props.fetchAllStudiesURL
+      success: (data) =>
+        @state.studies = data.studies
         @render()
       error: (xhr, status, err) =>
         console.error @props.url, status, err.toString()
@@ -87,7 +100,8 @@ app =
         studies: studies
         uuid: uuid
 
-    @fetchAll()
+    @fetchAllAnalyses()
+    @fetchAllStudies()
 
   render: ->
     React.render ce(AnalysisList, {analyses:@state.analyses, selected_uuid:@state.activeAnalysis.uuid}),

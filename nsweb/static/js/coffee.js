@@ -87,7 +87,6 @@ createDataTable = function(element, options) {
     },
     filterDelay: true
   };
-  console.log(_opts.columns);
   $.extend(_opts, options);
   tbl = $(element).dataTable(_opts);
   if (_opts.filterDelay) {
@@ -740,10 +739,12 @@ ce = React.createElement;
 
 app = {
   props: {
-    fetchAllURL: '/api/custom/all/',
+    fetchAllAnalysesURL: '/api/custom/all/',
+    fetchAllStudiesURL: '/api/studies/all/',
     saveURL: '/api/custom/save/',
     deleteURL: '/api/custom/',
-    studiesTableURL: '/api/analyses/'
+    studiesTableURL: '/api/analyses/',
+    getFullAnalysisURL: '/api/analyses/full/'
   },
   state: {
     activeAnalysis: null,
@@ -804,19 +805,37 @@ app = {
           _this.state.activeAnalysis.uuid = data.uuid;
           _this.state.activeAnalysis.id = data.id;
           saveToLocalStorage('ns-uuid', data.uuid);
-          return _this.fetchAll();
+          return _this.fetchAllAnalyses();
         };
       })(this)
     });
   },
-  fetchAll: function() {
+  fetchAllAnalyses: function() {
     return $.ajax({
       dataType: 'json',
       type: 'GET',
-      url: this.props.fetchAllURL,
+      url: this.props.fetchAllAnalysesURL,
       success: (function(_this) {
         return function(data) {
           _this.state.analyses = data.analyses;
+          return _this.render();
+        };
+      })(this),
+      error: (function(_this) {
+        return function(xhr, status, err) {
+          return console.error(_this.props.url, status, err.toString());
+        };
+      })(this)
+    });
+  },
+  fetchAllStudies: function() {
+    return $.ajax({
+      dataType: 'json',
+      type: 'GET',
+      url: this.props.fetchAllStudiesURL,
+      success: (function(_this) {
+        return function(data) {
+          _this.state.studies = data.studies;
           return _this.render();
         };
       })(this),
@@ -848,7 +867,8 @@ app = {
         uuid: uuid
       };
     }
-    return this.fetchAll();
+    this.fetchAllAnalyses();
+    return this.fetchAllStudies();
   },
   render: function() {
     React.render(ce(AnalysisList, {
