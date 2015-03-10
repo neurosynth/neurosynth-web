@@ -1,8 +1,7 @@
-from nsweb.core import add_blueprint#, db
-from flask import Blueprint #, redirect, jsonify, url_for, request
-# from flask_sqlalchemy import sqlalchemy
+from nsweb.core import add_blueprint
+from flask import Blueprint
 
-bp = Blueprint('apis',__name__,url_prefix='/api')
+bp = Blueprint('api', __name__, url_prefix='/api')
 
 from nsweb.controllers.api.analyses import *
 from nsweb.controllers.api.studies import *

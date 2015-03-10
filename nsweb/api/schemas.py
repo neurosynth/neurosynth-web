@@ -51,4 +51,3 @@ class LocationSchema(mm.Schema):
     class Meta:
 
         fields = ('x', 'y', 'z', 'studies', 'images')
-

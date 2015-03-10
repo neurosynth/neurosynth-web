@@ -2,7 +2,7 @@ from nsweb.core import add_blueprint, app
 from flask import Blueprint, render_template
 from flask_swagger import swagger
 
-bp = Blueprint('apis', __name__, url_prefix='/api')
+bp = Blueprint('api_v2', __name__, url_prefix='/api/v2')
 
 from nsweb.api.operations import *
 

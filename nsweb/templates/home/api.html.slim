@@ -1,13 +1,13 @@
 html
   head
-    title Neurosynth API v1
+    title Neurosynth API v2
     - assets "swagger_css"
       %link rel="stylesheet" href="{{ ASSET_URL }}"
     - assets "swagger_js"
       %script src="{{ ASSET_URL }}"
     script type="text/javascript"
       |window.swaggerUi = new SwaggerUi({
-        url:"/api/swagger.json",
+        url:"/api/v2/swagger.json",
         dom_id:"swagger-ui-container"
       });
       window.swaggerUi.load();

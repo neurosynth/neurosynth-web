@@ -105,13 +105,11 @@ def register_blueprints():
     import nsweb.controllers.studies
     import nsweb.controllers.analyses
     import nsweb.controllers.locations
-    # import nsweb.controllers.api
+    import nsweb.controllers.api
     import nsweb.api
     import nsweb.controllers.images
     import nsweb.controllers.decode
     import nsweb.controllers.genes
-    # import nsweb.controllers.analyze
-    # import nsweb.controllers.topics
 
     for blueprint in _blueprints:
         app.register_blueprint(blueprint)
