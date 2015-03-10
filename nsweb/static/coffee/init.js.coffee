@@ -46,6 +46,9 @@ $.fn.dataTable.TableTools.defaults.aButtons = [
     }
   ]
 
+# Throw JS errors instead of triggering alerts
+$.fn.dataTableExt.sErrMode = 'throw'
+
 createDataTable = (element, options) ->
 
   # Set defaults and overwrite with the passed object
