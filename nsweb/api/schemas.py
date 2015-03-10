@@ -10,7 +10,7 @@ class PeakSchema(mm.Schema):
 
 class AnalysisSchema(mm.Schema):
 
-    studies = mm.Nested('StudySchema', many=True, only='id')
+    studies = mm.Nested('StudySchema', many=True, only='pmid')
 
     class Meta:
 

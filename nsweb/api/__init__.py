@@ -4,7 +4,7 @@ from flask_swagger import swagger
 
 bp = Blueprint('apis', __name__, url_prefix='/api')
 
-from nsweb.api.studies import *
+from nsweb.api.operations import *
 
 add_blueprint(bp)
 
