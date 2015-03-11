@@ -1,19 +1,28 @@
 from nsweb.api import bp
 from flask import jsonify, request
 from nsweb.api.schemas import (AnalysisSchema, StudySchema, LocationSchema,
-                               ImageSchema)
+                               ImageSchema, DecodingSchema)
 from nsweb.models.images import Image
 from nsweb.models.analyses import Analysis
 from nsweb.models.locations import Location
 from nsweb.models.studies import Study
 from nsweb.models.peaks import Peak
+from nsweb.models.decodings import Decoding
+from nsweb.controllers import decode
 from nsweb.core import cache
 from sqlalchemy import func
 import re
 
 
+def make_cache_key():
+    ''' Replace default cache key prefix with a string that also includes
+    query arguments. '''
+    # query = '/'.join(['%s=%s' % (k, v) for (k, v) in request.args.items()])
+    return request.path + request.query_string
+
+
 @bp.route('/analyses/')
-# @cache.memoize(timeout=3600)
+@cache.cached(timeout=3600, key_prefix=make_cache_key)
 def get_analyses():
     """
     Retrieve meta-analysis data
@@ -86,7 +95,7 @@ def get_analyses():
 
 
 @bp.route('/studies/')
-# @cache.memoize(timeout=3600)
+@cache.cached(timeout=3600, key_prefix=make_cache_key)
 def get_studies():
     """
     Retrieve study data
@@ -148,8 +157,8 @@ def get_studies():
 
 
 @bp.route('/locations/')
-# @cache.memoize(timeout=3600)
-def get_locations():
+@cache.cached(timeout=3600, key_prefix=make_cache_key)
+def get_location():
     """
     Retrieve location data
     ---
@@ -163,17 +172,17 @@ def get_locations():
     parameters:
         - in: query
           name: x
-          description: x-coordinate(s)
+          description: x-coordinate
           required: true
           type: integer
         - in: query
           name: y
-          description: y-coordinate(s)
+          description: y-coordinate
           required: true
           type: integer
         - in: query
           name: z
-          description: z-coordinate(s)
+          description: z-coordinate
           required: true
           type: integer
         - in: query
@@ -204,7 +213,7 @@ def get_locations():
 
 
 @bp.route('/images/')
-# @cache.memoize(timeout=3600)
+@cache.cached(timeout=3600, key_prefix=make_cache_key)
 def get_images():
     """
     Retrieve image data
@@ -269,3 +278,58 @@ def get_images():
     images = images.paginate(page, limit, False).items
     schema = ImageSchema(many=True)
     return jsonify(data=schema.dump(images).data)
+
+
+@bp.route('/decode/')
+@cache.cached(timeout=3600, key_prefix=make_cache_key)
+def get_decoding():
+    """
+    Retrieve decoding data for a single image
+    ---
+    tags:
+        - decode
+    responses:
+        200:
+            description: Decoding data
+        default:
+            description: Decoding not found
+    parameters:
+        - in: query
+          name: uuid
+          description: UUID of the decoding
+          required: false
+          type: string
+        - in: query
+          name: image
+          description: ID of image to decode
+          type: integer
+          required: false
+        - in: query
+          name: neurovault
+          description: NeuroVault ID of image to decode
+          type: integer
+          required: false
+        - in: query
+          name: url
+          description: URL of Nifti image to decode
+          type: string
+          required: false
+    """
+    dec = Decoding.query.filter_by(display=1)
+
+    if 'uuid' in request.args:
+        dec = dec.filter_by(uuid=request.args['uuid']).first()
+
+    elif 'image' in request.args:
+        dec = decode.decode_analysis_image(request.args['image'])
+
+    elif 'neurovault' in request.args:
+        dec_id = decode.decode_neurovault(request.args['neurovault'], False)
+        dec = dec.filter_by(uuid=dec_id).first()
+
+    elif 'url' in request.args:
+        dec_id = decode.decode_neurovault(request.args['url'], False)
+        dec = dec.filter_by(uuid=dec_id).first()
+
+    schema = DecodingSchema()
+    return jsonify(data=schema.dump(dec).data)

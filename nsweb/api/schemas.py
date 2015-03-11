@@ -1,5 +1,7 @@
 from nsweb.core import marshmallow as mm
+from nsweb.initializers import settings
 from flask import url_for
+from os.path import join
 
 
 class PeakSchema(mm.Schema):
@@ -51,3 +53,21 @@ class LocationSchema(mm.Schema):
     class Meta:
 
         fields = ('x', 'y', 'z', 'studies', 'images')
+
+
+class DecodingSchema(mm.Schema):
+
+    def get_values(self, dec):
+        data = open(join(settings.DECODING_RESULTS_DIR,
+                    dec.uuid + '.txt')).read().splitlines()
+        data = [x.split('\t') for x in data]
+        return dict([(f, round(float(v), 3)) for (f, v) in data])
+
+    image = mm.Nested('ImageSchema', allow_null=True)
+    reference = mm.Function(lambda obj: obj.decoding_set.name)
+    values = mm.Method('get_values')
+
+    class Meta:
+
+        fields = ('id', 'url', 'neurovault_id', 'uuid', 'comments', 'image',
+                  'reference', 'values')

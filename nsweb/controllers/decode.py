@@ -233,8 +233,6 @@ def get_scatter(uuid, analysis):
         outfile, as_attachment=False, attachment_filename=basename(outfile))
 
 ### API ROUTES ###
-
-
 @bp.route('/data/')
 def get_data_api():
     if 'url' in request.args:
