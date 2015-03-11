@@ -12,7 +12,6 @@ import os
 bp = Blueprint('images', __name__, url_prefix='/images')
 
 
-
 @bp.route('/<int:val>/')
 def download(val, fdr=True):
     image = Image.query.get_or_404(val)
