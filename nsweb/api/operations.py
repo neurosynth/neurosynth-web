@@ -1,5 +1,6 @@
 from nsweb.api import bp
 from flask import jsonify, request
+import json
 from nsweb.api.schemas import (AnalysisSchema, StudySchema, LocationSchema,
                                ImageSchema, DecodingSchema)
 from nsweb.models.images import Image
@@ -29,11 +30,6 @@ def get_analyses():
     ---
     tags:
         - analyses
-    responses:
-        200:
-            description: Analysis information
-        default:
-            description: No analyses found
     parameters:
         - in: query
           name: limit
@@ -66,6 +62,15 @@ def get_analyses():
           type: array
           items:
             type: integer
+    responses:
+        200:
+            description: Analysis information
+            schema:
+              type: array
+              items:
+                $ref: '#/definitions/Analysis'
+        default:
+            description: No analyses found
     """
     DEFAULT_LIMIT = 25
     MAX_LIMIT = 100
@@ -91,7 +96,7 @@ def get_analyses():
 
     analyses = analyses.paginate(page, limit, False).items
     schema = AnalysisSchema(many=True)
-    return jsonify(data=schema.dump(analyses).data)
+    return json.dumps(schema.dump(analyses).data)
 
 
 @bp.route('/studies/')
@@ -164,11 +169,6 @@ def get_location():
     ---
     tags:
         - locations
-    responses:
-        200:
-            description: Location data
-        default:
-            description: No locations found
     parameters:
         - in: query
           name: x
@@ -190,6 +190,16 @@ def get_location():
           description: Radius of sphere within which to search for study activations, in mm (default = 6, max = 20).
           required: false
           type: integer
+          minimum: 1
+          maximum: 20
+          default: 6
+    responses:
+        200:
+          description: Location data
+          schema:
+            $ref: '#/definitions/Location'
+        default:
+            description: No locations found
     """
     x = int(request.args['x'])
     y = int(request.args['y'])
