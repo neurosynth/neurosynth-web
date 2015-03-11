@@ -16,7 +16,14 @@ app =
 
   setActiveAnalysis: (uuid) ->
     @state.activeAnalysis = @state.analyses.filter((a) -> a.uuid is uuid)[0]
+    # TODO: update ns-selection in localStorage
     @render()
+
+  activeStudies: ->
+    return @state.activeAnalysis.studies.map (pmid) => @state.studyDetails[pmid]
+
+  removeStudy: (pmid) ->
+    return false
 
   cloneActiveAnalysis: ->
     selection = {}
@@ -77,7 +84,10 @@ app =
       type: 'GET'
       url: @props.fetchAllStudiesURL
       success: (data) =>
-        @state.studies = data.studies
+        @state.all_studies = data.studies
+        @state.studyDetails = {}
+        for study in data.studies
+          @state.studyDetails[study.pmid] = study
         @render()
       error: (xhr, status, err) =>
         console.error @props.url, status, err.toString()
@@ -157,13 +167,16 @@ ActiveAnalysis = React.createClass
             p {}, "uuid: #{ uuid }"
           div {className: 'col-md-6'},
             p {}, "#{ studies.length } studies in this analysis"
-            button {className: 'btn btn-info btn-sm', onClick: @cloneHandler}, 'Clone Analyis'
+            button {className: 'btn btn-info btn-sm', onClick: @cloneHandler}, 'Clone Analysis'
+            span {}, ' '
+            button {className: 'btn btn-info btn-sm', onClick: @save}, 'Save Analysis'
             span {}, ' '
             button {className: 'btn btn-danger btn-sm', onClick: @deleteHandler}, 'Delete Analysis'
         div {className:'row'},
           div {className: 'col-md-12'},
             hr {}, ''
-      studiesSection = ce StudiesTable, {analysis: @props.analysis}
+#      studiesSection = ce StudiesTable, {analysis: @props.analysis}
+#      studiesSection = ce SelectedStudiesTable, {}
     else # headless (without uuid) analysis only present in browser's local storage
       header = div {},
         div {className: 'row'},
@@ -178,16 +191,28 @@ ActiveAnalysis = React.createClass
         div {className:'row'},
           div {className: 'col-md-12'},
             hr {}, ''
-      studiesSection = div {},
-        p {}, 'Below are the PMIDs of the studies you have selected but not yet saved. Save this analysis to see the study details. You can always delete or clone it.'
-        @props.analysis.studies.map (x) ->
-          p {}, x.toString()
+#      studiesSection = div {},
+#        p {}, 'Below are the PMIDs of the studies you have selected but not yet saved. Save this analysis to see the study details. You can always delete or clone it.'
+#        @props.analysis.studies.map (x) ->
+#          p {}, x.toString()
 
     return div {},
       header,
       div {className:'row'},
         div {className: 'col-md-12'},
-          studiesSection
+          div {role: 'tabpanel'},
+            ul {className: 'nav nav-tabs', role:'tablist'},
+              li {role:'presentation', className: 'active'},
+                a {href:'#selected-studies-tab', role:'tab', 'data-toggle':'tab'}, "Selected Studies (#{ @props.analysis.studies.length })"
+              li {role:'presentation'},
+                a {href:'#all-studies-tab', role:'tab', 'data-toggle':'tab'}, "All studies (#{ app.state.all_studies.length })"
+            div {className: 'tab-content'},
+              div {className: 'tab-pane active', role:'tab-panel', id:'selected-studies-tab'},
+                ce SelectedStudiesTable, {}
+#                studiesSection
+              div {className: 'tab-pane', role:'tab-panel', id:'all-studies-tab'},
+                h5 {}, "All Studies!!!!!"
+                ce AllStudiestable
 #          ce StudiesTable, {analysis: @props.analysis}
 
 StudiesTable = React.createClass
@@ -208,6 +233,71 @@ StudiesTable = React.createClass
 
   render: ->
     table {className:'table table-hover', id: 'custom-studies-table'},
+      thead {},
+        tr {},
+          th {}, 'Title '
+          th {}, 'Authors'
+          th {}, 'Journal'
+          th {}, 'Year'
+          th {}, 'PMID'
+
+SelectedStudiesTable = React.createClass
+  tableData: ->
+    app.activeStudies().map (item) ->
+      $.extend({'remove': '<button class="btn btn-sm">remove</button>'}, item)
+
+  componentDidMount: ->
+    console.log 'selected-studies table mounted'
+    $('#selected-studies-table').DataTable
+      data: @tableData()
+      columns: [
+        {data: 'title'}
+        {data: 'authors'}
+        {data: 'journal'}
+        {data: 'year'}
+        {data: 'pmid'}
+        {data: 'remove'}
+      ]
+    $('#selected-studies-table').find('tr').on 'click', 'button', ->
+      pmid = getPMID($(this).closest('tr'))
+      console.log "Removing ", pmid
+      app.removeStudy(pmid)
+
+  componentDidUpdate: ->
+    console.log 'selected-studies table updated'
+    t = $('#selected-studies-table').DataTable()
+    t.clear()
+    t.rows.add @tableData()
+    t.draw()
+
+  render: ->
+    table {className:'table table-hover', id: 'selected-studies-table'},
+      thead {},
+        tr {},
+          th {}, 'Title '
+          th {}, 'Authors'
+          th {}, 'Journal'
+          th {}, 'Year'
+          th {}, 'PMID'
+          th {}, 'Action'
+
+
+AllStudiestable = React.createClass
+  componentDidMount: ->
+    console.log 'All-studies table mounted'
+    $('#all-studies-table').DataTable
+      data: app.state.all_studies
+      columns: [
+        {data: 'title'}
+        {data: 'authors'}
+        {data: 'journal'}
+        {data: 'year'}
+        {data: 'pmid'}
+      ]
+    setupSelectableTable()
+
+  render: ->
+    table {className: 'table table-hover selectable-table', id: 'all-studies-table'},
       thead {},
         tr {},
           th {}, 'Title '
@@ -241,8 +331,9 @@ getPMID = (tr) ->
   return null if not href?
   return /(\d+)/.exec(href)[0]
 
-$(document).ready ->
+setupSelectableTable = ->
   $('.selectable-table').on 'click', 'tr', ->
+    console.log 'row clicked'
     pmid = getPMID(this)
     if not pmid?
       return
@@ -282,4 +373,7 @@ $(document).ready ->
     saveSelection(selection)
     redrawTableSelection()
 
+$(document).ready ->
+  setupSelectableTable()
   app.init()
+

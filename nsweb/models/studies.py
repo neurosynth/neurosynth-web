@@ -15,4 +15,6 @@ class Study(db.Model):
     # analyses = association_proxy('inclusions', 'analysis')
 
     def serialize(self):
-        return {'pmid': self.pmid, 'title': self.title, 'authors': self.authors, 'year': self.year}
+        return {'pmid': self.pmid, 'authors': self.authors, 'journal': self.journal,
+                'year': self.year,
+                'title': '<a href="/studies/%s">%s</a>' % (self.pmid, self.title)}
