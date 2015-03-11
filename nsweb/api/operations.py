@@ -13,6 +13,7 @@ from nsweb.core import cache
 from sqlalchemy import func
 import re
 
+
 def make_cache_key():
     ''' Replace default cache key prefix with a string that also includes
     query arguments. '''
@@ -171,17 +172,17 @@ def get_location():
     parameters:
         - in: query
           name: x
-          description: x-coordinate(s)
+          description: x-coordinate
           required: true
           type: integer
         - in: query
           name: y
-          description: y-coordinate(s)
+          description: y-coordinate
           required: true
           type: integer
         - in: query
           name: z
-          description: z-coordinate(s)
+          description: z-coordinate
           required: true
           type: integer
         - in: query
@@ -282,6 +283,38 @@ def get_images():
 @bp.route('/decode/')
 @cache.cached(timeout=3600, key_prefix=make_cache_key)
 def get_decoding():
+    """
+    Retrieve decoding data for a single image
+    ---
+    tags:
+        - decode
+    responses:
+        200:
+            description: Decoding data
+        default:
+            description: Decoding not found
+    parameters:
+        - in: query
+          name: uuid
+          description: UUID of the decoding
+          required: false
+          type: string
+        - in: query
+          name: image
+          description: ID of image to decode
+          type: integer
+          required: false
+        - in: query
+          name: neurovault
+          description: NeuroVault ID of image to decode
+          type: integer
+          required: false
+        - in: query
+          name: url
+          description: URL of Nifti image to decode
+          type: string
+          required: false
+    """
     dec = Decoding.query.filter_by(display=1)
 
     if 'uuid' in request.args:

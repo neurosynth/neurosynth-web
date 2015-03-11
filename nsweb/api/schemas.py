@@ -3,6 +3,7 @@ from nsweb.initializers import settings
 from flask import url_for
 from os.path import join
 
+
 class PeakSchema(mm.Schema):
 
     class Meta:
@@ -62,7 +63,7 @@ class DecodingSchema(mm.Schema):
         data = [x.split('\t') for x in data]
         return dict([(f, round(float(v), 3)) for (f, v) in data])
 
-    image = mm.Nested('ImageSchema')
+    image = mm.Nested('ImageSchema', allow_null=True)
     reference = mm.Function(lambda obj: obj.decoding_set.name)
     values = mm.Method('get_values')
 
