@@ -130,9 +130,10 @@ def save_custom_analysis():
         uid = unicode(uuid.uuid4())[:18]
         custom_analysis = CustomAnalysis(uuid=uid, name=name,
             user_id=current_user.id, n_studies=len(pmids))
-        db.session.add(custom_analysis)
+    db.session.add(custom_analysis)
     db.session.commit()
 
+    Frequency.query.filter_by(analysis_id=custom_analysis.id).delete()
     for pmid in pmids:
         freq = Frequency.query.filter_by(analysis_id=custom_analysis.id, pmid=pmid).first()
         if not freq:

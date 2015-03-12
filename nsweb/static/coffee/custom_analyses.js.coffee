@@ -1,6 +1,37 @@
 {div, br, ul, li, a, p, h1, h2, h4, h5, span, form, input, button, hr, table, thead, tr, th, td} = React.DOM
 ce = React.createElement
 
+SELECTED = 'info' # CSS class to apply to selected rows
+
+# Local Storage Helper Functions
+getSelectedStudies = ->
+  selection = JSON.parse(window.localStorage.getItem('ns-selection') or "{}")
+
+saveSelection = (selection) ->
+  window.localStorage.setItem('ns-selection', JSON.stringify(selection))
+#  window.localStorage.setItem('ns-uuid', null)
+
+saveToLocalStorage = (key, value) ->
+  window.localStorage.setItem(key, JSON.stringify(value))
+
+getFromLocalStorage = (key) ->
+  val = window.localStorage.getItem(key)
+  if val is null then val else JSON.parse(val)
+#  JSON.parse(window.localStorage.getItem(key))
+
+getPMID = (tr) ->
+  # Given tr DOM element parse the PMID
+  # Assumes the first column has a link of the form ..../<pmid>
+  href = $(tr).find('a').first().attr('href')
+  return null if not href?
+  return parseInt(/(\d+)/.exec(href)[0])
+
+arrayToObject = (array) ->
+  obj = {}
+  for item in array
+    obj[item] = 1
+  return obj
+
 app =
   props:
     fetchAllAnalysesURL: '/api/custom/all/'
@@ -11,19 +42,35 @@ app =
     getFullAnalysisURL: '/api/analyses/full/' # /api/analyses/full/ 
 
   state: # All mutable app state must be contained here
-    activeAnalysis: null
     analyses: []
+    allStudies: []
+    activeAnalysis:
+      studies: {}
+#      studyList: => Object.keys(@studies)
 
   setActiveAnalysis: (uuid) ->
-    @state.activeAnalysis = @state.analyses.filter((a) -> a.uuid is uuid)[0]
-    # TODO: update ns-selection in localStorage
+    @state.activeAnalysis = $.extend {}, @state.analyses.filter((a) -> a.uuid is uuid)[0]
+    @state.activeAnalysis.studies = arrayToObject(@state.activeAnalysis.studies)
+    @state.activeAnalysis.saved = true
+    saveSelection(@state.activeAnalysis.studies)
     @render()
 
   activeStudies: ->
-    return @state.activeAnalysis.studies.map (pmid) => @state.studyDetails[pmid]
+    return Object.keys(@state.activeAnalysis.studies).map (pmid) => @state.studyDetails[pmid]
 
   removeStudy: (pmid) ->
-    return false
+    console.log "In app.removeStudy"
+    delete @state.activeAnalysis.studies[pmid]
+    @state.activeAnalysis.saved = false
+    saveSelection(@state.activeAnalysis.studies)
+    @render()
+
+  addStudy: (pmid) ->
+    console.log "In app.addStudy"
+    @state.activeAnalysis.studies[pmid] = 1
+    @state.activeAnalysis.saved = false
+    saveSelection(@state.activeAnalysis.studies)
+    @render()
 
   cloneActiveAnalysis: ->
     selection = {}
@@ -52,7 +99,7 @@ app =
   saveActiveAnalysis: (name) ->
     @state.activeAnalysis.name = name
     data =
-      studies: @state.activeAnalysis.studies
+      studies: Object.keys(@state.activeAnalysis.studies)
       name: name
       uuid: @state.activeAnalysis.uuid
     $.ajax
@@ -84,11 +131,12 @@ app =
       type: 'GET'
       url: @props.fetchAllStudiesURL
       success: (data) =>
-        @state.all_studies = data.studies
+        @state.allStudies = data.studies
         @state.studyDetails = {}
         for study in data.studies
           @state.studyDetails[study.pmid] = study
-        @render()
+        @fetchAllAnalyses()
+#        @render()
       error: (xhr, status, err) =>
         console.error @props.url, status, err.toString()
 
@@ -97,23 +145,24 @@ app =
     See if there are any selected studies in localStorage.
     If so, create a new analysis
     ###
-    studies = getFromLocalStorage('ns-selection')
+#    studies = getFromLocalStorage('ns-selection')
     uuid = getFromLocalStorage('ns-uuid')
-    if studies
-      studies = Object.keys(studies)
-    else
-      studies = []
+#    if studies
+#      studies = Object.keys(studies)
+#    else
+#      studies = []
+#
+#    @state.activeAnalysis = {}
+    if uuid is null
+      @state.activeAnalysis.studies = getFromLocalStorage('ns-selection') or []
+      @state.activeAnalysis.uuid = uuid
 
-    @state.activeAnalysis = {}
-    if uuid is null and studies.length > 0
-      @state.activeAnalysis =
-        studies: studies
-        uuid: uuid
-
-    @fetchAllAnalyses()
     @fetchAllStudies()
+#    @fetchAllAnalyses(@fetchAllStudies(@render))
 
   render: ->
+    if not document.getElementById('custom-list-container')?
+      return
     React.render ce(AnalysisList, {analyses:@state.analyses, selected_uuid:@state.activeAnalysis.uuid}),
       document.getElementById('custom-list-container')
     React.render(ce(ActiveAnalysis, {analysis: @state.activeAnalysis}), document.getElementById('active-analysis-container'))
@@ -155,15 +204,16 @@ ActiveAnalysis = React.createClass
     app.discardSelection()
 
   render: ->
-    if Object.keys(@props.analysis).length is 0
-      return div {}, 'No analyis loaded.'
+#    if Object.keys(@props.analysis).length is 0
+#      return div {}, 'No analyis loaded.'
     uuid = @props.analysis.uuid
-    studies = @props.analysis.studies
+    studies = Object.keys(@props.analysis.studies)
     if uuid # previously saved analysis
       header = div {},
         div {className:'row'},
           div {className: 'col-md-6'},
-            h4 {}, @props.analysis.name
+            input {type: 'text', className: 'form-control', placeholder: 'Enter a name for this analysis', ref: 'name', defaultValue: @props.analysis.name}
+#            h4 {}, @props.analysis.name
             p {}, "uuid: #{ uuid }"
           div {className: 'col-md-6'},
             p {}, "#{ studies.length } studies in this analysis"
@@ -203,15 +253,16 @@ ActiveAnalysis = React.createClass
           div {role: 'tabpanel'},
             ul {className: 'nav nav-tabs', role:'tablist'},
               li {role:'presentation', className: 'active'},
-                a {href:'#selected-studies-tab', role:'tab', 'data-toggle':'tab'}, "Selected Studies (#{ @props.analysis.studies.length })"
+                a {href:'#selected-studies-tab', role:'tab', 'data-toggle':'tab'}, "Selected Studies (#{ studies.length })"
               li {role:'presentation'},
-                a {href:'#all-studies-tab', role:'tab', 'data-toggle':'tab'}, "All studies (#{ app.state.all_studies.length })"
+                a {href:'#all-studies-tab', role:'tab', 'data-toggle':'tab'}, "All studies (#{ app.state.allStudies.length })"
             div {className: 'tab-content'},
               div {className: 'tab-pane active', role:'tab-panel', id:'selected-studies-tab'},
                 ce SelectedStudiesTable, {}
 #                studiesSection
               div {className: 'tab-pane', role:'tab-panel', id:'all-studies-tab'},
-                h5 {}, "All Studies!!!!!"
+                br {},
+                p {}, "Add or remove studies to your analysis by clicking on the study. Studies that are already added are highlighted in blue."
                 ce AllStudiestable
 #          ce StudiesTable, {analysis: @props.analysis}
 
@@ -246,6 +297,12 @@ SelectedStudiesTable = React.createClass
     app.activeStudies().map (item) ->
       $.extend({'remove': '<button class="btn btn-sm">remove</button>'}, item)
 
+  setupRemoveButton: ->
+    $('#selected-studies-table').find('tr').on 'click', 'button', ->
+      pmid = getPMID($(this).closest('tr'))
+      console.log "Removing ", pmid
+      app.removeStudy(pmid)
+
   componentDidMount: ->
     console.log 'selected-studies table mounted'
     $('#selected-studies-table').DataTable
@@ -258,10 +315,7 @@ SelectedStudiesTable = React.createClass
         {data: 'pmid'}
         {data: 'remove'}
       ]
-    $('#selected-studies-table').find('tr').on 'click', 'button', ->
-      pmid = getPMID($(this).closest('tr'))
-      console.log "Removing ", pmid
-      app.removeStudy(pmid)
+    @setupRemoveButton()
 
   componentDidUpdate: ->
     console.log 'selected-studies table updated'
@@ -269,6 +323,7 @@ SelectedStudiesTable = React.createClass
     t.clear()
     t.rows.add @tableData()
     t.draw()
+    @setupRemoveButton()
 
   render: ->
     table {className:'table table-hover', id: 'selected-studies-table'},
@@ -286,7 +341,7 @@ AllStudiestable = React.createClass
   componentDidMount: ->
     console.log 'All-studies table mounted'
     $('#all-studies-table').DataTable
-      data: app.state.all_studies
+      data: app.state.allStudies
       columns: [
         {data: 'title'}
         {data: 'authors'}
@@ -296,8 +351,12 @@ AllStudiestable = React.createClass
       ]
     setupSelectableTable()
 
+  componentDidUpdate: ->
+    console.log 'All-studies table updated'
+    redrawTableSelection()
+
   render: ->
-    table {className: 'table table-hover selectable-table', id: 'all-studies-table'},
+    table {className: 'table selectable-table', id: 'all-studies-table'},
       thead {},
         tr {},
           th {}, 'Title '
@@ -306,30 +365,15 @@ AllStudiestable = React.createClass
           th {}, 'Year'
           th {}, 'PMID'
 
-SELECTED = 'info' # CSS class to apply to selected rows
-
-# Local Storage Helper Functions
-getSelectedStudies = ->
-  selection = JSON.parse(window.localStorage.getItem('ns-selection') or "{}")
-
-saveSelection = (selection) ->
-  window.localStorage.setItem('ns-selection', JSON.stringify(selection))
-  window.localStorage.setItem('ns-uuid', null)
-
-saveToLocalStorage = (key, value) ->
-  window.localStorage.setItem(key, JSON.stringify(value))
-
-getFromLocalStorage = (key) ->
-  val = window.localStorage.getItem(key)
-  if val is null then val else JSON.parse(val)
-#  JSON.parse(window.localStorage.getItem(key))
-
-getPMID = (tr) ->
-  # Given tr DOM element parse the PMID
-  # Assumes the first column has a link of the form ..../<pmid>
-  href = $(tr).find('a').first().attr('href')
-  return null if not href?
-  return /(\d+)/.exec(href)[0]
+redrawTableSelection = ->
+  console.log "Redrawing selectable table"
+  selection = getSelectedStudies()
+  $('.selectable-table').find('tbody').find('tr').each ->
+    pmid = getPMID(this)
+    if pmid of selection
+      $(this).addClass(SELECTED)
+    else
+      $(this).removeClass(SELECTED)
 
 setupSelectableTable = ->
   $('.selectable-table').on 'click', 'tr', ->
@@ -339,20 +383,14 @@ setupSelectableTable = ->
       return
     selection = getSelectedStudies()
     if pmid of selection
-      delete selection[pmid]
+      app.removeStudy(pmid)
+#      delete selection[pmid]
     else
-      selection[pmid] = 1
-    saveSelection(selection)
-    $(this).toggleClass(SELECTED)
-
-  redrawTableSelection = ->
-    selection = getSelectedStudies()
-    $('tbody').find('tr').each ->
-      pmid = getPMID(this)
-      if pmid of selection
-        $(this).addClass(SELECTED)
-      else
-        $(this).removeClass(SELECTED)
+      app.addStudy(pmid)
+    redrawTableSelection()
+#      selection[pmid] = 1
+#    saveSelection(selection)
+#    $(this).toggleClass(SELECTED)
 
   $('.selectable-table').on 'draw.dt', ->
     redrawTableSelection()
@@ -372,6 +410,8 @@ setupSelectableTable = ->
       delete selection[pmid]
     saveSelection(selection)
     redrawTableSelection()
+
+  redrawTableSelection()
 
 $(document).ready ->
   setupSelectableTable()
