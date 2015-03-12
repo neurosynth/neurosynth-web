@@ -1,4 +1,4 @@
-var ActiveAnalysis, AllStudiestable, AnalysisList, AnalysisListItem, NSCookie, SELECTED, Scatter, SelectedStudiesTable, StudiesTable, a, app, arrayToObject, br, button, ce, createDataTable, div, form, getFromLocalStorage, getPMID, getSelectedStudies, h1, h2, h4, h5, hr, input, li, load_reverse_inference_image, make_scatterplot, p, redrawTableSelection, runif, saveSelection, saveToLocalStorage, setupSelectableTable, span, table, td, textToHTML, th, thead, tr, ul, urlToParams, _ref,
+var ActiveAnalysis, AllStudiestable, AnalysisList, AnalysisListItem, NSCookie, SELECTED, Scatter, SelectedStudiesTable, StudiesTable, a, app, arrayToObject, br, button, ce, createDataTable, div, form, getFromLocalStorage, getPMID, getSelectedStudies, h1, h2, h4, h5, hr, input, label, li, load_reverse_inference_image, make_scatterplot, p, redrawTableSelection, runif, saveSelection, saveToLocalStorage, setupSelectableTable, span, table, td, textToHTML, th, thead, tr, ul, urlToParams, _ref,
   __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
 NSCookie = (function() {
@@ -733,7 +733,7 @@ $(document).ready(function() {
   });
 });
 
-_ref = React.DOM, div = _ref.div, br = _ref.br, ul = _ref.ul, li = _ref.li, a = _ref.a, p = _ref.p, h1 = _ref.h1, h2 = _ref.h2, h4 = _ref.h4, h5 = _ref.h5, span = _ref.span, form = _ref.form, input = _ref.input, button = _ref.button, hr = _ref.hr, table = _ref.table, thead = _ref.thead, tr = _ref.tr, th = _ref.th, td = _ref.td;
+_ref = React.DOM, div = _ref.div, br = _ref.br, ul = _ref.ul, li = _ref.li, a = _ref.a, p = _ref.p, h1 = _ref.h1, h2 = _ref.h2, h4 = _ref.h4, h5 = _ref.h5, span = _ref.span, form = _ref.form, input = _ref.input, button = _ref.button, hr = _ref.hr, table = _ref.table, thead = _ref.thead, tr = _ref.tr, th = _ref.th, td = _ref.td, label = _ref.label;
 
 ce = React.createElement;
 
@@ -843,6 +843,11 @@ app = {
     this.state.activeAnalysis = {};
     return this.render();
   },
+  setActiveAnalysisName: function(name) {
+    this.state.activeAnalysis.name = name;
+    this.state.activeAnalysis.saved = false;
+    return this.render();
+  },
   deleteAnalysis: function(uuid) {
     return $.ajax({
       dataType: 'json',
@@ -875,6 +880,7 @@ app = {
         return function(data) {
           _this.state.activeAnalysis.uuid = data.uuid;
           _this.state.activeAnalysis.id = data.id;
+          _this.state.activeAnalysis.saved = true;
           saveToLocalStorage('ns-uuid', data.uuid);
           return _this.fetchAllAnalyses();
         };
@@ -1004,30 +1010,35 @@ ActiveAnalysis = React.createClass({
   discardHandler: function() {
     return app.discardSelection();
   },
+  nameChangeHandler: function() {
+    return app.setActiveAnalysisName(this.refs.name.getDOMNode().value);
+  },
   render: function() {
-    var header, studies, uuid;
+    var header, saved, studies, uuid;
     uuid = this.props.analysis.uuid;
     studies = Object.keys(this.props.analysis.studies);
+    saved = this.props.analysis.saved;
     if (uuid) {
       header = div({}, div({
         className: 'row'
       }, div({
         className: 'col-md-6'
-      }, input({
+      }, label({}, 'Analysis name:', input({
         type: 'text',
         className: 'form-control',
-        placeholder: 'Enter a name for this analysis',
         ref: 'name',
-        defaultValue: this.props.analysis.name
-      }), p({}, "uuid: " + uuid)), div({
+        value: this.props.analysis.name,
+        onChange: this.nameChangeHandler
+      })), p({}, "uuid: " + uuid)), div({
         className: 'col-md-6'
       }, p({}, "" + studies.length + " studies in this analysis"), button({
         className: 'btn btn-info btn-sm',
         onClick: this.cloneHandler
       }, 'Clone Analysis'), span({}, ' '), button({
-        className: 'btn btn-info btn-sm',
+        className: 'btn btn-primary',
+        disabled: "" + (saved ? 'disabled' : ''),
         onClick: this.save
-      }, 'Save Analysis'), span({}, ' '), button({
+      }, 'Save'), span({}, ' '), button({
         className: 'btn btn-danger btn-sm',
         onClick: this.deleteHandler
       }, 'Delete Analysis'))), div({
@@ -1047,6 +1058,7 @@ ActiveAnalysis = React.createClass({
         ref: 'name'
       }), br({}, ''), button({
         className: 'btn btn-primary',
+        disabled: "" + (saved ? 'disabled' : ''),
         onClick: this.save
       }, 'Save selection as new custom analysis'), span({}, ' '), button({
         className: 'btn btn-danger',
@@ -1134,12 +1146,10 @@ SelectedStudiesTable = React.createClass({
     return $('#selected-studies-table').find('tr').on('click', 'button', function() {
       var pmid;
       pmid = getPMID($(this).closest('tr'));
-      console.log("Removing ", pmid);
       return app.removeStudy(pmid);
     });
   },
   componentDidMount: function() {
-    console.log('selected-studies table mounted');
     $('#selected-studies-table').DataTable({
       data: this.tableData(),
       columns: [
@@ -1162,7 +1172,6 @@ SelectedStudiesTable = React.createClass({
   },
   componentDidUpdate: function() {
     var t;
-    console.log('selected-studies table updated');
     t = $('#selected-studies-table').DataTable();
     t.clear();
     t.rows.add(this.tableData());
@@ -1179,7 +1188,6 @@ SelectedStudiesTable = React.createClass({
 
 AllStudiestable = React.createClass({
   componentDidMount: function() {
-    console.log('All-studies table mounted');
     $('#all-studies-table').DataTable({
       data: app.state.allStudies,
       columns: [
@@ -1199,7 +1207,6 @@ AllStudiestable = React.createClass({
     return setupSelectableTable();
   },
   componentDidUpdate: function() {
-    console.log('All-studies table updated');
     return redrawTableSelection();
   },
   render: function() {
@@ -1212,7 +1219,6 @@ AllStudiestable = React.createClass({
 
 redrawTableSelection = function() {
   var selection;
-  console.log("Redrawing selectable table");
   selection = getSelectedStudies();
   return $('.selectable-table').find('tbody').find('tr').each(function() {
     var pmid;

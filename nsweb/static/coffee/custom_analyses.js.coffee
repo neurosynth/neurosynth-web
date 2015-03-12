@@ -1,4 +1,4 @@
-{div, br, ul, li, a, p, h1, h2, h4, h5, span, form, input, button, hr, table, thead, tr, th, td} = React.DOM
+{div, br, ul, li, a, p, h1, h2, h4, h5, span, form, input, button, hr, table, thead, tr, th, td, label} = React.DOM
 ce = React.createElement
 
 SELECTED = 'info' # CSS class to apply to selected rows
@@ -86,6 +86,11 @@ app =
     @state.activeAnalysis = {}
     @render()
 
+  setActiveAnalysisName: (name) ->
+    @state.activeAnalysis.name = name
+    @state.activeAnalysis.saved = false
+    @render()
+
   deleteAnalysis: (uuid) ->
     $.ajax
       dataType: 'json'
@@ -111,6 +116,7 @@ app =
       success: (data) =>
         @state.activeAnalysis.uuid = data.uuid
         @state.activeAnalysis.id = data.id
+        @state.activeAnalysis.saved = true
         saveToLocalStorage('ns-uuid', data.uuid)
         @fetchAllAnalyses()
 
@@ -203,23 +209,31 @@ ActiveAnalysis = React.createClass
   discardHandler: ->
     app.discardSelection()
 
+  nameChangeHandler: ->
+    app.setActiveAnalysisName @refs.name.getDOMNode().value
+
   render: ->
 #    if Object.keys(@props.analysis).length is 0
 #      return div {}, 'No analyis loaded.'
     uuid = @props.analysis.uuid
     studies = Object.keys(@props.analysis.studies)
+    saved = @props.analysis.saved
+
+#    saveButton = button {className:"btn btn-primary #{ if saved then }", onClick: @save}, 'Save selection as new custom analysis'
+
     if uuid # previously saved analysis
       header = div {},
         div {className:'row'},
           div {className: 'col-md-6'},
-            input {type: 'text', className: 'form-control', placeholder: 'Enter a name for this analysis', ref: 'name', defaultValue: @props.analysis.name}
+            label {}, 'Analysis name:',
+              input {type: 'text', className: 'form-control', ref: 'name', value: @props.analysis.name, onChange: @nameChangeHandler}
 #            h4 {}, @props.analysis.name
             p {}, "uuid: #{ uuid }"
           div {className: 'col-md-6'},
             p {}, "#{ studies.length } studies in this analysis"
             button {className: 'btn btn-info btn-sm', onClick: @cloneHandler}, 'Clone Analysis'
             span {}, ' '
-            button {className: 'btn btn-info btn-sm', onClick: @save}, 'Save Analysis'
+            button {className:'btn btn-primary', disabled: "#{ if saved then 'disabled' else ''}", onClick: @save}, 'Save'
             span {}, ' '
             button {className: 'btn btn-danger btn-sm', onClick: @deleteHandler}, 'Delete Analysis'
         div {className:'row'},
@@ -233,7 +247,7 @@ ActiveAnalysis = React.createClass
           div {className: 'col-md-8'},
             input {type: 'text', className: 'form-control', placeholder: 'Enter a name for this analysis', ref: 'name'}
             br {}, ''
-            button {className:'btn btn-primary', onClick: @save}, 'Save selection as new custom analysis'
+            button {className:'btn btn-primary', disabled: "#{ if saved then 'disabled' else ''}", onClick: @save}, 'Save selection as new custom analysis'
             span {}, ' '
             button {className:'btn btn-danger', onClick: @discardHandler}, 'Discard current selection'
           div {className: 'col-md-4'},
@@ -300,11 +314,9 @@ SelectedStudiesTable = React.createClass
   setupRemoveButton: ->
     $('#selected-studies-table').find('tr').on 'click', 'button', ->
       pmid = getPMID($(this).closest('tr'))
-      console.log "Removing ", pmid
       app.removeStudy(pmid)
 
   componentDidMount: ->
-    console.log 'selected-studies table mounted'
     $('#selected-studies-table').DataTable
       data: @tableData()
       columns: [
@@ -318,7 +330,6 @@ SelectedStudiesTable = React.createClass
     @setupRemoveButton()
 
   componentDidUpdate: ->
-    console.log 'selected-studies table updated'
     t = $('#selected-studies-table').DataTable()
     t.clear()
     t.rows.add @tableData()
@@ -339,7 +350,6 @@ SelectedStudiesTable = React.createClass
 
 AllStudiestable = React.createClass
   componentDidMount: ->
-    console.log 'All-studies table mounted'
     $('#all-studies-table').DataTable
       data: app.state.allStudies
       columns: [
@@ -352,7 +362,6 @@ AllStudiestable = React.createClass
     setupSelectableTable()
 
   componentDidUpdate: ->
-    console.log 'All-studies table updated'
     redrawTableSelection()
 
   render: ->
@@ -366,7 +375,6 @@ AllStudiestable = React.createClass
           th {}, 'PMID'
 
 redrawTableSelection = ->
-  console.log "Redrawing selectable table"
   selection = getSelectedStudies()
   $('.selectable-table').find('tbody').find('tr').each ->
     pmid = getPMID(this)
