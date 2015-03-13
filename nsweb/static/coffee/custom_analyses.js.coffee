@@ -66,37 +66,51 @@ app =
   syncToLocalStorage: ->
     window.localStorage.setItem('ns-active-analysis', JSON.stringify(@state.activeAnalysis))
 
-  removeStudy: (pmid) ->
-    console.log "In app.removeStudy"
-    delete @state.activeAnalysis.studies[pmid]
-    @state.activeAnalysis.saved = false
-    @syncToLocalStorage()
-#    saveSelection(@state.activeAnalysis.studies)
-    @render()
-
-  addStudy: (pmid) ->
-    console.log "In app.addStudy"
-    @state.activeAnalysis.studies[pmid] = 1
+  update: ->
     @state.activeAnalysis.saved = false
     @state.activeAnalysis.blank = false
-#    saveSelection(@state.activeAnalysis.studies)
     @syncToLocalStorage()
     @render()
 
+  removeStudy: (pmid) ->
+    delete @state.activeAnalysis.studies[pmid]
+    @update()
+
+  removeStudies: (pmids) ->
+    for pmid in pmids
+      delete @state.activeAnalysis.studies[pmid]
+    @update()
+
+  addStudy: (pmid) ->
+    @state.activeAnalysis.studies[pmid] = 1
+    @update()
+
+  addStudies: (pmids) ->
+    for pmid in pmids
+      @state.activeAnalysis.studies[pmid] = 1
+    @update()
+
+  addAllStudies: ->
+    for study in @state.allStudies
+      @state.activeAnalysis.studies[study.pmid] = 1
+    @update()
+
+  removeAllStudies: ->
+    @state.activeAnalysis.studies = {}
+    @update()
+
   cloneActiveAnalysis: ->
-#    selection = {}
-#    @state.activeAnalysis.studies.forEach (study) ->
-#      selection[study] = 1
-#    saveSelection(selection)
     @state.activeAnalysis.uuid = null
     @state.activeAnalysis.id = null
     @state.activeAnalysis.saved = false
     @syncToLocalStorage()
     @render()
 
-  discardSelection: ->
-    saveSelection({})
-    @state.activeAnalysis = {}
+  clearActiveAnalysis: ->
+    @state.activeAnalysis =
+      blank: true
+      studies: {}
+    @syncToLocalStorage()
     @render()
 
   setActiveAnalysisName: (name) ->
@@ -161,7 +175,6 @@ app =
         for study in data.studies
           @state.studyDetails[study.pmid] = study
         @fetchAllAnalyses()
-#        @render()
       error: (xhr, status, err) =>
         console.error @props.url, status, err.toString()
 
@@ -188,6 +201,7 @@ AnalysisListItem = React.createClass
         ul {className:'list-unstyled'},
           li {}, "Name: #{ @props.name }"
           li {}, "uuid: #{ @props.uuid }"
+          li {}, "Number of studies: #{ @props.numStudies }"
       div {className: "col-md-2"},
         button {className:"btn btn-primary btn-sm #{ if @props.selected then 'disabled' else ''}", onClick: @loadHandler}, 'Load'
 
@@ -198,7 +212,7 @@ AnalysisList = React.createClass
       hr {}, ''
       @props.analyses.map (analysis) =>
         selected = if @props.selected_uuid is analysis.uuid then true else false
-        ce AnalysisListItem, {key: analysis.uuid, uuid: analysis.uuid, name:analysis.name, selected: selected}
+        ce AnalysisListItem, {key: analysis.uuid, uuid: analysis.uuid, name:analysis.name, numStudies: analysis.studies.length, selected: selected}
 
 
 ActiveAnalysis = React.createClass
@@ -212,7 +226,7 @@ ActiveAnalysis = React.createClass
     app.cloneActiveAnalysis()
 
   discardHandler: ->
-    app.discardSelection()
+    app.clearActiveAnalysis()
 
   nameChangeHandler: ->
     app.setActiveAnalysisName @refs.name.getDOMNode().value
@@ -228,16 +242,17 @@ ActiveAnalysis = React.createClass
     if uuid # previously saved analysis
       header = div {},
         div {className:'row'},
-          div {className: 'col-md-6'},
+          div {className: 'col-md-4'},
             label {}, 'Analysis name:',
               input {type: 'text', className: 'form-control', ref: 'name', value: @props.analysis.name, onChange: @nameChangeHandler}
-#            h4 {}, @props.analysis.name
             p {}, "uuid: #{ uuid }"
-          div {className: 'col-md-6'},
-            span {}, "#{ studies.length } studies in this analysis. "
+          div {className: 'col-md-8'},
+            p {}, "#{ studies.length } studies in this analysis. "
 #              if saved then "" else span {className: 'label label-warning'}, 'You have unsaved changes'
-            br {},
+#            br {},
             button {className: "btn #{ if saved then '' else 'btn-primary' } btn-sm", disabled: "#{ if saved then 'disabled' else ''}", onClick: @save}, 'Save Analysis'
+            span {}, ' '
+            button {className: 'btn btn-primary btn-sm'}, 'Run Analysis'
             span {}, ' '
             button {className: 'btn btn-info btn-sm', onClick: @cloneHandler}, 'Clone Analysis'
             span {}, ' '
@@ -248,13 +263,13 @@ ActiveAnalysis = React.createClass
     else # headless (without uuid) analysis only present in browser's local storage
       header = div {},
         div {className: 'row'},
-          div {className: 'col-md-6'},
+          div {className: 'col-md-4'},
             input {type: 'text', className: 'form-control', placeholder: 'Enter a name for this analysis', ref: 'name'}
             br {}, ''
             button {className:'btn btn-primary', disabled: "#{ if saved then 'disabled' else ''}", onClick: @save}, 'Save selection as new custom analysis'
             span {}, ' '
             button {className:'btn btn-danger', onClick: @discardHandler}, 'Discard current selection'
-          div {className: 'col-md-6'},
+          div {className: 'col-md-8'},
             p {}, "#{ studies.length } studies selected"
         div {className:'row'},
           div {className: 'col-md-12'},
@@ -366,15 +381,41 @@ AllStudiestable = React.createClass
   componentDidUpdate: ->
     redrawTableSelection()
 
+  addAllHandler: ->
+    app.addAllStudies()
+
+  removeAllHandler: ->
+    app.removeAllStudies()
+
+  filteredPMIDs: ->
+    filteredrows = $("#all-studies-table").dataTable()._('tr', {"filter": "applied"})
+    filteredrows.map (item) -> item.pmid
+
+  addAllFilteredHandler: ->
+    app.addStudies @filteredPMIDs()
+
+  removeAllFilteredHandler: ->
+    app.removeStudies @filteredPMIDs()
+
   render: ->
-    table {className: 'table selectable-table', id: 'all-studies-table'},
-      thead {},
-        tr {},
-          th {}, 'Title '
-          th {}, 'Authors'
-          th {}, 'Journal'
-          th {}, 'Year'
-          th {}, 'PMID'
+    div {},
+      button {className: 'btn btn-sm', onClick: @addAllHandler}, "Add all studies"
+      span {}, ' '
+      button {className: 'btn btn-sm', onClick: @removeAllHandler}, "Remove all studies"
+      span {}, ' '
+      button {className: 'btn btn-sm', onClick: @addAllFilteredHandler}, "Add all filtered studies"
+      span {}, ' '
+      button {className: 'btn btn-sm', onClick: @removeAllFilteredHandler}, "Remove all filtered studies"
+      br {}, ''
+      br {}, ''
+      table {className: 'table selectable-table', id: 'all-studies-table'},
+        thead {},
+          tr {},
+            th {}, 'Title '
+            th {}, 'Authors'
+            th {}, 'Journal'
+            th {}, 'Year'
+            th {}, 'PMID'
 
 redrawTableSelection = ->
 #  selection = getSelectedStudies()
@@ -387,7 +428,6 @@ redrawTableSelection = ->
 
 setupSelectableTable = ->
   $('.selectable-table').on 'click', 'tr', ->
-    console.log 'row clicked'
     pmid = getPMID(this)
     if not pmid?
       return
@@ -429,7 +469,7 @@ $(document).ready ->
   # On the custom analyses page, warn user of unsaved changes before navigating away
   if document.getElementById('custom-list-container')?
     window.onbeforeunload = (e) ->
-      if not (app.state.activeAnalysis.saved or app.state.activeAnalysis.blank)
+      if app.state.activeAnalysis.saved or app.state.activeAnalysis.blank
         return
       e = e or window.event
       message = 'You have unsaved changes.'

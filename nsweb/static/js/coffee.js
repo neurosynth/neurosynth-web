@@ -822,20 +822,49 @@ app = {
   syncToLocalStorage: function() {
     return window.localStorage.setItem('ns-active-analysis', JSON.stringify(this.state.activeAnalysis));
   },
-  removeStudy: function(pmid) {
-    console.log("In app.removeStudy");
-    delete this.state.activeAnalysis.studies[pmid];
-    this.state.activeAnalysis.saved = false;
-    this.syncToLocalStorage();
-    return this.render();
-  },
-  addStudy: function(pmid) {
-    console.log("In app.addStudy");
-    this.state.activeAnalysis.studies[pmid] = 1;
+  update: function() {
     this.state.activeAnalysis.saved = false;
     this.state.activeAnalysis.blank = false;
     this.syncToLocalStorage();
     return this.render();
+  },
+  removeStudy: function(pmid) {
+    console.log("In app.removeStudy");
+    delete this.state.activeAnalysis.studies[pmid];
+    return this.update();
+  },
+  removeStudies: function(pmids) {
+    var pmid, _i, _len;
+    for (_i = 0, _len = pmids.length; _i < _len; _i++) {
+      pmid = pmids[_i];
+      delete this.state.activeAnalysis.studies[pmid];
+    }
+    return this.update();
+  },
+  addStudy: function(pmid) {
+    this.state.activeAnalysis.studies[pmid] = 1;
+    return this.update();
+  },
+  addStudies: function(pmids) {
+    var pmid, _i, _len;
+    for (_i = 0, _len = pmids.length; _i < _len; _i++) {
+      pmid = pmids[_i];
+      this.state.activeAnalysis.studies[pmid] = 1;
+    }
+    return this.update();
+  },
+  addAllStudies: function() {
+    var study, _i, _len, _ref1;
+    _ref1 = this.state.allStudies;
+    for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+      study = _ref1[_i];
+      this.state.activeAnalysis.studies[study.pmid] = 1;
+    }
+    return this.update();
+  },
+  removeAllStudies: function() {
+    this.state.activeAnalysis.studies = {};
+    return this.update();
   },
   cloneActiveAnalysis: function() {
     this.state.activeAnalysis.uuid = null;
@@ -844,9 +873,12 @@ app = {
     this.syncToLocalStorage();
     return this.render();
   },
-  discardSelection: function() {
-    saveSelection({});
-    this.state.activeAnalysis = {};
+  clearActiveAnalysis: function() {
+    this.state.activeAnalysis = {
+      blank: true,
+      studies: {}
+    };
+    this.syncToLocalStorage();
     return this.render();
   },
   setActiveAnalysisName: function(name) {
@@ -976,7 +1008,7 @@ AnalysisListItem = React.createClass({
       className: "col-md-10"
     }, ul({
       className: 'list-unstyled'
-    }, li({}, "Name: " + this.props.name), li({}, "uuid: " + this.props.uuid))), div({
+    }, li({}, "Name: " + this.props.name), li({}, "uuid: " + this.props.uuid), li({}, "Number of studies: " + this.props.numStudies))), div({
       className: "col-md-2"
     }, button({
       className: "btn btn-primary btn-sm " + (this.props.selected ? 'disabled' : ''),
@@ -997,6 +1029,7 @@ AnalysisList = React.createClass({
           key: analysis.uuid,
           uuid: analysis.uuid,
           name: analysis.name,
+          numStudies: analysis.studies.length,
           selected: selected
         });
       };
@@ -1015,7 +1048,7 @@ ActiveAnalysis = React.createClass({
     return app.cloneActiveAnalysis();
   },
   discardHandler: function() {
-    return app.discardSelection();
+    return app.clearActiveAnalysis();
   },
   nameChangeHandler: function() {
     return app.setActiveAnalysisName(this.refs.name.getDOMNode().value);
@@ -1032,7 +1065,7 @@ ActiveAnalysis = React.createClass({
       header = div({}, div({
         className: 'row'
       }, div({
-        className: 'col-md-6'
+        className: 'col-md-4'
       }, label({}, 'Analysis name:', input({
         type: 'text',
         className: 'form-control',
@@ -1040,12 +1073,14 @@ ActiveAnalysis = React.createClass({
         value: this.props.analysis.name,
         onChange: this.nameChangeHandler
       })), p({}, "uuid: " + uuid)), div({
-        className: 'col-md-6'
-      }, span({}, "" + studies.length + " studies in this analysis. "), br({}, button({
+        className: 'col-md-8'
+      }, p({}, "" + studies.length + " studies in this analysis. "), button({
         className: "btn " + (saved ? '' : 'btn-primary') + " btn-sm",
         disabled: "" + (saved ? 'disabled' : ''),
         onClick: this.save
-      }, 'Save Analysis')), span({}, ' '), button({
+      }, 'Save Analysis'), span({}, ' '), button({
+        className: 'btn btn-primary btn-sm'
+      }, 'Run Analysis'), span({}, ' '), button({
         className: 'btn btn-info btn-sm',
         onClick: this.cloneHandler
       }, 'Clone Analysis'), span({}, ' '), button({
@@ -1060,7 +1095,7 @@ ActiveAnalysis = React.createClass({
       header = div({}, div({
         className: 'row'
       }, div({
-        className: 'col-md-6'
+        className: 'col-md-4'
       }, input({
         type: 'text',
         className: 'form-control',
@@ -1074,7 +1109,7 @@ ActiveAnalysis = React.createClass({
         className: 'btn btn-danger',
         onClick: this.discardHandler
       }, 'Discard current selection')), div({
-        className: 'col-md-6'
+        className: 'col-md-8'
       }, p({}, "" + studies.length + " studies selected"))), div({
         className: 'row'
       }, div({
@@ -1192,11 +1227,44 @@ AllStudiestable = React.createClass({
   componentDidUpdate: function() {
     return redrawTableSelection();
   },
+  addAllHandler: function() {
+    return app.addAllStudies();
+  },
+  removeAllHandler: function() {
+    return app.removeAllStudies();
+  },
+  filteredPMIDs: function() {
+    var filteredrows;
+    filteredrows = $("#all-studies-table").dataTable()._('tr', {
+      "filter": "applied"
+    });
+    return filteredrows.map(function(item) {
+      return item.pmid;
+    });
+  },
+  addAllFilteredHandler: function() {
+    return app.addStudies(this.filteredPMIDs());
+  },
+  removeAllFilteredHandler: function() {
+    return app.removeStudies(this.filteredPMIDs());
+  },
   render: function() {
-    return table({
+    return div({}, button({
+      className: 'btn btn-sm',
+      onClick: this.addAllHandler
+    }, "Add all studies"), span({}, ' '), button({
+      className: 'btn btn-sm',
+      onClick: this.removeAllHandler
+    }, "Remove all studies"), span({}, ' '), button({
+      className: 'btn btn-sm',
+      onClick: this.addAllFilteredHandler
+    }, "Add all filtered studies"), span({}, ' '), button({
+      className: 'btn btn-sm',
+      onClick: this.removeAllFilteredHandler
+    }, "Remove all filtered studies"), br({}, ''), br({}, ''), table({
       className: 'table selectable-table',
       id: 'all-studies-table'
-    }, thead({}, tr({}, th({}, 'Title '), th({}, 'Authors'), th({}, 'Journal'), th({}, 'Year'), th({}, 'PMID'))));
+    }, thead({}, tr({}, th({}, 'Title '), th({}, 'Authors'), th({}, 'Journal'), th({}, 'Year'), th({}, 'PMID')))));
   }
 });
 
@@ -1261,7 +1329,7 @@ $(document).ready(function() {
   if (document.getElementById('custom-list-container') != null) {
     return window.onbeforeunload = function(e) {
       var message;
-      if (!(app.state.activeAnalysis.saved || app.state.activeAnalysis.blank)) {
+      if (app.state.activeAnalysis.saved || app.state.activeAnalysis.blank) {
         return;
       }
       e = e || window.event;
