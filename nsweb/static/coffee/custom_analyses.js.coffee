@@ -4,9 +4,6 @@ ce = React.createElement
 SELECTED = 'info' # CSS class to apply to selected rows
 
 # Local Storage Helper Functions
-getSelectedStudies = ->
-  selection = JSON.parse(window.localStorage.getItem('ns-selection') or "{}")
-
 saveSelection = (selection) ->
   window.localStorage.setItem('ns-selection', JSON.stringify(selection))
 #  window.localStorage.setItem('ns-uuid', null)
@@ -18,6 +15,9 @@ getFromLocalStorage = (key) ->
   val = window.localStorage.getItem(key)
   if val is null then val else JSON.parse(val)
 #  JSON.parse(window.localStorage.getItem(key))
+
+getSelectedStudies = ->
+  selection = JSON.parse(window.localStorage.getItem('ns-selection') or "{}")
 
 getPMID = (tr) ->
   # Given tr DOM element parse the PMID
@@ -45,40 +45,53 @@ app =
     analyses: []
     allStudies: []
     activeAnalysis:
+      blank: true
       studies: {}
 #      studyList: => Object.keys(@studies)
 
   setActiveAnalysis: (uuid) ->
+    if not (@state.activeAnalysis.saved or @state.activeAnalysis.blank)
+      if not confirm "You have unsaved changes that will be discarded. Are you sure you want to proceeed?"
+        return
     @state.activeAnalysis = $.extend {}, @state.analyses.filter((a) -> a.uuid is uuid)[0]
     @state.activeAnalysis.studies = arrayToObject(@state.activeAnalysis.studies)
     @state.activeAnalysis.saved = true
-    saveSelection(@state.activeAnalysis.studies)
+#    saveSelection(@state.activeAnalysis.studies)
+    @syncToLocalStorage()
     @render()
 
   activeStudies: ->
     return Object.keys(@state.activeAnalysis.studies).map (pmid) => @state.studyDetails[pmid]
 
+  syncToLocalStorage: ->
+    window.localStorage.setItem('ns-active-analysis', JSON.stringify(@state.activeAnalysis))
+
   removeStudy: (pmid) ->
     console.log "In app.removeStudy"
     delete @state.activeAnalysis.studies[pmid]
     @state.activeAnalysis.saved = false
-    saveSelection(@state.activeAnalysis.studies)
+    @syncToLocalStorage()
+#    saveSelection(@state.activeAnalysis.studies)
     @render()
 
   addStudy: (pmid) ->
     console.log "In app.addStudy"
     @state.activeAnalysis.studies[pmid] = 1
     @state.activeAnalysis.saved = false
-    saveSelection(@state.activeAnalysis.studies)
+    @state.activeAnalysis.blank = false
+#    saveSelection(@state.activeAnalysis.studies)
+    @syncToLocalStorage()
     @render()
 
   cloneActiveAnalysis: ->
-    selection = {}
-    @state.activeAnalysis.studies.forEach (study) ->
-      selection[study] = 1
-    saveSelection(selection)
+#    selection = {}
+#    @state.activeAnalysis.studies.forEach (study) ->
+#      selection[study] = 1
+#    saveSelection(selection)
     @state.activeAnalysis.uuid = null
     @state.activeAnalysis.id = null
+    @state.activeAnalysis.saved = false
+    @syncToLocalStorage()
     @render()
 
   discardSelection: ->
@@ -92,14 +105,19 @@ app =
     @render()
 
   deleteAnalysis: (uuid) ->
+    if not confirm "Are you sure you want to delete this analysis? "
+      return
     $.ajax
       dataType: 'json'
       type: 'DELETE'
       url: @props.deleteURL + uuid.toString() + '/'
       success: (response) =>
-        @state.activeAnalysis = {}
-        @init()
-#        @fetchAllAnalyses()
+        @state.activeAnalysis =
+          blank: true
+          studies: {}
+        @syncToLocalStorage()
+#        @init()
+        @fetchAllAnalyses()
 
   saveActiveAnalysis: (name) ->
     @state.activeAnalysis.name = name
@@ -117,7 +135,8 @@ app =
         @state.activeAnalysis.uuid = data.uuid
         @state.activeAnalysis.id = data.id
         @state.activeAnalysis.saved = true
-        saveToLocalStorage('ns-uuid', data.uuid)
+#        saveToLocalStorage('ns-uuid', data.uuid)
+        @syncToLocalStorage()
         @fetchAllAnalyses()
 
   fetchAllAnalyses: ->
@@ -147,24 +166,10 @@ app =
         console.error @props.url, status, err.toString()
 
   init: ->
-    ###
-    See if there are any selected studies in localStorage.
-    If so, create a new analysis
-    ###
-#    studies = getFromLocalStorage('ns-selection')
-    uuid = getFromLocalStorage('ns-uuid')
-#    if studies
-#      studies = Object.keys(studies)
-#    else
-#      studies = []
-#
-#    @state.activeAnalysis = {}
-    if uuid is null
-      @state.activeAnalysis.studies = getFromLocalStorage('ns-selection') or []
-      @state.activeAnalysis.uuid = uuid
-
+    active = getFromLocalStorage('ns-active-analysis')
+    if active
+      @state.activeAnalysis = active
     @fetchAllStudies()
-#    @fetchAllAnalyses(@fetchAllStudies(@render))
 
   render: ->
     if not document.getElementById('custom-list-container')?
@@ -179,11 +184,11 @@ AnalysisListItem = React.createClass
 
   render: ->
     div {className: "row bs-callout panel #{ if @props.selected then 'bs-callout-info' else ''}"},
-      div {className: "col-md-8"},
+      div {className: "col-md-10"},
         ul {className:'list-unstyled'},
           li {}, "Name: #{ @props.name }"
           li {}, "uuid: #{ @props.uuid }"
-      div {className: "col-md-4"},
+      div {className: "col-md-2"},
         button {className:"btn btn-primary btn-sm #{ if @props.selected then 'disabled' else ''}", onClick: @loadHandler}, 'Load'
 
 AnalysisList = React.createClass
@@ -213,13 +218,12 @@ ActiveAnalysis = React.createClass
     app.setActiveAnalysisName @refs.name.getDOMNode().value
 
   render: ->
-#    if Object.keys(@props.analysis).length is 0
-#      return div {}, 'No analyis loaded.'
+    if @props.analysis.blank
+      return div {}, 'No active analysis currently loaded'
+
     uuid = @props.analysis.uuid
     studies = Object.keys(@props.analysis.studies)
     saved = @props.analysis.saved
-
-#    saveButton = button {className:"btn btn-primary #{ if saved then }", onClick: @save}, 'Save selection as new custom analysis'
 
     if uuid # previously saved analysis
       header = div {},
@@ -230,27 +234,27 @@ ActiveAnalysis = React.createClass
 #            h4 {}, @props.analysis.name
             p {}, "uuid: #{ uuid }"
           div {className: 'col-md-6'},
-            p {}, "#{ studies.length } studies in this analysis"
-            button {className: 'btn btn-info btn-sm', onClick: @cloneHandler}, 'Clone Analysis'
+            span {}, "#{ studies.length } studies in this analysis. "
+#              if saved then "" else span {className: 'label label-warning'}, 'You have unsaved changes'
+            br {},
+            button {className: "btn #{ if saved then '' else 'btn-primary' } btn-sm", disabled: "#{ if saved then 'disabled' else ''}", onClick: @save}, 'Save Analysis'
             span {}, ' '
-            button {className:'btn btn-primary', disabled: "#{ if saved then 'disabled' else ''}", onClick: @save}, 'Save'
+            button {className: 'btn btn-info btn-sm', onClick: @cloneHandler}, 'Clone Analysis'
             span {}, ' '
             button {className: 'btn btn-danger btn-sm', onClick: @deleteHandler}, 'Delete Analysis'
         div {className:'row'},
           div {className: 'col-md-12'},
             hr {}, ''
-#      studiesSection = ce StudiesTable, {analysis: @props.analysis}
-#      studiesSection = ce SelectedStudiesTable, {}
     else # headless (without uuid) analysis only present in browser's local storage
       header = div {},
         div {className: 'row'},
-          div {className: 'col-md-8'},
+          div {className: 'col-md-6'},
             input {type: 'text', className: 'form-control', placeholder: 'Enter a name for this analysis', ref: 'name'}
             br {}, ''
             button {className:'btn btn-primary', disabled: "#{ if saved then 'disabled' else ''}", onClick: @save}, 'Save selection as new custom analysis'
             span {}, ' '
             button {className:'btn btn-danger', onClick: @discardHandler}, 'Discard current selection'
-          div {className: 'col-md-4'},
+          div {className: 'col-md-6'},
             p {}, "#{ studies.length } studies selected"
         div {className:'row'},
           div {className: 'col-md-12'},
@@ -273,38 +277,36 @@ ActiveAnalysis = React.createClass
             div {className: 'tab-content'},
               div {className: 'tab-pane active', role:'tab-panel', id:'selected-studies-tab'},
                 ce SelectedStudiesTable, {}
-#                studiesSection
               div {className: 'tab-pane', role:'tab-panel', id:'all-studies-tab'},
                 br {},
                 p {}, "Add or remove studies to your analysis by clicking on the study. Studies that are already added are highlighted in blue."
                 ce AllStudiestable
-#          ce StudiesTable, {analysis: @props.analysis}
 
-StudiesTable = React.createClass
-  componentDidMount: ->
-    $('#custom-studies-table').dataTable
-      pageLength: 10
-      serverSide: true
-      ajax: app.props.studiesTableURL + @props.analysis.id + '/'
-      order: [[1, 'desc']]
-
-  componentDidUpdate: ->
-    if not @props.analysis.id
-      return
-    url = app.props.studiesTableURL + @props.analysis.id + '/'
-    studyTable = $('#custom-studies-table').DataTable()
-    studyTable.ajax.url(url)
-    studyTable.ajax.reload()
-
-  render: ->
-    table {className:'table table-hover', id: 'custom-studies-table'},
-      thead {},
-        tr {},
-          th {}, 'Title '
-          th {}, 'Authors'
-          th {}, 'Journal'
-          th {}, 'Year'
-          th {}, 'PMID'
+#StudiesTable = React.createClass
+#  componentDidMount: ->
+#    $('#custom-studies-table').dataTable
+#      pageLength: 10
+#      serverSide: true
+#      ajax: app.props.studiesTableURL + @props.analysis.id + '/'
+#      order: [[1, 'desc']]
+#
+#  componentDidUpdate: ->
+#    if not @props.analysis.id
+#      return
+#    url = app.props.studiesTableURL + @props.analysis.id + '/'
+#    studyTable = $('#custom-studies-table').DataTable()
+#    studyTable.ajax.url(url)
+#    studyTable.ajax.reload()
+#
+#  render: ->
+#    table {className:'table table-hover', id: 'custom-studies-table'},
+#      thead {},
+#        tr {},
+#          th {}, 'Title '
+#          th {}, 'Authors'
+#          th {}, 'Journal'
+#          th {}, 'Year'
+#          th {}, 'PMID'
 
 SelectedStudiesTable = React.createClass
   tableData: ->
@@ -375,10 +377,10 @@ AllStudiestable = React.createClass
           th {}, 'PMID'
 
 redrawTableSelection = ->
-  selection = getSelectedStudies()
+#  selection = getSelectedStudies()
   $('.selectable-table').find('tbody').find('tr').each ->
     pmid = getPMID(this)
-    if pmid of selection
+    if pmid of app.state.activeAnalysis.studies
       $(this).addClass(SELECTED)
     else
       $(this).removeClass(SELECTED)
@@ -389,8 +391,8 @@ setupSelectableTable = ->
     pmid = getPMID(this)
     if not pmid?
       return
-    selection = getSelectedStudies()
-    if pmid of selection
+#    selection = getSelectedStudies()
+    if pmid of app.state.activeAnalysis.studies
       app.removeStudy(pmid)
 #      delete selection[pmid]
     else
@@ -424,4 +426,17 @@ setupSelectableTable = ->
 $(document).ready ->
   setupSelectableTable()
   app.init()
+  # On the custom analyses page, warn user of unsaved changes before navigating away
+  if document.getElementById('custom-list-container')?
+    window.onbeforeunload = (e) ->
+      if not (app.state.activeAnalysis.saved or app.state.activeAnalysis.blank)
+        return
+      e = e or window.event
+      message = 'You have unsaved changes.'
+      # For IE6-8 and Firefox prior to version 4
+      if e
+        e.returnValue = message
+      # For Chrome, Safari, IE8+ and Opera 12+
+      return message
+
 

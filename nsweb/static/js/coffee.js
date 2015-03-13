@@ -1,4 +1,4 @@
-var ActiveAnalysis, AllStudiestable, AnalysisList, AnalysisListItem, NSCookie, SELECTED, Scatter, SelectedStudiesTable, StudiesTable, a, app, arrayToObject, br, button, ce, createDataTable, div, form, getFromLocalStorage, getPMID, getSelectedStudies, h1, h2, h4, h5, hr, input, label, li, load_reverse_inference_image, make_scatterplot, p, redrawTableSelection, runif, saveSelection, saveToLocalStorage, setupSelectableTable, span, table, td, textToHTML, th, thead, tr, ul, urlToParams, _ref,
+var ActiveAnalysis, AllStudiestable, AnalysisList, AnalysisListItem, NSCookie, SELECTED, Scatter, SelectedStudiesTable, a, app, arrayToObject, br, button, ce, createDataTable, div, form, getFromLocalStorage, getPMID, getSelectedStudies, h1, h2, h4, h5, hr, input, label, li, load_reverse_inference_image, make_scatterplot, p, redrawTableSelection, runif, saveSelection, saveToLocalStorage, setupSelectableTable, span, table, td, textToHTML, th, thead, tr, ul, urlToParams, _ref,
   __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
 NSCookie = (function() {
@@ -739,11 +739,6 @@ ce = React.createElement;
 
 SELECTED = 'info';
 
-getSelectedStudies = function() {
-  var selection;
-  return selection = JSON.parse(window.localStorage.getItem('ns-selection') || "{}");
-};
-
 saveSelection = function(selection) {
   return window.localStorage.setItem('ns-selection', JSON.stringify(selection));
 };
@@ -760,6 +755,11 @@ getFromLocalStorage = function(key) {
   } else {
     return JSON.parse(val);
   }
+};
+
+getSelectedStudies = function() {
+  var selection;
+  return selection = JSON.parse(window.localStorage.getItem('ns-selection') || "{}");
 };
 
 getPMID = function(tr) {
@@ -794,16 +794,22 @@ app = {
     analyses: [],
     allStudies: [],
     activeAnalysis: {
+      blank: true,
       studies: {}
     }
   },
   setActiveAnalysis: function(uuid) {
+    if (!(this.state.activeAnalysis.saved || this.state.activeAnalysis.blank)) {
+      if (!confirm("You have unsaved changes that will be discarded. Are you sure you want to proceeed?")) {
+        return;
+      }
+    }
     this.state.activeAnalysis = $.extend({}, this.state.analyses.filter(function(a) {
       return a.uuid === uuid;
     })[0]);
     this.state.activeAnalysis.studies = arrayToObject(this.state.activeAnalysis.studies);
     this.state.activeAnalysis.saved = true;
-    saveSelection(this.state.activeAnalysis.studies);
+    this.syncToLocalStorage();
     return this.render();
   },
   activeStudies: function() {
@@ -813,29 +819,29 @@ app = {
       };
     })(this));
   },
+  syncToLocalStorage: function() {
+    return window.localStorage.setItem('ns-active-analysis', JSON.stringify(this.state.activeAnalysis));
+  },
   removeStudy: function(pmid) {
     console.log("In app.removeStudy");
     delete this.state.activeAnalysis.studies[pmid];
     this.state.activeAnalysis.saved = false;
-    saveSelection(this.state.activeAnalysis.studies);
+    this.syncToLocalStorage();
     return this.render();
   },
   addStudy: function(pmid) {
     console.log("In app.addStudy");
     this.state.activeAnalysis.studies[pmid] = 1;
     this.state.activeAnalysis.saved = false;
-    saveSelection(this.state.activeAnalysis.studies);
+    this.state.activeAnalysis.blank = false;
+    this.syncToLocalStorage();
     return this.render();
   },
   cloneActiveAnalysis: function() {
-    var selection;
-    selection = {};
-    this.state.activeAnalysis.studies.forEach(function(study) {
-      return selection[study] = 1;
-    });
-    saveSelection(selection);
     this.state.activeAnalysis.uuid = null;
     this.state.activeAnalysis.id = null;
+    this.state.activeAnalysis.saved = false;
+    this.syncToLocalStorage();
     return this.render();
   },
   discardSelection: function() {
@@ -849,14 +855,21 @@ app = {
     return this.render();
   },
   deleteAnalysis: function(uuid) {
+    if (!confirm("Are you sure you want to delete this analysis? ")) {
+      return;
+    }
     return $.ajax({
       dataType: 'json',
       type: 'DELETE',
       url: this.props.deleteURL + uuid.toString() + '/',
       success: (function(_this) {
         return function(response) {
-          _this.state.activeAnalysis = {};
-          return _this.init();
+          _this.state.activeAnalysis = {
+            blank: true,
+            studies: {}
+          };
+          _this.syncToLocalStorage();
+          return _this.fetchAllAnalyses();
         };
       })(this)
     });
@@ -881,7 +894,7 @@ app = {
           _this.state.activeAnalysis.uuid = data.uuid;
           _this.state.activeAnalysis.id = data.id;
           _this.state.activeAnalysis.saved = true;
-          saveToLocalStorage('ns-uuid', data.uuid);
+          _this.syncToLocalStorage();
           return _this.fetchAllAnalyses();
         };
       })(this)
@@ -931,16 +944,10 @@ app = {
     });
   },
   init: function() {
-
-    /*
-    See if there are any selected studies in localStorage.
-    If so, create a new analysis
-     */
-    var uuid;
-    uuid = getFromLocalStorage('ns-uuid');
-    if (uuid === null) {
-      this.state.activeAnalysis.studies = getFromLocalStorage('ns-selection') || [];
-      this.state.activeAnalysis.uuid = uuid;
+    var active;
+    active = getFromLocalStorage('ns-active-analysis');
+    if (active) {
+      this.state.activeAnalysis = active;
     }
     return this.fetchAllStudies();
   },
@@ -966,11 +973,11 @@ AnalysisListItem = React.createClass({
     return div({
       className: "row bs-callout panel " + (this.props.selected ? 'bs-callout-info' : '')
     }, div({
-      className: "col-md-8"
+      className: "col-md-10"
     }, ul({
       className: 'list-unstyled'
     }, li({}, "Name: " + this.props.name), li({}, "uuid: " + this.props.uuid))), div({
-      className: "col-md-4"
+      className: "col-md-2"
     }, button({
       className: "btn btn-primary btn-sm " + (this.props.selected ? 'disabled' : ''),
       onClick: this.loadHandler
@@ -1015,6 +1022,9 @@ ActiveAnalysis = React.createClass({
   },
   render: function() {
     var header, saved, studies, uuid;
+    if (this.props.analysis.blank) {
+      return div({}, 'No active analysis currently loaded');
+    }
     uuid = this.props.analysis.uuid;
     studies = Object.keys(this.props.analysis.studies);
     saved = this.props.analysis.saved;
@@ -1031,14 +1041,14 @@ ActiveAnalysis = React.createClass({
         onChange: this.nameChangeHandler
       })), p({}, "uuid: " + uuid)), div({
         className: 'col-md-6'
-      }, p({}, "" + studies.length + " studies in this analysis"), button({
+      }, span({}, "" + studies.length + " studies in this analysis. "), br({}, button({
+        className: "btn " + (saved ? '' : 'btn-primary') + " btn-sm",
+        disabled: "" + (saved ? 'disabled' : ''),
+        onClick: this.save
+      }, 'Save Analysis')), span({}, ' '), button({
         className: 'btn btn-info btn-sm',
         onClick: this.cloneHandler
       }, 'Clone Analysis'), span({}, ' '), button({
-        className: 'btn btn-primary',
-        disabled: "" + (saved ? 'disabled' : ''),
-        onClick: this.save
-      }, 'Save'), span({}, ' '), button({
         className: 'btn btn-danger btn-sm',
         onClick: this.deleteHandler
       }, 'Delete Analysis'))), div({
@@ -1050,7 +1060,7 @@ ActiveAnalysis = React.createClass({
       header = div({}, div({
         className: 'row'
       }, div({
-        className: 'col-md-8'
+        className: 'col-md-6'
       }, input({
         type: 'text',
         className: 'form-control',
@@ -1064,7 +1074,7 @@ ActiveAnalysis = React.createClass({
         className: 'btn btn-danger',
         onClick: this.discardHandler
       }, 'Discard current selection')), div({
-        className: 'col-md-4'
+        className: 'col-md-6'
       }, p({}, "" + studies.length + " studies selected"))), div({
         className: 'row'
       }, div({
@@ -1104,33 +1114,6 @@ ActiveAnalysis = React.createClass({
       role: 'tab-panel',
       id: 'all-studies-tab'
     }, br({}, p({}, "Add or remove studies to your analysis by clicking on the study. Studies that are already added are highlighted in blue.")), ce(AllStudiestable)))))));
-  }
-});
-
-StudiesTable = React.createClass({
-  componentDidMount: function() {
-    return $('#custom-studies-table').dataTable({
-      pageLength: 10,
-      serverSide: true,
-      ajax: app.props.studiesTableURL + this.props.analysis.id + '/',
-      order: [[1, 'desc']]
-    });
-  },
-  componentDidUpdate: function() {
-    var studyTable, url;
-    if (!this.props.analysis.id) {
-      return;
-    }
-    url = app.props.studiesTableURL + this.props.analysis.id + '/';
-    studyTable = $('#custom-studies-table').DataTable();
-    studyTable.ajax.url(url);
-    return studyTable.ajax.reload();
-  },
-  render: function() {
-    return table({
-      className: 'table table-hover',
-      id: 'custom-studies-table'
-    }, thead({}, tr({}, th({}, 'Title '), th({}, 'Authors'), th({}, 'Journal'), th({}, 'Year'), th({}, 'PMID'))));
   }
 });
 
@@ -1218,12 +1201,10 @@ AllStudiestable = React.createClass({
 });
 
 redrawTableSelection = function() {
-  var selection;
-  selection = getSelectedStudies();
   return $('.selectable-table').find('tbody').find('tr').each(function() {
     var pmid;
     pmid = getPMID(this);
-    if (pmid in selection) {
+    if (pmid in app.state.activeAnalysis.studies) {
       return $(this).addClass(SELECTED);
     } else {
       return $(this).removeClass(SELECTED);
@@ -1233,14 +1214,13 @@ redrawTableSelection = function() {
 
 setupSelectableTable = function() {
   $('.selectable-table').on('click', 'tr', function() {
-    var pmid, selection;
+    var pmid;
     console.log('row clicked');
     pmid = getPMID(this);
     if (pmid == null) {
       return;
     }
-    selection = getSelectedStudies();
-    if (pmid in selection) {
+    if (pmid in app.state.activeAnalysis.studies) {
       app.removeStudy(pmid);
     } else {
       app.addStudy(pmid);
@@ -1277,5 +1257,19 @@ setupSelectableTable = function() {
 
 $(document).ready(function() {
   setupSelectableTable();
-  return app.init();
+  app.init();
+  if (document.getElementById('custom-list-container') != null) {
+    return window.onbeforeunload = function(e) {
+      var message;
+      if (!(app.state.activeAnalysis.saved || app.state.activeAnalysis.blank)) {
+        return;
+      }
+      e = e || window.event;
+      message = 'You have unsaved changes.';
+      if (e) {
+        e.returnValue = message;
+      }
+      return message;
+    };
+  }
 });
