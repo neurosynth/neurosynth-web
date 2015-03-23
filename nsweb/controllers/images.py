@@ -13,7 +13,7 @@ bp = Blueprint('images', __name__, url_prefix='/images')
 
 
 @bp.route('/<int:val>/')
-def download(val, fdr=True):
+def download(val, unthresholded=False):
     image = Image.query.get_or_404(val)
     if not image.download:
         abort(404)
@@ -21,7 +21,8 @@ def download(val, fdr=True):
     db.session.add(Download(image_id=val, ip=request.remote_addr))
     db.session.commit()
     # Send the file
-    filename = image.image_file if fdr else image.uncorrected_image_file
+    filename = image.image_file if not unthresholded \
+        else image.uncorrected_image_file
     return send_nifti(filename)
 
 

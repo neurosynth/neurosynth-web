@@ -3,6 +3,7 @@ from flask import (Blueprint, render_template, redirect, url_for, request,
 from nsweb.models.analyses import (Analysis, AnalysisSet, TopicAnalysis,
                                    TermAnalysis)
 from nsweb.core import add_blueprint
+from nsweb.controllers import images
 import json
 import re
 
@@ -10,10 +11,11 @@ bp = Blueprint('analyses', __name__, url_prefix='/analyses')
 
 
 ### ROUTES COMMON TO ALL ANALYSES ###
-def find_analysis(val):
+def find_analysis(name, type=None):
     ''' Retrieve analysis by either id (when int) or name (when string) '''
-    return Analysis.query.get(val) if re.match('\d+$', val) else \
-        Analysis.query.filter_by(name=val).first()
+    if re.match('\d+$', name):
+        return Analysis.query.get(name)
+    return Analysis.query.filter_by(type=type, name=name).first()
 
 
 @bp.route('/<string:val>/images')
@@ -32,15 +34,32 @@ def get_images(val):
     return jsonify(data=images)
 
 
-@bp.route('/<string:val>/images/reverseinference/')
-def get_reverse_inference_image(val):
-    # Horrible hacks here to serve just reverse inference images with or
-    # without FDR; totally mucks up API pattern, so clean up later.
-    analysis = find_analysis(val)
-    fdr = ('nofdr' not in request.args.keys())
-    img = [i for i in analysis.images if 'reverse' in i.label][0]
-    from nsweb.controllers import images
-    return images.download(img.id, fdr)
+@bp.route('/<string:type>/<string:name>/images/<string:image>/')
+@bp.route('/topics/<string:topic_set>/<string:name>/images/<string:image>/')
+def get_image(name, image, type=None, topic_set=None):
+    if type is None:
+        analysis = TopicAnalysis.query.join(AnalysisSet).filter(
+            TopicAnalysis.number == int(name),
+            AnalysisSet.name == topic_set).first()
+    else:
+        type = {'topics': 'topic', 'terms': 'term', 'custom': 'custom'}[type]
+        analysis = find_analysis(name, type=type)
+    unthresholded = ('unthresholded' in request.args.keys())
+    if re.match('\d+$', image):
+        img = analysis.images[int(image)]
+    elif image in ['reverse', 'forward']:
+        img = [i for i in analysis.images if image in i.label][0]
+    return images.download(img.id, unthresholded)
+
+# @bp.route('/<string:val>/images/reverseinference/')
+# def get_reverse_inference_image(val):
+#     # Horrible hacks here to serve just reverse inference images with or
+#     # without FDR; totally mucks up API pattern, so clean up later.
+#     analysis = find_analysis(val)
+#     fdr = ('nofdr' not in request.args.keys())
+#     img = [i for i in analysis.images if 'reverse' in i.label][0]
+#     from nsweb.controllers import images
+#     return images.download(img.id, fdr)
 
 
 @bp.route('/<string:val>/studies')
@@ -81,7 +100,7 @@ def list_terms():
 
 @bp.route('/terms/<string:term>/')
 def show_term(term):
-    analysis = find_analysis(term)
+    analysis = find_analysis(term, type='term')
     if analysis is None:
         return render_template('analyses/missing.html.slim', analysis=term)
     return render_template('analyses/terms/show.html.slim',
