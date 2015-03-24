@@ -52,12 +52,7 @@ $(document).ready ->
     $.get(url, (result) ->
       loadImages(result.data)
       )
-
-  loadAnalysisSimilarity = ->
-    url = '/images/' + rev_inf + '/decode'
-    $('#analysis-similarity-table').DataTable().ajax.url(url).load().order([1, 'desc'])
     
-
   # Load state (e.g., which tab to display)
   activeTab = window.cookie.get('analysisTab')
   $("#analysis-menu li:eq(#{activeTab}) a").tab('show')
@@ -65,7 +60,6 @@ $(document).ready ->
   if analysis?
     loadAnalysisStudies()
     loadAnalysisImages()
-    # loadAnalysisSimilarity()
 
 
   # Update cookie to reflect last tab user was on

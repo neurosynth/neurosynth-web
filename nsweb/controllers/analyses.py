@@ -51,16 +51,6 @@ def get_image(name, image, type=None, topic_set=None):
         img = [i for i in analysis.images if image in i.label][0]
     return images.download(img.id, unthresholded)
 
-# @bp.route('/<string:val>/images/reverseinference/')
-# def get_reverse_inference_image(val):
-#     # Horrible hacks here to serve just reverse inference images with or
-#     # without FDR; totally mucks up API pattern, so clean up later.
-#     analysis = find_analysis(val)
-#     fdr = ('nofdr' not in request.args.keys())
-#     img = [i for i in analysis.images if 'reverse' in i.label][0]
-#     from nsweb.controllers import images
-#     return images.download(img.id, fdr)
-
 
 @bp.route('/<string:val>/studies')
 def get_studies(val):
