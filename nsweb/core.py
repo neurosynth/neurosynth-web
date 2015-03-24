@@ -25,6 +25,7 @@ cache = Cache(config={'CACHE_TYPE': 'simple'})
 
 # Initialize celery
 celery = make_celery(app)
+from nsweb import tasks
 
 db = SQLAlchemy()
 _blueprints = []
