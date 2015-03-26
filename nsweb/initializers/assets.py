@@ -57,6 +57,30 @@ js_bundle = Bundle('js/lib/jquery.js',
                   coffee_bundle,
                    filters='rjsmin', output='js/main.min.js')
 
+swagger_js = Bundle(
+    # 'js/lib/swagger-ui/jquery-ui.js',
+    'js/lib/swagger-ui/shred.bundle.js',
+    'js/lib/swagger-ui/jquery-1.8.0.min.js',
+    'js/lib/swagger-ui/jquery.slideto.min.js',
+    'js/lib/swagger-ui/jquery.wiggle.min.js',
+    'js/lib/swagger-ui/jquery.ba-bbq.min.js',
+    'js/lib/swagger-ui/handlebars-2.0.0.js',
+    'js/lib/swagger-ui/underscore-min.js',
+    'js/lib/swagger-ui/backbone-min.js',
+    'js/lib/swagger-ui/swagger-client.js',
+    'js/lib/swagger-ui/swagger-ui.min.js',
+    'js/lib/swagger-ui/highlight.7.3.pack.js',
+    'js/lib/swagger-ui/marked.js', filters='rjsmin',
+    output='js/swagger.min.js'
+)
+
+swagger_css = Bundle(
+    'css/swagger-ui/typography.css',
+    'css/swagger-ui/reset.css',
+    'css/swagger-ui/screen.css',
+    filters='cssmin', output='css/swagger.min.css')
+
+
 def init_assets(app):
     app.config['ASSETS_DEBUG'] = settings.DEBUG
     webassets = Environment(app)
@@ -65,6 +89,9 @@ def init_assets(app):
     webassets.register('css', css_bundle)
     webassets.register('coffee', coffee_bundle)
     webassets.register('js', js_bundle)
+
+    webassets.register('swagger_js', swagger_js)
+    webassets.register('swagger_css', swagger_css)
     # webassets.manifest = 'cache' if not app.debug else False
     # webassets.cache = not app.debug
     # webassets.debug = app.debug

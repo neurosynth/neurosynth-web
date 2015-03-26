@@ -1,5 +1,4 @@
-from flask import (Blueprint, render_template, url_for, jsonify, abort,
-                   send_file)
+from flask import (Blueprint, render_template, abort, send_file)
 from nsweb.models.genes import Gene
 from nsweb.core import add_blueprint
 from nsweb.tasks import make_scatterplot

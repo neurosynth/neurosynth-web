@@ -46,6 +46,9 @@ $.fn.dataTable.TableTools.defaults.aButtons = [
     }
   ]
 
+# Throw JS errors instead of triggering alerts
+$.fn.dataTableExt.sErrMode = 'throw'
+
 createDataTable = (element, options) ->
 
   # Set defaults and overwrite with the passed object
@@ -91,7 +94,7 @@ $(document).ready ->
     
     createDataTable('#decoding_results_table', {
       pagingType: "simple"
-      displayLength: 10
+      pageLength: 10
       processing: true
       stateSave: false
       orderClasses: false

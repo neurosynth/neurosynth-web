@@ -6,14 +6,17 @@ Flask-Babel
 Flask-Cake>=0.2.1
 Flask-Cache
 Flask-Mail
+Flask-Marshmallow
 Flask-Migrate
 Flask-Restless>=0.12
 Flask-Script
+Flask-Swagger
 Flask-SQLAlchemy>=1.0
 Flask-Uploads
 Flask-User==0.6.1
 Flask-WTF
 jinja2
+marshmallow
 neurosynth
 -e git+https://github.com/nilearn/nilearn.git#egg=nilearn
 matplotlib

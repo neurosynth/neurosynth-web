@@ -20,6 +20,9 @@
 	    g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
 	    s.parentNode.insertBefore(g,s)}(document,'script'));
     </script>
+    {% assets "js" -%}
+      <script src="{{ ASSET_URL }}"></script>
+    {% endassets %}
 </head>
 <body>
 	<!-- Docs master nav -->    
@@ -120,10 +123,5 @@
     </div>
     </div>
     <div class="top-space40"></div>
-
-{#    <script src="http://fb.me/react-0.12.2.js"></script>#}
-    {% assets "js" %}
-      <script src="{{ ASSET_URL }}"></script>
-    {% endassets %}
 </body>
 </html>

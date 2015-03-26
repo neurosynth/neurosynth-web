@@ -3,11 +3,10 @@ from flask import Blueprint, render_template, url_for, request, jsonify
 from nsweb.models.locations import Location
 from nsweb.models.images import LocationImage
 from nsweb.models.peaks import Peak
-import simplejson as json
 from flask_sqlalchemy import sqlalchemy
 from nsweb.initializers import settings
 from os.path import join, exists
-from nsweb.tasks import make_coactivation_map
+from nsweb import tasks
 from nsweb.core import db
 from nsweb.controllers.decode import decode_analysis_image, get_voxel_data
 from nsweb.controllers.images import get_decoding_data
@@ -131,7 +130,7 @@ def make_location(x, y, z):
         x, y, z)
     filename = join(settings.IMAGE_DIR, 'coactivation', filename)
     if not exists(filename):
-        result = make_coactivation_map.delay(x, y, z).wait()
+        tasks.make_coactivation_map.delay(x, y, z).wait()
     if exists(filename):
         ma_image = LocationImage(
             name='Meta-analytic coactivation for seed (%d, %d, %d)' % (

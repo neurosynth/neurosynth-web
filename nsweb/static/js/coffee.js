@@ -73,6 +73,8 @@ $.fn.dataTable.TableTools.defaults.aButtons = [
   }
 ];
 
+$.fn.dataTableExt.sErrMode = 'throw';
+
 createDataTable = function(element, options) {
   var iDelay, tbl, _opts;
   _opts = {
@@ -130,7 +132,7 @@ $(document).ready(function() {
   if ($('#page-decode-show, #page-genes-show').length) {
     return createDataTable('#decoding_results_table', {
       pagingType: "simple",
-      displayLength: 10,
+      pageLength: 10,
       processing: true,
       stateSave: false,
       orderClasses: false,
@@ -434,7 +436,7 @@ $(document).ready(function() {
 });
 
 $(document).ready(function() {
-  var activeTab, columns, loadAnalysisImages, loadAnalysisSimilarity, loadAnalysisStudies;
+  var activeTab, columns, loadAnalysisImages, loadAnalysisStudies;
   if (!$('#page-analysis').length) {
     return;
   }
@@ -502,11 +504,6 @@ $(document).ready(function() {
     return $.get(url, function(result) {
       return loadImages(result.data);
     });
-  };
-  loadAnalysisSimilarity = function() {
-    var url;
-    url = '/images/' + rev_inf + '/decode';
-    return $('#analysis-similarity-table').DataTable().ajax.url(url).load().order([1, 'desc']);
   };
   activeTab = window.cookie.get('analysisTab');
   $("#analysis-menu li:eq(" + activeTab + ") a").tab('show');
@@ -829,7 +826,6 @@ app = {
     return this.render();
   },
   removeStudy: function(pmid) {
-    console.log("In app.removeStudy");
     delete this.state.activeAnalysis.studies[pmid];
     return this.update();
   },
@@ -1283,7 +1279,6 @@ redrawTableSelection = function() {
 setupSelectableTable = function() {
   $('.selectable-table').on('click', 'tr', function() {
     var pmid;
-    console.log('row clicked');
     pmid = getPMID(this);
     if (pmid == null) {
       return;

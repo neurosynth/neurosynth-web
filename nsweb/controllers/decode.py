@@ -146,14 +146,11 @@ def decode_url(url, metadata={}, render=True):
             'url': url,
             'name': metadata.get('name', basename(url)),
             'image_modified_at': modified,
-            'filename': filename
+            'filename': filename,
+            'neurovault_id': metadata.get('nv_id', None)
         }
 
         dec = _run_decoder(**kwargs)
-
-        # dec.data = metadata
-        # db.session.add(dec)
-        # db.session.commit()
 
     if render:
         return show(dec, dec.uuid)
@@ -167,6 +164,7 @@ def decode_neurovault(id, render=True):
     metadata = json.loads(resp.content)
     if 'file' not in metadata:
         return render_template('decode/missing.html.slim')
+    metadata['nv_id'] = id
     return decode_url(metadata['file'], metadata, render=render)
 
 
@@ -187,7 +185,8 @@ def show(decoding=None, uuid=None):
         'download': '/decode/%s/image' % decoding.uuid
     }]
     return render_template('decode/show.html.slim', image_id=decoding.uuid,
-                           images=json.dumps(images))
+                           images=json.dumps(images),
+                           decoding=decoding)
 
 
 @bp.route('/<string:uuid>/data')
@@ -234,8 +233,6 @@ def get_scatter(uuid, analysis):
         outfile, as_attachment=False, attachment_filename=basename(outfile))
 
 ### API ROUTES ###
-
-
 @bp.route('/data/')
 def get_data_api():
     if 'url' in request.args:
