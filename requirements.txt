@@ -1,3 +1,4 @@
+blinker
 celery
 cssmin
 Flask>=0.10.1
@@ -22,6 +23,7 @@ neurosynth
 matplotlib
 MySQL-Python
 numpy>=1.8
+opbeat
 pandas>=0.13
 pyscss
 seaborn

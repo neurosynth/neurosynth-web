@@ -81,6 +81,13 @@ LOGGING_LEVEL = 'DEBUG'
 CELERY_BROKER_URL = 'redis://localhost:6379'
 CELERY_RESULT_BACKEND='redis://localhost:6379'
 
+# Error logging with Opbeat
+OPBEAT_ENABLED = False
+OPBEAT_ORGANIZATION_ID = "..."
+OPBEAT_APP_ID = "..."
+OPBEAT_SECRET_TOKEN = "..."
+OPBEAT_DEBUG = True
+
 ### App-level configuration ###
 DEBUG = True
 PROTOTYPE = True
