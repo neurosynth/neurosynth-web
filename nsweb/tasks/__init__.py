@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from nilearn.image import resample_img
 from nsweb.core import celery
+from os import unlink
 from os.path import join, basename, exists
 from nsweb.tasks.scatterplot import scatter
 import traceback
@@ -29,6 +30,7 @@ def load_image(masker, filename, save_resampled=True):
             img, target_affine=decode_image.anatomical.get_affine(),
             target_shape=(91, 109, 91), interpolation='nearest')
         if save_resampled:
+            unlink(filename)
             img.to_filename(filename)
     return masker.mask(img)
 
@@ -137,6 +139,8 @@ def decode_image(filename, reference, uuid, mask=None, drop_zeros=False,
         if drop_zeros:
             voxels = np.where((data != 0) & np.isfinite(data))[0]
             data = data[voxels]
+        # Otherwise we still need to replace NaNs or bad things happen
+        data = np.nan_to_num(data)
 
         # standardize image and get correlation
         data = (data - data.mean())/data.std()

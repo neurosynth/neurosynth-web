@@ -87,7 +87,13 @@ def decode_analysis_image(image):
 
     dec = _get_decoding(image_id=image)
 
-    if dec is None or not settings.CACHE_DECODINGS:
+    # Delete old record
+    if not settings.CACHE_DECODINGS and dec is not None:
+        db.session.delete(dec)
+        db.session.commit()
+        dec = None
+
+    if dec is None:
 
         image = Image.query.get(image)
         filename = image.image_file
@@ -126,7 +132,13 @@ def decode_url(url, metadata={}, render=True):
 
     dec = _get_decoding(url=url)
 
-    if dec is None or not settings.CACHE_DECODINGS:
+    # Delete old record
+    if not settings.CACHE_DECODINGS and dec is not None:
+        db.session.delete(dec)
+        db.session.commit()
+        dec = None
+
+    if dec is None:
 
         unique_id = uuid.uuid4().hex
         filename = join(settings.DECODED_IMAGE_DIR, unique_id + ext.group(0))
