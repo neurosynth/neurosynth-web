@@ -10,6 +10,13 @@ import re
 bp = Blueprint('analyses', __name__, url_prefix='/analyses')
 
 
+### TOP INDEX ###
+@bp.route('/')
+def list_analyses():
+    n_terms = TermAnalysis.query.count()
+    return render_template('analyses/index.html.slim', n_terms=n_terms)
+
+
 ### ROUTES COMMON TO ALL ANALYSES ###
 def find_analysis(name, type=None):
     ''' Retrieve analysis by either id (when int) or name (when string) '''
@@ -34,16 +41,10 @@ def get_images(val):
     return jsonify(data=images)
 
 
-@bp.route('/<string:type>/<string:name>/images/<string:image>/')
-@bp.route('/topics/<string:topic_set>/<string:name>/images/<string:image>/')
-def get_image(name, image, type=None, topic_set=None):
-    if type is None:
-        analysis = TopicAnalysis.query.join(AnalysisSet).filter(
-            TopicAnalysis.number == int(name),
-            AnalysisSet.name == topic_set).first()
-    else:
-        type = {'topics': 'topic', 'terms': 'term', 'custom': 'custom'}[type]
-        analysis = find_analysis(name, type=type)
+@bp.route('/<string:analysis>/images/<string:image>/')
+def get_image_file(analysis, image):
+    if not isinstance(analysis, Analysis):
+        analysis = find_analysis(analysis)
     unthresholded = ('unthresholded' in request.args.keys())
     if re.match('\d+$', image):
         img = analysis.images[int(image)]
@@ -68,11 +69,16 @@ def get_studies(val):
     return data
 
 
-### TOP INDEX ###
-@bp.route('/')
-def list_analyses():
-    n_terms = TermAnalysis.query.count()
-    return render_template('analyses/index.html.slim', n_terms=n_terms)
+@bp.route('/<string:id>/')
+def show_analysis(id):
+    analysis = find_analysis(id)
+    if analysis is None:
+        return render_template('analyses/missing.html.slim', analysis=id)
+    if analysis.type == 'term':
+        return redirect(url_for('analyses.show_term', term=analysis.name))
+    elif analysis.type == 'topic':
+        return redirect(url_for('analyses.show_topic', number=analysis.number,
+                                topic_set=analysis.analysis_set.name))
 
 
 ### TERM-SPECIFIC ROUTES ###
@@ -96,6 +102,12 @@ def show_term(term):
     return render_template('analyses/terms/show.html.slim',
                            analysis=analysis,
                            cog_atlas=json.loads(analysis.cog_atlas or '{}'))
+
+@bp.route('/<string:type>/<string:name>/images/<string:image>/')
+def get_term_image_file(type, name, image):
+    type = type.strip('s') # e.g., 'topics' => 'topic'
+    analysis = find_analysis(name, type=type)
+    return get_image_file(analysis, image)
 
 
 ### TOPIC-SPECIFIC ROUTES ###
@@ -133,16 +145,12 @@ def show_topic(topic_set, number):
                            analysis_set=topic.analysis_set, analysis=topic)
 
 
-### FALLBACK GENERIC ROUTE ###
-@bp.route('/<string:id>/')
-def show_analysis(id):
-    analysis = find_analysis(id)
-    if analysis is None:
-        return render_template('analyses/missing.html.slim', analysis=id)
-    if analysis.type == 'term':
-        return redirect(url_for('analyses.show_term', term=analysis.name))
-    elif analysis.type == 'topic':
-        return redirect(url_for('analyses.show_topic', number=analysis.number,
-                                topic_set=analysis.analysis_set.name))
+@bp.route('/topics/<string:topic_set>/<string:number>/images/<string:image>/')
+def get_topic_image_file(topic_set, number, image):
+    analysis = TopicAnalysis.query.join(AnalysisSet).filter(
+            TopicAnalysis.number == int(number),
+            AnalysisSet.name == topic_set).first()
+    return get_image_file(analysis, image)
+
 
 add_blueprint(bp)
