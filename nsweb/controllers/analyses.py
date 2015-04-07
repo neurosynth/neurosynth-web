@@ -22,7 +22,10 @@ def find_analysis(name, type=None):
     ''' Retrieve analysis by either id (when int) or name (when string) '''
     if re.match('\d+$', name):
         return Analysis.query.get(name)
-    return Analysis.query.filter_by(type=type, name=name).first()
+    query = Analysis.query.filter_by(name=name)
+    if type is not None:
+        query = query.filter_by(type=type)
+    return query.first()
 
 
 @bp.route('/<string:val>/images')
@@ -56,7 +59,7 @@ def get_image_file(analysis, image):
 @bp.route('/<string:val>/studies')
 def get_studies(val):
     analysis = find_analysis(val)
-    if 'dt' in request.args:
+    if 'dt' in request.args:  # DataTables
         data = []
         for f in analysis.frequencies:
             s = f.study
