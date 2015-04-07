@@ -75,9 +75,9 @@ urlToParams = () ->
     JSON.parse "{\"" + decodeURI(search).replace(/"/g, "\"").replace(/&/g, "\",\"").replace(RegExp("=", "g"), "\":\"") + "\"}"
 window.urlToParams = urlToParams
 
-load_reverse_inference_image = (analysis, fdr=false) ->
-  url = '/analyses/' + analysis + '/images/reverseinference'
-  url += '?nofdr' if not fdr
+loadReverseInferenceImage = (analysis, fdr=false) ->
+  url = '/analyses/' + analysis + '/images/reverse'
+  url += '?unthresholded' if not fdr
   [{
     name: analysis + ' (reverse inference)'
     url: url
