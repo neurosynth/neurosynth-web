@@ -211,7 +211,7 @@ AnalysisList = React.createClass
       hr {}, ''
       @props.analyses.map (analysis) =>
         selected = if @props.selected_uuid is analysis.uuid then true else false
-        ce AnalysisListItem, {key: analysis.uuid, uuid: analysis.uuid, name:analysis.name, numStudies: analysis.studies.length, selected: selected}
+        React.createElement AnalysisListItem, {key: analysis.uuid, uuid: analysis.uuid, name:analysis.name, numStudies: analysis.studies.length, selected: selected}
 
 
 ActiveAnalysis = React.createClass
@@ -290,11 +290,11 @@ ActiveAnalysis = React.createClass
                 a {href:'#all-studies-tab', role:'tab', 'data-toggle':'tab'}, "All studies (#{ app.state.allStudies.length })"
             div {className: 'tab-content'},
               div {className: 'tab-pane active', role:'tab-panel', id:'selected-studies-tab'},
-                ce SelectedStudiesTable, {}
+                React.createElement SelectedStudiesTable, {}
               div {className: 'tab-pane', role:'tab-panel', id:'all-studies-tab'},
                 br {},
                 p {}, "Add or remove studies to your analysis by clicking on the study. Studies that are already added are highlighted in blue."
-                ce AllStudiestable
+                React.createElement AllStudiestable
 
 #StudiesTable = React.createClass
 #  componentDidMount: ->
