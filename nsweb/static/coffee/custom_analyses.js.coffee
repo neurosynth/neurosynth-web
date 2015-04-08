@@ -1,5 +1,4 @@
 {div, br, ul, li, a, p, h1, h2, h4, h5, span, form, input, button, hr, table, thead, tr, th, td, label} = React.DOM
-ce = React.createElement
 
 SELECTED = 'info' # CSS class to apply to selected rows
 
@@ -187,9 +186,9 @@ app =
   render: ->
     if not document.getElementById('custom-list-container')?
       return
-    React.render ce(AnalysisList, {analyses:@state.analyses, selected_uuid:@state.activeAnalysis.uuid}),
+    React.render React.createElement(AnalysisList, {analyses:@state.analyses, selected_uuid:@state.activeAnalysis.uuid}),
       document.getElementById('custom-list-container')
-    React.render(ce(ActiveAnalysis, {analysis: @state.activeAnalysis}), document.getElementById('active-analysis-container'))
+    React.render(React.createElement(ActiveAnalysis, {analysis: @state.activeAnalysis}), document.getElementById('active-analysis-container'))
 
 AnalysisListItem = React.createClass
   loadHandler: ->
