@@ -1,16 +1,17 @@
-# <<<<<<< HEAD
-# from flask import Blueprint, render_template, redirect, url_for, request, jsonify, abort, session, g
-# from nsweb.models.analyses import Analysis, AnalysisSet, TopicAnalysis, TermAnalysis, CustomAnalysis
-# =======
 from flask import (Blueprint, render_template, redirect, url_for, request,
                    jsonify, abort)
 from nsweb.models.analyses import (Analysis, AnalysisSet, TopicAnalysis,
                                    TermAnalysis, CustomAnalysis)
-# >>>>>>> master
-from nsweb.core import add_blueprint
+from nsweb.models.images import CustomAnalysisImage
+from nsweb.core import db, add_blueprint
 from nsweb.controllers import images
 import json
 import re
+from flask.ext.user import login_required
+from nsweb import tasks
+from nsweb.initializers import settings
+from nsweb.controllers import error_page
+from os.path import join, exists
 
 bp = Blueprint('analyses', __name__, url_prefix='/analyses')
 
@@ -172,5 +173,51 @@ def get_topic_image_file(topic_set, number, image):
 @bp.route('/custom/')
 def list_custom_analyses():
     return render_template('analyses/custom/index.html.slim')
+
+
+@bp.route('/custom/run/<string:uid>/', methods=['GET', 'POST'])
+@login_required
+def run_custom_analysis(uid):
+    """
+    Given a uuid, kick off the analysis run and redirect the user to the results page once
+    the analysis is complete.
+    """
+    custom = CustomAnalysis.query.filter_by(uuid=uid).first()
+
+    if not custom or not custom.studies:
+        abort(404)
+
+    ids = [s.pmid for s in custom.studies]
+    if tasks.run_metaanalysis.delay(ids, custom.uuid).wait():
+        # Update analysis record
+        rev_inf = '%s_pFgA_z_FDR_0.01.nii.gz' % custom.uuid
+        rev_inf = join(settings.IMAGE_DIR, 'custom', rev_inf)
+        fwd_inf = '%s_pAgF_z_FDR_0.01.nii.gz' % custom.uuid
+        fwd_inf = join(settings.IMAGE_DIR, 'custom', fwd_inf)
+        if exists(rev_inf):
+            images = [
+                CustomAnalysisImage(
+                    name='%s (forward inference)' % custom.name,
+                    image_file=fwd_inf,
+                    label='%s (forward inference)' % custom.name,
+                    stat='z-score',
+                    display=1,
+                    download=1
+                ),
+                CustomAnalysisImage(
+                    name='%s (reverse inference)' % custom.name,
+                    image_file=rev_inf,
+                    label='%s (reverse inference)' % custom.name,
+                    stat='z-score',
+                    display=1,
+                    download=1
+                )
+            ]
+            custom.images = images
+            db.session.add(custom)
+            db.session.commit()
+            return redirect(url_for('analyses.show_custom_analysis', uid=uid))
+    return error_page("An unspecified error occurred while trying to run "
+                      "the custom meta-analysis. Please try again.")
 
 add_blueprint(bp)
