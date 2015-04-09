@@ -910,6 +910,7 @@ app = {
   saveActiveAnalysis: function(name, description) {
     var data;
     this.state.activeAnalysis.name = name;
+    this.state.activeAnalysis.description = description;
     data = {
       studies: Object.keys(this.state.activeAnalysis.studies),
       name: name,
@@ -1129,7 +1130,7 @@ ActiveAnalysis = React.createClass({
         className: 'form-control',
         ref: 'description',
         placeholder: 'Enter a description for this analysis'
-      })), h4({}, Description), p({}, this.props.analysis.description), hr({}, ''))));
+      })), hr({}, ''))));
     }
     return div({}, header, div({
       className: 'row'

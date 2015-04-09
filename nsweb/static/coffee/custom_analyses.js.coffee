@@ -140,6 +140,7 @@ app =
 
   saveActiveAnalysis: (name, description) ->
     @state.activeAnalysis.name = name
+    @state.activeAnalysis.description = description
     data =
       studies: Object.keys(@state.activeAnalysis.studies)
       name: name
@@ -286,8 +287,6 @@ ActiveAnalysis = React.createClass
           div {className: 'col-md-12'},
             label {}, 'Description:',
               textarea {className: 'form-control', ref: 'description', placeholder: 'Enter a description for this analysis'}
-            h4 {}, Description
-            p {}, @props.analysis.description
             hr {}, ''
 #      studiesSection = div {},
 #        p {}, 'Below are the PMIDs of the studies you have selected but not yet saved. Save this analysis to see the study details. You can always delete or clone it.'
