@@ -5,10 +5,14 @@
     .col-md-12
       h3 Custom Analyses
   .row
-    .col-md-4
-      /h4 Your Saved Analyses
-      /hr
-      div#custom-list-container
-        p You currently don't have any saved analyses
-    .col-md-8#active-analysis-container
-      h5 Active Analysis
+    - if current_user.is_authenticated()
+      .col-md-4
+        /h4 Your Saved Analyses
+        /hr
+        div#custom-list-container
+          p You currently don't have any saved analyses
+      .col-md-8#active-analysis-container
+        h5 Active Analysis
+     - else
+      .col-md-12
+        p You must be signed in to be able to create and save custom analyses.

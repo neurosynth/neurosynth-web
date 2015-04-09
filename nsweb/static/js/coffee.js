@@ -1,4 +1,4 @@
-var ActiveAnalysis, AllStudiestable, AnalysisList, AnalysisListItem, NSCookie, SELECTED, Scatter, SelectedStudiesTable, a, app, arrayToObject, br, button, ce, createDataTable, div, form, getFromLocalStorage, getPMID, getSelectedStudies, h1, h2, h4, h5, hr, input, label, li, load_reverse_inference_image, make_scatterplot, p, redrawTableSelection, runif, saveSelection, saveToLocalStorage, setupSelectableTable, span, table, td, textToHTML, th, thead, tr, ul, urlToParams, _ref,
+var ActiveAnalysis, AllStudiestable, AnalysisList, AnalysisListItem, NSCookie, SELECTED, Scatter, SelectedStudiesTable, a, app, arrayToObject, br, button, ce, createDataTable, div, form, getFromLocalStorage, getPMID, getSelectedStudies, h1, h2, h4, h5, hr, input, label, li, load_reverse_inference_image, make_scatterplot, p, redrawTableSelection, runif, saveSelection, saveToLocalStorage, setupSelectableTable, span, table, td, textToHTML, textarea, th, thead, tr, ul, urlToParams, _ref,
   __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
 NSCookie = (function() {
@@ -730,7 +730,7 @@ $(document).ready(function() {
   });
 });
 
-_ref = React.DOM, div = _ref.div, br = _ref.br, ul = _ref.ul, li = _ref.li, a = _ref.a, p = _ref.p, h1 = _ref.h1, h2 = _ref.h2, h4 = _ref.h4, h5 = _ref.h5, span = _ref.span, form = _ref.form, input = _ref.input, button = _ref.button, hr = _ref.hr, table = _ref.table, thead = _ref.thead, tr = _ref.tr, th = _ref.th, td = _ref.td, label = _ref.label;
+_ref = React.DOM, div = _ref.div, br = _ref.br, ul = _ref.ul, li = _ref.li, a = _ref.a, p = _ref.p, h1 = _ref.h1, h2 = _ref.h2, h4 = _ref.h4, h5 = _ref.h5, span = _ref.span, form = _ref.form, input = _ref.input, button = _ref.button, hr = _ref.hr, table = _ref.table, thead = _ref.thead, tr = _ref.tr, th = _ref.th, td = _ref.td, label = _ref.label, textarea = _ref.textarea;
 
 ce = React.createElement;
 
@@ -882,6 +882,11 @@ app = {
     this.state.activeAnalysis.saved = false;
     return this.render();
   },
+  setActiveAnalysisDescription: function(description) {
+    this.state.activeAnalysis.description = description;
+    this.state.activeAnalysis.saved = false;
+    return this.render();
+  },
   deleteAnalysis: function(uuid) {
     if (!confirm("Are you sure you want to delete this analysis? ")) {
       return;
@@ -902,12 +907,13 @@ app = {
       })(this)
     });
   },
-  saveActiveAnalysis: function(name) {
+  saveActiveAnalysis: function(name, description) {
     var data;
     this.state.activeAnalysis.name = name;
     data = {
       studies: Object.keys(this.state.activeAnalysis.studies),
       name: name,
+      description: description,
       uuid: this.state.activeAnalysis.uuid
     };
     return $.ajax({
@@ -1035,7 +1041,7 @@ AnalysisList = React.createClass({
 
 ActiveAnalysis = React.createClass({
   save: function() {
-    return app.saveActiveAnalysis(this.refs.name.getDOMNode().value);
+    return app.saveActiveAnalysis(this.refs.name.getDOMNode().value, this.refs.description.getDOMNode().value);
   },
   deleteHandler: function() {
     return app.deleteAnalysis(this.props.analysis.uuid);
@@ -1048,6 +1054,9 @@ ActiveAnalysis = React.createClass({
   },
   nameChangeHandler: function() {
     return app.setActiveAnalysisName(this.refs.name.getDOMNode().value);
+  },
+  descriptionChangeHandler: function() {
+    return app.setActiveAnalysisDescription(this.refs.description.getDOMNode().value);
   },
   render: function() {
     var header, saved, studies, uuid;
@@ -1086,7 +1095,13 @@ ActiveAnalysis = React.createClass({
         className: 'row'
       }, div({
         className: 'col-md-12'
-      }, hr({}, ''))));
+      }, label({}, 'Description:', textarea({
+        className: 'form-control',
+        ref: 'description',
+        placeholder: 'Enter a description for this analysis',
+        value: this.props.analysis.description,
+        onChange: this.descriptionChangeHandler
+      })), hr({}, ''))));
     } else {
       header = div({}, div({
         className: 'row'
@@ -1110,7 +1125,11 @@ ActiveAnalysis = React.createClass({
         className: 'row'
       }, div({
         className: 'col-md-12'
-      }, hr({}, ''))));
+      }, label({}, 'Description:', textarea({
+        className: 'form-control',
+        ref: 'description',
+        placeholder: 'Enter a description for this analysis'
+      })), h4({}, Description), p({}, this.props.analysis.description), hr({}, ''))));
     }
     return div({}, header, div({
       className: 'row'

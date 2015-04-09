@@ -111,6 +111,7 @@ def save_custom_analysis():
     name = data.get('name')
     uid = data.get('uuid')
     studies = data.get('studies', [])
+    description = data.get('description')
     pmids = [int(x) for x in studies]
 
     # Verify that all requested pmids are in the database
@@ -125,10 +126,12 @@ def save_custom_analysis():
             return jsonify(dict(result='error', error='No matching analysis found.'))
         if name:
             custom_analysis.name = name
+        if description is not None:
+            custom_analysis.description = description
     else:
         # create new custom analysis
         uid = unicode(uuid.uuid4())[:18]
-        custom_analysis = CustomAnalysis(uuid=uid, name=name,
+        custom_analysis = CustomAnalysis(uuid=uid, name=name, description=description,
             user_id=current_user.id, n_studies=len(pmids))
     db.session.add(custom_analysis)
     db.session.commit()
@@ -151,7 +154,7 @@ def get_custom_analysis(uid):
 
     We're assuming that the user doesn't have to be logged in and that anyone
     can access the analysis if they know its uuid. This makes it easy for users to
-    share links to their cusotm analyses.
+    share links to their custom analyses.
     """
     custom = CustomAnalysis.query.filter_by(uuid=uid).first()
     if not custom:

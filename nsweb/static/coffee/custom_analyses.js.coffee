@@ -1,4 +1,4 @@
-{div, br, ul, li, a, p, h1, h2, h4, h5, span, form, input, button, hr, table, thead, tr, th, td, label} = React.DOM
+{div, br, ul, li, a, p, h1, h2, h4, h5, span, form, input, button, hr, table, thead, tr, th, td, label, textarea} = React.DOM
 ce = React.createElement
 
 SELECTED = 'info' # CSS class to apply to selected rows
@@ -118,6 +118,11 @@ app =
     @state.activeAnalysis.saved = false
     @render()
 
+  setActiveAnalysisDescription: (description) ->
+    @state.activeAnalysis.description = description
+    @state.activeAnalysis.saved = false
+    @render()
+
   deleteAnalysis: (uuid) ->
     if not confirm "Are you sure you want to delete this analysis? "
       return
@@ -133,11 +138,12 @@ app =
 #        @init()
         @fetchAllAnalyses()
 
-  saveActiveAnalysis: (name) ->
+  saveActiveAnalysis: (name, description) ->
     @state.activeAnalysis.name = name
     data =
       studies: Object.keys(@state.activeAnalysis.studies)
       name: name
+      description: description
       uuid: @state.activeAnalysis.uuid
     $.ajax
       dataType: 'json'
@@ -217,7 +223,7 @@ AnalysisList = React.createClass
 
 ActiveAnalysis = React.createClass
   save: ->
-    app.saveActiveAnalysis @refs.name.getDOMNode().value
+    app.saveActiveAnalysis @refs.name.getDOMNode().value, @refs.description.getDOMNode().value
 
   deleteHandler: ->
     app.deleteAnalysis(@props.analysis.uuid)
@@ -230,6 +236,9 @@ ActiveAnalysis = React.createClass
 
   nameChangeHandler: ->
     app.setActiveAnalysisName @refs.name.getDOMNode().value
+
+  descriptionChangeHandler: ->
+    app.setActiveAnalysisDescription @refs.description.getDOMNode().value
 
   render: ->
     if @props.analysis.blank
@@ -259,6 +268,8 @@ ActiveAnalysis = React.createClass
             button {className: 'btn btn-danger btn-sm', onClick: @deleteHandler}, 'Delete Analysis'
         div {className:'row'},
           div {className: 'col-md-12'},
+            label {}, 'Description:',
+              textarea {className: 'form-control', ref: 'description', placeholder: 'Enter a description for this analysis', value: @props.analysis.description, onChange: @descriptionChangeHandler}
             hr {}, ''
     else # headless (without uuid) analysis only present in browser's local storage
       header = div {},
@@ -273,6 +284,10 @@ ActiveAnalysis = React.createClass
             p {}, "#{ studies.length } studies selected"
         div {className:'row'},
           div {className: 'col-md-12'},
+            label {}, 'Description:',
+              textarea {className: 'form-control', ref: 'description', placeholder: 'Enter a description for this analysis'}
+            h4 {}, Description
+            p {}, @props.analysis.description
             hr {}, ''
 #      studiesSection = div {},
 #        p {}, 'Below are the PMIDs of the studies you have selected but not yet saved. Save this analysis to see the study details. You can always delete or clone it.'
