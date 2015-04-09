@@ -13,7 +13,7 @@ from flask.ext.marshmallow import Marshmallow
 from nsweb.initializers import settings
 from nsweb.initializers.assets import init_assets
 from nsweb.initializers import make_celery
-
+from opbeat.contrib.flask import Opbeat
 
 app = Flask('NSWeb', static_folder=settings.STATIC_FOLDER,
             template_folder=settings.TEMPLATE_FOLDER)
@@ -81,6 +81,17 @@ def create_app(debug=True):
 
     # i18n support
     Babel(app)
+
+    # Opbeat error logging
+    if settings.OPBEAT_ENABLED:
+        app.config['OPBEAT'] = {
+            'ORGANIZATION_ID': settings.OPBEAT_ORGANIZATION_ID,
+            'APP_ID': settings.OPBEAT_APP_ID,
+            'SECRET_TOKEN': settings.OPBEAT_SECRET_TOKEN,
+            'INCLUDE_PATHS': ['nsweb'],
+            'DEBUG': settings.DEBUG or settings.OPBEAT_DEBUG
+        }
+        Opbeat(app)
 
     # API
     marshmallow.init_app(app)

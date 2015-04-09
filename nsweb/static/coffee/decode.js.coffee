@@ -18,7 +18,7 @@ $(document).ready ->
       $(row).children('td').addClass('highlight-table-row')
       last_row_selected = row
       analysis = $('td:eq(1)', row).text()
-      imgs = load_reverse_inference_image(analysis)
+      imgs = loadReverseInferenceImage(analysis)
       viewer.loadImages(imgs)
       $(viewer).off('imagesLoaded')
       $(viewer).on('imagesLoaded', (e) ->

@@ -1,4 +1,4 @@
-var ActiveAnalysis, AllStudiestable, AnalysisList, AnalysisListItem, NSCookie, SELECTED, Scatter, SelectedStudiesTable, a, app, arrayToObject, br, button, ce, createDataTable, div, form, getFromLocalStorage, getPMID, getSelectedStudies, h1, h2, h4, h5, hr, input, label, li, load_reverse_inference_image, make_scatterplot, p, redrawTableSelection, runif, saveSelection, saveToLocalStorage, setupSelectableTable, span, table, td, textToHTML, textarea, th, thead, tr, ul, urlToParams, _ref,
+var ActiveAnalysis, AllStudiestable, AnalysisList, AnalysisListItem, NSCookie, SELECTED, Scatter, SelectedStudiesTable, a, app, arrayToObject, br, button, ce, createDataTable, div, form, getFromLocalStorage, getPMID, getSelectedStudies, h1, h2, h4, h5, hr, input, label, li, loadReverseInferenceImage, make_scatterplot, p, redrawTableSelection, runif, saveSelection, saveToLocalStorage, setupSelectableTable, span, table, td, textToHTML, textarea, th, thead, tr, ul, urlToParams, _ref,
   __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
 NSCookie = (function() {
@@ -108,14 +108,14 @@ urlToParams = function() {
 
 window.urlToParams = urlToParams;
 
-load_reverse_inference_image = function(analysis, fdr) {
+loadReverseInferenceImage = function(analysis, fdr) {
   var url;
   if (fdr == null) {
     fdr = false;
   }
-  url = '/analyses/' + analysis + '/images/reverseinference';
+  url = '/analyses/' + analysis + '/images/reverse';
   if (!fdr) {
-    url += '?nofdr';
+    url += '?unthresholded';
   }
   return [
     {
@@ -683,7 +683,7 @@ $(document).ready(function() {
         $(row).children('td').addClass('highlight-table-row');
         last_row_selected = row;
         analysis = $('td:eq(1)', row).text();
-        imgs = load_reverse_inference_image(analysis);
+        imgs = loadReverseInferenceImage(analysis);
         viewer.loadImages(imgs);
         $(viewer).off('imagesLoaded');
         $(viewer).on('imagesLoaded', function(e) {
@@ -989,11 +989,11 @@ app = {
     if (document.getElementById('custom-list-container') == null) {
       return;
     }
-    React.render(ce(AnalysisList, {
+    React.render(React.createElement(AnalysisList, {
       analyses: this.state.analyses,
       selected_uuid: this.state.activeAnalysis.uuid
     }), document.getElementById('custom-list-container'));
-    return React.render(ce(ActiveAnalysis, {
+    return React.render(React.createElement(ActiveAnalysis, {
       analysis: this.state.activeAnalysis
     }), document.getElementById('active-analysis-container'));
   }
@@ -1027,7 +1027,7 @@ AnalysisList = React.createClass({
       return function(analysis) {
         var selected;
         selected = _this.props.selected_uuid === analysis.uuid ? true : false;
-        return ce(AnalysisListItem, {
+        return React.createElement(AnalysisListItem, {
           key: analysis.uuid,
           uuid: analysis.uuid,
           name: analysis.name,
@@ -1159,11 +1159,11 @@ ActiveAnalysis = React.createClass({
       className: 'tab-pane active',
       role: 'tab-panel',
       id: 'selected-studies-tab'
-    }, ce(SelectedStudiesTable, {})), div({
+    }, React.createElement(SelectedStudiesTable, {})), div({
       className: 'tab-pane',
       role: 'tab-panel',
       id: 'all-studies-tab'
-    }, br({}, p({}, "Add or remove studies to your analysis by clicking on the study. Studies that are already added are highlighted in blue.")), ce(AllStudiestable)))))));
+    }, br({}, p({}, "Add or remove studies to your analysis by clicking on the study. Studies that are already added are highlighted in blue.")), React.createElement(AllStudiestable)))))));
   }
 });
 
