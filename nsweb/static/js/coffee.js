@@ -1062,9 +1062,6 @@ ActiveAnalysis = React.createClass({
   },
   render: function() {
     var header, saved, studies, uuid;
-    if (this.props.analysis.blank) {
-      return div({}, 'No active analysis currently loaded');
-    }
     uuid = this.props.analysis.uuid;
     studies = Object.keys(this.props.analysis.studies);
     saved = this.props.analysis.saved;
@@ -1162,7 +1159,7 @@ ActiveAnalysis = React.createClass({
       className: 'tab-pane active',
       role: 'tab-panel',
       id: 'selected-studies-tab'
-    }, React.createElement(SelectedStudiesTable, {})), div({
+    }, br({}, React.createElement(SelectedStudiesTable, {}))), div({
       className: 'tab-pane',
       role: 'tab-panel',
       id: 'all-studies-tab'

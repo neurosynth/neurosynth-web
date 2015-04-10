@@ -243,9 +243,8 @@ ActiveAnalysis = React.createClass
     app.setActiveAnalysisDescription @refs.description.getDOMNode().value
 
   render: ->
-    if @props.analysis.blank
-      return div {}, 'No active analysis currently loaded'
-
+#    if @props.analysis.blank
+#      return div {}, 'No active analysis currently loaded'
     uuid = @props.analysis.uuid
     studies = Object.keys(@props.analysis.studies)
     saved = @props.analysis.saved
@@ -306,6 +305,7 @@ ActiveAnalysis = React.createClass
                 a {href:'#all-studies-tab', role:'tab', 'data-toggle':'tab'}, "All studies (#{ app.state.allStudies.length })"
             div {className: 'tab-content'},
               div {className: 'tab-pane active', role:'tab-panel', id:'selected-studies-tab'},
+                br {},
                 React.createElement SelectedStudiesTable, {}
               div {className: 'tab-pane', role:'tab-panel', id:'all-studies-tab'},
                 br {},
