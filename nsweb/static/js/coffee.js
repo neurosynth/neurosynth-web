@@ -785,7 +785,8 @@ app = {
     saveURL: '/api/custom/save/',
     deleteURL: '/api/custom/',
     studiesTableURL: '/api/analyses/',
-    getFullAnalysisURL: '/api/analyses/full/'
+    getFullAnalysisURL: '/api/analyses/full/',
+    runAnalysisURL: '/analyses/custom/run/'
   },
   state: {
     analyses: [],
@@ -1084,8 +1085,9 @@ ActiveAnalysis = React.createClass({
         className: "btn " + (saved ? '' : 'btn-primary') + " btn-sm",
         disabled: "" + (saved ? 'disabled' : ''),
         onClick: this.save
-      }, 'Save Analysis'), span({}, ' '), button({
-        className: 'btn btn-primary btn-sm'
+      }, 'Save Analysis'), span({}, ' '), a({
+        className: 'btn btn-primary btn-sm',
+        href: app.props.runAnalysisURL + uuid
       }, 'Run Analysis'), span({}, ' '), button({
         className: 'btn btn-info btn-sm',
         onClick: this.cloneHandler
@@ -1319,7 +1321,7 @@ setupSelectableTable = function() {
     $('tbody').find('tr').each(function() {
       var pmid;
       pmid = getPMID(this);
-      return selection[pmid] = 1;
+      return app.addStudy(pmid);
     });
     saveSelection(selection);
     return redrawTableSelection();
@@ -1330,7 +1332,7 @@ setupSelectableTable = function() {
     $('tbody').find('tr').each(function() {
       var pmid;
       pmid = getPMID(this);
-      return delete selection[pmid];
+      return app.removeStudy(pmid);
     });
     saveSelection(selection);
     return redrawTableSelection();

@@ -39,7 +39,8 @@ app =
     saveURL: '/api/custom/save/'
     deleteURL: '/api/custom/'
     studiesTableURL: '/api/analyses/' # /api/analyses/<analysis id>/ (to be consumed by DataTable)
-    getFullAnalysisURL: '/api/analyses/full/' # /api/analyses/full/ 
+    getFullAnalysisURL: '/api/analyses/full/' # /api/analyses/full/
+    runAnalysisURL: '/analyses/custom/run/'
 
   state: # All mutable app state must be contained here
     analyses: []
@@ -262,7 +263,7 @@ ActiveAnalysis = React.createClass
 #            br {},
             button {className: "btn #{ if saved then '' else 'btn-primary' } btn-sm", disabled: "#{ if saved then 'disabled' else ''}", onClick: @save}, 'Save Analysis'
             span {}, ' '
-            button {className: 'btn btn-primary btn-sm'}, 'Run Analysis'
+            a {className: 'btn btn-primary btn-sm', href: app.props.runAnalysisURL + uuid}, 'Run Analysis'
             span {}, ' '
             button {className: 'btn btn-info btn-sm', onClick: @cloneHandler}, 'Clone Analysis'
             span {}, ' '
@@ -463,7 +464,7 @@ setupSelectableTable = ->
     selection = getSelectedStudies()
     $('tbody').find('tr').each ->
       pmid = getPMID(this)
-      selection[pmid] = 1
+      app.addStudy(pmid)
     saveSelection(selection)
     redrawTableSelection()
 
@@ -471,7 +472,7 @@ setupSelectableTable = ->
     selection = getSelectedStudies()
     $('tbody').find('tr').each ->
       pmid = getPMID(this)
-      delete selection[pmid]
+      app.removeStudy(pmid)
     saveSelection(selection)
     redrawTableSelection()
 
