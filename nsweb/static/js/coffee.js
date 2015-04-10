@@ -1014,7 +1014,7 @@ AnalysisListItem = React.createClass({
     }, li({}, "Name: " + this.props.name), li({}, "uuid: " + this.props.uuid), li({}, "Number of studies: " + this.props.numStudies))), div({
       className: "col-md-2"
     }, button({
-      className: "btn btn-primary btn-sm " + (this.props.selected ? 'disabled' : ''),
+      className: "btn btn-primary btn-sm " + (this.props.selected ? '' : ''),
       onClick: this.loadHandler
     }, 'Load')));
   }

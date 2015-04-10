@@ -210,7 +210,7 @@ AnalysisListItem = React.createClass
           li {}, "uuid: #{ @props.uuid }"
           li {}, "Number of studies: #{ @props.numStudies }"
       div {className: "col-md-2"},
-        button {className:"btn btn-primary btn-sm #{ if @props.selected then 'disabled' else ''}", onClick: @loadHandler}, 'Load'
+        button {className:"btn btn-primary btn-sm #{ if @props.selected then '' else ''}", onClick: @loadHandler}, 'Load'
 
 AnalysisList = React.createClass
   render: ->
