@@ -1,13 +1,13 @@
-- set page_title = 'Neurosynth Gene Atlas -- ' + gene.name
+- set page_title = 'Neurosynth Gene Atlas -- ' + gene.symbol
 - extends "layout/base.html"
 - block content
   - import "macros/_decode_viewer.html.slim" as viewers
   - import "macros/_scatterplot.html.slim" as scatterplot
   .row#page-genes-show
     .col-md-10
-      h2 {{gene.name}} gene expression
+      h2 {{gene.symbol}} gene expression
       .lead
-        |Brain-wide gene expression levels for the gene {{gene.name}}, as made available in the <a href="http://human.brain-map.org/">Allen Human Brain Atlas</a>. Detailed information is available from the <a href="http://human.brain-map.org/microarray/search/show?exact_match=false&search_term={{gene.name}}&search_type=gene">Allen Brain Atlas data portal</a>.
+        |Brain-wide gene expression levels for the gene {{gene.symbol}} ({{gene.name}}), as made available in the <a href="http://human.brain-map.org/">Allen Human Brain Atlas</a>. Detailed information is available from the <a href="http://human.brain-map.org/microarray/search/show?exact_match=false&search_term={{gene.symbol}}&search_type=gene">Allen Brain Atlas data portal</a>.
       .decode-viewer style="width: 580px; float: left;"
         ul#decode-menu.nav.nav-pills
           li.active
@@ -36,7 +36,7 @@
             
       .analysis-list style="width: 200px; margin-left: 20px; margin-top: 50px;"
         h4 Term similarity
-        p To compare the {{gene.name}} map against a Neurosynth term, click on an arrow below.
+        p To compare the {{gene.symbol}} map against a Neurosynth term, click on an arrow below.
         table#decoding_results_table.table.table-striped.table-hover.table-condensed
           thead
             tr
