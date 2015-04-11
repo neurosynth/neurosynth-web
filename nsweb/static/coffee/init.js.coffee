@@ -62,7 +62,6 @@ createDataTable = (element, options) ->
     tableTools: { sSwfPath: "/static/swf/copy_csv_xls.swf" } 
     filterDelay: true
   }
-  console.log(_opts.columns)
   $.extend(_opts, options)
   tbl = $(element).dataTable(_opts)
   tbl.fnSetFilteringDelay(iDelay=400) if _opts.filterDelay

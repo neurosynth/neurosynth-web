@@ -59,7 +59,7 @@ class DecodingSchema(mm.Schema):
 
     def get_values(self, dec):
         data = open(join(settings.DECODING_RESULTS_DIR,
-                    dec.uuid + '.txt')).read().splitlines()
+                         dec.uuid + '.txt')).read().splitlines()
         data = [x.split('\t') for x in data]
         return dict([(f, round(float(v), 3)) for (f, v) in data])
 
@@ -71,3 +71,12 @@ class DecodingSchema(mm.Schema):
 
         fields = ('id', 'url', 'neurovault_id', 'uuid', 'comments', 'image',
                   'reference', 'values')
+
+
+class GeneSchema(mm.Schema):
+
+    images = mm.Nested('ImageSchema', many=True, only='id')
+
+    class Meta:
+
+        fields = ('symbol', 'name', 'synonyms', 'locus_type', 'images')

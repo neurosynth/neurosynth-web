@@ -12,7 +12,6 @@ import os
 from os.path import join, basename, exists
 from neurosynth import Masker
 from neurosynth.base.dataset import Dataset
-# from neurosynth.base import transformations
 from neurosynth.analysis import meta
 import numpy as np
 import pandas as pd
@@ -321,84 +320,8 @@ class DatabaseBuilder:
 
             self.db.session.commit()
 
-    # def generate_location_loadings(self, analysis_dir=None, output_dir=None,
-    #                                min_studies_at_voxel=50, voxel=True,
-    #                                coactivation=True):
-    #     """ Create json files containing analysis data for every point in the
-    #     brain. """
 
-    #     if analysis_dir is None:
-    #         analysis_dir = join(settings.IMAGE_DIR, 'analyses')
-    #     if output_dir is None:
-    #         output_dir = settings.LOCATION_FEATURE_DIR
-
-    #     masker = self.dataset.masker
-
-    #     study_names = self.dataset.image_table.ids
-    #     p_active = self.dataset.image_table.data.sum(1)
-
-    #     v = np.where(p_active >= min_studies_at_voxel)[0]
-    # Save this for later
-    #     ijk_reduced = np.array(v).squeeze()
-
-    # Only use images contained in Analysis table--we don't want users
-    # being linked to analyses that don't exist in cases where there are
-    # orphaned images.
-    #     analyses = self.db.session.query(LocationAnalysis.name).all()
-    #     analyses = [i[0] for i in analyses]
-    #     n_analyses = len(analyses)
-
-    #     if coactivation:
-    #         z = np.zeros((self.dataset.image_table.data.shape[0], n_analyses))
-
-    #     if voxel:
-    # Read in all rev inf z and posterior prob images
-    #         rev_inf_z = np.zeros(
-    #             (self.dataset.image_table.data.shape[0], n_analyses))
-    #         rev_inf_pp = np.zeros(
-    #             (self.dataset.image_table.data.shape[0], n_analyses))
-
-    #         print "Reading in images..."
-    #         for i, f in enumerate(analyses):
-
-    #             if (i + 1) % 100 == 0:
-    # print "Loaded analysis #%d..." % (i + 1)
-
-    #             rev_inf_z[:, i] = masker.mask(
-    #                 join(analysis_dir, f + '_pFgA_z.nii.gz'))
-    #             rev_inf_pp[:, i] = masker.mask(
-    #                 join(analysis_dir, f + '_pFgA_given_pF=0.50.nii.gz'))
-
-    #         print "Done loading..."
-    #         p_active = masker.unmask(p_active).squeeze()
-    #         keep_vox = np.where(p_active >= min_studies_at_voxel)
-    # ijk = zip(*keep_vox)  # Exclude voxels with few studies
-    #         xyz = transformations.mat_to_xyz(np.array(ijk))[:, ::-1]
-
-    #         print "Processing voxels..."
-    #         num_vox = len(xyz)
-
-    #         for i, seed in enumerate(xyz):
-
-    #             location_name = '_'.join(str(x) for x in seed)
-    #             analysisfile = join(
-    #                 output_dir, '%s_analyses.txt' % location_name)
-    # if os.path.isfile(analysisfile): continue
-    #             if (i + 1) % 1000 == 0:
-    #                 print "\nProcessing %d/%d..." % (i + 1, num_vox)
-    #             ind = ijk_reduced[i]
-    #             z_scores = list(rev_inf_z[ind, :].ravel())
-    #             z_scores = ['%.2f' % x for x in z_scores]
-    #             pp = list(rev_inf_pp[ind, :].ravel())
-    #             pp = ['%.2f' % x for x in pp]
-    #             data = {
-    #                 'data': []
-    #             }
-    #             for j in range(n_analyses):
-    #                 data['data'].append([analyses[j], z_scores[j], pp[j]])
-    #             json.dump(data, open(analysisfile, 'w'))
-
-    def add_genes(self, gene_dir=None, reset=True):
+    def add_genes(self, gene_dir=None, reset=True, update_images=True):
         """ Add records for genes, working from a directory containing gene
         images. """
 
@@ -408,6 +331,11 @@ class DatabaseBuilder:
 
         if gene_dir is None:
             gene_dir = settings.GENE_IMAGE_DIR
+
+        hgnc = join(settings.ASSET_DIR, 'hgnc_complete_set.txt.gz')
+        gene_data = pd.read_csv(hgnc, sep='\t', compression='gzip',
+                                index_col=1)
+        gene_data = gene_data.fillna('')
 
         genes = glob(join(gene_dir, "*.nii.gz"))
         print "Adding %d genes..." % len(genes)
@@ -420,18 +348,29 @@ class DatabaseBuilder:
             found[symbol] = 1
             gene = Gene.query.filter_by(symbol=symbol).first()
             if gene is None:
-                gene = Gene(name=symbol, symbol=symbol)
-            gene.images = [GeneImage(
-                image_file=g,
-                label="AHBA gene expression levels for " + symbol,
-                stat="z-score",
-                display=1,
-                download=1
-            )]
+                gene = Gene(symbol=symbol)
+            # Update with metadata from HGNC file
+            if symbol in gene_data.index:
+                name, locus_type, synonyms = list(gene_data.loc[symbol,
+                    ['Approved Name', 'Locus Type', 'Synonyms']])
+                gene.name = name
+                gene.locus_type = locus_type
+                gene.synonyms = synonyms
+
+            if update_images:
+                gene.images = [GeneImage(
+                    image_file=g,
+                    label="AHBA gene expression levels for " + symbol,
+                    stat="z-score",
+                    display=1,
+                    download=1
+                )]
 
             self.db.session.add(gene)
             if i % 1000 == 0:
                 self.db.session.commit()
+
+        self.db.session.commit()
 
     def add_topics(self, generate_images=True, add_images=True, top_n=20,
                    reset=False):
