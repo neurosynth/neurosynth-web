@@ -720,6 +720,53 @@ $(document).ready(function() {
 });
 
 $(document).ready(function() {
+  var columns;
+  if (!$('#page-genes-list').length) {
+    return;
+  }
+  createDataTable('#gene-list-table', {
+    ajax: '/api/v2/dt/genes',
+    serverSide: true
+  });
+  columns = [
+    {
+      width: '20%'
+    }, {
+      width: '40%'
+    }, {
+      width: '20%'
+    }, {
+      width: '20%'
+    }
+  ];
+  $.get('/analyses/gene_names', function(result) {
+    return $('#gene-search').autocomplete({
+      minLength: 2,
+      delay: 0,
+      select: function(e, ui) {
+        return window.location.href = '/genes/' + ui.item.value;
+      },
+      source: function(request, response) {
+        var filtered, matcher, re;
+        re = $.ui.autocomplete.escapeRegex(request.term);
+        matcher = new RegExp('^' + re, "i");
+        filtered = $.grep(result.data, function(item, index) {
+          return matcher.test(item);
+        });
+        return response(filtered.slice(0, 10));
+      }
+    });
+  });
+  return $('#gene-search').keyup(function(e) {
+    var text;
+    text = $('#gene-search').val();
+    if (e.keyCode === 13) {
+      return window.location.href = '/genes/' + text;
+    }
+  });
+});
+
+$(document).ready(function() {
   var url;
   if (!$('#page-home').length) {
     return;
@@ -994,6 +1041,9 @@ app = {
     return this.fetchAllStudies();
   },
   render: function() {
+    if (document.getElementById('custom-list-container') == null) {
+      return;
+    }
     React.render(React.createElement(AnalysisList, {
       analyses: this.state.analyses,
       selected_uuid: this.state.activeAnalysis.uuid

@@ -199,8 +199,8 @@ app =
     @fetchAllStudies()
 
   render: ->
-#    if not document.getElementById('custom-list-container')?
-#      return
+    if not document.getElementById('custom-list-container')?
+      return
     React.render React.createElement(AnalysisList, {analyses:@state.analyses, selected_uuid:@state.activeAnalysis.uuid}),
       document.getElementById('custom-list-container')
     React.render(React.createElement(ActiveAnalysis, {analysis: @state.activeAnalysis}), document.getElementById('active-analysis-container'))
