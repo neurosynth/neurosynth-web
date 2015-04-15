@@ -1365,8 +1365,6 @@ setupSelectableTable = function() {
 
 $(document).ready(function() {
   setupSelectableTable();
-  console.log("modal container element:");
-  console.log(document.getElementById('modal-container'));
   app.init();
   if (document.getElementById('custom-list-container') != null) {
     return window.onbeforeunload = function(e) {
