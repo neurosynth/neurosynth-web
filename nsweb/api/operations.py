@@ -1,13 +1,14 @@
 from nsweb.api import bp
 from flask import jsonify, request
 from nsweb.api.schemas import (AnalysisSchema, StudySchema, LocationSchema,
-                               ImageSchema, DecodingSchema)
+                               ImageSchema, DecodingSchema, GeneSchema)
 from nsweb.models.images import Image
 from nsweb.models.analyses import Analysis
 from nsweb.models.locations import Location
 from nsweb.models.studies import Study
 from nsweb.models.peaks import Peak
 from nsweb.models.decodings import Decoding
+from nsweb.models.genes import Gene
 from nsweb.controllers import decode
 from nsweb.core import cache
 from sqlalchemy import func
@@ -333,3 +334,64 @@ def get_decoding():
 
     schema = DecodingSchema()
     return jsonify(data=schema.dump(dec).data)
+
+@bp.route('/genes/')
+@cache.cached(timeout=3600, key_prefix=make_cache_key)
+def get_genes():
+    """
+    Retrieve gene data
+    ---
+    tags:
+        - genes
+    responses:
+        200:
+            description: Gene information
+        default:
+            description: No genes found
+    parameters:
+        - in: query
+          name: limit
+          description: Maximum number of genes to retrieve (default = 25; max = 100)
+          type: integer
+          required: false
+        - in: query
+          name: page
+          description: Page number
+          type: integer
+          required: false
+        - in: query
+          name: symbol
+          description: Gene symbol
+          type: array
+          required: false
+          collectionFormat: csv
+          items:
+            type: string
+        - in: query
+          name: id
+          description: Gene ID(s)
+          required: false
+          collectionFormat: csv
+          type: array
+          items:
+            type: integer
+    """
+    DEFAULT_LIMIT = 25
+    MAX_LIMIT = 100
+    limit = int(request.args.get('limit', DEFAULT_LIMIT))
+    limit = min(limit, MAX_LIMIT)
+    page = int(request.args.get('page', 1))
+
+    genes = Gene.query
+
+    if 'id' in request.args:
+        ids = re.split('[\s,]+', request.args['id'].strip(' ,'))
+        genes = genes.filter(Gene.id.in_([int(x) for x in ids]))
+
+    if 'symbol' in request.args:
+        symbols = re.split('[\s,]+', request.args['symbol'].strip(' ,'))
+        genes = genes.filter(Gene.symbol.in_(symbols))
+
+    genes = genes.paginate(page, limit, False).items
+    schema = GeneSchema(many=True)
+    return jsonify(data=schema.dump(genes).data)

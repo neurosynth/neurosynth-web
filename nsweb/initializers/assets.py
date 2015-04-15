@@ -35,6 +35,7 @@ coffee_bundle = Bundle('coffee/init.js.coffee',
                  'coffee/analyses.js.coffee',
                  'coffee/locations.js.coffee',
                  'coffee/decode.js.coffee',
+                 'coffee/genes.js.coffee',
                  'coffee/home.js.coffee',
                  'coffee/custom_analyses.js.coffee',
                  filters='coffeescript', output='js/coffee.js')

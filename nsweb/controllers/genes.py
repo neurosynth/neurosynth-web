@@ -16,18 +16,18 @@ def index():
     return render_template('genes/index.html.slim')
 
 
-@bp.route('/<string:name>/')
-def show(name):
-    gene = Gene.query.filter_by(symbol=name).first()
+@bp.route('/<string:symbol>/')
+def show(symbol):
+    gene = Gene.query.filter_by(symbol=symbol).first()
     if gene is None:
-        return error_page("We have no data for the gene '%s'" % name)
+        return error_page("We have no data for the gene '%s'" % symbol)
     image = gene.images[0]
     # Run decoder if it hasn't been run before
     dec = decode_analysis_image(image.id)
     url = '/images/%s' % image.id
     images = [{
         'id': image.id,
-        'name': name,
+        'name': symbol,
         'url':  url,
         'colorPalette': 'intense red-blue',
         'download': url,
