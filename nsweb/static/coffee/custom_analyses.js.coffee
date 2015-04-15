@@ -48,6 +48,8 @@ app =
     activeAnalysis:
       blank: true
       studies: {}
+    showModal: false
+    modalMessage: 'No message'
 #      studyList: => Object.keys(@studies)
 
   setActiveAnalysis: (uuid) ->
@@ -142,6 +144,8 @@ app =
   saveActiveAnalysis: (name, description) ->
     @state.activeAnalysis.name = name
     @state.activeAnalysis.description = description
+    @state.showModal = true
+    @state.modalMessage = 'Saving analysis. Please wait...'
     data =
       studies: Object.keys(@state.activeAnalysis.studies)
       name: name
@@ -158,8 +162,10 @@ app =
         @state.activeAnalysis.id = data.id
         @state.activeAnalysis.saved = true
 #        saveToLocalStorage('ns-uuid', data.uuid)
+        @state.showModal = false
         @syncToLocalStorage()
         @fetchAllAnalyses()
+    @render()
 
   fetchAllAnalyses: ->
     $.ajax
@@ -193,11 +199,12 @@ app =
     @fetchAllStudies()
 
   render: ->
-    if not document.getElementById('custom-list-container')?
-      return
+#    if not document.getElementById('custom-list-container')?
+#      return
     React.render React.createElement(AnalysisList, {analyses:@state.analyses, selected_uuid:@state.activeAnalysis.uuid}),
       document.getElementById('custom-list-container')
     React.render(React.createElement(ActiveAnalysis, {analysis: @state.activeAnalysis}), document.getElementById('active-analysis-container'))
+    React.render(React.createElement(DialogBox, {}), document.getElementById('modal-container'))
 
 AnalysisListItem = React.createClass
   loadHandler: ->
@@ -243,7 +250,7 @@ ActiveAnalysis = React.createClass
     app.setActiveAnalysisDescription @refs.description.getDOMNode().value
 
   render: ->
-#    if @props.analysis.blank
+#    if @props.analysis .blank
 #      return div {}, 'No active analysis currently loaded'
     uuid = @props.analysis.uuid
     studies = Object.keys(@props.analysis.studies)
@@ -337,6 +344,19 @@ ActiveAnalysis = React.createClass
 #          th {}, 'Journal'
 #          th {}, 'Year'
 #          th {}, 'PMID'
+
+DialogBox = React.createClass
+  render: ->
+    div {className: "modal fade", tabIndex:"-1", role:"dialog", 'aria-hidden':'true'},
+      div {className: "modal-dialog modal-sm"},
+        div {className:"modal-content"},
+          p {}, app.state.modalMessage
+
+  componentDidUpdate: ->
+    if app.state.showModal
+      $('.modal').modal('show')
+    else
+      $('.modal').modal('hide')
 
 SelectedStudiesTable = React.createClass
   tableData: ->

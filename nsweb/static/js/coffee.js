@@ -1,4 +1,4 @@
-var ActiveAnalysis, AllStudiestable, AnalysisList, AnalysisListItem, NSCookie, SELECTED, Scatter, SelectedStudiesTable, a, app, arrayToObject, br, button, ce, createDataTable, div, form, getFromLocalStorage, getPMID, getSelectedStudies, h1, h2, h4, h5, hr, input, label, li, loadReverseInferenceImage, make_scatterplot, p, redrawTableSelection, runif, saveSelection, saveToLocalStorage, setupSelectableTable, span, table, td, textToHTML, textarea, th, thead, tr, ul, urlToParams, _ref,
+var ActiveAnalysis, AllStudiestable, AnalysisList, AnalysisListItem, DialogBox, NSCookie, SELECTED, Scatter, SelectedStudiesTable, a, app, arrayToObject, br, button, ce, createDataTable, div, form, getFromLocalStorage, getPMID, getSelectedStudies, h1, h2, h4, h5, hr, input, label, li, loadReverseInferenceImage, make_scatterplot, p, redrawTableSelection, runif, saveSelection, saveToLocalStorage, setupSelectableTable, span, table, td, textToHTML, textarea, th, thead, tr, ul, urlToParams, _ref,
   __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
 NSCookie = (function() {
@@ -794,7 +794,9 @@ app = {
     activeAnalysis: {
       blank: true,
       studies: {}
-    }
+    },
+    showModal: false,
+    modalMessage: 'No message'
   },
   setActiveAnalysis: function(uuid) {
     if (!(this.state.activeAnalysis.saved || this.state.activeAnalysis.blank)) {
@@ -912,13 +914,15 @@ app = {
     var data;
     this.state.activeAnalysis.name = name;
     this.state.activeAnalysis.description = description;
+    this.state.showModal = true;
+    this.state.modalMessage = 'Saving analysis. Please wait...';
     data = {
       studies: Object.keys(this.state.activeAnalysis.studies),
       name: name,
       description: description,
       uuid: this.state.activeAnalysis.uuid
     };
-    return $.ajax({
+    $.ajax({
       dataType: 'json',
       type: 'POST',
       data: {
@@ -930,11 +934,13 @@ app = {
           _this.state.activeAnalysis.uuid = data.uuid;
           _this.state.activeAnalysis.id = data.id;
           _this.state.activeAnalysis.saved = true;
+          _this.state.showModal = false;
           _this.syncToLocalStorage();
           return _this.fetchAllAnalyses();
         };
       })(this)
     });
+    return this.render();
   },
   fetchAllAnalyses: function() {
     return $.ajax({
@@ -988,16 +994,14 @@ app = {
     return this.fetchAllStudies();
   },
   render: function() {
-    if (document.getElementById('custom-list-container') == null) {
-      return;
-    }
     React.render(React.createElement(AnalysisList, {
       analyses: this.state.analyses,
       selected_uuid: this.state.activeAnalysis.uuid
     }), document.getElementById('custom-list-container'));
-    return React.render(React.createElement(ActiveAnalysis, {
+    React.render(React.createElement(ActiveAnalysis, {
       analysis: this.state.activeAnalysis
     }), document.getElementById('active-analysis-container'));
+    return React.render(React.createElement(DialogBox, {}), document.getElementById('modal-container'));
   }
 };
 
@@ -1164,6 +1168,28 @@ ActiveAnalysis = React.createClass({
       role: 'tab-panel',
       id: 'all-studies-tab'
     }, br({}, p({}, "Add or remove studies to your analysis by clicking on the study. Studies that are already added are highlighted in blue.")), React.createElement(AllStudiestable)))))));
+  }
+});
+
+DialogBox = React.createClass({
+  render: function() {
+    return div({
+      className: "modal fade",
+      tabIndex: "-1",
+      role: "dialog",
+      'aria-hidden': 'true'
+    }, div({
+      className: "modal-dialog modal-sm"
+    }, div({
+      className: "modal-content"
+    }, p({}, app.state.modalMessage))));
+  },
+  componentDidUpdate: function() {
+    if (app.state.showModal) {
+      return $('.modal').modal('show');
+    } else {
+      return $('.modal').modal('hide');
+    }
   }
 });
 
@@ -1339,6 +1365,8 @@ setupSelectableTable = function() {
 
 $(document).ready(function() {
   setupSelectableTable();
+  console.log("modal container element:");
+  console.log(document.getElementById('modal-container'));
   app.init();
   if (document.getElementById('custom-list-container') != null) {
     return window.onbeforeunload = function(e) {
