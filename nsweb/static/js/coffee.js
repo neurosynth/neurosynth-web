@@ -836,6 +836,7 @@ app = {
   state: {
     analyses: [],
     allStudies: [],
+    studyDetails: {},
     activeAnalysis: {
       blank: true,
       studies: {}
@@ -858,6 +859,9 @@ app = {
     return this.render();
   },
   activeStudies: function() {
+    if (Object.keys(this.state.studyDetails).length === 0) {
+      return [];
+    }
     return Object.keys(this.state.activeAnalysis.studies).map((function(_this) {
       return function(pmid) {
         return _this.state.studyDetails[pmid];
@@ -995,6 +999,7 @@ app = {
       success: (function(_this) {
         return function(data) {
           _this.state.analyses = data.analyses;
+          _this.fetchAllStudies();
           return _this.render();
         };
       })(this),
@@ -1020,7 +1025,7 @@ app = {
             study = _ref1[_i];
             _this.state.studyDetails[study.pmid] = study;
           }
-          return _this.fetchAllAnalyses();
+          return _this.render();
         };
       })(this),
       error: (function(_this) {
@@ -1036,7 +1041,7 @@ app = {
     if (active) {
       this.state.activeAnalysis = active;
     }
-    return this.fetchAllStudies();
+    return this.fetchAllAnalyses();
   },
   render: function() {
     if (document.getElementById('custom-list-container') == null) {
@@ -1314,6 +1319,11 @@ AllStudiestable = React.createClass({
     return setupSelectableTable();
   },
   componentDidUpdate: function() {
+    var t;
+    t = $('#all-studies-table').DataTable();
+    t.clear();
+    t.rows.add(app.state.allStudies);
+    t.draw();
     return redrawTableSelection();
   },
   addAllHandler: function() {

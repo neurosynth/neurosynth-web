@@ -44,6 +44,7 @@ app =
   state: # All mutable app state must be contained here
     analyses: []
     allStudies: []
+    studyDetails: {}
     activeAnalysis:
       blank: true
       studies: {}
@@ -63,6 +64,8 @@ app =
     @render()
 
   activeStudies: ->
+    if Object.keys(@state.studyDetails).length is 0
+      return []
     return Object.keys(@state.activeAnalysis.studies).map (pmid) => @state.studyDetails[pmid]
 
   syncToLocalStorage: ->
@@ -173,6 +176,7 @@ app =
       url: @props.fetchAllAnalysesURL
       success: (data) =>
         @state.analyses = data.analyses
+        @fetchAllStudies()
         @render()
       error: (xhr, status, err) =>
         console.error @props.url, status, err.toString()
@@ -187,7 +191,7 @@ app =
         @state.studyDetails = {}
         for study in data.studies
           @state.studyDetails[study.pmid] = study
-        @fetchAllAnalyses()
+        @render()
       error: (xhr, status, err) =>
         console.error @props.url, status, err.toString()
 
@@ -195,7 +199,7 @@ app =
     active = getFromLocalStorage('ns-active-analysis')
     if active
       @state.activeAnalysis = active
-    @fetchAllStudies()
+    @fetchAllAnalyses()
 
   render: ->
     if not document.getElementById('custom-list-container')?
@@ -413,6 +417,10 @@ AllStudiestable = React.createClass
     setupSelectableTable()
 
   componentDidUpdate: ->
+    t = $('#all-studies-table').DataTable()
+    t.clear()
+    t.rows.add app.state.allStudies
+    t.draw()
     redrawTableSelection()
 
   addAllHandler: ->
