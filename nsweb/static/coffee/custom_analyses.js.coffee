@@ -218,7 +218,9 @@ AnalysisListItem = React.createClass
       div {className: "col-md-10"},
         ul {className:'list-unstyled'},
           li {}, "Name: #{ @props.name }"
-          li {}, "Analysis ID: #{ @props.uuid }"
+          li {}, "Analysis ID: ",
+            br {}
+            span {}, @props.uuid
           li {}, "Number of studies: #{ @props.numStudies }"
       div {className: "col-md-2"},
         button {className:"btn btn-primary btn-sm #{ if @props.selected then '' else ''}", onClick: @loadHandler}, 'Load'
@@ -264,7 +266,7 @@ ActiveAnalysis = React.createClass
         div {className:'row'},
           div {className: 'col-md-4'},
             label {}, 'Analysis name:',
-              input {type: 'text', className: 'form-control', ref: 'name', value: @props.analysis.name, onChange: @nameChangeHandler}
+              input {type: 'text', className: 'form-control', ref: 'name', value: @props.analysis.name, onChange: @nameChangeHandler, required:'required'}
             p {}, "Analysis ID: #{ uuid }"
           div {className: 'col-md-8'},
             p {}, "#{ studies.length } studies in this analysis. "
@@ -451,13 +453,13 @@ AllStudiestable = React.createClass
 
   render: ->
     div {},
-      button {className: 'btn btn-sm', onClick: @addAllHandler}, "Add all studies"
+      button {className: 'btn btn-sm btn-info', onClick: @addAllFilteredHandler}, "Add all filtered studies"
       span {}, ' '
-      button {className: 'btn btn-sm', onClick: @removeAllHandler}, "Remove all studies"
+      button {className: 'btn btn-sm btn-info', onClick: @removeAllFilteredHandler}, "Remove all filtered studies"
       span {}, ' '
-      button {className: 'btn btn-sm', onClick: @addAllFilteredHandler}, "Add all filtered studies"
+      button {className: 'btn btn-sm btn-warning', onClick: @addAllHandler}, "Add all studies"
       span {}, ' '
-      button {className: 'btn btn-sm', onClick: @removeAllFilteredHandler}, "Remove all filtered studies"
+      button {className: 'btn btn-sm btn-warning', onClick: @removeAllHandler}, "Remove all studies"
       br {}, ''
       br {}, ''
       table {className: 'table selectable-table', id: 'all-studies-table'},

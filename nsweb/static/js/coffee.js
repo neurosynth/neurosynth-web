@@ -1069,7 +1069,7 @@ AnalysisListItem = React.createClass({
       className: "col-md-10"
     }, ul({
       className: 'list-unstyled'
-    }, li({}, "Name: " + this.props.name), li({}, "Analysis ID: " + this.props.uuid), li({}, "Number of studies: " + this.props.numStudies))), div({
+    }, li({}, "Name: " + this.props.name), li({}, "Analysis ID: ", br({}), span({}, this.props.uuid)), li({}, "Number of studies: " + this.props.numStudies))), div({
       className: "col-md-2"
     }, button({
       className: "btn btn-primary btn-sm " + (this.props.selected ? '' : ''),
@@ -1132,7 +1132,8 @@ ActiveAnalysis = React.createClass({
         className: 'form-control',
         ref: 'name',
         value: this.props.analysis.name,
-        onChange: this.nameChangeHandler
+        onChange: this.nameChangeHandler,
+        required: 'required'
       })), p({}, "Analysis ID: " + uuid)), div({
         className: 'col-md-8'
       }, p({}, "" + studies.length + " studies in this analysis. "), button({
@@ -1367,18 +1368,18 @@ AllStudiestable = React.createClass({
   },
   render: function() {
     return div({}, button({
-      className: 'btn btn-sm',
-      onClick: this.addAllHandler
-    }, "Add all studies"), span({}, ' '), button({
-      className: 'btn btn-sm',
-      onClick: this.removeAllHandler
-    }, "Remove all studies"), span({}, ' '), button({
-      className: 'btn btn-sm',
+      className: 'btn btn-sm btn-info',
       onClick: this.addAllFilteredHandler
     }, "Add all filtered studies"), span({}, ' '), button({
-      className: 'btn btn-sm',
+      className: 'btn btn-sm btn-info',
       onClick: this.removeAllFilteredHandler
-    }, "Remove all filtered studies"), br({}, ''), br({}, ''), table({
+    }, "Remove all filtered studies"), span({}, ' '), button({
+      className: 'btn btn-sm btn-warning',
+      onClick: this.addAllHandler
+    }, "Add all studies"), span({}, ' '), button({
+      className: 'btn btn-sm btn-warning',
+      onClick: this.removeAllHandler
+    }, "Remove all studies"), br({}, ''), br({}, ''), table({
       className: 'table selectable-table',
       id: 'all-studies-table'
     }, thead({}, tr({}, th({}, 'Title '), th({}, 'Authors'), th({}, 'Journal'), th({}, 'Year'), th({}, 'PMID')))));

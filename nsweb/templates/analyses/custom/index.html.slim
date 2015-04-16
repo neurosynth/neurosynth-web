@@ -6,12 +6,12 @@
       h3 Custom Analyses
   .row
     - if current_user.is_authenticated()
-      .col-md-4
+      .col-md-3
         /h4 Your Saved Analyses
         /hr
         div#custom-list-container
           p Loading your saved analyses...
-      .col-md-8#active-analysis-container
+      .col-md-9#active-analysis-container
         br
      - else
       .col-md-12
