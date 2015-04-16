@@ -1,5 +1,4 @@
 {div, br, ul, li, a, p, h1, h2, h4, h5, span, form, input, button, hr, table, thead, tr, th, td, label, textarea} = React.DOM
-ce = React.createElement
 
 SELECTED = 'info' # CSS class to apply to selected rows
 
