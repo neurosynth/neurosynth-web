@@ -1,4 +1,4 @@
-var ActiveAnalysis, AllStudiestable, AnalysisList, AnalysisListItem, DialogBox, NSCookie, SELECTED, Scatter, SelectedStudiesTable, a, app, arrayToObject, br, button, ce, createDataTable, div, form, getFromLocalStorage, getPMID, getSelectedStudies, h1, h2, h4, h5, hr, input, label, li, loadReverseInferenceImage, make_scatterplot, p, redrawTableSelection, runif, saveSelection, saveToLocalStorage, setupSelectableTable, span, table, td, textToHTML, textarea, th, thead, tr, ul, urlToParams, _ref,
+var ActiveAnalysis, AllStudiestable, AnalysisList, AnalysisListItem, DialogBox, NSCookie, SELECTED, Scatter, SelectedStudiesTable, a, app, arrayToObject, br, button, createDataTable, div, form, getFromLocalStorage, getPMID, getSelectedStudies, h1, h2, h4, h5, hr, input, label, li, loadReverseInferenceImage, make_scatterplot, p, redrawTableSelection, runif, saveSelection, saveToLocalStorage, setupSelectableTable, span, table, td, textToHTML, textarea, th, thead, tr, ul, urlToParams, _ref,
   __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
 NSCookie = (function() {
@@ -779,8 +779,6 @@ $(document).ready(function() {
 
 _ref = React.DOM, div = _ref.div, br = _ref.br, ul = _ref.ul, li = _ref.li, a = _ref.a, p = _ref.p, h1 = _ref.h1, h2 = _ref.h2, h4 = _ref.h4, h5 = _ref.h5, span = _ref.span, form = _ref.form, input = _ref.input, button = _ref.button, hr = _ref.hr, table = _ref.table, thead = _ref.thead, tr = _ref.tr, th = _ref.th, td = _ref.td, label = _ref.label, textarea = _ref.textarea;
 
-ce = React.createElement;
-
 SELECTED = 'info';
 
 saveSelection = function(selection) {
@@ -1066,7 +1064,7 @@ AnalysisListItem = React.createClass({
       className: "col-md-10"
     }, ul({
       className: 'list-unstyled'
-    }, li({}, "Name: " + this.props.name), li({}, "uuid: " + this.props.uuid), li({}, "Number of studies: " + this.props.numStudies))), div({
+    }, li({}, "Name: " + this.props.name), li({}, "Analysis ID: " + this.props.uuid), li({}, "Number of studies: " + this.props.numStudies))), div({
       className: "col-md-2"
     }, button({
       className: "btn btn-primary btn-sm " + (this.props.selected ? '' : ''),
@@ -1130,7 +1128,7 @@ ActiveAnalysis = React.createClass({
         ref: 'name',
         value: this.props.analysis.name,
         onChange: this.nameChangeHandler
-      })), p({}, "uuid: " + uuid)), div({
+      })), p({}, "Analysis ID: " + uuid)), div({
         className: 'col-md-8'
       }, p({}, "" + studies.length + " studies in this analysis. "), button({
         className: "btn " + (saved ? '' : 'btn-primary') + " btn-sm",

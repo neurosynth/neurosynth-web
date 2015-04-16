@@ -214,7 +214,7 @@ AnalysisListItem = React.createClass
       div {className: "col-md-10"},
         ul {className:'list-unstyled'},
           li {}, "Name: #{ @props.name }"
-          li {}, "uuid: #{ @props.uuid }"
+          li {}, "Analysis ID: #{ @props.uuid }"
           li {}, "Number of studies: #{ @props.numStudies }"
       div {className: "col-md-2"},
         button {className:"btn btn-primary btn-sm #{ if @props.selected then '' else ''}", onClick: @loadHandler}, 'Load'
@@ -261,7 +261,7 @@ ActiveAnalysis = React.createClass
           div {className: 'col-md-4'},
             label {}, 'Analysis name:',
               input {type: 'text', className: 'form-control', ref: 'name', value: @props.analysis.name, onChange: @nameChangeHandler}
-            p {}, "uuid: #{ uuid }"
+            p {}, "Analysis ID: #{ uuid }"
           div {className: 'col-md-8'},
             p {}, "#{ studies.length } studies in this analysis. "
 #              if saved then "" else span {className: 'label label-warning'}, 'You have unsaved changes'
