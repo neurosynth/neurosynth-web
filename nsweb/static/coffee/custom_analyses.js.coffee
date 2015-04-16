@@ -5,7 +5,6 @@ SELECTED = 'info' # CSS class to apply to selected rows
 # Local Storage Helper Functions
 saveSelection = (selection) ->
   window.localStorage.setItem('ns-selection', JSON.stringify(selection))
-#  window.localStorage.setItem('ns-uuid', null)
 
 saveToLocalStorage = (key, value) ->
   window.localStorage.setItem(key, JSON.stringify(value))
@@ -13,7 +12,6 @@ saveToLocalStorage = (key, value) ->
 getFromLocalStorage = (key) ->
   val = window.localStorage.getItem(key)
   if val is null then val else JSON.parse(val)
-#  JSON.parse(window.localStorage.getItem(key))
 
 getSelectedStudies = ->
   selection = JSON.parse(window.localStorage.getItem('ns-selection') or "{}")
@@ -50,7 +48,6 @@ app =
       studies: {}
     showModal: false
     modalMessage: 'No message'
-#      studyList: => Object.keys(@studies)
 
   setActiveAnalysis: (uuid) ->
     if not (@state.activeAnalysis.saved or @state.activeAnalysis.blank)
@@ -59,7 +56,6 @@ app =
     @state.activeAnalysis = $.extend {}, @state.analyses.filter((a) -> a.uuid is uuid)[0]
     @state.activeAnalysis.studies = arrayToObject(@state.activeAnalysis.studies)
     @state.activeAnalysis.saved = true
-#    saveSelection(@state.activeAnalysis.studies)
     @syncToLocalStorage()
     @render()
 
@@ -140,7 +136,6 @@ app =
           blank: true
           studies: {}
         @syncToLocalStorage()
-#        @init()
         @fetchAllAnalyses()
 
   saveActiveAnalysis: (name, description) ->
@@ -163,7 +158,6 @@ app =
         @state.activeAnalysis.uuid = data.uuid
         @state.activeAnalysis.id = data.id
         @state.activeAnalysis.saved = true
-#        saveToLocalStorage('ns-uuid', data.uuid)
         @state.showModal = false
         @syncToLocalStorage()
         @fetchAllAnalyses()
@@ -308,11 +302,6 @@ ActiveAnalysis = React.createClass
                 label {className: 'col-md-10'}, 'Description:',
                   textarea {className: 'form-control', rows:"4", ref: 'description', placeholder: 'Enter a description for this analysis'}
             hr {}, ''
-
-#      studiesSection = div {},
-#        p {}, 'Below are the PMIDs of the studies you have selected but not yet saved. Save this analysis to see the study details. You can always delete or clone it.'
-#        @props.analysis.studies.map (x) ->
-#          p {}, x.toString()
 
     return div {},
       header,
@@ -485,16 +474,11 @@ setupSelectableTable = ->
     pmid = getPMID(this)
     if not pmid?
       return
-#    selection = getSelectedStudies()
     if pmid of app.state.activeAnalysis.studies
       app.removeStudy(pmid)
-#      delete selection[pmid]
     else
       app.addStudy(pmid)
     redrawTableSelection()
-#      selection[pmid] = 1
-#    saveSelection(selection)
-#    $(this).toggleClass(SELECTED)
 
   $('.selectable-table').on 'draw.dt', ->
     redrawTableSelection()
@@ -532,5 +516,3 @@ $(document).ready ->
         e.returnValue = message
       # For Chrome, Safari, IE8+ and Opera 12+
       return message
-
-
