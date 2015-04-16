@@ -222,7 +222,7 @@ AnalysisListItem = React.createClass
 AnalysisList = React.createClass
   render: ->
     div {className:'custom-analysis-list panel'},
-      h4 {}, "Your saved custom analyses (#{ @props.analyses.length })"
+      h5 {}, "You have #{ @props.analyses.length } saved custom analyses"
       hr {}, ''
       @props.analyses.map (analysis) =>
         selected = if @props.selected_uuid is analysis.uuid then true else false

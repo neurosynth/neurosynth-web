@@ -1077,7 +1077,7 @@ AnalysisList = React.createClass({
   render: function() {
     return div({
       className: 'custom-analysis-list panel'
-    }, h4({}, "Your saved custom analyses (" + this.props.analyses.length + ")"), hr({}, ''), this.props.analyses.map((function(_this) {
+    }, h5({}, "You have " + this.props.analyses.length + " saved custom analyses"), hr({}, ''), this.props.analyses.map((function(_this) {
       return function(analysis) {
         var selected;
         selected = _this.props.selected_uuid === analysis.uuid ? true : false;
