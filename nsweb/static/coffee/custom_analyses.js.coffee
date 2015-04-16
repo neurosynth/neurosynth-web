@@ -279,25 +279,34 @@ ActiveAnalysis = React.createClass
             button {className: 'btn btn-danger btn-sm', onClick: @deleteHandler}, 'Delete Analysis'
         div {className:'row'},
           div {className: 'col-md-12'},
-            label {}, 'Description:',
-              textarea {className: 'form-control', ref: 'description', placeholder: 'Enter a description for this analysis', value: @props.analysis.description, onChange: @descriptionChangeHandler}
+            form {},
+              div {className: "row"},
+                label {className: 'col-md-10'}, 'Description:',
+                textarea {className: 'form-control', rows: "4", ref: 'description', placeholder: 'Enter a description for this analysis', value: @props.analysis.description, onChange: @descriptionChangeHandler}
             hr {}, ''
     else # headless (without uuid) analysis only present in browser's local storage
       header = div {},
         div {className: 'row'},
+          div {className: 'col-md-12'},
+            p {}
+        div {className: 'row'},
           div {className: 'col-md-4'},
             input {type: 'text', className: 'form-control', placeholder: 'Enter a name for this analysis', ref: 'name'}
             br {}, ''
-            button {className:'btn btn-primary', disabled: "#{ if saved then 'disabled' else ''}", onClick: @save}, 'Save selection as new custom analysis'
-            span {}, ' '
-            button {className:'btn btn-danger', onClick: @discardHandler}, 'Discard current selection'
           div {className: 'col-md-8'},
-            p {}, "#{ studies.length } studies selected"
+            span {className: ''},
+              span {}, "#{ studies.length } studies selected "
+              button {className:'btn btn-primary', disabled: "#{ if saved then 'disabled' else ''}", onClick: @save}, 'Save as new custom analysis'
+              span {}, ' '
+              button {className:'btn btn-danger', onClick: @discardHandler}, 'Discard'
         div {className:'row'},
           div {className: 'col-md-12'},
-            label {}, 'Description:',
-              textarea {className: 'form-control', ref: 'description', placeholder: 'Enter a description for this analysis'}
+            form {},
+              div {className: "row"},
+                label {className: 'col-md-10'}, 'Description:',
+                  textarea {className: 'form-control', rows:"4", ref: 'description', placeholder: 'Enter a description for this analysis'}
             hr {}, ''
+
 #      studiesSection = div {},
 #        p {}, 'Below are the PMIDs of the studies you have selected but not yet saved. Save this analysis to see the study details. You can always delete or clone it.'
 #        @props.analysis.studies.map (x) ->
@@ -353,7 +362,8 @@ DialogBox = React.createClass
     div {className: "modal fade", tabIndex:"-1", role:"dialog", 'aria-hidden':'true'},
       div {className: "modal-dialog modal-sm"},
         div {className:"modal-content"},
-          p {}, app.state.modalMessage
+          div {className:"modal-body"},
+            h4 {}, app.state.modalMessage
 
   componentDidUpdate: ->
     if app.state.showModal

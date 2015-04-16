@@ -1152,15 +1152,24 @@ ActiveAnalysis = React.createClass({
         className: 'row'
       }, div({
         className: 'col-md-12'
-      }, label({}, 'Description:', textarea({
+      }, form({}, div({
+        className: "row"
+      }, label({
+        className: 'col-md-10'
+      }, 'Description:', textarea({
         className: 'form-control',
+        rows: "4",
         ref: 'description',
         placeholder: 'Enter a description for this analysis',
         value: this.props.analysis.description,
         onChange: this.descriptionChangeHandler
-      })), hr({}, ''))));
+      })))), hr({}, ''))));
     } else {
       header = div({}, div({
+        className: 'row'
+      }, div({
+        className: 'col-md-12'
+      }, p({}))), div({
         className: 'row'
       }, div({
         className: 'col-md-4'
@@ -1169,24 +1178,31 @@ ActiveAnalysis = React.createClass({
         className: 'form-control',
         placeholder: 'Enter a name for this analysis',
         ref: 'name'
-      }), br({}, ''), button({
+      }), br({}, '')), div({
+        className: 'col-md-8'
+      }, span({
+        className: ''
+      }, span({}, "" + studies.length + " studies selected "), button({
         className: 'btn btn-primary',
         disabled: "" + (saved ? 'disabled' : ''),
         onClick: this.save
-      }, 'Save selection as new custom analysis'), span({}, ' '), button({
+      }, 'Save as new custom analysis'), span({}, ' '), button({
         className: 'btn btn-danger',
         onClick: this.discardHandler
-      }, 'Discard current selection')), div({
-        className: 'col-md-8'
-      }, p({}, "" + studies.length + " studies selected"))), div({
+      }, 'Discard')))), div({
         className: 'row'
       }, div({
         className: 'col-md-12'
-      }, label({}, 'Description:', textarea({
+      }, form({}, div({
+        className: "row"
+      }, label({
+        className: 'col-md-10'
+      }, 'Description:', textarea({
         className: 'form-control',
+        rows: "4",
         ref: 'description',
         placeholder: 'Enter a description for this analysis'
-      })), hr({}, ''))));
+      })))), hr({}, ''))));
     }
     return div({}, header, div({
       className: 'row'
@@ -1235,7 +1251,9 @@ DialogBox = React.createClass({
       className: "modal-dialog modal-sm"
     }, div({
       className: "modal-content"
-    }, p({}, app.state.modalMessage))));
+    }, div({
+      className: "modal-body"
+    }, h4({}, app.state.modalMessage)))));
   },
   componentDidUpdate: function() {
     if (app.state.showModal) {
