@@ -66,6 +66,7 @@ nsweb/static/js/main.min.js
 nsweb/static/css/main.min.css
 nsweb/static/css/main.css
 
+migrations
 migrations/versions/*.py
 
 TODO.txt
