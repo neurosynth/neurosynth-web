@@ -1233,11 +1233,16 @@ ActiveAnalysis = React.createClass({
       className: 'tab-pane active',
       role: 'tab-panel',
       id: 'selected-studies-tab'
-    }, br({}, React.createElement(SelectedStudiesTable, {}))), div({
+    }, br({}, React.createElement(SelectedStudiesTable, {
+      selectedCount: Object.keys(app.activeStudies()).length
+    }))), div({
       className: 'tab-pane',
       role: 'tab-panel',
       id: 'all-studies-tab'
-    }, br({}, p({}, "Add or remove studies to your analysis by clicking on the study. Studies that are already added are highlighted in blue.")), React.createElement(AllStudiestable)))))));
+    }, br({}, p({}, "Add or remove studies to your analysis by clicking on the study. Studies that are already added are highlighted in blue.")), React.createElement(AllStudiestable, {
+      allStudies: app.state.allStudies,
+      selectedCount: Object.keys(app.state.activeAnalysis.studies).length
+    })))))));
   }
 });
 
@@ -1266,6 +1271,7 @@ DialogBox = React.createClass({
 });
 
 SelectedStudiesTable = React.createClass({
+  mixins: [React.addons.PureRenderMixin],
   tableData: function() {
     return app.activeStudies().map(function(item) {
       return $.extend({
@@ -1281,6 +1287,8 @@ SelectedStudiesTable = React.createClass({
     });
   },
   componentDidMount: function() {
+    console.log('SelectedStudiesTable mounted, with props:');
+    console.log(this.props);
     $('#selected-studies-table').DataTable({
       data: this.tableData(),
       columns: [
@@ -1318,9 +1326,11 @@ SelectedStudiesTable = React.createClass({
 });
 
 AllStudiestable = React.createClass({
+  mixins: [React.addons.PureRenderMixin],
   componentDidMount: function() {
+    this.currLength = this.props.allStudies.legnth;
     $('#all-studies-table').DataTable({
-      data: app.state.allStudies,
+      data: this.props.allStudies,
       columns: [
         {
           data: 'title'
@@ -1339,10 +1349,13 @@ AllStudiestable = React.createClass({
   },
   componentDidUpdate: function() {
     var t;
-    t = $('#all-studies-table').DataTable();
-    t.clear();
-    t.rows.add(app.state.allStudies);
-    t.draw();
+    if (this.props.allStudies.length !== this.currLength) {
+      this.currLength = this.props.allStudies.length;
+      t = $('#all-studies-table').DataTable();
+      t.clear();
+      t.rows.add(this.props.allStudies);
+      t.draw();
+    }
     return redrawTableSelection();
   },
   addAllHandler: function() {

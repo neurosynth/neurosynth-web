@@ -316,37 +316,13 @@ ActiveAnalysis = React.createClass
             div {className: 'tab-content'},
               div {className: 'tab-pane active', role:'tab-panel', id:'selected-studies-tab'},
                 br {},
-                React.createElement SelectedStudiesTable, {}
+                React.createElement SelectedStudiesTable, {selectedCount: Object.keys(app.activeStudies()).length}
               div {className: 'tab-pane', role:'tab-panel', id:'all-studies-tab'},
                 br {},
                 p {}, "Add or remove studies to your analysis by clicking on the study. Studies that are already added are highlighted in blue."
-                React.createElement AllStudiestable
-
-#StudiesTable = React.createClass
-#  componentDidMount: ->
-#    $('#custom-studies-table').dataTable
-#      pageLength: 10
-#      serverSide: true
-#      ajax: app.props.studiesTableURL + @props.analysis.id + '/'
-#      order: [[1, 'desc']]
-#
-#  componentDidUpdate: ->
-#    if not @props.analysis.id
-#      return
-#    url = app.props.studiesTableURL + @props.analysis.id + '/'
-#    studyTable = $('#custom-studies-table').DataTable()
-#    studyTable.ajax.url(url)
-#    studyTable.ajax.reload()
-#
-#  render: ->
-#    table {className:'table table-hover', id: 'custom-studies-table'},
-#      thead {},
-#        tr {},
-#          th {}, 'Title '
-#          th {}, 'Authors'
-#          th {}, 'Journal'
-#          th {}, 'Year'
-#          th {}, 'PMID'
+                React.createElement AllStudiestable, {
+                  allStudies: app.state.allStudies,
+                  selectedCount: Object.keys(app.state.activeAnalysis.studies).length}
 
 DialogBox = React.createClass
   render: ->
@@ -363,6 +339,8 @@ DialogBox = React.createClass
       $('.modal').modal('hide')
 
 SelectedStudiesTable = React.createClass
+  mixins: [React.addons.PureRenderMixin]
+
   tableData: ->
     app.activeStudies().map (item) ->
       $.extend({'remove': '<button class="btn btn-sm">remove</button>'}, item)
@@ -373,6 +351,8 @@ SelectedStudiesTable = React.createClass
       app.removeStudy(pmid)
 
   componentDidMount: ->
+    console.log 'SelectedStudiesTable mounted, with props:'
+    console.log @props
     $('#selected-studies-table').DataTable
       data: @tableData()
       columns: [
@@ -405,9 +385,12 @@ SelectedStudiesTable = React.createClass
 
 
 AllStudiestable = React.createClass
+  mixins: [React.addons.PureRenderMixin]
+
   componentDidMount: ->
+    @currLength = @props.allStudies.legnth
     $('#all-studies-table').DataTable
-      data: app.state.allStudies
+      data: @props.allStudies
       columns: [
         {data: 'title'}
         {data: 'authors'}
@@ -418,10 +401,12 @@ AllStudiestable = React.createClass
     setupSelectableTable()
 
   componentDidUpdate: ->
-    t = $('#all-studies-table').DataTable()
-    t.clear()
-    t.rows.add app.state.allStudies
-    t.draw()
+    if @props.allStudies.length != @currLength
+      @currLength = @props.allStudies.length
+      t = $('#all-studies-table').DataTable()
+      t.clear()
+      t.rows.add @props.allStudies
+      t.draw()
     redrawTableSelection()
 
   addAllHandler: ->
