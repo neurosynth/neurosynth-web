@@ -42,15 +42,16 @@ def make_cache_key():
 def get_params(val=None, location=False):
     ''' Extract x/y/z and radius from either URL route or query parameters '''
     if val is None:
-        x = int(request.args.get('x', 0))
-        y = int(request.args.get('y', 0))
-        z = int(request.args.get('z', 0))
-        radius = int(request.args.get('r', 6))
+        x = int(request.args.get('x', 0) or 0)
+        y = int(request.args.get('y', 0) or 0)
+        z = int(request.args.get('z', 0) or 0)
+        radius = int(request.args.get('r', 6) or 6)
+
     else:
-        params = [int(e) for e in val.split('_')]
+        params = val.split('_')
         if len(params) == 3:
             params.append(6)
-        x, y, z, radius = params
+        x, y, z, radius = [int(val) for val in params]
 
     # Check validity and redirect if necessary
     check_xyz(x, y, z)
