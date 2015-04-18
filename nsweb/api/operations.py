@@ -10,6 +10,7 @@ from nsweb.models.peaks import Peak
 from nsweb.models.decodings import Decoding
 from nsweb.models.genes import Gene
 from nsweb.controllers import decode
+from nsweb.controllers.locations import check_xyz
 from nsweb.core import cache
 from sqlalchemy import func
 import re
@@ -18,7 +19,6 @@ import re
 def make_cache_key():
     ''' Replace default cache key prefix with a string that also includes
     query arguments. '''
-    # query = '/'.join(['%s=%s' % (k, v) for (k, v) in request.args.items()])
     return request.path + request.query_string
 
 
@@ -197,6 +197,9 @@ def get_location():
     z = int(request.args['z'])
     #  Radius: 6 mm by default, max 2 cm
     r = min(int(request.args.get('r', 6)), 20)
+
+    # Check validity of coordinates and redirect if necessary
+    check_xyz(x, y, z)
 
     loc = Location.query.filter_by(x=x, y=y, z=z).first()
     if loc is None:
