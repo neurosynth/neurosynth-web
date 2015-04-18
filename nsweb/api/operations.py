@@ -325,11 +325,12 @@ def get_decoding():
         dec = decode.decode_analysis_image(request.args['image'])
 
     elif 'neurovault' in request.args:
-        dec_id = decode.decode_neurovault(request.args['neurovault'], False)
+        dec_id = decode.decode_neurovault(request.args['neurovault'],
+                                          render=False)
         dec = dec.filter_by(uuid=dec_id).first()
 
     elif 'url' in request.args:
-        dec_id = decode.decode_neurovault(request.args['url'], False)
+        dec_id = decode.decode_url(request.args['url'], render=False)
         dec = dec.filter_by(uuid=dec_id).first()
 
     schema = DecodingSchema()
