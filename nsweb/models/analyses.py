@@ -13,6 +13,9 @@ class AnalysisSet(db.Model):
     n_analyses = db.Column(db.Integer, default=0)
     type = db.Column(db.String(50))
     description = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.datetime.utcnow,
+                           onupdate=datetime.datetime.now)
 
 
 class Analysis(db.Model):
@@ -30,6 +33,9 @@ class Analysis(db.Model):
     analysis_set = db.relationship('AnalysisSet', backref=db.backref(
         'analyses', cascade='all'))
     display = db.Column(db.Boolean)
+    created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.datetime.utcnow,
+                           onupdate=datetime.datetime.now)
 
     __mapper_args__ = {
         'polymorphic_identity': 'analysis',
@@ -82,7 +88,6 @@ class CustomAnalysis(Analysis):
     user_id = db.Column(db.Integer, db.ForeignKey(User.id))
     user = db.relationship(User, backref=db.backref('analyses',
                            cascade='all'))
-    created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     __mapper_args__ = {
         'polymorphic_identity': 'custom'
     }

@@ -2,6 +2,7 @@ from nsweb.core import db
 from nsweb.models.analyses import CustomAnalysis, TermAnalysis, TopicAnalysis
 from nsweb.models.locations import Location
 from nsweb.models.genes import Gene
+import datetime
 
 
 class Image(db.Model):
@@ -15,6 +16,9 @@ class Image(db.Model):
     display = db.Column(db.Boolean)
     download = db.Column(db.Boolean)
     type = db.Column(db.String(20))
+    created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.datetime.utcnow,
+                           onupdate=datetime.datetime.now)
 
     __mapper_args__ = {
         'polymorphic_on': type,

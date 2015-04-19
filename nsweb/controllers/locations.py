@@ -1,5 +1,6 @@
 from nsweb.core import add_blueprint, cache
-from flask import Blueprint, render_template, url_for, request, jsonify
+from flask import (Blueprint, render_template, url_for, request, jsonify,
+                   redirect)
 from nsweb.models.locations import Location
 from nsweb.models.images import LocationImage
 from nsweb.models.peaks import Peak
@@ -7,7 +8,7 @@ from flask_sqlalchemy import sqlalchemy
 from nsweb.initializers import settings
 from os.path import join, exists
 from nsweb import tasks
-from nsweb.core import db
+from nsweb.core import db, app
 from nsweb.controllers.decode import decode_analysis_image, get_voxel_data
 from nsweb.controllers.images import get_decoding_data
 import pandas as pd
@@ -17,18 +18,43 @@ import numpy as np
 bp = Blueprint('locations', __name__, url_prefix='/locations')
 
 
+class RedirectedLocation(Exception):
+
+    def __init__(self, url, status_code=None):
+        Exception.__init__(self)
+        self.url = url
+        if status_code is None:
+            status_code = 302
+        self.status_code = status_code
+
+
+@app.errorhandler(RedirectedLocation)
+def handle_redirected_location(error):
+    return redirect(error.url, error.status_code)
+
+
+def make_cache_key():
+    ''' Replace default cache key prefix with a string that also includes
+    query arguments. '''
+    return request.path + request.query_string
+
+
 def get_params(val=None, location=False):
     ''' Extract x/y/z and radius from either URL route or query parameters '''
     if val is None:
-        x = int(request.args.get('x', 0))
-        y = int(request.args.get('y', 0))
-        z = int(request.args.get('z', 0))
-        radius = int(request.args.get('r', 6))
+        x = int(request.args.get('x', 0) or 0)
+        y = int(request.args.get('y', 0) or 0)
+        z = int(request.args.get('z', 0) or 0)
+        radius = int(request.args.get('r', 6) or 6)
+
     else:
-        params = [int(e) for e in val.split('_')]
+        params = val.split('_')
         if len(params) == 3:
             params.append(6)
-        x, y, z, radius = params
+        x, y, z, radius = [int(val) for val in params]
+
+    # Check validity and redirect if necessary
+    check_xyz(x, y, z)
 
     if radius > 20:
         radius = 20
@@ -37,17 +63,20 @@ def get_params(val=None, location=False):
     return (x, y, z, radius)
 
 
-@bp.route('/')
-@bp.route('/<string:val>/')
-def show(val=None):
-    x, y, z, radius = get_params(val)
-    return render_template('locations/index.html.slim', radius=radius, x=x,
-                           y=y, z=z)
+def check_xyz(x, y, z):
+    # Round all x/y/z values to nearest even number
+    _x, _y, _z = map(lambda v: int(round(v/2.)*2), [x, y, z])
+    if (x, y, z) != (_x, _y, _z):
+        new_args = dict(request.args.items() +
+                        {'x': _x, 'y': _y, 'z': _z}.items())
+        url = url_for(request.url_rule.endpoint, **new_args)
+        raise RedirectedLocation(url)
 
 
 @bp.route('/<string:val>/images')
-@cache.memoize(timeout=3600)
-def get_images(val):
+@bp.route('/images/')
+@cache.cached(timeout=3600, key_prefix=make_cache_key)
+def get_images(val=None):
     location = get_params(val, location=True)
     if location is None:
         x, y, z, r = get_params(val)
@@ -70,14 +99,16 @@ def get_images(val):
 
 
 @bp.route('/<string:val>/compare/')
-@cache.memoize(timeout=3600)
-def compare_location(val, decimals=2):
+@bp.route('/compare/')
+@cache.cached(timeout=3600, key_prefix=make_cache_key)
+def compare_location(val=None, decimals=2):
     """ Compare this voxel to various image sets using various approaches.
     Currently returns correlations between the coactivation/functional
     connectivity maps seeded at this voxel and all images in a given term set,
     plus activation data at this location.
     """
     x, y, z, radius = get_params(val)
+    print [x, y, z, radius]
     location = get_params(val, location=True) or make_location(x, y, z)
     ma = zip(*get_decoding_data(location.images[0].id, get_json=False))
     fc = zip(*get_decoding_data(location.images[1].id, get_json=False))
@@ -97,9 +128,10 @@ def compare_location(val, decimals=2):
     return jsonify(data=data.values.tolist())
 
 
-@bp.route('/<string:val>/studies')
-@cache.memoize(timeout=3600)
-def get_studies(val):
+@bp.route('/<string:val>/studies/')
+@bp.route('/studies/')
+@cache.cached(timeout=3600, key_prefix=make_cache_key)
+def get_studies(val=None):
     x, y, z, radius = get_params(val)
     points = Peak.closestPeaks(radius, x, y, z)
     # prevents duplicate studies
@@ -119,6 +151,15 @@ def get_studies(val):
         data = [{'pmid': p[0].study.pmid, 'peaks':p[1]} for p in points]
         data = jsonify(data=data)
     return data
+
+
+@bp.route('/')
+@bp.route('/<string:val>/')
+@cache.cached(timeout=3600, key_prefix=make_cache_key)
+def show(val=None):
+    x, y, z, radius = get_params(val)
+    return render_template('locations/index.html.slim', radius=radius, x=x,
+                           y=y, z=z)
 
 
 def make_location(x, y, z):
