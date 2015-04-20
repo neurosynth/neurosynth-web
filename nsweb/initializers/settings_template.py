@@ -72,6 +72,8 @@ MYSQL_USER = 'nsweb'
 MYSQL_PASSWORD = 'changeme'
 MYSQL_PRODUCTION_DB = 'nsweb'
 MYSQL_DEVELOPMENT_DB = 'nsweb_development'
+MYSQL_TEST_DB = 'nsweb_test'
+TEST_URL = 'http://test.neurosynth.org'
 
 ### Logging ###
 LOGGING_PATH = DATA_DIR + 'log.txt'

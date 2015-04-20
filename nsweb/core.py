@@ -53,7 +53,7 @@ def password_validator(form, field):
         raise ValidationError('Password must have at least 4 characters')
 
 
-def create_app(debug=True):
+def create_app(debug=True, test=False):
     '''creates app instance, db instance, and apimanager instance'''
 
     # Extra config stuff
@@ -63,7 +63,9 @@ def create_app(debug=True):
     if settings.SQL_ADAPTER == 'sqlite':
         db_uri = settings.SQLALCHEMY_SQLITE_URI
     elif settings.SQL_ADAPTER == 'mysql':
-        if settings.DEBUG:
+        if test:
+            db_to_use = settings.MYSQL_TEST_DB
+        elif settings.DEBUG:
             db_to_use = settings.MYSQL_DEVELOPMENT_DB
         else:
             db_to_use = settings.MYSQL_PRODUCTION_DB

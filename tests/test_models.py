@@ -1,10 +1,12 @@
+""" Test model functionality. """
+from nsweb.models.studies import Study
+from nsweb.models.peaks import Peak
 
-from nsweb.models import Study, Peak, Feature, Frequency, Image, FeatureImage, Location, LocationImage, LocationFeature
-
-class TestModels
-
-    def test_feature(self):
-            feature = Feature(feature='test', num_studies=1, num_activations=1)
-            features =Feature.query.all()
-            self.assert_model_contains_fields(feature, ['feature','num_studies','num_activations'])
-            self.assert_model_equality([feature], features)
+def test_studies(db):
+    study = Study(pmid=345345, title='test study',
+        authors='Jokkin, Eumast',
+        journal='Journal of Nonexistent Findings',
+        year=2008)
+    study.peaks = [Peak(x=-12, y=14, z=40), Peak(x=22, y=22, z=22)]
+    db.session.add(study)
+    db.session.commit()
