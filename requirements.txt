@@ -28,6 +28,7 @@ pandas>=0.13
 pyscss
 pytest
 seaborn
+selenium
 simplejson
 slimish-jinja
 SQLAlchemy
