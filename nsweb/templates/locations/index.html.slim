@@ -50,9 +50,9 @@
             br
 
           - if current_user.is_authenticated()
-            table#location_studies_table.table-striped.table-hover.table.table-condensed.small-datatable.selectable-table
+            %table#location_studies_table.table-striped.table-hover.table.table-condensed.small-datatable.selectable-table
           - else
-            table#location_studies_table.table-striped.table-hover.table.table-condensed.small-datatable
+            %table#location_studies_table.table-striped.table-hover.table.table-condensed.small-datatable
 
           thead
             tr
