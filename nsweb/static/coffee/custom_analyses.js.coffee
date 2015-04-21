@@ -488,9 +488,9 @@ setupSelectableTable = ->
 
 $(document).ready ->
   setupSelectableTable()
-  app.init()
   # On the custom analyses page, warn user of unsaved changes before navigating away
   if document.getElementById('custom-list-container')?
+    app.init()
     window.onbeforeunload = (e) ->
       if app.state.activeAnalysis.saved or app.state.activeAnalysis.blank
         return

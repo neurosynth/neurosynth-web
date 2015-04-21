@@ -8,9 +8,14 @@
             <div class="lead">
                 There are currently {{ studies }} studies in the Neurosynth database
             </div>
-            <p>The table below contains a listing of all studies currently included in the Neurosynth database,
+            <p>
+                The table below contains a listing of all studies currently included in the Neurosynth database,
                 representing a significant fraction of the current fMRI literature. New studies are added at regular
-                intervals.</p>
+                intervals.
+                {% if not current_user.is_authenticated() %}
+                If you'd like to select individual studies from the table below and conduct custom online meta-analyses, please <a href="/user/sign-in">log in</a>.
+                {% endif %}
+            </p>
             {% if current_user.is_authenticated() %}
                 <span>
                 <button class="btn btn-primary" id="select-all-btn">Select all studies on this page</button>
@@ -20,7 +25,7 @@
                 </span>
                 <br><br>
             {% endif %}
-            <table class="table table-hover {% if current_user.is_authenticated %}selectable-table{% endif %}"
+            <table class="table table-hover {% if current_user.is_authenticated() %}selectable-table{% endif %}"
                    id="studies_table">
                 <thead>
                 <tr>
