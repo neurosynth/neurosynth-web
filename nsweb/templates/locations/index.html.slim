@@ -2,6 +2,7 @@
 - extends "layout/base.html"
 - block content
   - import "macros/_analysis_viewer.html.slim" as viewers
+  - import "macros/_datatables.html.slim" as datatables
   .row#page-location
     .col-md-10
       .big-text
@@ -42,23 +43,25 @@
                 input id="radius-submit" type="button" value="Go"
           br
           br
-          - if current_user.is_authenticated()
-            button.bt.btn-primary#select-all-btn Select all studies on this page
-            button.bt.btn-primary#deselect-all-btn Deselect all studies on this page
-            br
-            br
 
-          - if current_user.is_authenticated()
-            %table#location_studies_table.table-striped.table-hover.table.table-condensed.small-datatable.selectable-table
-          - else
-            %table#location_studies_table.table-striped.table-hover.table.table-condensed.small-datatable
+          / - if current_user.is_authenticated()
+          /   button.bt.btn-primary#select-all-btn Select all studies on this page
+          /   button.bt.btn-primary#deselect-all-btn Deselect all studies on this page
+          /   br
+          /   br
 
-          thead
-            tr
-              th Title
-              th Authors
-              th Journal
-              th Activations
+          / - if current_user.is_authenticated()
+          /   %table#location_studies_table.table-striped.table-hover.table.table-condensed.small-datatable.selectable-table
+          / - else
+          /   %table#location_studies_table.table-striped.table-hover.table.table-condensed.small-datatable
+
+          / thead
+          /   tr
+          /     th Title
+          /     th Authors
+          /     th Journal
+          /     th Activations
+          {{datatables.studies_table(False, current_user, 'location_studies_table')}}
         #associations.tab-pane
           h3 Associations with meta-analysis maps
           table#location_analyses_table.table-striped.table-hover.table.table-condensed.small-datatable
