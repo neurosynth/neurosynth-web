@@ -51,7 +51,7 @@ app =
 
   setActiveAnalysis: (uuid) ->
     if not (@state.activeAnalysis.saved or @state.activeAnalysis.blank)
-      if not confirm "You have unsaved changes that will be discarded. Are you sure you want to proceeed?"
+      if not confirm "You have unsaved changes that will be discarded. Are you sure you want to proceed?"
         return
     @state.activeAnalysis = $.extend {}, @state.analyses.filter((a) -> a.uuid is uuid)[0]
     @state.activeAnalysis.studies = arrayToObject(@state.activeAnalysis.studies)
@@ -110,6 +110,8 @@ app =
   clearActiveAnalysis: ->
     @state.activeAnalysis =
       blank: true
+      name: ''
+      description: ''
       studies: {}
     @syncToLocalStorage()
     @render()
@@ -258,26 +260,27 @@ ActiveAnalysis = React.createClass
     if uuid # previously saved analysis
       header = div {},
         div {className:'row'},
-          div {className: 'col-md-4'},
-            label {}, 'Analysis name:',
-              input {type: 'text', className: 'form-control', ref: 'name', value: @props.analysis.name, onChange: @nameChangeHandler, required:'required'}
-            p {}, "Analysis ID: #{ uuid }"
           div {className: 'col-md-8'},
+            div {className:'row'},
+              label {className: 'col-md-6'}, 'Analysis name:',
+                input {type: 'text', className: 'form-control', ref: 'name', value: @props.analysis.name, onChange: @nameChangeHandler, required:'required'}
+            div {className:'row'},
+              div {className: 'col-md-8'},
+                p {}, "Analysis ID: #{ uuid }"
+          div {className: 'col-md-4'},
             p {}, "#{ studies.length } studies in this analysis. "
-#              if saved then "" else span {className: 'label label-warning'}, 'You have unsaved changes'
-#            br {},
-            button {className: "btn #{ if saved then '' else 'btn-primary' } btn-sm", disabled: "#{ if saved then 'disabled' else ''}", onClick: @save}, 'Save Analysis'
+            button {className: "btn #{ if saved then '' else 'btn-primary' } btn-sm", disabled: "#{ if saved then 'disabled' else ''}", onClick: @save}, 'Save'
             span {}, ' '
-            a {className: 'btn btn-primary btn-sm', href: app.props.runAnalysisURL + uuid}, 'Run Analysis'
+            button {className: 'btn btn-info btn-sm', onClick: @cloneHandler}, 'Save as...'
             span {}, ' '
-            button {className: 'btn btn-info btn-sm', onClick: @cloneHandler}, 'Clone Analysis'
+            a {className: 'btn btn-primary btn-sm', href: app.props.runAnalysisURL + uuid}, 'Run'
             span {}, ' '
-            button {className: 'btn btn-danger btn-sm', onClick: @deleteHandler}, 'Delete Analysis'
+            button {className: 'btn btn-danger btn-sm pull-right', onClick: @deleteHandler}, 'Delete'
         div {className:'row'},
           div {className: 'col-md-12'},
             form {},
               div {className: "row"},
-                label {className: 'col-md-10'}, 'Description:',
+                label {className: 'col-md-8'}, 'Description:',
                 textarea {className: 'form-control', rows: "4", ref: 'description', placeholder: 'Enter a description for this analysis', value: @props.analysis.description, onChange: @descriptionChangeHandler}
             hr {}, ''
     else # headless (without uuid) analysis only present in browser's local storage
@@ -286,21 +289,23 @@ ActiveAnalysis = React.createClass
           div {className: 'col-md-12'},
             p {}
         div {className: 'row'},
-          div {className: 'col-md-4'},
-            input {type: 'text', className: 'form-control', placeholder: 'Enter a name for this analysis', ref: 'name'}
-            br {}, ''
-          div {className: 'col-md-8'},
+          div {className: 'col-md-6'},
+            div {className: 'row'},
+              label {className: 'col-md-8'}, 'Analysis name:',
+                input {type: 'text', className: 'form-control', placeholder: 'Enter a name for this analysis', ref: 'name'}
+              br {}, ''
+          div {className: 'col-md-6'},
             span {className: ''},
               span {}, "#{ studies.length } studies selected "
-              button {className:'btn btn-primary', disabled: "#{ if saved then 'disabled' else ''}", onClick: @save}, 'Save as new custom analysis'
+              button {className:'btn btn-primary btn-sm', disabled: "#{ if saved then 'disabled' else ''}", onClick: @save}, 'Save as new custom analysis'
               span {}, ' '
-              button {className:'btn btn-danger', onClick: @discardHandler}, 'Discard'
+              button {className:'btn btn-danger btn-sm', onClick: @discardHandler}, 'Discard'
         div {className:'row'},
           div {className: 'col-md-12'},
             form {},
               div {className: "row"},
-                label {className: 'col-md-10'}, 'Description:',
-                  textarea {className: 'form-control', rows:"4", ref: 'description', placeholder: 'Enter a description for this analysis'}
+                label {className: 'col-md-8'}, 'Description:',
+                  textarea {className: 'form-control', rows:"4", ref: 'description', value: @props.analysis.description, placeholder: 'Enter a description for this analysis'}
             hr {}, ''
 
     return div {},
