@@ -23,7 +23,7 @@ class DecodingSet(db.Model):
 class Decoding(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
-    url = db.Column(db.String(255), unique=True, nullable=True)
+    url = db.Column(db.String(255), nullable=True)
     neurovault_id = db.Column(db.Integer, nullable=True)
     filename = db.Column(db.String(200))
     uuid = db.Column(db.String(32), unique=True)
