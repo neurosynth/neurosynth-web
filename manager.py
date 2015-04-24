@@ -4,7 +4,7 @@ from flask import url_for
 from flask.ext.migrate import Migrate, MigrateCommand
 from nsweb.models import *
 
-create_app(app)
+create_app()
 migrate = Migrate(app, db)
 manager = Manager(app)
 manager.add_command('db', MigrateCommand)
