@@ -2,8 +2,10 @@
 - extends "layout/base.html"
 - block content
   .row
-    .col-md-12
+    .col-md-8
       h3 Custom Analyses
+    .col-md-4
+      a target="_blank" href="/custom-analyses-faq/" New to custom analyses? Read the Custom Analyses FAQ
   .row
     - if current_user.is_authenticated()
       .col-md-3
