@@ -10,7 +10,7 @@
     .col-md-8
       h1.top-space0 {{analysis.name}}
       .lead
-        | A custom meta-analysis of {{analysis.n_studies}} studies created by {{ analysis.user.username }} {{ 'on ' + analysis.created_at.strftime('%B %d, %Y') if analysis.created_at != None }}
+        | A custom meta-analysis of {{analysis.n_studies}} studies created by {{ analysis.user.username }} {{ 'on ' + analysis.updated_at.strftime('%B %d, %Y') if analysis.updated_at != None }}
       - if analysis.description
         p {{ analysis.description }}
     %div.col-md-2

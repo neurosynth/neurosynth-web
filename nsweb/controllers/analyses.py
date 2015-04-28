@@ -12,6 +12,7 @@ from nsweb import tasks
 from nsweb.initializers import settings
 from nsweb.controllers import error_page
 from os.path import join, exists
+import datetime as dt
 
 bp = Blueprint('analyses', __name__, url_prefix='/analyses')
 
@@ -189,45 +190,56 @@ def faq_custom_analyses():
 @login_required
 def run_custom_analysis(uid):
     """
-    Given a uuid, kick off the analysis run and redirect the user to the results page once
-    the analysis is complete.
+    Given a uuid, kick off the analysis run and redirect the user to the
+    results page once the analysis is complete.
     """
     custom = CustomAnalysis.query.filter_by(uuid=uid).first()
 
     if not custom or not custom.studies:
         abort(404)
 
-    ids = [s.pmid for s in custom.studies]
-    if tasks.run_metaanalysis.delay(ids, custom.uuid).wait():
-        # Update analysis record
-        rev_inf = '%s_pFgA_z_FDR_0.01.nii.gz' % custom.uuid
-        rev_inf = join(settings.IMAGE_DIR, 'custom', rev_inf)
-        fwd_inf = '%s_pAgF_z_FDR_0.01.nii.gz' % custom.uuid
-        fwd_inf = join(settings.IMAGE_DIR, 'custom', fwd_inf)
-        if exists(rev_inf):
-            images = [
-                CustomAnalysisImage(
-                    name='%s (forward inference)' % custom.name,
-                    image_file=fwd_inf,
-                    label='%s (forward inference)' % custom.name,
-                    stat='z-score',
-                    display=1,
-                    download=1
-                ),
-                CustomAnalysisImage(
-                    name='%s (reverse inference)' % custom.name,
-                    image_file=rev_inf,
-                    label='%s (reverse inference)' % custom.name,
-                    stat='z-score',
-                    display=1,
-                    download=1
-                )
-            ]
-            custom.images = images
-            db.session.add(custom)
-            db.session.commit()
-            return redirect(url_for('analyses.show_custom_analysis', uid=uid))
-    return error_page("An unspecified error occurred while trying to run "
-                      "the custom meta-analysis. Please try again.")
+    # Only generate images if the analysis has never been run, if changes have
+    # been made since the last run, or if images are missing.
+    if not custom.last_run_at or (custom.last_run_at < custom.updated_at) or \
+            not custom.images:
+
+        ids = [s.pmid for s in custom.studies]
+        if tasks.run_metaanalysis.delay(ids, custom.uuid).wait():
+            # Update analysis record
+            rev_inf = '%s_pFgA_z_FDR_0.01.nii.gz' % custom.uuid
+            rev_inf = join(settings.IMAGE_DIR, 'custom', rev_inf)
+            fwd_inf = '%s_pAgF_z_FDR_0.01.nii.gz' % custom.uuid
+            fwd_inf = join(settings.IMAGE_DIR, 'custom', fwd_inf)
+            if exists(rev_inf):
+                images = [
+                    CustomAnalysisImage(
+                        name='%s (forward inference)' % custom.name,
+                        image_file=fwd_inf,
+                        label='%s (forward inference)' % custom.name,
+                        stat='z-score',
+                        display=1,
+                        download=1
+                    ),
+                    CustomAnalysisImage(
+                        name='%s (reverse inference)' % custom.name,
+                        image_file=rev_inf,
+                        label='%s (reverse inference)' % custom.name,
+                        stat='z-score',
+                        display=1,
+                        download=1
+                    )
+                ]
+                custom.images = images
+                custom.last_run_at = dt.datetime.utcnow()
+                db.session.add(custom)
+                db.session.commit()
+                return redirect(url_for('analyses.show_custom_analysis',
+                                        uid=uid))
+        return error_page("An unspecified error occurred while trying "
+                          "to run the custom meta-analysis. Please try "
+                          "again.")
+
+    return redirect(url_for('analyses.show_custom_analysis', uid=uid))
+
 
 add_blueprint(bp)
