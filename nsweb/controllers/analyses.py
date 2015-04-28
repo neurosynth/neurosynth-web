@@ -112,9 +112,10 @@ def show_term(term):
                            analysis=analysis,
                            cog_atlas=json.loads(analysis.cog_atlas or '{}'))
 
+
 @bp.route('/<string:type>/<string:name>/images/<string:image>/')
 def get_term_image_file(type, name, image):
-    type = type.strip('s') # e.g., 'topics' => 'topic'
+    type = type.strip('s')  # e.g., 'topics' => 'topic'
     analysis = find_analysis(name, type=type)
     return get_image_file(analysis, image)
 
@@ -154,6 +155,8 @@ def show_topic(topic_set, number):
                            analysis_set=topic.analysis_set, analysis=topic)
 
 ### CUSTOM ANALYSIS ROUTES ###
+
+
 @bp.route('/custom/<string:uid>/')
 def show_custom_analysis(uid):
     custom = CustomAnalysis.query.filter_by(uuid=uid).first()
@@ -165,14 +168,21 @@ def show_custom_analysis(uid):
 @bp.route('/topics/<string:topic_set>/<string:number>/images/<string:image>/')
 def get_topic_image_file(topic_set, number, image):
     analysis = TopicAnalysis.query.join(AnalysisSet).filter(
-            TopicAnalysis.number == int(number),
-            AnalysisSet.name == topic_set).first()
+        TopicAnalysis.number == int(number),
+        AnalysisSet.name == topic_set).first()
     return get_image_file(analysis, image)
 
 
 @bp.route('/custom/')
 def list_custom_analyses():
     return render_template('analyses/custom/index.html.slim')
+
+
+@bp.route('/custom/faq/')
+def faq_custom_analyses():
+    data = json.load(open(join(settings.ROOT_DIR, 'data', 'json',
+                               'faq_custom_analyses.json')))
+    return render_template('home/faq_custom_analyses.html.slim', data=data)
 
 
 @bp.route('/custom/run/<string:uid>/', methods=['GET', 'POST'])

@@ -42,11 +42,6 @@ def faq():
     data = json.load(open(join(settings.ROOT_DIR, 'data', 'json', 'faq.json')))
     return render_template('home/faq.html.slim', data=data)
 
-@bp.route('/custom-analyses-faq/')
-def faq_custom_analyses():
-    data = json.load(open(join(settings.ROOT_DIR, 'data', 'json', 'faq_custom_analyses.json')))
-    return render_template('home/faq_custom_analyses.html.slim', data=data)
-
 @bp.route('/code/')
 def code():
     return render_template('home/code.html.slim')
