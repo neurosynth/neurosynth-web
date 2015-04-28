@@ -33,18 +33,19 @@
         #studies.tab-pane
           .location-studies-head
             %h3#current-location-studies
-            .location-adjust-radius
-              .radius-element Adjust radius:
-              .radius-element
-                input type="range"  name="rad-in" id="rad-in" min="1" max="20" value="{{radius}}"
-              .radius-element
-                input type="number" name="rad-out" id="rad-out" min="1" max="20" value="{{radius}}"
-              .radius-element
-                input id="radius-submit" type="button" value="Go"
-          br
-          br
-
-          {{datatables.studies_table(False, current_user, 'location_studies_table')}}
+            .row
+              .col-md-12
+                .location-adjust-radius
+                  .radius-element Adjust radius:
+                  .radius-element
+                    input type="range"  name="rad-in" id="rad-in" min="1" max="20" value="{{radius}}"
+                  .radius-element
+                    input type="number" name="rad-out" id="rad-out" min="1" max="20" value="{{radius}}"
+                  .radius-element
+                    input id="radius-submit" type="button" value="Go"
+            .row
+              .col-md-12
+                {{datatables.studies_table(False, current_user, 'location_studies_table')}}
         #associations.tab-pane
           h3 Associations with meta-analysis maps
           table#location_analyses_table.table-striped.table-hover.table.table-condensed.small-datatable
