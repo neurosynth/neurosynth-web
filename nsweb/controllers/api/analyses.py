@@ -4,10 +4,10 @@ from nsweb.models.analyses import (TermAnalysis, AnalysisSet, CustomAnalysis,
                                    Analysis)
 from nsweb.models.studies import Study
 from nsweb.models.frequencies import Frequency
-from nsweb.initializers import settings
 from nsweb.core import db
 from flask.ext.login import current_user
 from flask.ext.user import login_required
+import datetime as dt
 import json
 import uuid
 
@@ -129,6 +129,9 @@ def save_custom_analysis():
         uid = unicode(uuid.uuid4())[:18]
         custom_analysis = CustomAnalysis(uuid=uid, name=name, description=description,
             user_id=current_user.id, n_studies=len(pmids))
+    # Explicitly update timestamp, because it won't be changed if only studies
+    # are modified, and we need to compare this with last_run_at later.
+    custom_analysis.updated_at = dt.datetime.utcnow()
     db.session.add(custom_analysis)
     db.session.commit()
 

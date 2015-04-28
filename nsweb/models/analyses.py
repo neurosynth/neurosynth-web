@@ -35,7 +35,7 @@ class Analysis(db.Model):
     display = db.Column(db.Boolean)
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.datetime.utcnow,
-                           onupdate=datetime.datetime.now)
+                           onupdate=datetime.datetime.utcnow)
 
     __mapper_args__ = {
         'polymorphic_identity': 'analysis',
@@ -88,6 +88,7 @@ class CustomAnalysis(Analysis):
     user_id = db.Column(db.Integer, db.ForeignKey(User.id))
     user = db.relationship(User, backref=db.backref('analyses',
                            cascade='all'))
+    last_run_at = db.Column(db.DateTime)
     __mapper_args__ = {
         'polymorphic_identity': 'custom'
     }
