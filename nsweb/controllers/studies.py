@@ -8,7 +8,7 @@ bp = Blueprint('studies', __name__, url_prefix='/studies')
 @bp.route('/')
 def index():
     """Returns the studies page."""
-    return render_template('studies/index.html.slim',
+    return render_template('studies/index.html',
                            studies=Study.query.count())
 
 

@@ -10,10 +10,10 @@
     .col-md-8
       h1.top-space0 Topic {{topic_n}}
       .lead An automated meta-analysis of {{analysis.n_studies}} studies
-    .col-md-2
-      .analysis-search
-        span Search for another analysis:
-        input type="text" id="analysis-search"
+    %div.col-md-2
+      / .analysis-search
+      /   span Search for another analysis:
+      /   input type="text" id="analysis-search"
   .row#page-analysis
     .col-md-10.content
       h4 Top-loading terms for this topic:
@@ -33,8 +33,8 @@
             |var options = {"panzoomEnabled":false}
             var settings = ['no-zoom', 'layers','nav','checkboxes']
           p {{viewers.viewer()|safe}}
-
-        {{datatables.analysis_studies_table('Topic ' + topic_n)}}
+        #studies.tab-pane
+          {{datatables.studies_table('Topic ' + topic_n, current_user)}}
 
         #faq.tab-pane
           h3 Topic-based meta-analyses: Frequently Asked Questions

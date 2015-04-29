@@ -37,6 +37,7 @@ coffee_bundle = Bundle('coffee/init.js.coffee',
                  'coffee/decode.js.coffee',
                  'coffee/genes.js.coffee',
                  'coffee/home.js.coffee',
+                 'coffee/custom_analyses.js.coffee',
                  filters='coffeescript', output='js/coffee.js')
 
 # consolidated JavaScript bundle
@@ -47,6 +48,8 @@ js_bundle = Bundle('js/lib/jquery.js',
                   'js/lib/bootstrap.js',
                   'js/lib/setfilterdelay.js',
                   'js/lib/dataTables.tableTools.min.js',
+                  # 'js/lib/react-0.12.2.js',
+                  'js/lib/react-with-addons-0.13.1.js',
                   'js/nsviewer/amplify.js',
                   'js/nsviewer/panzoom.js',
                   'js/nsviewer/rainbow.js',

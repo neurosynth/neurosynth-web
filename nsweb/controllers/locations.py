@@ -1,6 +1,7 @@
 from nsweb.core import add_blueprint, cache
 from flask import (Blueprint, render_template, url_for, request, jsonify,
                    redirect)
+from flask.ext.user import current_user
 from nsweb.models.locations import Location
 from nsweb.models.images import LocationImage
 from nsweb.models.peaks import Peak
@@ -36,7 +37,7 @@ def handle_redirected_location(error):
 def make_cache_key():
     ''' Replace default cache key prefix with a string that also includes
     query arguments. '''
-    return request.path + request.query_string
+    return request.path + request.query_string + unicode(current_user.is_authenticated())
 
 
 def get_params(val=None, location=False):

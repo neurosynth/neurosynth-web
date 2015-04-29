@@ -13,3 +13,8 @@ class Study(db.Model):
     peaks = db.relationship('Peak', backref=db.backref('study', lazy='joined'), lazy='dynamic')
     analyses = association_proxy('frequencies', 'analysis')
     # analyses = association_proxy('inclusions', 'analysis')
+
+    def serialize(self):
+        return {'pmid': self.pmid, 'authors': self.authors, 'journal': self.journal,
+                'year': self.year,
+                'title': '<a href="/studies/%s">%s</a>' % (self.pmid, self.title)}

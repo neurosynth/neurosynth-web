@@ -63,3 +63,11 @@ def get_study_peaks(val):
 # attempted optimization.
     data = jsonify(data=data)
     return data
+
+@bp.route('/studies/all/')
+def get_all_studies():
+    """
+    :return: JSON object containing all studies
+    """
+    all_studies = Study.query.all()
+    return jsonify(dict(studies=[s.serialize() for s in all_studies]))

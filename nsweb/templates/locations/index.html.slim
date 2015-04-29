@@ -2,6 +2,7 @@
 - extends "layout/base.html"
 - block content
   - import "macros/_analysis_viewer.html.slim" as viewers
+  - import "macros/_datatables.html.slim" as datatables
   .row#page-location
     .col-md-10
       .big-text
@@ -32,21 +33,19 @@
         #studies.tab-pane
           .location-studies-head
             %h3#current-location-studies
-            .location-adjust-radius
-              .radius-element Adjust radius:
-              .radius-element
-                input type="range"  name="rad-in" id="rad-in" min="1" max="20" value="{{radius}}"
-              .radius-element
-                input type="number" name="rad-out" id="rad-out" min="1" max="20" value="{{radius}}"
-              .radius-element
-                input id="radius-submit" type="button" value="Go"
-          table#location_studies_table.table-striped.table-hover.table.table-condensed.small-datatable
-            thead
-              tr
-                th Title
-                th Authors
-                th Journal
-                th Activations
+            .row
+              .col-md-12
+                .location-adjust-radius
+                  .radius-element Adjust radius:
+                  .radius-element
+                    input type="range"  name="rad-in" id="rad-in" min="1" max="20" value="{{radius}}"
+                  .radius-element
+                    input type="number" name="rad-out" id="rad-out" min="1" max="20" value="{{radius}}"
+                  .radius-element
+                    input id="radius-submit" type="button" value="Go"
+            .row
+              .col-md-12
+                {{datatables.studies_table(False, current_user, 'location_studies_table')}}
         #associations.tab-pane
           h3 Associations with meta-analysis maps
           table#location_analyses_table.table-striped.table-hover.table.table-condensed.small-datatable

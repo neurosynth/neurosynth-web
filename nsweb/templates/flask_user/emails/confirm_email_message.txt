@@ -1,7 +1,7 @@
 {% extends 'flask_user/emails/base_message.txt' %}
 
 {% block message %}
-Thank you for registering with Flask-User.
+Thank you for registering with Neurosynth.
 
 {% if user_manager.enable_confirm_email -%}
 Visit the link below to complete your registration:

@@ -3,8 +3,6 @@
 # You can use CoffeeScript in this file: http://jashkenas.github.com/coffee-script/
 $(document).ready ->
 
-  return if not $('#page-study').length
-
   # Load the table layers
   if study?
     url = '/studies/' + study  + '/tables'
@@ -34,5 +32,7 @@ $(document).ready ->
     data = (parseInt(i) for i in data[1..])
     viewer.moveToAtlasCoords(data)
   )
+
+
 
   # window.loadImages() if viewer?

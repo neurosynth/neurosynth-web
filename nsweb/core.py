@@ -10,10 +10,12 @@ from flask.ext.user import UserManager, SQLAlchemyAdapter
 from slimish_jinja import SlimishExtension
 from flask.ext.cache import Cache
 from flask.ext.marshmallow import Marshmallow
+from flask_mail import Mail
 from nsweb.initializers import settings
 from nsweb.initializers.assets import init_assets
 from nsweb.initializers import make_celery
 from opbeat.contrib.flask import Opbeat
+from wtforms.validators import ValidationError
 
 app = Flask('NSWeb', static_folder=settings.STATIC_FOLDER,
             template_folder=settings.TEMPLATE_FOLDER)
@@ -33,6 +35,8 @@ _blueprints = []
 # API-related stuff
 marshmallow = Marshmallow()
 
+mail = Mail()
+
 
 def setup_logging(logging_path, level):
     '''Setups logging in app'''
@@ -46,10 +50,15 @@ def setup_logging(logging_path, level):
         logger.addHandler(file_handler)
 
 
+def password_validator(form, field):
+    password = field.data
+    if len(password) < 4:
+        raise ValidationError('Password must have at least 4 characters')
+
+
 def create_app(debug=True, test=False):
     '''creates app instance, db instance, and apimanager instance'''
 
-    # Extra config stuff
     app.config['DEBUG'] = debug
 
     # Generate DB URI
@@ -98,12 +107,19 @@ def create_app(debug=True, test=False):
     # API
     marshmallow.init_app(app)
 
+    # Set up mail stuff
+    if settings.MAIL_ENABLE:
+        params = ['MAIL_USERNAME', 'MAIL_PASSWORD', 'MAIL_DEFAULT_SENDER',
+                  'MAIL_SERVER', 'MAIL_PORT', 'MAIL_USE_SSL']
+        app.config.update({(p, getattr(settings, p)) for p in params})
+        mail.init_app(app)
+
     # Set up user management
     app.config['CSRF_ENABLED'] = True
-    app.config['USER_ENABLE_EMAIL'] = False
+    app.config['USER_ENABLE_FORGOT_PASSWORD'] = True
     from nsweb.models.users import User
     db_adapter = SQLAlchemyAdapter(db, User)
-    UserManager(db_adapter, app)
+    UserManager(db_adapter, app, password_validator=password_validator)
 
     # load blueprints
     register_blueprints()

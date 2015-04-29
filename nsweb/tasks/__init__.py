@@ -243,7 +243,7 @@ def make_scatterplot(filename, analysis, base_id, reference='terms_full', outfil
         if y_lab is None:
             y_lab = '%s meta-analysis (z-score)' % analysis
         masks = make_scatterplot.masks
-        
+
         if gene_masks:
             spatial_masks = [masks['subcortex']]
             region_labels = ['hippocampus', 'accumbens', 'amygdala', 'putamen']
@@ -276,9 +276,10 @@ def run_metaanalysis(ids, name):
     """
     try:
         ma = meta.MetaAnalysis(run_metaanalysis.dataset, ids)
-        outdir = join(settings.IMAGE_DIR, 'analyses')
+        outdir = join(settings.IMAGE_DIR, 'custom')
         ma.save_results(outdir, name, image_list=['pFgA_z_FDR_0.01',
                         'pAgF_z_FDR_0.01'])
         return True
     except Exception, e:
+        print traceback.format_exc()
         return False

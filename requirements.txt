@@ -14,7 +14,7 @@ Flask-Script
 Flask-Swagger
 Flask-SQLAlchemy>=1.0
 Flask-Uploads
-Flask-User
+Flask-User==0.6.1
 Flask-WTF
 jinja2
 marshmallow

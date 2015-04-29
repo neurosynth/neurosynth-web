@@ -35,7 +35,8 @@
             |var options = {"panzoomEnabled":false}
             var settings = ['no-zoom', 'layers','nav','checkboxes']
           p {{viewers.viewer()|safe}}
-        {{datatables.analysis_studies_table(analysis.name)}}
+        #studies.tab-pane
+          {{datatables.studies_table(analysis.name, current_user)}}
         / #similarity.tab-pane
         /   h4 Most similar terms
         /   table#analysis-similarity-table.table-striped.table-hover.table.table-condensed

@@ -2,6 +2,7 @@ from nsweb.core import db
 from sqlalchemy.ext.associationproxy import association_proxy
 import datetime
 from nsweb.models.users import User
+from nsweb.models.studies import Study
 from nsweb.models.frequencies import Frequency
 
 
@@ -22,7 +23,7 @@ class Analysis(db.Model):
     __tablename__ = 'analysis'
     id = db.Column(db.Integer, primary_key=True)
     analysis_set_id = db.Column(db.Integer, db.ForeignKey(AnalysisSet.id))
-    name = db.Column(db.String(100) ,unique=False)
+    name = db.Column(db.String(100), unique=False)
     n_studies = db.Column(db.Integer, default=0)
     n_activations = db.Column(db.Integer, default=0)
     description = db.Column(db.Text)
@@ -34,12 +35,18 @@ class Analysis(db.Model):
     display = db.Column(db.Boolean)
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.datetime.utcnow,
-                           onupdate=datetime.datetime.now)
+                           onupdate=datetime.datetime.utcnow)
 
     __mapper_args__ = {
         'polymorphic_identity': 'analysis',
         'polymorphic_on': type
     }
+
+    @property
+    def reverse_inference_image(self):
+        """ Convenience method for accessing the reverse inference image. """
+        return self.images[1]
+
 
 class TermAnalysis(Analysis):
     __tablename__ = 'term_analysis'
@@ -50,11 +57,6 @@ class TermAnalysis(Analysis):
     __mapper_args__ = {
         'polymorphic_identity': 'term'
     }
-
-    @property
-    def reverse_inference_image(self):
-        """ Convenience method for accessing the reverse inference image. """
-        return self.images[1]
 
 
 class TopicAnalysis(Analysis):
@@ -86,6 +88,13 @@ class CustomAnalysis(Analysis):
     user_id = db.Column(db.Integer, db.ForeignKey(User.id))
     user = db.relationship(User, backref=db.backref('analyses',
                            cascade='all'))
+    last_run_at = db.Column(db.DateTime)
     __mapper_args__ = {
         'polymorphic_identity': 'custom'
     }
+
+    def serialize(self):
+        return dict(id=self.id, uuid=self.uuid, name=self.name, description=self.description,
+                    studies=[f.pmid for f in self.studies])
+
+

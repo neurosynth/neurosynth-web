@@ -9,9 +9,9 @@
     <title>{% block title %}{{ page_title|default(('Neurosynth')) }}{% endblock %}</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    {% assets "css" -%}
+    {% assets "css" %}
       <link rel="stylesheet" href="{{ ASSET_URL }}">
-    {%- endassets %}
+    {% endassets %}
     {% block css_style %}
     {% endblock %}
     <script>
@@ -40,6 +40,8 @@
                             <li><a href="{{url_for('analyses.list_terms')}}">Terms</a></li>
                             <li class="divider"></li>
                             <li><a href="{{url_for('analyses.list_topic_sets')}}">Topics</a></li>
+<!--                             <li class="divider"></li>
+                            <li><a href="{{url_for('analyses.list_custom_analyses')}}">Custom</a></li> -->
                         </ul>
                     </li>
 					<!-- <li class=""><a href="/analyses/">Analyses</a></li> -->
@@ -48,13 +50,22 @@
                     <li class=""><a href="/decode/">Decoder</a></li>
                     <li class=""><a href="/code/">Code</a></li>
 			        <li class=""><a href="/faq/">FAQs</a></li>
+                    {% if current_user.is_authenticated() %}
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Signed in as {{ current_user.username }}<span class="caret"></span></a>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a href="{{ config.USER_LOGOUT_URL }}">Sign out</a></li>
+                        </ul>
+                    </li>
+                    {% else %}
+                        <li class=""><a href="{{ config.USER_LOGIN_URL }}">Sign in</a></li>
+                    {% endif %}
 		        </ul>
 		        <ul class="nav navbar-nav navbar-right">
 		        </ul>
 	        </nav>
 	    </div>
 	</header>
-    
     {% block flash_message %}
         {% with messages = get_flashed_messages(with_categories=True) %}
             {% if messages %}
@@ -63,7 +74,7 @@
                     {% for category, msg in messages %}
                         <div class="alert alert-{{ category }}">
                             <button type="button" class="close" data-dismiss="alert">x</button>
-                            {{ msg }}
+                            {{ msg|safe }}
                         </div>
                     {% endfor %}
                 </div>
@@ -110,7 +121,7 @@
             </div>
         </div>
     </div>
+    </div>
     <div class="top-space40"></div>
-
 </body>
 </html>

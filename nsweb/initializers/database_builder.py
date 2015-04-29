@@ -298,6 +298,7 @@ class DatabaseBuilder:
             image_dir = join(settings.IMAGE_DIR, 'analyses')
             if not os.path.exists(image_dir):
                 os.makedirs(image_dir)
+                os.makedirs(join(settings.IMAGE_DIR, 'custom'))
 
         if analyses is None:
             analyses = self._get_feature_names()
