@@ -348,16 +348,15 @@ SelectedStudiesTable = React.createClass
 
   tableData: ->
     app.activeStudies().map (item) ->
-      $.extend({'remove': '<button class="btn btn-sm">remove</button>'}, item)
+      $.extend({'remove': '<button class="btn btn-sm remove-btn btn-warning">remove</button>'}, item)
 
   setupRemoveButton: ->
-    $('#selected-studies-table').find('tr').on 'click', 'button', ->
+    $('#selected-studies-table').off 'click', '.remove-btn'
+    $('#selected-studies-table').on 'click', '.remove-btn', ->
       pmid = getPMID($(this).closest('tr'))
       app.removeStudy(pmid)
 
   componentDidMount: ->
-    console.log 'SelectedStudiesTable mounted, with props:'
-    console.log @props
     $('#selected-studies-table').DataTable
       data: @tableData()
       columns: [
