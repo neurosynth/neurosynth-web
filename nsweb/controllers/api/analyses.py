@@ -19,7 +19,8 @@ def list_terms():
     offset = int(request.args['start'])
 
     order_by = '{0} {1}'.format(
-        ['name', 'n_studies', 'n_activations'][int(request.args['order[0][column]'])],
+        ['name', 'n_studies', 'n_activations'][
+            int(request.args['order[0][column]'])],
         str(request.args['order[0][dir]']))
     search = str(request.args['search[value]']).strip()
 
@@ -30,7 +31,7 @@ def list_terms():
                            TermAnalysis.n_studies.like(search) |
                            TermAnalysis.n_activations.like(search))
     data = data.order_by(order_by)
-    data = data.paginate(page=(offset/results_per_page)+1,
+    data = data.paginate(page=(offset / results_per_page) + 1,
                          per_page=results_per_page, error_out=False)
     result = {}
     result['draw'] = int(request.args['draw'])  # for security
@@ -39,11 +40,12 @@ def list_terms():
     result['data'] = [
         ['<a href={0}>{1}</a>'.format(
             url_for('analyses.show_term', term=d.name), d.name),
-                            d.n_studies,
-                            d.n_activations,
-                            ] for d in data.items]
+         d.n_studies,
+         d.n_activations,
+         ] for d in data.items]
     result = jsonify(**result)
     return result
+
 
 @bp.route('/topics/')
 def list_topic_sets():
@@ -51,10 +53,11 @@ def list_topic_sets():
     data = [[
         '<a href={0}>{1}</a>'.format(
             url_for('analyses.show_topic_set', topic_set=ts.name),
-                    ts.name),
+            ts.name),
         ts.description,
         ts.n_analyses] for ts in topic_sets]
     return jsonify(data=data)
+
 
 @bp.route('/topics/<string:topic_set>/')
 def list_topics(topic_set):
@@ -65,8 +68,9 @@ def list_topics(topic_set):
                     number=t.number), 'Topic ' + str(t.number).zfill(3)),
          t.terms,
          t.n_studies
-        ] for t in ts.analyses]
+         ] for t in ts.analyses]
     return jsonify(data=data)
+
 
 @bp.route('/analyses/<string:name>/')
 def find_api_analysis(name):
@@ -76,21 +80,26 @@ def find_api_analysis(name):
     val = Analysis.query.filter_by(name=name).first().id
     return redirect(url_for('analyses.api', id=val))
 
+
 @bp.route('/analyses/<int:val>/')
 def analyses_api(val):
     data = Analysis.query.get(val)
-#     data=Frequency.query.filter_by(analysis_id=int(val))#attempted optimization. Join causes slower performance however
-    data = [['<a href={0}>{1}</a>'.format(url_for('studies.show', val=f.pmid) , f.study.title),
-              f.study.authors,
-              f.study.journal,
-              f.study.year,
-              round(f.frequency, 3),
-              ] for f in data.frequencies]
+# data=Frequency.query.filter_by(analysis_id=int(val))#attempted
+# optimization. Join causes slower performance however
+    data = [['<a href={0}>{1}</a>'.format(url_for('studies.show', val=f.pmid),
+                                          f.study.title),
+             f.study.authors,
+             f.study.journal,
+             f.study.year,
+             round(f.frequency, 3),
+             ] for f in data.frequencies]
     data = jsonify(aaData=data)
     return data
 
+
 def serialize_custom_analysis():
     pass
+
 
 @bp.route('/custom/save/', methods=['POST', 'GET'])
 @login_required
@@ -114,12 +123,15 @@ def save_custom_analysis():
     for pmid in pmids:
         study = Study.query.filter_by(pmid=pmid).first()
         if not study:
-            return jsonify(dict(result='error', error='Invalid PMID: %s' % pmid))
+            return jsonify(
+                dict(result='error', error='Invalid PMID: %s' % pmid))
 
     if uid:
-        custom_analysis = CustomAnalysis.query.filter_by(uuid=uid, user_id=current_user.id).first()
+        custom_analysis = CustomAnalysis.query.filter_by(
+            uuid=uid, user_id=current_user.id).first()
         if not custom_analysis:
-            return jsonify(dict(result='error', error='No matching analysis found.'))
+            return jsonify(
+                dict(result='error', error='No matching analysis found.'))
         if name:
             custom_analysis.name = name
         if description is not None:
@@ -127,23 +139,27 @@ def save_custom_analysis():
     else:
         # create new custom analysis
         uid = unicode(uuid.uuid4())[:18]
-        custom_analysis = CustomAnalysis(uuid=uid, name=name, description=description,
-            user_id=current_user.id, n_studies=len(pmids))
+        custom_analysis = CustomAnalysis(
+            uuid=uid, name=name, description=description,
+            user_id=current_user.id)
     # Explicitly update timestamp, because it won't be changed if only studies
     # are modified, and we need to compare this with last_run_at later.
     custom_analysis.updated_at = dt.datetime.utcnow()
+    custom_analysis.n_studies = len(pmids)
     db.session.add(custom_analysis)
     db.session.commit()
 
     Frequency.query.filter_by(analysis_id=custom_analysis.id).delete()
     for pmid in pmids:
-        freq = Frequency.query.filter_by(analysis_id=custom_analysis.id, pmid=pmid).first()
+        freq = Frequency.query.filter_by(
+            analysis_id=custom_analysis.id, pmid=pmid).first()
         if not freq:
             freq = Frequency(analysis_id=custom_analysis.id, pmid=pmid)
             db.session.add(freq)
     db.session.commit()
 
     return jsonify(dict(result='success', uuid=uid, id=custom_analysis.id))
+
 
 @bp.route('/custom/<string:uid>/', methods=['GET'])
 def get_custom_analysis(uid):
@@ -152,8 +168,8 @@ def get_custom_analysis(uid):
     and a list of its associated studies
 
     We're assuming that the user doesn't have to be logged in and that anyone
-    can access the analysis if they know its uuid. This makes it easy for users to
-    share links to their custom analyses.
+    can access the analysis if they know its uuid. This makes it easy for users
+    to share links to their custom analyses.
     """
     custom = CustomAnalysis.query.filter_by(uuid=uid).first()
     if not custom:
@@ -163,6 +179,7 @@ def get_custom_analysis(uid):
     # response = dict(uuid=uid, name=custom.name, studies=[f.pmid for f in freqs])
     return jsonify(custom.serialize())
 
+
 @bp.route('/custom/all/', methods=['GET'])
 @login_required
 def get_custom_analyses():
@@ -170,7 +187,8 @@ def get_custom_analyses():
     :return: All stored custom analyses for the requesting user
     """
     response = {
-        'analyses': [custom.serialize() for custom in CustomAnalysis.query.filter_by(user_id=current_user.id)]
+        'analyses': [custom.serialize() for custom in
+                     CustomAnalysis.query.filter_by(user_id=current_user.id)]
     }
     return jsonify(response)
 
@@ -179,7 +197,8 @@ def get_custom_analyses():
 @login_required
 def copy_custom_analysis(uid):
     """
-    Given a uuid of an existing analysis, create a clone of the analysis with a new uuid
+    Given a uuid of an existing analysis, create a clone of the analysis with
+    a new uuid
     :param uuid:
     :return: JSON blob including the new uuid
     """
@@ -188,7 +207,8 @@ def copy_custom_analysis(uid):
         abort(404)
 
     uid = unicode(uuid.uuid4())[:18]
-    new_custom = CustomAnalysis(uuid=uid, user_id=current_user.id, name=custom.name)
+    new_custom = CustomAnalysis(
+        uuid=uid, user_id=current_user.id, name=custom.name)
     db.session.add(new_custom)
     db.session.commit()
 
@@ -215,6 +235,7 @@ def delete_custom_analysis(uid):
         abort(404)
     if custom.user_id != current_user.id:
         abort(403)
-    db.session.delete(custom)  # TODO: instead of deleting, consider setting a deleted flag instead
+    # TODO: instead of deleting, consider setting a deleted flag instead
+    db.session.delete(custom)
     db.session.commit()
     return jsonify(dict(result='success'))
