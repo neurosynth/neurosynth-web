@@ -250,6 +250,19 @@ ActiveAnalysis = React.createClass
   descriptionChangeHandler: ->
     app.setActiveAnalysisDescription @refs.description.getDOMNode().value
 
+  componentDidMount: ->
+    numSelected = Object.keys(app.state.activeAnalysis.studies).length
+    if numSelected is 0
+      $('#selected-studies-tab-header').removeClass('active')
+      $('#all-studies-tab-header').addClass('active')
+      $('#selected-studies-tab').removeClass('active')
+      $('#all-studies-tab').addClass('active')
+    else
+      $('#selected-studies-tab-header').addClass('active')
+      $('#all-studies-tab-header').removeClass('active')
+      $('#selected-studies-tab').addClass('active')
+      $('#all-studies-tab').removeClass('active')
+
   render: ->
 #    if @props.analysis .blank
 #      return div {}, 'No active analysis currently loaded'
@@ -314,9 +327,9 @@ ActiveAnalysis = React.createClass
         div {className: 'col-md-12'},
           div {role: 'tabpanel'},
             ul {className: 'nav nav-tabs', role:'tablist'},
-              li {role:'presentation', className: 'active'},
+              li {role:'presentation', id:'selected-studies-tab-header'},
                 a {href:'#selected-studies-tab', role:'tab', 'data-toggle':'tab'}, "Selected Studies (#{ studies.length })"
-              li {role:'presentation'},
+              li {role:'presentation', id:'all-studies-tab-header'},
                 a {href:'#all-studies-tab', role:'tab', 'data-toggle':'tab'}, "All studies (#{ app.state.allStudies.length })"
             div {className: 'tab-content'},
               div {className: 'tab-pane active', role:'tab-panel', id:'selected-studies-tab'},
