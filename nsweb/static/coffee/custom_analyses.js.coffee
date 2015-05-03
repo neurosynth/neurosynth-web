@@ -182,6 +182,7 @@ app =
       dataType: 'json'
       type: 'GET'
       url: @props.fetchAllStudiesURL
+      cache: true
       success: (data) =>
         @state.allStudies = data.studies
         @state.studyDetails = {}
