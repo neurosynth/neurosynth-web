@@ -116,13 +116,8 @@ app =
     @syncToLocalStorage()
     @render()
 
-  setActiveAnalysisName: (name) ->
-    @state.activeAnalysis.name = name
-    @state.activeAnalysis.saved = false
-    @render()
-
-  setActiveAnalysisDescription: (description) ->
-    @state.activeAnalysis.description = description
+  setActiveAnalysisAttr: (name, value) ->
+    @state.activeAnalysis[name] = value
     @state.activeAnalysis.saved = false
     @render()
 
@@ -140,15 +135,14 @@ app =
         @syncToLocalStorage()
         @fetchAllAnalyses()
 
-  saveActiveAnalysis: (name, description) ->
-    @state.activeAnalysis.name = name
-    @state.activeAnalysis.description = description
+  saveActiveAnalysis: ->
     @state.showModal = true
     @state.modalMessage = 'Saving analysis. Please wait...'
     data =
       studies: Object.keys(@state.activeAnalysis.studies)
-      name: name
-      description: description
+      name: @state.activeAnalysis.name
+      description: @state.activeAnalysis.description
+      private: @state.activeAnalysis.private
       uuid: @state.activeAnalysis.uuid
     $.ajax
       dataType: 'json'
@@ -183,6 +177,8 @@ app =
       type: 'GET'
       url: @props.fetchAllStudiesURL
       cache: true
+      headers:
+        'Cache-Control': 'max-age=600'
       success: (data) =>
         @state.allStudies = data.studies
         @state.studyDetails = {}
@@ -234,7 +230,7 @@ AnalysisList = React.createClass
 
 ActiveAnalysis = React.createClass
   save: ->
-    app.saveActiveAnalysis @refs.name.getDOMNode().value, @refs.description.getDOMNode().value
+    app.saveActiveAnalysis()
 
   deleteHandler: ->
     app.deleteAnalysis(@props.analysis.uuid)
@@ -246,10 +242,13 @@ ActiveAnalysis = React.createClass
     app.clearActiveAnalysis()
 
   nameChangeHandler: ->
-    app.setActiveAnalysisName @refs.name.getDOMNode().value
+    app.setActiveAnalysisAttr 'name', @refs.name.getDOMNode().value
+
+  privateChangeHandler: ->
+    app.setActiveAnalysisAttr 'private', @refs.private.getDOMNode().checked
 
   descriptionChangeHandler: ->
-    app.setActiveAnalysisDescription @refs.description.getDOMNode().value
+    app.setActiveAnalysisAttr 'description', @refs.description.getDOMNode().value
 
   componentDidMount: ->
     numSelected = Object.keys(app.state.activeAnalysis.studies).length
@@ -296,6 +295,10 @@ ActiveAnalysis = React.createClass
               div {className: "row"},
                 label {className: 'col-md-8'}, 'Description:',
                 textarea {className: 'form-control', rows: "4", ref: 'description', placeholder: 'Enter a description for this analysis', value: @props.analysis.description, onChange: @descriptionChangeHandler}
+              div {className: "row"},
+                label {className: 'col-md-8'},
+                  input {type:'checkbox', ref:'private', checked:@props.analysis.private, onChange: @privateChangeHandler},
+                    ' Make this analysis private'
             hr {}, ''
     else # headless (without uuid) analysis only present in browser's local storage
       header = div {},
@@ -319,7 +322,11 @@ ActiveAnalysis = React.createClass
             form {},
               div {className: "row"},
                 label {className: 'col-md-8'}, 'Description:',
-                  textarea {className: 'form-control', rows:"4", ref: 'description', value: @props.analysis.description, placeholder: 'Enter a description for this analysis'}
+                  textarea {className: 'form-control', rows:"4", ref: 'description', value: @props.analysis.description, placeholder: 'Enter a description for this analysis',  onChange: @descriptionChangeHandler}
+              div {className: "row"},
+                label {className: 'col-md-8'},
+                  input {type:'checkbox', ref:'private', checked:@props.analysis.private, onChange: @privateChangeHandler},
+                    ' Make this analysis private'
             hr {}, ''
 
     return div {},

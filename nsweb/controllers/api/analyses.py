@@ -117,6 +117,7 @@ def save_custom_analysis():
     uid = data.get('uuid')
     studies = data.get('studies', [])
     description = data.get('description')
+    private = data.get('private')
     pmids = [int(x) for x in studies]
 
     # Verify that all requested pmids are in the database
@@ -136,12 +137,13 @@ def save_custom_analysis():
             custom_analysis.name = name
         if description is not None:
             custom_analysis.description = description
+        custom_analysis.private = private
     else:
         # create new custom analysis
         uid = unicode(uuid.uuid4())[:18]
         custom_analysis = CustomAnalysis(
             uuid=uid, name=name, description=description,
-            user_id=current_user.id)
+            user_id=current_user.id, private=private)
     # Explicitly update timestamp, because it won't be changed if only studies
     # are modified, and we need to compare this with last_run_at later.
     custom_analysis.updated_at = dt.datetime.utcnow()
