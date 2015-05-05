@@ -179,6 +179,13 @@ def list_custom_analyses():
     return render_template('analyses/custom/index.html.slim')
 
 
+@bp.route('/browse/')
+def browse_public_analyses():
+    analyses = CustomAnalysis.query.filter(CustomAnalysis.private == False).all()
+    analyses += CustomAnalysis.query.filter(CustomAnalysis.private == None).all()
+    return render_template('analyses/custom/browse_public.html', analyses=analyses)
+
+
 @bp.route('/custom/faq/')
 def faq_custom_analyses():
     data = json.load(open(join(settings.ROOT_DIR, 'data', 'json',

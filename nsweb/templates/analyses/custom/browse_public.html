@@ -1,0 +1,34 @@
+{% set page_title = 'Neurosynth: Browse Public Analyses' %}
+{% extends "layout/base.html" %}
+{% block content %}
+    <div class="row" id="page-study">
+        <div class="col-md-12">
+            <h1>Browse Public Analyses</h1>
+
+            <div class="lead">
+            </div>
+            <table class="table table-hover table-striped">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>ID</th>
+                    <th>#Studies</th>
+                    <th>User</th>
+                    <th>Created on</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for analysis in analyses %}
+                    <tr>
+                    <td><a href="{{ url_for('analyses.show_custom_analysis', uid=analysis.uuid) }}">{{ analysis.name }}</a></td>
+                    <td>{{ analysis.uuid }}</td>
+                    <td>{{ analysis.n_studies }}</td>
+                    <td>{{ analysis.user.username }}</td>
+                    <td>{{ analysis.user.created_at }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}
