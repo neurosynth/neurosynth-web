@@ -97,10 +97,6 @@ def analyses_api(val):
     return data
 
 
-def serialize_custom_analysis():
-    pass
-
-
 @bp.route('/custom/save/', methods=['POST', 'GET'])
 @login_required
 def save_custom_analysis():

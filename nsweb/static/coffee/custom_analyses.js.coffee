@@ -29,13 +29,24 @@ arrayToObject = (array) ->
     obj[item] = 1
   return obj
 
+Router = Backbone.Router.extend
+  routes:
+    "new": "new"
+    "saved/:uid": "load"
+  load: (uid) ->
+    console.log "/saved/:uid URL matched"
+    app.setActiveAnalysis(uid)
+  new: ->
+    console.log "/new URL matched"
+
 app =
   props:
     fetchAllAnalysesURL: '/api/custom/all/'
     fetchAllStudiesURL: '/api/studies/all/'
     saveURL: '/api/custom/save/'
     deleteURL: '/api/custom/'
-    studiesTableURL: '/api/analyses/' # /api/analyses/<analysis id>/ (to be consumed by DataTable)
+    getCustomAnalysis: '/api/custom/'  # /api/custom/<uid>
+#    studiesTableURL: '/api/analyses/' # /api/analyses/<analysis id>/ (to be consumed by DataTable)
     getFullAnalysisURL: '/api/analyses/full/' # /api/analyses/full/
     runAnalysisURL: '/analyses/custom/run/'
 
@@ -49,15 +60,31 @@ app =
     showModal: false
     modalMessage: 'No message'
 
+  getAnalysis: (uuid, callback) ->
+    # See if the analysis is in the pre-loaded list of saved analyses -
+    # (it should be, if it belongs to the current user)
+    analysis = @state.analyses.filter((a) -> a.uuid is uuid)[0]
+    if analysis?
+      callback(analysis)
+      return
+    $.ajax
+      dataType: 'json'
+      type: 'GET'
+      url: @props.getCustomAnalysis + uuid.toString() + '/'
+      success: (response) =>
+        callback(response)
+
   setActiveAnalysis: (uuid) ->
     if not (@state.activeAnalysis.saved or @state.activeAnalysis.blank)
       if not confirm "You have unsaved changes that will be discarded. Are you sure you want to proceed?"
         return
-    @state.activeAnalysis = $.extend {}, @state.analyses.filter((a) -> a.uuid is uuid)[0]
-    @state.activeAnalysis.studies = arrayToObject(@state.activeAnalysis.studies)
-    @state.activeAnalysis.saved = true
-    @syncToLocalStorage()
-    @render()
+    @getAnalysis uuid, (analysis) =>
+      @state.activeAnalysis = $.extend {}, analysis
+      @state.activeAnalysis.studies = arrayToObject(@state.activeAnalysis.studies)
+      @state.activeAnalysis.saved = true
+      @syncToLocalStorage()
+      @render()
+      @router.navigate('saved/' + uuid)
 
   activeStudies: ->
     if Object.keys(@state.studyDetails).length is 0
@@ -159,19 +186,19 @@ app =
         @fetchAllAnalyses()
     @render()
 
-  fetchAllAnalyses: ->
+  fetchAllAnalyses: (callback) ->
     $.ajax
       dataType: 'json'
       type: 'GET'
       url: @props.fetchAllAnalysesURL
       success: (data) =>
         @state.analyses = data.analyses
-        @fetchAllStudies()
+        callback() if typeof(callback) is 'function'
         @render()
       error: (xhr, status, err) =>
         console.error @props.url, status, err.toString()
 
-  fetchAllStudies: ->
+  fetchAllStudies: (callback) ->
     $.ajax
       dataType: 'json'
       type: 'GET'
@@ -184,15 +211,23 @@ app =
         @state.studyDetails = {}
         for study in data.studies
           @state.studyDetails[study.pmid] = study
+        callback() if typeof(callback) is 'function'
         @render()
       error: (xhr, status, err) =>
         console.error @props.url, status, err.toString()
+
+  router: new Router()
 
   init: ->
     active = getFromLocalStorage('ns-active-analysis')
     if active
       @state.activeAnalysis = active
-    @fetchAllAnalyses()
+    @fetchAllAnalyses =>
+      @fetchAllStudies =>
+        started = Backbone.history.start
+          root: '/analyses/custom/'
+        console.log "started ", started
+
 
   render: ->
     if not document.getElementById('custom-list-container')?
@@ -264,8 +299,6 @@ ActiveAnalysis = React.createClass
       $('#all-studies-tab').removeClass('active')
 
   render: ->
-#    if @props.analysis .blank
-#      return div {}, 'No active analysis currently loaded'
     uuid = @props.analysis.uuid
     studies = Object.keys(@props.analysis.studies)
     saved = @props.analysis.saved
