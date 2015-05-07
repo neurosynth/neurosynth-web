@@ -309,7 +309,7 @@ ActiveAnalysis = React.createClass
           div {className: 'col-md-6'},
             div {className: 'row'},
               label {className: 'col-md-8'}, 'Analysis name:',
-                input {type: 'text', className: 'form-control', placeholder: 'Enter a name for this analysis', ref: 'name'}
+                input {type: 'text', className: 'form-control', ref: 'name', value: @props.analysis.name, onChange: @nameChangeHandler, required:'required', placeholder: 'Enter a name for this analysis'}
               br {}, ''
           div {className: 'col-md-6'},
             span {className: ''},
