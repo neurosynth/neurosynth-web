@@ -1,4 +1,4 @@
-{div, br, ul, li, a, p, h1, h2, h4, h5, span, form, input, button, hr, table, thead, tr, th, td, label, textarea} = React.DOM
+{div, br, ul, li, a, p, h1, h2, h4, h5, span, strong, form, input, button, hr, table, thead, tr, th, td, label, textarea} = React.DOM
 
 SELECTED = 'info' # CSS class to apply to selected rows
 
@@ -34,10 +34,9 @@ Router = Backbone.Router.extend
     "new": "new"
     "saved/:uid": "load"
   load: (uid) ->
-    console.log "/saved/:uid URL matched"
     app.setActiveAnalysis(uid)
   new: ->
-    console.log "/new URL matched"
+    console.log "/new URL matched" # Do nothing for now
 
 app =
   props:
@@ -46,7 +45,6 @@ app =
     saveURL: '/api/custom/save/'
     deleteURL: '/api/custom/'
     getCustomAnalysis: '/api/custom/'  # /api/custom/<uid>
-#    studiesTableURL: '/api/analyses/' # /api/analyses/<analysis id>/ (to be consumed by DataTable)
     getFullAnalysisURL: '/api/analyses/full/' # /api/analyses/full/
     runAnalysisURL: '/analyses/custom/run/'
 
@@ -59,12 +57,14 @@ app =
       studies: {}
     showModal: false
     modalMessage: 'No message'
+    editMode: false
 
   getAnalysis: (uuid, callback) ->
     # See if the analysis is in the pre-loaded list of saved analyses -
     # (it should be, if it belongs to the current user)
     analysis = @state.analyses.filter((a) -> a.uuid is uuid)[0]
     if analysis?
+      analysis.owned = true
       callback(analysis)
       return
     $.ajax
@@ -72,7 +72,10 @@ app =
       type: 'GET'
       url: @props.getCustomAnalysis + uuid.toString() + '/'
       success: (response) =>
+        response.owned = false
         callback(response)
+      error: ->
+        alert "Sorry, the analysis you're trying to access is either private or does not exist"
 
   setActiveAnalysis: (uuid) ->
     if not (@state.activeAnalysis.saved or @state.activeAnalysis.blank)
@@ -82,7 +85,9 @@ app =
       @state.activeAnalysis = $.extend {}, analysis
       @state.activeAnalysis.studies = arrayToObject(@state.activeAnalysis.studies)
       @state.activeAnalysis.saved = true
+
       @syncToLocalStorage()
+      @state.editMode = false
       @render()
       @router.navigate('saved/' + uuid)
 
@@ -132,6 +137,8 @@ app =
     @state.activeAnalysis.id = null
     @state.activeAnalysis.saved = false
     @syncToLocalStorage()
+    @router.navigate('new')
+    @state.editMode = true
     @render()
 
   clearActiveAnalysis: ->
@@ -148,6 +155,10 @@ app =
     @state.activeAnalysis.saved = false
     @render()
 
+  enterEditMode: ->
+    @state.editMode = true
+    @render()
+
   deleteAnalysis: (uuid) ->
     if not confirm "Are you sure you want to delete this analysis? "
       return
@@ -160,6 +171,8 @@ app =
           blank: true
           studies: {}
         @syncToLocalStorage()
+        @router.navigate('new')
+        @state.editMode = true
         @fetchAllAnalyses()
 
   saveActiveAnalysis: ->
@@ -182,7 +195,9 @@ app =
         @state.activeAnalysis.id = data.id
         @state.activeAnalysis.saved = true
         @state.showModal = false
+        @state.editMode = false
         @syncToLocalStorage()
+        @router.navigate('saved/' + data.uuid)
         @fetchAllAnalyses()
     @render()
 
@@ -222,12 +237,13 @@ app =
     active = getFromLocalStorage('ns-active-analysis')
     if active
       @state.activeAnalysis = active
+    else
+      @state.editMode = true
     @fetchAllAnalyses =>
       @fetchAllStudies =>
         started = Backbone.history.start
           root: '/analyses/custom/'
         console.log "started ", started
-
 
   render: ->
     if not document.getElementById('custom-list-container')?
@@ -263,6 +279,12 @@ AnalysisList = React.createClass
         React.createElement AnalysisListItem, {key: analysis.uuid, uuid: analysis.uuid, name:analysis.name, numStudies: analysis.studies.length, selected: selected}
 
 
+includeIf = (predicate, component) ->
+  if predicate
+    component
+  else
+    span {}
+
 ActiveAnalysis = React.createClass
   save: ->
     app.saveActiveAnalysis()
@@ -285,9 +307,13 @@ ActiveAnalysis = React.createClass
   descriptionChangeHandler: ->
     app.setActiveAnalysisAttr 'description', @refs.description.getDOMNode().value
 
+  editHandler: -> app.enterEditMode()
+
+  cancelEditHandler: -> app.setActiveAnalysis(@props.analysis.uuid)
+
   componentDidMount: ->
     numSelected = Object.keys(app.state.activeAnalysis.studies).length
-    if numSelected is 0
+    if numSelected is 0 and app.state.editMode
       $('#selected-studies-tab-header').removeClass('active')
       $('#all-studies-tab-header').addClass('active')
       $('#selected-studies-tab').removeClass('active')
@@ -302,67 +328,87 @@ ActiveAnalysis = React.createClass
     uuid = @props.analysis.uuid
     studies = Object.keys(@props.analysis.studies)
     saved = @props.analysis.saved
-
-    if uuid # previously saved analysis
-      header = div {},
-        div {className:'row'},
-          div {className: 'col-md-8'},
-            div {className:'row'},
-              label {className: 'col-md-6'}, 'Analysis name:',
-                input {type: 'text', className: 'form-control', ref: 'name', value: @props.analysis.name, onChange: @nameChangeHandler, required:'required'}
-            div {className:'row'},
-              div {className: 'col-md-8'},
-                p {}, "Analysis ID: #{ uuid }"
-          div {className: 'col-md-4'},
-            p {}, "#{ studies.length } studies in this analysis. "
-            button {className: "btn #{ if saved then '' else 'btn-primary' } btn-sm", disabled: "#{ if saved then 'disabled' else ''}", onClick: @save}, 'Save'
-            span {}, ' '
-            button {className: 'btn btn-info btn-sm', onClick: @cloneHandler}, 'Save as...'
-            span {}, ' '
-            a {className: 'btn btn-primary btn-sm', href: app.props.runAnalysisURL + uuid}, 'Run'
-            span {}, ' '
-            button {className: 'btn btn-danger btn-sm pull-right', onClick: @deleteHandler}, 'Delete'
-        div {className:'row'},
-          div {className: 'col-md-12'},
-            form {},
-              div {className: "row"},
-                label {className: 'col-md-8'}, 'Description:',
-                textarea {className: 'form-control', rows: "4", ref: 'description', placeholder: 'Enter a description for this analysis', value: @props.analysis.description, onChange: @descriptionChangeHandler}
-              div {className: "row"},
-                label {className: 'col-md-8'},
-                  input {type:'checkbox', ref:'private', checked:@props.analysis.private, onChange: @privateChangeHandler},
-                    ' Make this analysis private'
-            hr {}, ''
-    else # headless (without uuid) analysis only present in browser's local storage
-      header = div {},
-        div {className: 'row'},
-          div {className: 'col-md-12'},
-            p {}
-        div {className: 'row'},
-          div {className: 'col-md-6'},
-            div {className: 'row'},
-              label {className: 'col-md-8'}, 'Analysis name:',
-                input {type: 'text', className: 'form-control', ref: 'name', value: @props.analysis.name, onChange: @nameChangeHandler, required:'required', placeholder: 'Enter a name for this analysis'}
-              br {}, ''
-          div {className: 'col-md-6'},
-            span {className: ''},
-              span {}, "#{ studies.length } studies selected "
-              button {className:'btn btn-primary btn-sm', disabled: "#{ if saved then 'disabled' else ''}", onClick: @save}, 'Save as new custom analysis'
+    if not app.state.editMode
+      header = div {className:'row'},
+        div {className: 'col-md-8'},
+          p {}, 'Analysis name: ',
+            strong {}, @props.analysis.name
+          p {}, "Analysis ID: #{ uuid }"
+          p {}, "Created by: ",
+            strong {}, @props.analysis.user
+          h5 {}, "Description:"
+          p {}, @props.analysis.description
+          p {}, "Privacy: ",
+            strong {}, "#{ if @props.analysis.private then 'Private' else 'Anyone with the URL can view this analysis' }"
+          hr {}, ''
+        div {className: 'col-md-4'},
+          p {}, "#{ studies.length } studies in this analysis. "
+          includeIf @props.analysis.owned, button {className: 'btn btn-info btn-sm', onClick: @editHandler}, 'Edit'
+          span {}, ' '
+          button {className: 'btn btn-info btn-sm', onClick: @cloneHandler}, 'Save as...'
+          span {}, ' '
+          includeIf (studies.length > 0),
+            a {className: 'btn btn-primary btn-sm', href: app.props.runAnalysisURL + uuid}, if @props.analysis.owned then 'Run' else 'View Results'
+          includeIf (studies.length > 0), span {}, ' '
+          includeIf @props.analysis.owned, button {className: 'btn btn-danger btn-sm pull-right', onClick: @deleteHandler}, 'Delete'
+    else
+      if uuid # previously saved analysis
+        header = div {},
+          div {className:'row'},
+            div {className: 'col-md-8'},
+              div {className:'row'},
+                label {className: 'col-md-6'}, 'Analysis name:',
+                  input {type: 'text', className: 'form-control', ref: 'name', value: @props.analysis.name, onChange: @nameChangeHandler, required:'required'}
+              div {className:'row'},
+                div {className: 'col-md-8'},
+                  p {}, "Analysis ID: #{ uuid }"
+              div {className:'row'},
+                div {className: 'col-md-12'},
+                  form {},
+                    div {className: "row"},
+                      label {className: 'col-md-8'}, 'Description:',
+                      textarea {className: 'form-control', rows: "4", ref: 'description', placeholder: 'Enter a description for this analysis', value: @props.analysis.description, onChange: @descriptionChangeHandler}
+                    div {className: "row"},
+                      label {className: 'col-md-8'},
+                        input {type:'checkbox', ref:'private', checked:@props.analysis.private, onChange: @privateChangeHandler},
+                          ' Make this analysis private'
+              hr {}, ''
+            div {className: 'col-md-4'},
+              p {}, "#{ studies.length } studies in this analysis. "
+              button {className: "btn #{ if saved then '' else 'btn-primary' } btn-sm", disabled: "#{ if saved then 'disabled' else ''}", onClick: @save}, 'Save'
               span {}, ' '
-              button {className:'btn btn-danger btn-sm', onClick: @discardHandler}, 'Discard'
-        div {className:'row'},
-          div {className: 'col-md-12'},
-            form {},
-              div {className: "row"},
-                label {className: 'col-md-8'}, 'Description:',
-                  textarea {className: 'form-control', rows:"4", ref: 'description', value: @props.analysis.description, placeholder: 'Enter a description for this analysis',  onChange: @descriptionChangeHandler}
-              div {className: "row"},
-                label {className: 'col-md-8'},
-                  input {type:'checkbox', ref:'private', checked:@props.analysis.private, onChange: @privateChangeHandler},
-                    ' Make this analysis private'
-            hr {}, ''
+              button {className: 'btn btn-sm', onClick: @cancelEditHandler}, 'Cancel'
+      else # headless (without uuid) analysis only present in browser's local storage
+        header = div {},
+          div {className: 'row'},
+            div {className: 'col-md-12'},
+              p {}
+          div {className: 'row'},
+            div {className: 'col-md-6'},
+              div {className: 'row'},
+                label {className: 'col-md-8'}, 'Analysis name:',
+                  input {type: 'text', className: 'form-control', ref: 'name', value: @props.analysis.name, onChange: @nameChangeHandler, required:'required', placeholder: 'Enter a name for this analysis'}
+                br {}, ''
+            div {className: 'col-md-6'},
+              span {className: ''},
+                span {}, "#{ studies.length } studies selected "
+                button {className:'btn btn-primary btn-sm', disabled: "#{ if saved then 'disabled' else ''}", onClick: @save}, 'Save as new custom analysis'
+                span {}, ' '
+                button {className:'btn btn-danger btn-sm', onClick: @discardHandler}, 'Discard'
+          div {className:'row'},
+            div {className: 'col-md-12'},
+              form {},
+                div {className: "row"},
+                  label {className: 'col-md-8'}, 'Description:',
+                    textarea {className: 'form-control', rows:"4", ref: 'description', value: @props.analysis.description, placeholder: 'Enter a description for this analysis',  onChange: @descriptionChangeHandler}
+                div {className: "row"},
+                  label {className: 'col-md-8'},
+                    input {type:'checkbox', ref:'private', checked:@props.analysis.private, onChange: @privateChangeHandler},
+                      ' Make this analysis private'
+              hr {}, ''
 
     return div {},
+      br {},
       header,
       div {className:'row'},
         div {className: 'col-md-12'},
@@ -370,12 +416,13 @@ ActiveAnalysis = React.createClass
             ul {className: 'nav nav-tabs', role:'tablist'},
               li {role:'presentation', id:'selected-studies-tab-header'},
                 a {href:'#selected-studies-tab', role:'tab', 'data-toggle':'tab'}, "Selected Studies (#{ studies.length })"
-              li {role:'presentation', id:'all-studies-tab-header'},
-                a {href:'#all-studies-tab', role:'tab', 'data-toggle':'tab'}, "All studies (#{ app.state.allStudies.length })"
+              includeIf app.state.editMode,
+                li {role:'presentation', id:'all-studies-tab-header'},
+                  a {href:'#all-studies-tab', role:'tab', 'data-toggle':'tab'}, "All studies (#{ app.state.allStudies.length })"
             div {className: 'tab-content'},
               div {className: 'tab-pane active', role:'tab-panel', id:'selected-studies-tab'},
                 br {},
-                React.createElement SelectedStudiesTable, {selectedCount: Object.keys(app.activeStudies()).length}
+                React.createElement SelectedStudiesTable, {selectedCount: Object.keys(app.activeStudies()).length, editMode: app.state.editMode}
               div {className: 'tab-pane', role:'tab-panel', id:'all-studies-tab'},
                 br {},
                 p {}, "Add or remove studies to your analysis by clicking on the study. Studies that are already added are highlighted in blue."
@@ -401,8 +448,13 @@ SelectedStudiesTable = React.createClass
   mixins: [React.addons.PureRenderMixin]
 
   tableData: ->
+    if @props.editMode
+      removeHTML = '<button class="btn btn-sm remove-btn btn-warning">remove</button>'
+    else
+      removeHTML = '-'
+
     app.activeStudies().map (item) ->
-      $.extend({'remove': '<button class="btn btn-sm remove-btn btn-warning">remove</button>'}, item)
+      $.extend({'remove': removeHTML }, item)
 
   setupRemoveButton: ->
     $('#selected-studies-table').off 'click', '.remove-btn'

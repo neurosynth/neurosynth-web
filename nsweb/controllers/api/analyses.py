@@ -172,11 +172,9 @@ def get_custom_analysis(uid):
     custom = CustomAnalysis.query.filter_by(uuid=uid).first()
     if not custom:
         abort(404)
-    # response = custom.serialize()
-    # freqs = Frequency.query.filter_by(analysis_id=custom.id)
-    # response = dict(uuid=uid, name=custom.name, studies=[f.pmid for f in freqs])
+    if current_user.id != custom.user_id and (custom.private or not custom.last_run_at):
+        abort(403)
     return jsonify(custom.serialize())
-
 
 @bp.route('/custom/all/', methods=['GET'])
 @login_required

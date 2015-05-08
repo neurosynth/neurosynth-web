@@ -98,6 +98,6 @@ class CustomAnalysis(Analysis):
     def serialize(self):
         return dict(id=self.id, uuid=self.uuid, name=self.name, description=self.description,
                     studies=[f.pmid for f in self.studies],
-                    private=self.private)
+                    private=self.private, user=self.user.username)
 
 
