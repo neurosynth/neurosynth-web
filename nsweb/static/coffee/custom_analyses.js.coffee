@@ -261,11 +261,10 @@ AnalysisListItem = React.createClass
     div {className: "row bs-callout panel #{ if @props.selected then 'bs-callout-info' else ''}"},
       div {className: "col-md-10"},
         ul {className:'list-unstyled'},
-          li {}, "Name: #{ @props.name }"
-          li {}, "Analysis ID: ",
-            br {}
-            span {}, @props.uuid
-          li {}, "Number of studies: #{ @props.numStudies }"
+          li {},
+            strong {}, @props.name
+          li {}, "ID: " + @props.uuid,
+          li {}, "#{ @props.numStudies } studies"
       div {className: "col-md-2"},
         button {className:"btn btn-primary btn-sm #{ if @props.selected then '' else ''}", onClick: @loadHandler}, 'Load'
 
