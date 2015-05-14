@@ -94,3 +94,11 @@ th[colspan="2"] {
     border-left: 1px solid #c0c0c0;
     border-top: 1px solid #c0c0c0;
 }
+
+.expr-form-group{
+    width: 600px;
+}
+
+#exprInput{
+    width: 430px;
+}

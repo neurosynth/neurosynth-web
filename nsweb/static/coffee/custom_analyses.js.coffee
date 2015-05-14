@@ -592,9 +592,9 @@ AllStudiestable = React.createClass
               button {className: 'btn btn-sm btn-primary pull-right', onClick: @clearQuery}, "Clear"
       div {className: 'row'},
         form {className: 'form-inline col-md-12'},
-          div {className: 'form-group'},
-            label {for: 'exprInput'}, 'Advanced Expression Query:'
-            input {type: 'text', id: 'exprInput', className: 'form-control', ref: 'expr', placeholder: 'enter an expression'}
+          div {className: 'form-group expr-form-group'},
+            label {htmlFor: 'exprInput'}, 'Advanced Expression Query:'
+              input {type: 'text', id: 'exprInput', className: 'form-control', ref: 'expr', placeholder: 'enter an expression'}
           button {className: 'btn btn-sm btn-primary', onClick: @runQuery}, "Search"
         hr {}
         br {}, ''
