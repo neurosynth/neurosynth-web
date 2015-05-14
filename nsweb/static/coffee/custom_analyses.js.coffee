@@ -60,6 +60,8 @@ app =
     showModal: false
     modalMessage: 'No message'
     editMode: false
+    currentExpr: ''
+    exprFilterEnabled: false
 
   getAnalysis: (uuid, callback) ->
     # See if the analysis is in the pre-loaded list of saved analyses -
@@ -163,6 +165,7 @@ app =
 
   runQuery: (expr) ->
     url = @props.expressionQueryURL + '"' + expr + '"'
+    @state.currentExpr = expr
     $.ajax
       dataType: 'json'
       type: 'GET'
@@ -170,9 +173,14 @@ app =
       success: (response) =>
         validPMIDs = response.ids
         @state.filteredStudies = @state.allStudies.filter (x) -> $.inArray(x.pmid, validPMIDs) > -1
+        @state.exprFilterEnabled = true
         @render()
-        console.log "Filtered: ", @state.filteredStudies.length
-    console.log "Running query #{ expr }"
+
+  clearQuery: ->
+    @state.filteredStudies = @state.allStudies
+    @state.exprFilterEnabled = false
+    @state.currentExpr = ''
+    @render()
 
   deleteAnalysis: (uuid) ->
     if not confirm "Are you sure you want to delete this analysis? "
@@ -256,9 +264,8 @@ app =
       @state.editMode = true
     @fetchAllAnalyses =>
       @fetchAllStudies =>
-        started = Backbone.history.start
+        Backbone.history.start
           root: '/analyses/custom/'
-        console.log "started ", started
 
   render: ->
     if not document.getElementById('custom-list-container')?
@@ -333,6 +340,13 @@ ActiveAnalysis = React.createClass
       $('#selected-studies-tab').removeClass('active')
       $('#all-studies-tab').addClass('active')
     else
+      $('#selected-studies-tab-header').addClass('active')
+      $('#all-studies-tab-header').removeClass('active')
+      $('#selected-studies-tab').addClass('active')
+      $('#all-studies-tab').removeClass('active')
+
+  componentDidUpdate: ->
+    if not app.state.editMode
       $('#selected-studies-tab-header').addClass('active')
       $('#all-studies-tab-header').removeClass('active')
       $('#selected-studies-tab').addClass('active')
@@ -442,7 +456,9 @@ ActiveAnalysis = React.createClass
                 p {}, "Add or remove studies to your analysis by clicking on the study. Studies that are already added are highlighted in blue."
                 React.createElement AllStudiestable, {
                   allStudies: app.state.allStudies,
-                  filteredStudies: app.state.filteredStudies,
+                  studies: app.state.filteredStudies,
+                  currentExpr: app.state.currentExpr,
+                  exprFilterEnabled: app.state.exprFilterEnabled,
                   selectedCount: Object.keys(app.state.activeAnalysis.studies).length}
 
 DialogBox = React.createClass
@@ -513,9 +529,9 @@ AllStudiestable = React.createClass
   mixins: [React.addons.PureRenderMixin]
 
   componentDidMount: ->
-    @currLength = @props.filteredStudies.legnth
+    @currLength = @props.studies.legnth
     $('#all-studies-table').DataTable
-      data: @props.filteredStudies
+      data: @props.studies
       columns: [
         {data: 'title'}
         {data: 'authors'}
@@ -526,11 +542,11 @@ AllStudiestable = React.createClass
     setupSelectableTable()
 
   componentDidUpdate: ->
-    if @props.filteredStudies.length != @currLength
-      @currLength = @props.filteredStudies.length
+    if @props.studies.length != @currLength
+      @currLength = @props.studies.length
       t = $('#all-studies-table').DataTable()
       t.clear()
-      t.rows.add @props.filteredStudies
+      t.rows.add @props.studies
       t.draw()
     redrawTableSelection()
 
@@ -552,7 +568,8 @@ AllStudiestable = React.createClass
 
   runQuery: ->
     app.runQuery @refs.expr.getDOMNode().value
-    console.log @refs.expr.getDOMNode().value
+
+  clearQuery: -> app.clearQuery()
 
   render: ->
     div {},
@@ -565,13 +582,20 @@ AllStudiestable = React.createClass
       button {className: 'btn btn-sm btn-warning', onClick: @removeAllHandler}, "Remove all studies"
       br {}, ''
       br {}, ''
+      includeIf @props.exprFilterEnabled,
+        div {className: 'row'},
+          div {className: 'col-md-12'},
+            div {className: 'alert alert-success'},
+              "Query ",
+              strong {}, @props.currentExpr
+              " returned #{@props.studies.length} studies."
+              button {className: 'btn btn-sm btn-primary pull-right', onClick: @clearQuery}, "Clear"
       div {className: 'row'},
-        p {}, "Currently #{@props.filteredStudies.length} studies in the table"
         form {className: 'form-inline col-md-12'},
           div {className: 'form-group'},
-            label {for: 'exprInput'}, 'Expression:'
+            label {for: 'exprInput'}, 'Advanced Expression Query:'
             input {type: 'text', id: 'exprInput', className: 'form-control', ref: 'expr', placeholder: 'enter an expression'}
-          button {className: 'btn btn-sm btn-primary', onClick: @runQuery}, "Submit"
+          button {className: 'btn btn-sm btn-primary', onClick: @runQuery}, "Search"
         hr {}
         br {}, ''
         br {}

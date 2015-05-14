@@ -58,7 +58,10 @@ def get_study_list():
 @login_required
 def get_studies_by_expression(expression):
     expr_ids = tasks.get_studies_by_expression.delay(expression).wait()
-    return jsonify(ids=list(expr_ids))
+    ids = []
+    if expr_ids:
+        ids = list(expr_ids)
+    return jsonify(ids=ids)
 
 
 # Begin client side APIs
