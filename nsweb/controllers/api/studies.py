@@ -57,7 +57,7 @@ def get_study_list():
 
 @login_required
 def get_studies_by_expression(expression):
-    expr_ids = tasks.get_studies_by_expression.delay(expression).wait()
+    expr_ids = tasks.get_studies_by_expression.delay(expression.lower()).wait()
     ids = []
     if expr_ids:
         ids = list(expr_ids)
