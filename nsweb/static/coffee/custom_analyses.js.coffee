@@ -47,10 +47,12 @@ app =
     getCustomAnalysis: '/api/custom/'  # /api/custom/<uid>
     getFullAnalysisURL: '/api/analyses/full/' # /api/analyses/full/
     runAnalysisURL: '/analyses/custom/run/'
+    expressionQueryURL: '/api/studies/?expression='
 
   state: # All mutable app state must be contained here
     analyses: []
     allStudies: []
+    filteredStudies: []
     studyDetails: {}
     activeAnalysis:
       blank: true
@@ -159,6 +161,19 @@ app =
     @state.editMode = true
     @render()
 
+  runQuery: (expr) ->
+    url = @props.expressionQueryURL + '"' + expr + '"'
+    $.ajax
+      dataType: 'json'
+      type: 'GET'
+      url: url
+      success: (response) =>
+        validPMIDs = response.ids
+        @state.filteredStudies = @state.allStudies.filter (x) -> $.inArray(x.pmid, validPMIDs) > -1
+        @render()
+        console.log "Filtered: ", @state.filteredStudies.length
+    console.log "Running query #{ expr }"
+
   deleteAnalysis: (uuid) ->
     if not confirm "Are you sure you want to delete this analysis? "
       return
@@ -222,7 +237,7 @@ app =
       headers:
         'Cache-Control': 'max-age=600'
       success: (data) =>
-        @state.allStudies = data.studies
+        @state.allStudies = @state.filteredStudies = data.studies
         @state.studyDetails = {}
         for study in data.studies
           @state.studyDetails[study.pmid] = study
@@ -427,6 +442,7 @@ ActiveAnalysis = React.createClass
                 p {}, "Add or remove studies to your analysis by clicking on the study. Studies that are already added are highlighted in blue."
                 React.createElement AllStudiestable, {
                   allStudies: app.state.allStudies,
+                  filteredStudies: app.state.filteredStudies,
                   selectedCount: Object.keys(app.state.activeAnalysis.studies).length}
 
 DialogBox = React.createClass
@@ -497,9 +513,9 @@ AllStudiestable = React.createClass
   mixins: [React.addons.PureRenderMixin]
 
   componentDidMount: ->
-    @currLength = @props.allStudies.legnth
+    @currLength = @props.filteredStudies.legnth
     $('#all-studies-table').DataTable
-      data: @props.allStudies
+      data: @props.filteredStudies
       columns: [
         {data: 'title'}
         {data: 'authors'}
@@ -510,11 +526,11 @@ AllStudiestable = React.createClass
     setupSelectableTable()
 
   componentDidUpdate: ->
-    if @props.allStudies.length != @currLength
-      @currLength = @props.allStudies.length
+    if @props.filteredStudies.length != @currLength
+      @currLength = @props.filteredStudies.length
       t = $('#all-studies-table').DataTable()
       t.clear()
-      t.rows.add @props.allStudies
+      t.rows.add @props.filteredStudies
       t.draw()
     redrawTableSelection()
 
@@ -534,6 +550,10 @@ AllStudiestable = React.createClass
   removeAllFilteredHandler: ->
     app.removeStudies @filteredPMIDs()
 
+  runQuery: ->
+    app.runQuery @refs.expr.getDOMNode().value
+    console.log @refs.expr.getDOMNode().value
+
   render: ->
     div {},
       button {className: 'btn btn-sm btn-info', onClick: @addAllFilteredHandler}, "Add all filtered studies"
@@ -545,6 +565,16 @@ AllStudiestable = React.createClass
       button {className: 'btn btn-sm btn-warning', onClick: @removeAllHandler}, "Remove all studies"
       br {}, ''
       br {}, ''
+      div {className: 'row'},
+        p {}, "Currently #{@props.filteredStudies.length} studies in the table"
+        form {className: 'form-inline col-md-12'},
+          div {className: 'form-group'},
+            label {for: 'exprInput'}, 'Expression:'
+            input {type: 'text', id: 'exprInput', className: 'form-control', ref: 'expr', placeholder: 'enter an expression'}
+          button {className: 'btn btn-sm btn-primary', onClick: @runQuery}, "Submit"
+        hr {}
+        br {}, ''
+        br {}
       table {className: 'table selectable-table', id: 'all-studies-table'},
         thead {},
           tr {},
