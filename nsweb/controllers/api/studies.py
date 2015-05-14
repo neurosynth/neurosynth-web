@@ -1,3 +1,5 @@
+import urllib
+
 from nsweb.controllers.api import bp
 from flask import request, jsonify, url_for
 from nsweb.models.studies import Study
@@ -57,7 +59,8 @@ def get_study_list():
 
 @login_required
 def get_studies_by_expression(expression):
-    expr_ids = tasks.get_studies_by_expression.delay(expression.lower()).wait()
+    decoded_expr = urllib.unquote(expression).lower()
+    expr_ids = tasks.get_studies_by_expression.delay(decoded_expr).wait()
     ids = []
     if expr_ids:
         ids = list(expr_ids)

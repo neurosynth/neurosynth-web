@@ -164,7 +164,7 @@ app =
     @render()
 
   runQuery: (expr) ->
-    url = @props.expressionQueryURL + '"' + expr + '"'
+    url = @props.expressionQueryURL + encodeURIComponent(expr)
     @state.currentExpr = expr
     $.ajax
       dataType: 'json'
