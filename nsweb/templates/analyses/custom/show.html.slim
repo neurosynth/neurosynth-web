@@ -14,6 +14,8 @@
       - if analysis.description
         p {{ analysis.description }}
     %div.col-md-2
+      - if not analysis.private
+        a.btn.btn-primary href="{{ url_for analyses.list_custom_analyses }}#saved/{{ analysis.uuid }}" Copy or edit this analysis
       / .analysis-search
       /   span Search for another term:
       /   input type="text" id="term-analysis-search"
