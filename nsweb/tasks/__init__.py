@@ -34,6 +34,7 @@ def load_image(masker, filename, save_resampled=True):
             img.to_filename(filename)
     return masker.mask(img)
 
+
 def xyz_to_mat(foci):
     """ Convert an N x 3 array of XYZ coordinates to matrix indices. """
     foci = np.hstack((foci, np.ones((foci.shape[0], 1))))
@@ -94,7 +95,8 @@ class NeurosynthTask(Task):
         """ Return a dict of predefined region masks. """
         maps = {
             'cortex': join(settings.MASK_DIR, 'cortex.nii.gz'),
-            'subcortex': join(settings.MASK_DIR, 'subcortex_drewUpdated.nii.gz'),
+            'subcortex': join(settings.MASK_DIR,
+                              'subcortex_drewUpdated.nii.gz'),
             'hippocampus': join(settings.MASK_DIR, 'FSL_BHipp_thr0.nii.gz'),
             'accumbens': join(settings.MASK_DIR, 'FSL_BNAcc_thr0.nii.gz'),
             'amygdala': join(settings.MASK_DIR, 'FSL_BAmyg_thr0.nii.gz'),
@@ -105,9 +107,11 @@ class NeurosynthTask(Task):
             maps[m] = load_image(self.masker, img)
         return maps
 
+
 @celery.task(base=NeurosynthTask)
 def save_uploaded_image(filename, **kwargs):
     pass
+
 
 @celery.task(base=NeurosynthTask)
 def decode_image(filename, reference, uuid, mask=None, drop_zeros=False,
@@ -143,8 +147,8 @@ def decode_image(filename, reference, uuid, mask=None, drop_zeros=False,
         data = np.nan_to_num(data)
 
         # standardize image and get correlation
-        data = (data - data.mean())/data.std()
-        r = np.dot(ref.data[voxels].T, data)/ref.n_voxels
+        data = (data - data.mean()) / data.std()
+        r = np.dot(ref.data[voxels].T, data) / ref.n_voxels
         outfile = join(settings.DECODING_RESULTS_DIR, uuid + '.txt')
         labels = ref.labels.keys()
         pd.Series(r, index=labels).to_csv(outfile, sep='\t')
@@ -152,6 +156,7 @@ def decode_image(filename, reference, uuid, mask=None, drop_zeros=False,
     except Exception, e:
         print traceback.format_exc()
         return False
+
 
 @celery.task(base=NeurosynthTask)
 def get_voxel_data(reference, x, y, z, get_pp=True):
@@ -183,6 +188,7 @@ def get_voxel_data(reference, x, y, z, get_pp=True):
         print traceback.format_exc()
         return False
 
+
 @celery.task(base=NeurosynthTask)
 def make_coactivation_map(x, y, z, r=6, min_studies=0.01):
     """ Generate a coactivation map on-the-fly for the given seed voxel. """
@@ -193,15 +199,18 @@ def make_coactivation_map(x, y, z, r=6, min_studies=0.01):
             return False
         ma = meta.MetaAnalysis(dataset, ids, min_studies=min_studies)
         outdir = join(settings.IMAGE_DIR, 'coactivation')
-        prefix = 'metaanalytic_coactivation_%s_%s_%s' % (str(x), str(y), str(z))
+        prefix = 'metaanalytic_coactivation_%s_%s_%s' % (
+            str(x), str(y), str(z))
         ma.save_results(outdir, prefix, image_list=['pFgA_z_FDR_0.01'])
         return True
     except Exception, e:
         print traceback.format_exc()
         return False
 
+
 @celery.task(base=NeurosynthTask)
-def make_scatterplot(filename, analysis, base_id, reference='terms_full', outfile=None, n_voxels=None,
+def make_scatterplot(filename, analysis, base_id, reference='terms_full',
+                     outfile=None, n_voxels=None,
                      x_lab="Uploaded Image", y_lab=None, gene_masks=False):
     """ Generate a scatter plot displaying relationship between two images
     (typically a Neurosynth meta-analysis map and a retrieved image), where
@@ -256,7 +265,7 @@ def make_scatterplot(filename, analysis, base_id, reference='terms_full', outfil
         region_masks = [masks[l] for l in region_labels]
 
         scatter(x, y, region_masks=region_masks, mask_labels=region_labels,
-                unlabeled_alpha=0.15, alpha=0.5, fig_size=(12,12),
+                unlabeled_alpha=0.15, alpha=0.5, fig_size=(12, 12),
                 palette='Set1', x_lab=x_lab, y_lab=y_lab, savefile=outfile,
                 spatial_masks=spatial_masks, voxel_count_mask=voxel_count_mask)
 
@@ -278,8 +287,23 @@ def run_metaanalysis(ids, name):
         ma = meta.MetaAnalysis(run_metaanalysis.dataset, ids)
         outdir = join(settings.IMAGE_DIR, 'custom')
         ma.save_results(outdir, name, image_list=['pFgA_z_FDR_0.01',
-                        'pAgF_z_FDR_0.01'])
+                                                  'pAgF_z_FDR_0.01'])
         return True
     except Exception, e:
+        print traceback.format_exc()
+        return False
+
+
+@celery.task(base=NeurosynthTask)
+def get_studies_by_expression(expression):
+    """ Retrieve study IDs based on expression.
+    Args:
+        expression (str): An expression to pass to the Neurosynth PEG.
+    Returns: A list of PMIDs.
+    """
+    try:
+        return get_studies_by_expression.dataset.get_studies(
+            expression=expression)
+    except:
         print traceback.format_exc()
         return False

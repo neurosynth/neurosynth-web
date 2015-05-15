@@ -3,7 +3,8 @@ from nsweb.initializers import settings
 
 def make_celery(app):
     """ Initialize and return a new Celery instance """
-    celery = Celery(app.import_name, broker=settings.CELERY_BROKER_URL, backend=settings.CELERY_RESULT_BACKEND)
+    celery = Celery(app.import_name, broker=settings.CELERY_BROKER_URL,
+                    backend=settings.CELERY_RESULT_BACKEND)
     TaskBase = celery.Task
     class ContextTask(TaskBase):
         abstract = True

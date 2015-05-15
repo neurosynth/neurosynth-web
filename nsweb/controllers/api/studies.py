@@ -1,12 +1,29 @@
+import urllib
+
 from nsweb.controllers.api import bp
 from flask import request, jsonify, url_for
 from nsweb.models.studies import Study
+from flask.ext.user import login_required
+from nsweb import tasks
+from nsweb.core import cache
+import re
 
 # Begin server side APIs
 
 
+def make_cache_key():
+    ''' Replace default cache key prefix with a string that also includes
+    query arguments. '''
+    return request.path + request.query_string
+
+
 @bp.route('/studies/')
+@cache.cached(timeout=3600, key_prefix=make_cache_key)
 def get_study_list():
+
+    if 'expression' in request.args:
+        return get_studies_by_expression(request.args['expression'])
+
     data = Study.query
     results_per_page = int(request.args['length'])
     offset = int(request.args['start'])
@@ -39,6 +56,16 @@ def get_study_list():
         '<a href=http://www.ncbi.nlm.nih.gov/pubmed/{0}>{0}</a>'.format(d.pmid)] for d in data.items]
     result = jsonify(**result)
     return result
+
+
+@login_required
+def get_studies_by_expression(expression):
+    decoded_expr = urllib.unquote(expression).lower().strip('"')
+    expr_ids = tasks.get_studies_by_expression.delay(decoded_expr).wait()
+    ids = []
+    if expr_ids:
+        ids = list(expr_ids)
+    return jsonify(ids=ids)
 
 
 # Begin client side APIs

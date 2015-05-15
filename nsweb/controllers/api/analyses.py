@@ -97,10 +97,6 @@ def analyses_api(val):
     return data
 
 
-def serialize_custom_analysis():
-    pass
-
-
 @bp.route('/custom/save/', methods=['POST', 'GET'])
 @login_required
 def save_custom_analysis():
@@ -117,6 +113,7 @@ def save_custom_analysis():
     uid = data.get('uuid')
     studies = data.get('studies', [])
     description = data.get('description')
+    private = data.get('private')
     pmids = [int(x) for x in studies]
 
     # Verify that all requested pmids are in the database
@@ -136,12 +133,13 @@ def save_custom_analysis():
             custom_analysis.name = name
         if description is not None:
             custom_analysis.description = description
+        custom_analysis.private = private
     else:
         # create new custom analysis
         uid = unicode(uuid.uuid4())[:18]
         custom_analysis = CustomAnalysis(
             uuid=uid, name=name, description=description,
-            user_id=current_user.id)
+            user_id=current_user.id, private=private)
     # Explicitly update timestamp, because it won't be changed if only studies
     # are modified, and we need to compare this with last_run_at later.
     custom_analysis.updated_at = dt.datetime.utcnow()
@@ -174,11 +172,9 @@ def get_custom_analysis(uid):
     custom = CustomAnalysis.query.filter_by(uuid=uid).first()
     if not custom:
         abort(404)
-    # response = custom.serialize()
-    # freqs = Frequency.query.filter_by(analysis_id=custom.id)
-    # response = dict(uuid=uid, name=custom.name, studies=[f.pmid for f in freqs])
+    if current_user.id != custom.user_id and (custom.private or not custom.last_run_at):
+        abort(403)
     return jsonify(custom.serialize())
-
 
 @bp.route('/custom/all/', methods=['GET'])
 @login_required

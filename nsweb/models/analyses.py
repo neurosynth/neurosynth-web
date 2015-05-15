@@ -88,6 +88,8 @@ class CustomAnalysis(Analysis):
     user_id = db.Column(db.Integer, db.ForeignKey(User.id))
     user = db.relationship(User, backref=db.backref('analyses',
                            cascade='all'))
+    private = db.Column(db.Boolean, default=False)
+
     last_run_at = db.Column(db.DateTime)
     __mapper_args__ = {
         'polymorphic_identity': 'custom'
@@ -95,6 +97,7 @@ class CustomAnalysis(Analysis):
 
     def serialize(self):
         return dict(id=self.id, uuid=self.uuid, name=self.name, description=self.description,
-                    studies=[f.pmid for f in self.studies])
+                    studies=[f.pmid for f in self.studies],
+                    private=self.private, user=self.user.username)
 
 
