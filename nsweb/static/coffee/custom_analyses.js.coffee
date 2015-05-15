@@ -633,7 +633,7 @@ setupSelectableTable = ->
 
   $('#select-all-btn').click ->
     selection = getSelectedStudies()
-    $('tbody').find('tr').each ->
+    $('.selectable-table>tbody').find('tr').each ->
       pmid = getPMID(this)
       app.addStudy(pmid)
     saveSelection(selection)
@@ -641,7 +641,7 @@ setupSelectableTable = ->
 
   $('#deselect-all-btn').click ->
     selection = getSelectedStudies()
-    $('tbody').find('tr').each ->
+    $('.selectable-table>tbody').find('tr').each ->
       pmid = getPMID(this)
       app.removeStudy(pmid)
     saveSelection(selection)
