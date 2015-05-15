@@ -96,10 +96,10 @@ def get_all_studies():
     """
     :return: JSON object containing all studies
     """
-    all_studies = Study.query.all()
-    key = str(len(all_studies))
+    key = str(Study.query.count())
     if request.headers.get('If-None-Match') == key:
         return '', 304, {}
+    all_studies = Study.query.all()
     response = jsonify(dict(studies=[s.serialize() for s in all_studies]))
     response.headers['ETag'] = key
     response.headers['Cache-Control'] = 'max-age=600'
