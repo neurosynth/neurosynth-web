@@ -6,6 +6,7 @@ from nsweb.models.studies import Study
 from flask.ext.user import login_required
 from nsweb import tasks
 from nsweb.core import cache
+import re
 
 # Begin server side APIs
 
@@ -59,7 +60,7 @@ def get_study_list():
 
 @login_required
 def get_studies_by_expression(expression):
-    decoded_expr = urllib.unquote(expression).lower()
+    decoded_expr = urllib.unquote(expression).lower().strip('"')
     expr_ids = tasks.get_studies_by_expression.delay(decoded_expr).wait()
     ids = []
     if expr_ids:
