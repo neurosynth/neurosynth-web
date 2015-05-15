@@ -3,7 +3,8 @@ from flask import jsonify, request
 from nsweb.api.schemas import (AnalysisSchema, StudySchema, LocationSchema,
                                ImageSchema, DecodingSchema, GeneSchema)
 from nsweb.models.images import Image
-from nsweb.models.analyses import Analysis
+from nsweb.models.analyses import (Analysis, TermAnalysis, TopicAnalysis,
+                                   CustomAnalysis)
 from nsweb.models.locations import Location
 from nsweb.models.studies import Study
 from nsweb.models.peaks import Peak
@@ -13,6 +14,7 @@ from nsweb.controllers import decode
 from nsweb.controllers.locations import check_xyz
 from nsweb.core import cache
 from sqlalchemy import func
+from sqlalchemy.orm import with_polymorphic
 import re
 
 
@@ -74,14 +76,23 @@ def get_analyses():
     limit = min(limit, MAX_LIMIT)
     page = int(request.args.get('page', 1))
 
-    # Optional arguments
     analyses = Analysis.query
-    if 'type' in request.args:
-        type = request.args['type']
-        # Disallow custom analyses for now
-        if type in ['term', 'topic']:
-            analyses = analyses.filter_by(type=type)
 
+    # Can only retrieve analyses of a single type; defaults to terms.
+    type = request.args.get('type', 'term')
+
+    valid_types = {
+        'term': TermAnalysis,
+        'topic': TopicAnalysis,
+        'custom': CustomAnalysis
+    }
+    if type in valid_types.keys():
+        analyses = analyses.with_polymorphic(valid_types[type])
+        analyses = analyses.filter_by(type=type)
+    if type == 'custom':
+        analyses = analyses.filter(CustomAnalysis.private == 0)
+
+    # Optional arguments
     if 'id' in request.args:
         ids = re.split('[\s,]+', request.args['id'].strip(' ,'))
         analyses = analyses.filter(Analysis.id.in_([int(x) for x in ids]))
