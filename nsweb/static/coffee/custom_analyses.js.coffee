@@ -497,12 +497,12 @@ SelectedStudiesTable = React.createClass
     $('#selected-studies-table').DataTable
       data: @tableData()
       columns: [
-        {data: 'title'}
-        {data: 'authors'}
-        {data: 'journal'}
-        {data: 'year'}
-        {data: 'pmid'}
-        {data: 'remove'}
+        {data: 'title', width: '40%'}
+        {data: 'authors', width: '18%'}
+        {data: 'journal', width: '15%'}
+        {data: 'year', width: '7%'}
+        {data: 'pmid', width: '10%'}
+        {data: 'remove', width: '10%'}
       ]
     @setupRemoveButton()
 
@@ -533,11 +533,11 @@ AllStudiestable = React.createClass
     $('#all-studies-table').DataTable
       data: @props.studies
       columns: [
-        {data: 'title'}
-        {data: 'authors'}
-        {data: 'journal'}
-        {data: 'year'}
-        {data: 'pmid'}
+        {data: 'title', width: '40%'}
+        {data: 'authors', width: '28%'}
+        {data: 'journal', width: '15%'}
+        {data: 'year', width: '7%'}
+        {data: 'pmid', width: '10%'}
       ]
     setupSelectableTable()
 
