@@ -7,6 +7,7 @@ from nsweb.models.analyses import (Analysis, TermAnalysis, TopicAnalysis,
                                    CustomAnalysis)
 from nsweb.models.locations import Location
 from nsweb.models.studies import Study
+from nsweb.models.frequencies import Frequency
 from nsweb.models.peaks import Peak
 from nsweb.models.decodings import Decoding
 from nsweb.models.genes import Gene
@@ -152,8 +153,10 @@ def get_studies():
 
     studies = Study.query
 
-    if 'pmid' in request.args:
-        ids = re.split('[\s,]+', request.args['pmid'].strip(' ,'))
+    if 'pmid' in request.args or 'id' in request.args:
+        ids = request.args.get('id', None)
+        ids = request.args.get('pmid', ids)
+        ids = re.split('[\s,]+', ids.strip(' ,'))
         studies = studies.filter(Study.pmid.in_([int(x) for x in ids]))
 
     if 'search' in request.args and len(request.args['search']) > 1:
@@ -349,6 +352,7 @@ def get_decoding():
 
     schema = DecodingSchema()
     return jsonify(data=schema.dump(dec).data)
+
 
 @bp.route('/genes/')
 @cache.cached(timeout=3600, key_prefix=make_cache_key)
