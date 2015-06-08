@@ -4,7 +4,7 @@ import sys
 
 ### SETTINGS THAT SHOULD ALWAYS BE UPDATED ###
 # Root path for generated data
-DATA_DIR = '/root/path/to/data'
+DATA_DIR = '/data'
 
 
 ### SHOULD NOT NEED TO BE UPDATED ###
@@ -27,10 +27,10 @@ ROOT_DIR = os.path.realpath(
     join(join(os.path.dirname(__file__), os.path.pardir), os.path.pardir))
 
 # Static content
-STATIC_FOLDER = ROOT_DIR + '/nsweb/static'
+STATIC_FOLDER = join(ROOT_DIR, 'nsweb', 'static')
 
 # Templates
-TEMPLATE_FOLDER = ROOT_DIR + '/nsweb/templates'
+TEMPLATE_FOLDER = join(ROOT_DIR, 'nsweb', 'templates')
 
 
 ### DECODER-RELATED PATHS ###
@@ -38,7 +38,7 @@ TEMPLATE_FOLDER = ROOT_DIR + '/nsweb/templates'
 DECODED_IMAGE_DIR = join(DATA_DIR, 'images', 'decoded')
 
 # Path to saved decoding image array--this is kept active in memory
-DECODING_DATA = join(DATA_DIR, 'decoding', 'decoding.msg')
+DECODING_DATA = join(ASSET_DIR, 'decoding.msg')
 
 # Path to output decoding results (flat .txt files)
 DECODING_RESULTS_DIR = join(DATA_DIR, 'decoding', 'results')
@@ -65,8 +65,8 @@ GENE_IMAGE_DIR = join(IMAGE_DIR, 'genes')
 # Adapter to use--either 'mysql' or 'sqlite'
 SQL_ADAPTER = 'sqlite'
 
-# SQLite path
-SQLALCHEMY_SQLITE_URI = 'sqlite:///' + DATA_DIR + 'prod.db'
+# SQLite pat
+SQLALCHEMY_SQLITE_URI = join('sqlite://', DATA_DIR, 'prod.db')
 
 # MySQL configuration
 MYSQL_USER = 'nsweb'
@@ -77,7 +77,7 @@ MYSQL_TEST_DB = 'nsweb_test'
 TEST_URL = 'http://test.neurosynth.org'
 
 ### Logging ###
-LOGGING_PATH = DATA_DIR + 'log.txt'
+LOGGING_PATH = join(DATA_DIR, 'log.txt')
 LOGGING_LEVEL = 'DEBUG'
 
 ### Celery settings for background tasks ###
