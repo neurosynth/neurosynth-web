@@ -1,6 +1,7 @@
 blinker
 celery
 cssmin
+fig
 Flask>=0.10.1
 Flask-Assets
 Flask-Babel
@@ -29,6 +30,7 @@ pandas>=0.13
 ply
 pyscss
 pytest
+redis
 seaborn
 selenium
 simplejson
