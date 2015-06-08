@@ -32,7 +32,7 @@ pytest
 seaborn
 selenium
 simplejson
-sklearn
+scikit-learn
 slimish-jinja
 SQLAlchemy
 uwsgi
