@@ -4,8 +4,9 @@ FROM ubuntu:14.04
 # File Author / Maintainer
 MAINTAINER Tal Yarkoni
 
-# Set all environment variables we'll need
+# Set and create data directory
 ENV data_dir /data
+RUN mkdir ${data_dir}
 
 # Add the application resources URL
 RUN echo "deb http://archive.ubuntu.com/ubuntu/ $(lsb_release -sc) main universe" >> /etc/apt/sources.list
@@ -28,7 +29,7 @@ RUN apt-get -y --no-install-recommends install python python-dev python-distribu
 WORKDIR /opt
 
 # Clone github repo--temporary
-RUN git clone https://github.com/PsychoinformaticsLab/neurosynth-web.git
+RUN git clone https://github.com/neurosynth/neurosynth-web.git
 
 # Get pip to download and install requirements:
 RUN pip install -r neurosynth-web/requirements.txt
@@ -43,4 +44,4 @@ WORKDIR /opt/neurosynth-web
 RUN cp nsweb/initializers/settings_template.py nsweb/initializers/settings.py
 
 # Replace with ENV variables
-RUN sed -i 's/\/root\/path\/to\/data/${data_dir}/g' nsweb/initializers/settings.py
+RUN sed -i "s|/root/path/to/data|$data_dir|g" nsweb/initializers/settings.py

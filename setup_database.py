@@ -14,7 +14,7 @@ def main():
     db.app = app  # Set context on DB
     builder = database_builder.DatabaseBuilder(
         db, dataset=dataset,
-        studies=os.path.join(settings.ASSET_DIR, 'studies.txt'),
+        studies=os.path.join(settings.ASSET_DIR, 'database.txt'),
         features=os.path.join(settings.ASSET_DIR, 'features.txt'),
         # reset_db=True, reset_dataset=True)
         reset_db=False, reset_dataset=False)

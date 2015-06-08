@@ -13,6 +13,7 @@ from os.path import join, basename, exists
 from neurosynth import Masker
 from neurosynth.base.dataset import Dataset
 from neurosynth.analysis import meta
+import neurosynth as ns
 import numpy as np
 import pandas as pd
 import random
@@ -44,6 +45,12 @@ class DatabaseBuilder:
             reset_dataset: if True, will regenerate the pickled Neurosynth
                 dataset.
         """
+
+        if (studies is not None and not os.path.exists(studies)) \
+                or settings.RESET_ASSETS:
+            print "WARNING: RESETTING ALL NEUROSYNTH ASSETS!"
+            self.reset_assets()
+
         if reset_db:
             print "WARNING: RESETTING DATABASE!!!"
 
@@ -70,6 +77,11 @@ class DatabaseBuilder:
 
         if reset_db:
             self.reset_database()
+
+    def reset_assets(self):
+        if not exists(settings.ASSET_DIR):
+            os.makedirs(settings.ASSET_DIR)
+        ns.dataset.download(path=settings.ASSET_DIR, unpack=True)
 
     def reset_database(self):
         ''' Drop and re-create all tables. '''
@@ -321,7 +333,6 @@ class DatabaseBuilder:
 
             self.db.session.commit()
 
-
     def add_genes(self, gene_dir=None, reset=True, update_images=True):
         """ Add records for genes, working from a directory containing gene
         images. """
@@ -353,7 +364,7 @@ class DatabaseBuilder:
             # Update with metadata from HGNC file
             if symbol in gene_data.index:
                 name, locus_type, synonyms = list(gene_data.loc[symbol,
-                    ['Approved Name', 'Locus Type', 'Synonyms']])
+                                                                ['Approved Name', 'Locus Type', 'Synonyms']])
                 gene.name = name
                 gene.locus_type = locus_type
                 gene.synonyms = synonyms

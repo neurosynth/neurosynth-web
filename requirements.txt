@@ -18,18 +18,21 @@ Flask-User==0.6.1
 Flask-WTF
 jinja2
 marshmallow
-neurosynth
--e git+https://github.com/nilearn/nilearn.git#egg=nilearn
 matplotlib
 MySQL-Python
+neurosynth
+nibabel
+nilearn
 numpy>=1.8
 opbeat
 pandas>=0.13
+ply
 pyscss
 pytest
 seaborn
 selenium
 simplejson
+sklearn
 slimish-jinja
 SQLAlchemy
 uwsgi
