@@ -51,7 +51,10 @@ DECODING_SCATTERPLOTS_DIR = join(DATA_DIR, 'decoding', 'scatterplots')
 # last decoding; when False, will re-run the decoder every time.
 CACHE_DECODINGS = True
 
-# Path to memory-mapped arrays of image data
+# Path to memory-mapped arrays of image data.
+# Note: when running a development build inside a docker container or other VM,
+# memmapping may fail. In such a case, this shoudl point to a directory on the
+# local disk image rather than the host.
 MEMMAP_DIR = join(DATA_DIR, 'memmaps')
 
 
@@ -66,7 +69,7 @@ GENE_IMAGE_DIR = join(IMAGE_DIR, 'genes')
 SQL_ADAPTER = 'sqlite'
 
 # SQLite pat
-SQLALCHEMY_SQLITE_URI = join('sqlite://', DATA_DIR, 'prod.db')
+SQLALCHEMY_SQLITE_URI = join('sqlite:///', DATA_DIR, 'prod.db')
 
 # MySQL configuration
 MYSQL_USER = 'nsweb'

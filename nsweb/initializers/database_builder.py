@@ -86,6 +86,10 @@ class DatabaseBuilder:
             settings.DECODING_RESULTS_DIR,
             settings.DECODING_SCATTERPLOTS_DIR,
             settings.DECODED_IMAGE_DIR,
+            settings.MASK_DIR,
+            settings.TOPIC_DIR,
+            settings.GENE_IMAGE_DIR,
+            settings.MEMMAP_DIR
         ]
         for d in check_dirs:
             if not exists(d):

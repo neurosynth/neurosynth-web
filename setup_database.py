@@ -3,6 +3,7 @@ from nsweb.initializers import settings
 from nsweb.initializers import database_builder
 import os
 
+
 def main():
     create_app(debug=settings.DEBUG)
     import nsweb.models     #registers models
@@ -16,8 +17,8 @@ def main():
         db, dataset=dataset,
         studies=os.path.join(settings.ASSET_DIR, 'database.txt'),
         features=os.path.join(settings.ASSET_DIR, 'features.txt'),
-        # reset_db=True, reset_dataset=True)
-        reset_db=False, reset_dataset=False)
+        reset_db=True, reset_dataset=True)
+        # reset_db=False, reset_dataset=False)
 
 
     print "Adding analyses..."
@@ -39,19 +40,19 @@ def main():
     builder.generate_analysis_images(
         analyses=analyses, add_to_db=False, overwrite=True)
 
-    print "Adding topic sets..."
-    builder.add_topics(generate_images=True, add_images=True, top_n=40)
+    # print "Adding topic sets..."
+    # builder.add_topics(generate_images=True, add_images=True, top_n=40)
 
-    print "Adding cognitive atlas information for available terms..."
-    builder.add_cognitive_atlas_nodes()
+    # print "Adding cognitive atlas information for available terms..."
+    # builder.add_cognitive_atlas_nodes()
 
     print "Memory-mapping key image sets..."
     builder.memory_map_images(include=['terms'], reset=True)
 
-    print "Adding genes..."
-    builder.add_genes()
+    # print "Adding genes..."
+    # builder.add_genes()
 
-    builder.memory_map_images(include=['terms', 'topics', 'genes'])
+    #builder.memory_map_images(include=['terms', 'topics', 'genes'])
 
 
 if __name__ == '__main__':
