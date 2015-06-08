@@ -4,10 +4,6 @@ FROM ubuntu:14.04
 # File Author / Maintainer
 MAINTAINER Tal Yarkoni
 
-# Set and create data directory
-ENV data_dir /data
-RUN mkdir ${data_dir}
-
 # Add the application resources URL
 RUN echo "deb http://archive.ubuntu.com/ubuntu/ $(lsb_release -sc) main universe" >> /etc/apt/sources.list
 
@@ -26,22 +22,13 @@ RUN npm install -g coffee-script
 # Install Python and various packages
 RUN apt-get -y --no-install-recommends install python python-dev python-distribute python-pip python-numpy python-scipy python-matplotlib ipython ipython-notebook python-pandas python-sympy python-nose python-mysqldb python-tk
 
-WORKDIR /opt
+# Add code
+ADD . /code
 
-# Clone github repo--temporary
-RUN git clone https://github.com/neurosynth/neurosynth-web.git
+WORKDIR /code
 
 # Get pip to download and install requirements:
-RUN pip install -r neurosynth-web/requirements.txt
-
-# Expose ports
-EXPOSE 80
-
-# Set the default directory where CMD will execute
-WORKDIR /opt/neurosynth-web
+RUN pip install -r requirements.txt
 
 # Copy the settings template
 RUN cp nsweb/initializers/settings_template.py nsweb/initializers/settings.py
-
-# Replace with ENV variables
-RUN sed -i "s|/root/path/to/data|$data_dir|g" nsweb/initializers/settings.py

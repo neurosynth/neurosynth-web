@@ -1,0 +1,9 @@
+web:
+    build: .
+    ports:
+        - "5001:5001"
+    volumes:
+        - .:/code
+        - /Users/tal/Downloads/ns_data:/data
+    environment:
+        - INSTANCE_TYPE=web-server
