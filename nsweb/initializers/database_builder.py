@@ -20,6 +20,7 @@ import random
 from glob import glob
 import json
 import re
+import shutil
 
 
 class DatabaseBuilder:
@@ -51,9 +52,6 @@ class DatabaseBuilder:
             print "WARNING: RESETTING ALL NEUROSYNTH ASSETS!"
             self.reset_assets()
 
-        if reset_db:
-            print "WARNING: RESETTING DATABASE!!!"
-
         # Load or create Neurosynth Dataset instance
         if dataset is None or reset_dataset or (isinstance(dataset, basestring)
                                                 and not os.path.exists(dataset)
@@ -76,11 +74,27 @@ class DatabaseBuilder:
         self.db = db
 
         if reset_db:
+            print "WARNING: RESETTING DATABASE!!!"
             self.reset_database()
 
     def reset_assets(self):
-        if not exists(settings.ASSET_DIR):
-            os.makedirs(settings.ASSET_DIR)
+        # Create data directories if needed
+        check_dirs = [
+            settings.ASSET_DIR,
+            settings.IMAGE_DIR,
+            join(settings.IMAGE_DIR, 'coactivation'),
+            settings.DECODING_RESULTS_DIR,
+            settings.DECODING_SCATTERPLOTS_DIR,
+            settings.DECODED_IMAGE_DIR,
+        ]
+        for d in check_dirs:
+            if not exists(d):
+                os.makedirs(d)
+
+        # Copy anatomical image
+        anat = join(settings.ROOT_DIR, 'data', 'images', 'anatomical.nii.gz')
+        shutil.copy(anat, join(settings.IMAGE_DIR))
+
         ns.dataset.download(path=settings.ASSET_DIR, unpack=True)
 
     def reset_database(self):
@@ -363,8 +377,9 @@ class DatabaseBuilder:
                 gene = Gene(symbol=symbol)
             # Update with metadata from HGNC file
             if symbol in gene_data.index:
-                name, locus_type, synonyms = list(gene_data.loc[symbol,
-                                                                ['Approved Name', 'Locus Type', 'Synonyms']])
+                name, locus_type, synonyms = list(
+                    gene_data.loc[symbol,
+                                  ['Approved Name', 'Locus Type', 'Synonyms']])
                 gene.name = name
                 gene.locus_type = locus_type
                 gene.synonyms = synonyms
@@ -547,6 +562,7 @@ class DatabaseBuilder:
             # Initialize memmap
             n_images = len(images)
             mm_file = join(mm_dir, '%s_images.dat' % name)
+            print len(sampled_vox), n_images, mm_file
             mm = np.memmap(mm_file, dtype='float32', mode='w+',
                            shape=(len(sampled_vox), n_images))
 
