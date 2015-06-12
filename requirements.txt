@@ -19,6 +19,7 @@ Flask-User==0.6.1
 Flask-WTF
 jinja2
 marshmallow
+marshmallow-sqlalchemy
 matplotlib
 MySQL-Python
 neurosynth
