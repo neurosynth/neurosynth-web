@@ -29,6 +29,3 @@ WORKDIR /code
 
 # Get pip to download and install requirements:
 RUN pip install -r requirements.txt
-
-# Copy the settings template
-RUN cp nsweb/initializers/settings_template.py nsweb/initializers/settings.py

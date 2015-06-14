@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# Copy settings template to settings
+cp nsweb/initializers/settings_template.py nsweb/initializers/settings.py
+
 # Launch redis service
 sudo service redis-server start
 
