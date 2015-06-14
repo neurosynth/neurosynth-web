@@ -69,7 +69,7 @@ GENE_IMAGE_DIR = join(IMAGE_DIR, 'genes')
 SQL_ADAPTER = 'sqlite'
 
 # SQLite pat
-SQLALCHEMY_SQLITE_URI = join('sqlite:///', DATA_DIR, 'prod.db')
+SQLALCHEMY_SQLITE_URI = 'sqlite:///' + join(DATA_DIR, 'prod.db')
 
 # MySQL configuration
 MYSQL_USER = 'nsweb'

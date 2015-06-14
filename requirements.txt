@@ -29,7 +29,7 @@ numpy>=1.8
 opbeat
 pandas>=0.13
 ply
-pyscss
+pyscss==1.2.0
 pytest
 redis
 seaborn

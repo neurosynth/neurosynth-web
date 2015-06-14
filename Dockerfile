@@ -14,7 +14,7 @@ RUN apt-get update
 RUN apt-get install -y --no-install-recommends tar git curl nano wget dialog net-tools build-essential
 
 # install other non-Python packages: redis, node, MySQL, nginx
-RUN apt-get -y --no-install-recommends install redis-server npm mysql-server nginx
+RUN apt-get -y --no-install-recommends install redis-server node npm mysql-server nginx
 
 # install coffeescript with Node
 RUN npm install -g coffee-script
