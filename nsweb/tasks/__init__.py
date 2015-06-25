@@ -182,7 +182,7 @@ def get_voxel_data(reference, x, y, z, get_pp=True):
             _pp = pd.Series(ref.data[ind, :].ravel(), index=labels, name='pp')
             _pp = _pp * ref.stats['std'].values + ref.stats['mean'].values
             result = pd.concat([result, _pp], axis=1)
-        return result
+        return result.to_json()
 
     except Exception:
         print traceback.format_exc()
@@ -270,8 +270,7 @@ def make_scatterplot(filename, analysis, base_id, reference='terms_full',
                 spatial_masks=spatial_masks, voxel_count_mask=voxel_count_mask)
 
     except Exception, e:
-        print e
-        print e.message
+        print traceback.format_exc()
         return False
 
 

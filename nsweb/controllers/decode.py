@@ -15,6 +15,7 @@ import os
 from datetime import datetime
 from email.utils import parsedate
 from nsweb.controllers import error_page
+import pandas as pd
 
 bp = Blueprint('decode', __name__, url_prefix='/decode')
 
@@ -51,7 +52,7 @@ def get_voxel_data(x, y, z, reference='terms', get_json=True, get_pp=True):
         reference = valid_references[0]
     result = tasks.get_voxel_data.delay(
         reference, x, y, z, get_pp).wait()
-    return result.to_json() if get_json else result
+    return result if get_json else pd.read_json(result)
 
 
 def _get_decoding(**kwargs):
