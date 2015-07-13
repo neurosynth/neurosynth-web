@@ -47,25 +47,26 @@ class Mallet:
     def train_topics(self, input=None, num_topics=100, optimize_interval=10,
                      output_doc_topics='doc_topics.txt', output_topic_keys='topic_keys.txt', 
                      output_model=None, num_top_words=20, inferencer_filename=None, num_threads=None,
-                     num_iterations=None):
+                     num_iterations=None, random_seed=0):
         if input is None:
             input = self.corpus
         line = MALLET_PATH + ' train-topics --input %s --num-topics %d' % (input, num_topics)
         args = locals()
         for p in ['optimize_interval', 'output_doc_topics', 'output_topic_keys', 
                     'output_model', 'num_top_words', 'inferencer_filename', 'num_threads',
-                    'num_iterations']:
+                    'num_iterations', 'random_seed']:
             if p in args and args[p] is not None:
                 line += ' --%s %s' % (p.replace('_', '-'), str(args[p]))
         self.doc_topics = output_doc_topics
         return check_output(line.split())
 
-    def parse_doc_topics(self, input=None, prefix=''):
-        ''' Reads in a doc-topics MALLET file produced by train-topics and 
-        rearranges it into a pandas DF where the rows are documents and 
+    def parse_doc_topics(self, input=None, prefix='', topic_keys=None):
+        ''' Reads in a doc-topics MALLET file produced by train-topics and
+        rearranges it into a pandas DF where the rows are documents and
         the columns are topics in natural order. '''
         if input is not None:
             self.doc_topics = input
+
         docs = open(self.doc_topics).readlines()[1::]
 
         n_topics = len(docs[0].strip().split('\t'))/2 - 1
@@ -88,7 +89,14 @@ class Mallet:
             for p in pairs:
                 weights[i, int(p[0])] = p[1]
 
-        columns = [prefix + str(i) for i in range(n_topics)]
+        if topic_keys is not None:
+            columns = []
+            for l in open(topic_keys).read().splitlines():
+                l = l.split()[:5]
+                l.pop(1)
+                columns.append('_'.join(l))
+        else:
+            columns = [prefix + str(i) for i in range(n_topics)]
         return pd.DataFrame(weights, index=labels, columns=columns)
 
 
@@ -123,13 +131,15 @@ class TopicFactory(object):
 
         for n in n_topics:
 
-            name = 'v3-topics-%d' % int(n)
+            name = 'v4-topics-%d' % int(n)
 
             key_file = os.path.join(key_dir, name + '.txt')
             self.mallet.train_topics(
                 'texts.mallet', num_topics=n, num_top_words=100,
-                output_topic_keys=key_file, num_iterations=1000)
-            topics = self.mallet.parse_doc_topics(prefix='topic')
+                output_topic_keys=key_file, num_iterations=1000,
+                random_seed=1000)
+            topics = self.mallet.parse_doc_topics(prefix='topic',
+                                                  topic_keys=key_file)
             topic_file = os.path.join(analysis_dir, name + '.txt')
             topics.to_csv(topic_file, sep='\t', index_label='id')
 
@@ -138,7 +148,7 @@ class TopicFactory(object):
                 'name': name,
                 'description': 'A set of %d topics extracted with LDA from '
                 'the abstracts of all articles in the Neurosynth database as of'
-                ' February 2015 (10,903 articles).' % n,
+                ' July 2015 (11,406 articles).' % n,
                 'n_topics': n
             }
             json_file = os.path.join(settings.TOPIC_DIR, name + '.json')
@@ -146,4 +156,4 @@ class TopicFactory(object):
 
 if __name__ == '__main__':
     tf = TopicFactory()
-    tf.make_topics([50, 100, 200])
+    tf.make_topics([50, 100, 200, 400])
