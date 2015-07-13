@@ -26,7 +26,7 @@ import shutil
 class DatabaseBuilder:
 
     def __init__(self, db, dataset=None, studies=None, features=None,
-                 reset_db=False, reset_dataset=False):
+                 reset_db=False, reset_dataset=False, download_data=True):
         """
         Initialize instance from a pickled Neurosynth Dataset instance or a
         pair of study and analysis .txt files.
@@ -45,12 +45,14 @@ class DatabaseBuilder:
                 incrementally.
             reset_dataset: if True, will regenerate the pickled Neurosynth
                 dataset.
+            download_data: if True, ignores any existing files and downloads the
+                latest Neurosynth data files from GitHub.
         """
 
         if (studies is not None and not os.path.exists(studies)) \
                 or settings.RESET_ASSETS:
             print "WARNING: RESETTING ALL NEUROSYNTH ASSETS!"
-            self.reset_assets()
+            self.reset_assets(download_data)
 
         # Load or create Neurosynth Dataset instance
         if dataset is None or reset_dataset or (isinstance(dataset, basestring)
@@ -77,11 +79,12 @@ class DatabaseBuilder:
             print "WARNING: RESETTING DATABASE!!!"
             self.reset_database()
 
-    def reset_assets(self):
+    def reset_assets(self, download=True):
         # Create data directories if needed
         check_dirs = [
             settings.ASSET_DIR,
             settings.IMAGE_DIR,
+            join(settings.IMAGE_DIR, 'analyses'),
             join(settings.IMAGE_DIR, 'coactivation'),
             settings.DECODING_RESULTS_DIR,
             settings.DECODING_SCATTERPLOTS_DIR,
@@ -99,7 +102,8 @@ class DatabaseBuilder:
         anat = join(settings.ROOT_DIR, 'data', 'images', 'anatomical.nii.gz')
         shutil.copy(anat, join(settings.IMAGE_DIR))
 
-        ns.dataset.download(path=settings.ASSET_DIR, unpack=True)
+        if download:
+            ns.dataset.download(path=settings.ASSET_DIR, unpack=True)
 
     def reset_database(self):
         ''' Drop and re-create all tables. '''
@@ -428,6 +432,9 @@ class DatabaseBuilder:
 
         topic_image_dir = join(settings.IMAGE_DIR, 'topics')
 
+        # Get all valid Study ids for speed
+        study_ids = [x[0] for x in set(self.db.session.query(Study.pmid).all())]
+
         for ts in topic_sets:
             data = json.load(open(ts))
             n = int(data['n_topics'])
@@ -455,18 +462,15 @@ class DatabaseBuilder:
                     prefix=ts.name)
 
             feature_data = self.dataset.feature_table.data
-
-            # Get all valid Study ids for speed
-            study_ids = [x[0]
-                         for x in set(self.db.session.query(Study.pmid).all())]
+            feature_names = dataset.get_feature_names()
 
             for i in range(n):
 
                 # Disable autoflush temporarily because it causes problems
                 with self.db.session.no_autoflush:
                     terms = ', '.join(key_data.pop(0).split()[2:][:top_n])
-                    topic = TopicAnalysis(name=ts.name + '_topic%d' % i,
-                                          terms=terms, number=i)
+                    name = ts.name + '_' + feature_names[i]
+                    topic = TopicAnalysis(name=name, terms=terms, number=i)
 
                     self.db.session.add(topic)
                     self.db.session.commit()
