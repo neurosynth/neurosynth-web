@@ -27,7 +27,11 @@
           p {{viewers.viewer()|safe}}
         #studies.tab-pane
           h4 Studies associated with the feature "{{feature}}"
-          table#feature_studies_table.table-striped.table-hover.table.table-condensed.default-datatable
+          button.bt.btn-primary#select-all-btn Select all studies on this page
+          button.bt.btn-primary#deselect-all-btn Deselect all studies on this page
+          br
+          br
+          table#feature_studies_table.table-striped.table-hover.table.table-condensed.default-datatable.selectable-table
             thead
               tr
                 th Title

@@ -1,0 +1,27 @@
+html
+  head
+    title Neurosynth API v2
+    - assets "swagger_css"
+      %link rel="stylesheet" href="{{ ASSET_URL }}"
+    - assets "swagger_js"
+      %script src="{{ ASSET_URL }}"
+    script type="text/javascript"
+      |window.swaggerUi = new SwaggerUi({
+        url:"/api/v2/swagger.json",
+        dom_id:"swagger-ui-container"
+      });
+      window.swaggerUi.load();
+  body.swagger-section
+    / #header
+    /   .swagger-ui-wrap
+    /     a#logo href="http://neurosynth.org" neurosynth.org
+    /     form#api_selector
+    /       .input
+    /         input placeholder="http://example.com/api" id="input_baseUrl" name="baseUrl" type="text"
+    /       .input
+    /         input placeholder="api_key" id="input_apiKey" name="apiKey" type="text"
+    /       .input
+    /         a#explore href="#" Explore
+    #message-bar.swagger-ui-wrap
+      |&nbsp;
+    %div#swagger-ui-container.swagger-ui-wrap

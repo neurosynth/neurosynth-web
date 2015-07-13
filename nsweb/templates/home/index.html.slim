@@ -3,48 +3,28 @@
 - block content
   - import "macros/_home_viewer.html.slim" as viewers
   .row#page-home
-    .col-md-9.col-md-offset-1
+    .col-md-10
       .huge-text neurosynth.org
 
       .lead Neurosynth is a platform for large-scale, automated synthesis of functional magnetic resonance imaging (fMRI) data.
 
       .lead It takes thousands of published articles reporting the results of fMRI studies, chews on them for a bit, and then spits out images that look like this:
   .row
-    .col-md-10.col-md-offset-1
+    .col-md-10
       script type="text/javascript"
         |var options = {"panzoomEnabled":false}
         var settings = ['no-zoom', 'nav']
-        var feature = '{{ feature.name }}'
-      p {{ viewers.viewer(feature) }}
-  %hr.top-space40
-  / .row
-  /   .col-md-10.col-md-offset-1
-  /     .row
-  /       .col-md-3
-  /         h3 Learn
-  /       .col-md-3
-  /         h3 Browse
-  /       .col-md-3
-  /         h3 Decode
-  / %hr.top-space40
+        var analysis = '{{ analysis.id }}'
+      p {{ viewers.viewer(analysis) }}
+      %hr.top-space40
+
   .row
-    .col-md-10.col-md-offset-1
+    .col-md-10
       h3 Database Status
       .current-status style="font-size: 18px;"
         p
           |{{ stats['n_peaks'] }} activations reported in <a href="/studies" class="big-link">{{ stats['n_studies'] }} studies</a>
         p 
-          | Interactive, downloadable meta-analyses of <a href="/features" class="big-link">{{ stats['n_features'] }} features</a>
+          | Interactive, downloadable meta-analyses of <a href="/analyses/terms" class="big-link">{{ stats['n_analyses'] }} terms</a>
         p
-          | Functional connectivity/coactivation maps for over <a href="/locations" class="big-link">150,000 brain locations</a>
-        / p
-        /   | {{ stats['n_decodings'] }} brain images <a href="/decode">decoded online</a>
-          
-        / .span2.offset1
-        /   a.twitter-timeline href="https://twitter.com/neurosynth" data-widget-id="335214024004349953"
-        /     |Tweets by @neurosynth
-        /   script type="text/javascript"
-        /     |!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
-  / .row
-  /   .col-md-12.top-space20
-  /     %img src="{{url_for('static', filename='images/nimh-logo.png')}}"
+          | Functional connectivity and coactivation maps for over <a href="/locations" class="big-link">150,000 brain locations</a>

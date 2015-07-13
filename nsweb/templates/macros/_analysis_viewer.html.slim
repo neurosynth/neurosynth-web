@@ -1,0 +1,73 @@
+- macro viewer()
+  .viewer#analysis-viewer
+
+    .viewer-left-col
+
+      #view-coronal.view
+        %canvas height="220" width="220"
+        %#nav-yaxis.slider.nav-slider-vertical
+
+      #view-axial.view
+        %canvas height="264" width="220"
+        %#nav-zaxis.slider.nav-slider-vertical
+
+    .viewer-middle-col
+
+      #view-sagittal.view
+        %canvas height="220" width="264"
+        %#nav-xaxis.slider.nav-slider-horizontal
+
+      .layer-data-panel
+
+        .coordinate-info
+          .coordinate-head
+            .intensity-info.data-row
+              %.intensity-label
+              %#data-current-value.data-value.intensity-value
+            .whats-here-box
+              button#load-location.btn.btn-success What's here?
+          .plane-pos-box
+            .plane-pos-label X:
+            input type="number" class="plane-pos" name="current-x" id="current-x" min="-90" max="90" value="0"
+          .plane-pos-box
+            .plane-pos-label Y:
+            input type="number" class="plane-pos" name="current-y" id="current-y" min="-72" max="108" value="0"
+          .plane-pos-box
+            .plane-pos-label Z:
+            input type="number" class="plane-pos" name="current-z" id="current-z" min="-106" max="90" value="0"
+
+
+        #description.data-row
+          h5 Description
+          %#image-description
+
+
+    .viewer-right-col
+
+      #layer-panel
+        span Layers
+        #layer-list-panel
+          %#layer_visible_list
+          %ul#layer-list.layer-settings
+
+        #layer-settings-panel
+          .layer-container-half-width
+            span Color palette:
+            %select#select-color.layer-settings.form-control
+            span Positive/Negative:
+            %select#select-sign.layer-settings.form-control
+          %#checkbox-list
+          .layer-container-full-width
+            %.top-space20
+            .layer-settings-row
+              .row-label Thresholds:
+              input#neg-threshold-text.slider-text
+              %#neg-threshold.slider.layer-settings.layer-settings-slider
+              %#threshold-zero -/+
+              %#pos-threshold.slider.layer-settings.layer-settings-slider
+              input#pos-threshold-text.slider-text
+            .layer-settings-row
+              .row-label Opacity:
+              input#opacity-text.slider-text
+              %#opacity.slider.layer-settings.layer-settings-slider
+

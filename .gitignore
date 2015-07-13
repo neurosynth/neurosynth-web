@@ -55,15 +55,27 @@ docs/_build/
 
 # Data
 #data/
-deploy/
+deploy/deploy-dev.ini
+deploy/deploy.ini
 
-# Config, cache, assets, and other stuff we don't need to share
+# Config, cache, compiled assets, etc.
 nsweb/initializers/settings.py
-#nsweb/static/js/coffee.js
+nsweb/static/js/coffee.js
 nsweb/static/.webassets-cache/
-#nsweb/static/js/main.min.js
-#nsweb/static/css/main.min.css
-#nsweb/static/css/main.css
+nsweb/static/js/main.min.js
+nsweb/static/css/main.min.css
+nsweb/static/css/main.css
+
+# migrations
+# migrations/versions/*.py
 
 TODO.txt
 running.txt
+
+.idea
+*.ipynb
+.ipynb_checkpoints
+
+log.txt
+.dropbox
+Icon*

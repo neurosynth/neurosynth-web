@@ -4,8 +4,11 @@
   - import "macros/_decode_viewer.html.slim" as viewers
   - import "macros/_scatterplot.html.slim" as scatterplot
   .row#page-decode-show
-    .col-md-offset-1
-      h2 Decoding results
+    .col-md-12
+      h2
+        span Decoding results
+        - if decoding.neurovault_id
+          | for image <a href="http://neurovault.org/images/{{decoding.neurovault_id}}">{{decoding.name}}</a>
       .decode-viewer style="width: 580px; float: left;"
         ul#decode-menu.nav.nav-pills
           li.active
@@ -20,7 +23,7 @@
               |var options = {"panzoomEnabled":false};
               var settings = ['no-zoom', 'layers','nav','checkboxes'];
               var images = {{images}};
-              var image_id = '{{ decoding.uuid }}';
+              var image_id = '{{image_id}}';
             p {{viewers.viewer()|safe}}
           #scatter.tab-pane
             #loading-message Loading image...
@@ -32,12 +35,12 @@
           / #info.tab-pane
           /   h4 About this image
             
-      .feature-list style="width: 200px; margin-left: 20px; margin-top: 50px;"
-        h4 Feature loadings
-        p To compare the decoded image against a term, click on an arrow below.
+      .analysis-list style="width: 200px; margin-left: 20px; margin-top: 50px;"
+        h4 Term similarity
+        p To compare the decoded image against a Neurosynth term, click on an arrow below.
         table#decoding_results_table.table.table-striped.table-hover.table-condensed
           thead
             tr
               %th
-              th feature
+              th analysis
               th corr.

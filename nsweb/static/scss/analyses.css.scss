@@ -1,0 +1,144 @@
+// Place all the styles related to the analyses controller here.
+// They will automatically be included in application.css.
+// You can use Sass (SCSS) here: http://sass-lang.com/
+#analysis-viewer {
+	float: left;
+	// min-height: 800px;
+}
+
+.analysis_search {
+	margin-top: 20px;
+
+	input {
+		width: 300px;
+	}
+}
+
+#analysis-image-selector {
+	width: 300px;
+	margin: 20px 15px 0px 0px;
+	float: right;
+
+	select {
+		width: 260px;
+	}
+}
+
+.plane-pos-box {
+	width: 87px;
+	float: left;
+	text-align: center;
+	vertical-align: middle;
+	margin-right: 1px;
+}
+
+.plane-pos-label {
+	float: left;	
+	vertical-align: middle;
+	font-size: 14px;
+	padding-top: 10px;
+	line-height: 1.2em;
+}
+
+.coordinate-info {
+	width: 264px;
+	float: left;
+	margin-bottom: 10px;
+
+	input {
+		width: 60px;
+		font-size: 20px;
+		font-weight: bold;
+		line-height: 1.2em;
+		margin: 0px 0px 3px 0px;
+		text-align: center;
+		vertical-align: middle;
+		border-radius: 5px;
+	}
+
+	input[type=number]::-webkit-inner-spin-button, 
+	input[type=number]::-webkit-outer-spin-button { 
+	  -webkit-appearance: none; 
+	  margin: 0; 
+	}
+}
+
+.coordinate-head {
+	height: 52px;
+	width: 100%;
+	float: left;
+}
+
+.coordinate-title {
+	float: left;
+	width: 120px;
+	font-size: 20px;
+	margin-top: 5px;
+	line-height: 1.2em;
+}
+
+.layer-data-panel {
+	width: 100%;
+}
+
+.intensity-info {
+	width: 160px;
+	padding-top: 5px;
+	float: left;
+}
+
+.intensity-label {
+	font-size: 16px;
+	width: 70px;
+	float: left;
+	padding-top: 2px;
+}
+
+.intensity-value {
+	font-size: 22px;
+	width: 60px;
+	float: left;
+}
+
+.whats-here-box {
+	// width: 80px;
+	float: right;
+	// padding: 5px;
+	// font-size: 20px;
+}
+
+#load-location {
+	// white-space: normal;
+	// width: 80px;
+}
+
+.analysis-search {
+	padding-top: 30px;
+	float: right
+}
+
+ul.dropdown-menu {
+	background-color: #999;
+	li {
+		font-size: 1.2em;
+	}
+
+}
+
+.resource-head {
+	width: 100%;
+	float: left;
+	margin-top: 30px;
+}
+
+.resource-desc {
+	float: left;
+	.left {
+		float: left;
+		width: 70%;
+	}
+	.right {
+		padding-top: 20px;
+		float: left;
+	}
+}

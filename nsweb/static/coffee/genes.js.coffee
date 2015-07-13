@@ -1,37 +1,37 @@
 
 $(document).ready ->
 
-  # return if not $('#page-genes').length
+  return if not $('#page-genes-list').length
 
-  # # Load the table layers
-  # gene = document.URL.split('/').slice(-2)[0]
-  # loadImages()
+  # Initialize DataTables
+  createDataTable('#gene-list-table', {ajax: '/api/v2/dt/genes', serverSide: true})
+  columns = [
+    { width: '20%' }
+    { width: '40%' }
+    { width: '20%' }
+    { width: '20%' }
+  ]
 
-  # $('#decoding_results_table').DataTable().ajax.url('/genes/' + gene + '/decode').load()
+  # autocomplete
+  $.get('/analyses/gene_names', (result) ->
 
-  # $('#decoding_results_table').on('click', 'i', (e) =>
-  #   row = $(e.target).closest('tr')
-  #   feature = $('td:eq(1)', row).text()
-  #   load_reverse_inference_image(feature)
-  #   # Load scatterplot
-  #   $('.scatterplot').html('<img src="/genes/' + gene + '/scatter/' + feature + '.png" width="550">')
-  # )
-
-  # $(viewer).on('afterClick', (e) =>
-  #   xyz = viewer.coords_xyz()
-  #   $('#x-in').val(xyz[0])
-  #   $('#y-in').val(xyz[1])
-  #   $('#z-in').val(xyz[2])
-  # )
-
-  # $(viewer).trigger('afterClick')
-
-  # # $('.plane-pos').keypress((e) ->
-  # #     update() if(e.which == 13)
-  # # )
-
-  # $('.plane-pos').change( (e) =>
-  #   coords = [$('#x-in').val(), $('#y-in').val(), $('#z-in').val()]
-  #   viewer.moveToAtlasCoords(parseInt(i) for i in coords)
-  #   $(viewer).trigger('afterClick')  # To get values rounded to nearest voxel with data
-  # )
+    $('#gene-search').autocomplete( 
+      minLength: 2
+      delay: 0
+      select: (e, ui) -> 
+        window.location.href = '/genes/' + ui.item.value
+      # only match words that start with string, and limit to 10
+      source: (request, response) ->
+        re = $.ui.autocomplete.escapeRegex(request.term)
+        matcher = new RegExp('^' + re, "i" )
+        filtered = $.grep(result.data, (item, index) ->
+          return matcher.test(item)
+        )
+        response(filtered.slice(0, 10))
+    )
+  )
+    
+  $('#gene-search').keyup((e) ->
+    text = $('#gene-search').val()
+    window.location.href = ('/genes/' + text) if (e.keyCode == 13)
+  )

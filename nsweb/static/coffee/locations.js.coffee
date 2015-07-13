@@ -12,68 +12,73 @@ $(document).ready ->
 
   return if not $('#page-location').length
 
-  getLocationString = () ->
+  getLocationString = ->
     coords = [$('#x-in').val(), $('#y-in').val(), $('#z-in').val(), $('#rad-out').val()]
     coords[3] = 20 if coords[3] > 20
     coords.join('_')
 
-  loadLocationStudies = () ->
+  loadLocationStudies = ->
     url = '/locations/' + getLocationString() + '/studies?dt=1'
     $('#location_studies_table').DataTable().ajax.url(url).load().order([3, 'desc'])
 
-  loadLocationImages = () ->
+  loadLocationImages = ->
     url = '/locations/' + getLocationString()  + '/images'
     $.get(url, (result) ->
       window.loadImages(result.data)
+      loadLocationSimilarity(result.data[0].id)
       )
 
-  loadLocationFeatures = () ->
-    url = '/locations/' + getLocationString() + '/features'
-    $('#location_features_table').DataTable().ajax.url(url).load().order([1, 'desc'])
+  loadLocationComparisons = ->
+    url = '/locations/' + getLocationString() + '/compare'
+    $('#location_analyses_table').DataTable().ajax.url(url).load().order([1, 'desc'])
 
+  loadLocationSimilarity = (id) ->
+    url = '/images/' + id + '/decode'
+    $('#analysis-similarity-table').DataTable().ajax.url(url).load().order([1, 'desc'])
     #TODO: IMPLEMENT MOVE CURSOR TO SEED
 
   update = ->
     loadLocationStudies()
     loadLocationImages()
-    loadLocationFeatures()
+    loadLocationComparisons()
     base = window.location.href.split('?')[0]
     coords = { x: $('#x-in').val(), y: $('#y-in').val(), z: $('#z-in').val(), r: $('#rad-out').val()}
     xyz = [coords.x, coords.y, coords.z]
     study_info = 'Studies reporting activation within ' + coords.r + ' mm of (' + xyz.join(', ') + ')'
     $('#current-location-studies') .text(study_info)
-    map_info = 'Functional connectivity and coactivation maps for (' + xyz.join(', ') + ')'
-    $('#current-location-maps').html(map_info)
     
     # TODO: IMPLEMENT ONPOPSTATE  
     # window.history.pushState(null, null, base + '?' + $.param(coords))
 
   moveTo = ->
     base = window.location.href.split('?')[0]
-    coords = { x: $('#x-in').val(), y: $('#y-in').val(), z: $('#z-in').val(), r: $('#rad-out').val()}
-    url = base + '?' + $.param(coords)
+    coords = [$('#x-in').val(), $('#y-in').val(), $('#z-in').val(), $('#rad-out').val()]
+    url = '/locations/' + coords.join('_')
     window.location.href = url
   
-  $('#location_studies_table').dataTable({
-    paginationType: "full_numbers"
-    displayLength: 10
-    processing: true
-    autoWidth: true
-    # orderClasses: false
-  })
+  createDataTable('#location_studies_table', {
+      pageLength: 10
+      columns: [
+        { width: '40%' }
+        { width: '38%' }
+        { width: '15%' }
+        { width: '7%' }
+      ]})
 
-  $('#location_features_table').dataTable({
-    paginationType: "full_numbers"
-    displayLength: 10
-    processing: true
-    autoWidth: true
-    # orderClasses: false
-    columnDefs: [{
-      targets: 0
-      render: (data, type, row, meta) ->
-        '<a href="/features/'+ data + '">' + data + '</a>'
-    }]
-  })
+  createDataTable('#location_analyses_table', {
+    pageLength: 10
+    autoWidth: false
+    columns: [
+      {
+        width: '28%'
+        render: (data, type, row, meta) ->
+          '<a href="/analyses/terms/'+ data + '">' + data + '</a>'
+      }
+      { width: '18%' }
+      { width: '18%' }
+      { width: '18%' }
+      { width: '18%' }
+    ]})
 
   # Load state (e.g., which tab to display)
   activeTab = window.cookie.get('locationTab')

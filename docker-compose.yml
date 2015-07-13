@@ -1,0 +1,10 @@
+web:
+    build: .
+    ports:
+        - "5001:5001"
+    volumes:
+        - .:/code
+        - /CHANGEME:/data
+    environment:
+        - INSTANCE_TYPE=web-server
+    command: /code/scripts/docker_startup.sh

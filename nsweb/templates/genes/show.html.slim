@@ -1,11 +1,13 @@
-- set page_title = 'Neurosynth Gene Atlas -- ' + gene
+- set page_title = 'Neurosynth Gene Atlas -- ' + gene.symbol
 - extends "layout/base.html"
 - block content
   - import "macros/_decode_viewer.html.slim" as viewers
   - import "macros/_scatterplot.html.slim" as scatterplot
   .row#page-genes-show
-    .col-md-offset-1
-      h2 {{gene }} gene expression
+    .col-md-10
+      h2 {{gene.symbol}} gene expression
+      .lead
+        |Brain-wide gene expression levels for the gene {{gene.symbol}} ({{gene.name}}), as made available in the <a href="http://human.brain-map.org/">Allen Human Brain Atlas</a>. Detailed information is available from the <a href="http://human.brain-map.org/microarray/search/show?exact_match=false&search_term={{gene.symbol}}&search_type=gene">Allen Brain Atlas data portal</a>.
       .decode-viewer style="width: 580px; float: left;"
         ul#decode-menu.nav.nav-pills
           li.active
@@ -20,7 +22,7 @@
               |var options = {"panzoomEnabled":false};
               var settings = ['no-zoom', 'layers','nav','checkboxes'];
               var images = {{images}};
-              var image_id = '{{ gene }}';
+              var image_id = '{{image_id}}';
             p {{viewers.viewer()|safe}}
           #scatter.tab-pane
             #loading-message Loading image...
@@ -32,14 +34,14 @@
           / #info.tab-pane
           /   h4 About this image
             
-      .feature-list style="width: 200px; margin-left: 20px; margin-top: 50px;"
-        h4 Feature loadings
-        p To compare the {{gene}} map against a term, click on an arrow below.
+      .analysis-list style="width: 200px; margin-left: 20px; margin-top: 50px;"
+        h4 Term similarity
+        p To compare the {{gene.symbol}} map against a Neurosynth term, click on an arrow below.
         table#decoding_results_table.table.table-striped.table-hover.table-condensed
           thead
             tr
               %th
-              th feature
+              th analysis
               th corr.
 
 
@@ -101,10 +103,10 @@
 /       .row
 /         %.col-md-12.scatterplot
 /     .col-md-2
-/       %h3 Top features
+/       %h3 Top analyses
 /       table#decoding_results_table.table.table-striped.table-hover.table-condensed
 /         thead
 /           tr
 /             %th
-/             th feature
+/             th analysis
 /             th correlation

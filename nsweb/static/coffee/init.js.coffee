@@ -3,7 +3,7 @@ class NSCookie
     constructor: (@contents = null) ->
         @contents ?= {
             locationTab: 0
-            featureTab: 0
+            analysisTab: 0
         }
         @save()
 
@@ -24,17 +24,61 @@ class NSCookie
         else
             new NSCookie(JSON.parse($.cookie('neurosynth')))
 
+
+### DATATABLES-RELATED CODE ###
+
+# tabletools defaults for CSV/XLS export
+$.fn.dataTable.TableTools.defaults.aButtons = [
+    {
+      sExtends: 'copy'
+      sButtonText: 'Copy'
+      oSelectorOpts: filter: 'applied'
+    },
+    {
+      sExtends: 'csv'
+      sButtonText: 'CSV'
+      oSelectorOpts: filter: 'applied'
+    },
+    {
+      sExtends: 'xls'
+      sButtonText: 'XLS'
+      oSelectorOpts: filter: 'applied'
+    }
+  ]
+
+# Throw JS errors instead of triggering alerts
+$.fn.dataTableExt.sErrMode = 'throw'
+
+createDataTable = (element, options) ->
+
+  # Set defaults and overwrite with the passed object
+  _opts = {
+    pagingType: "full_numbers"
+    pageLength: 25
+    stateSave: true
+    orderClasses: true
+    processing: true
+    dom: 'T<"clear">lfrtip'
+    tableTools: { sSwfPath: "/static/swf/copy_csv_xls.swf" } 
+    filterDelay: true
+  }
+  $.extend(_opts, options)
+  tbl = $(element).dataTable(_opts)
+  tbl.fnSetFilteringDelay(iDelay=400) if _opts.filterDelay
+  tbl
+
+
 ### METHODS USED ON MORE THAN ONE PAGE ###
 urlToParams = () ->
     search = window.location.search.substring(1);
     JSON.parse "{\"" + decodeURI(search).replace(/"/g, "\"").replace(/&/g, "\",\"").replace(RegExp("=", "g"), "\":\"") + "\"}"
 window.urlToParams = urlToParams
 
-load_reverse_inference_image = (feature, fdr=false) ->
-  url = '/features/' + feature + '/images/reverseinference'
-  url += '?nofdr' if not fdr
+loadReverseInferenceImage = (analysis, fdr=false) ->
+  url = '/analyses/' + analysis + '/images/reverse'
+  url += '?unthresholded' if not fdr
   [{
-    name: feature + ' (reverse inference)'
+    name: analysis + ' (reverse inference)'
     url: url
     colorPalette: 'yellow'
     download: true
@@ -47,12 +91,10 @@ $(document).ready ->
 
   # Decoding results for pages that use it
   if $('#page-decode-show, #page-genes-show').length
-
-    console.log("Doing this...")
     
-    tbl = $('#decoding_results_table').dataTable
-      paginationType: "simple"
-      displayLength: 10
+    createDataTable('#decoding_results_table', {
+      pagingType: "simple"
+      pageLength: 10
       processing: true
       stateSave: false
       orderClasses: false
@@ -65,9 +107,9 @@ $(document).ready ->
           width: '20%'
         },
         { 
-          data: "feature"
+          data: "analysis"
           render: (data, type, row, meta) ->
-            '<a href="/features/'+ data + '">' + data + '</a>'
+            '<a href="/analyses/terms/'+ data + '">' + data + '</a>'
           width: '%60%'
         }, 
         {
@@ -75,4 +117,5 @@ $(document).ready ->
           width: '20%'
           },
         ]
+      })
 

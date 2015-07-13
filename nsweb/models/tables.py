@@ -1,4 +1,5 @@
-from nsweb.models import *
+from nsweb.core import db
+from sqlalchemy.ext.associationproxy import association_proxy
 
 class Table(db.Model):
 
@@ -9,4 +10,4 @@ class Table(db.Model):
     journal = db.Column(db.String(200))
     study = db.relationship('Study', backref=db.backref('tables'))
     peaks = db.relationship('Peak', backref=db.backref('table', lazy='joined'), lazy='dynamic')
-    features = association_proxy('frequencies', 'feature')
+    analyses = association_proxy('frequencies', 'analyses')

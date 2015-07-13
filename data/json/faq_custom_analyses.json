@@ -1,0 +1,53 @@
+{
+  "sections": [
+    {
+      "name": "",
+      "questions": [
+        {
+          "q": "What is a custom analysis?",
+          "a": "A custom analysis is a Neurosynth meta-analysis conducted on a set of studies manually selected by a user. By contrast, most analyses in Neurosynth are precomputed automatically using some simple criterion to determine which studies are included. For example, each of the term-based meta-analyses includes all and only those studies that use a given term with high frequency. This automated approach allows us to pre-populate the site with thousands of meta-analyses that are likely to be of interest to various users. However, we also recognize that many users will want the flexiblity to exclude or include studies from an analysis. The custom analysis interface provides you with the ability to do this."
+        },
+        {
+          "q": "Why do I have to log in in order to create custom meta-analyses?",
+          "a": "So that you're able to manage, edit, and delete your custom analyses, and so that we can attribute results to their creators appropriately if you choose to make your analyses public (see below)."
+        },
+        {
+          "q": "Is there any limit to the number of analyses I can create?",
+          "a": "No. While we reserve the right to impose usage limits if the computational demands associated with the custom meta-analysis functionality increase prohibitively, at the moment there are no limits, and you're free to create and run as many custom analyses as you like. We do ask that you be mindful that Neurosynth is a free communal resource, and expect that you won't, say, try to run a hundred large custom analyses simultaneously."
+        },
+        {
+          "q": "How do I use the interface?",
+          "a": "We think the interface is relatively intuitive, and we would encourage you to experiment with it. In general, the interface is split into two tabs: Selected studies and All studies. Selected studies displays all the studies currently included in your meta-analysis, and allows you to remove them one at a time if desired. All studies provides an interface for rapidly selecting or adding subsets of studies from the entire database. Probably the quickest way to add studies is to search for specific strings (e.g., an author name, a keyword, etc.) and then click on 'all filtered studies' to add only those studies that meet the desired criteria to your analysis.<br /><br />Note that you can also modify the studies in a custom analysis from other pages on the Neurosynth site. For example, suppose you want to do a custom meta-analysis on all studies that activate within 6 mm of either the location (-20, 14, 20) or the location (20, 14, 20). You can do this by navigating to the location page for each coordinate, clicking on the 'studies' tab, and then clicking 'select all studies on this page'. If you navigate back to the custom meta-analysis interface,  you will see that the last analysis you loaded (i.e., the currently active analysis) now contains all the studies in the lists on the location pages. You can do the same thing for any study table anywhere on the Neurosynth site, allowing you to easily construct a custom analysis via different search interfaces."
+        },
+        {
+          "q": "What do you I do when I'm done selecting studies, and want to run the analysis and see the results?",
+          "a": "Just press the 'Run' button! It will probably take a few seconds (but typically well under a minute) to run the analysis itself, and you will then be automatically redirected to the viewing page, which has the same interface as the rest of the Neurosynth site."
+        },
+        {
+          "q": "The database is missing some studies I want to include in my meta-analysis. Can I add them manually?",
+          "a": "Unfortunately, at the moment, it's not possible to add new studies, or to edit existing ones. We recognize that this is an important limitation and are actively working to address this in a future release. Rest assured that our long-term goal is to allow you to add, edit, delete, and annotate any studies you like using the web interface. But for now, you can only add or delete existing studies."
+        },
+        {
+          "q": "Can I edit or validate studies manually before I run an analysis?",
+          "a": "As noted in the previous answer, there is currently no support for study editing. We realize this is a major limitation, and adding this kind of functionality in a future release is one of our highest priorities."
+        },
+        {
+          "q": "Can other people see the results of my custom meta-analysis?",
+          "a": "Yes and no. When a new custom analysis is created, it is assigned a very long unique identifier. There is no way to guess this ID, so it would be impossible for a random user to stumble onto your analysis. Moreover, there is no listing of all custom analyses, so users cannot randomly browse through analyses until they find yours. That said, if you share the URL for your custom analysis with others, they will be able to view the analysis. In the future, we may introduce additional permissions that will enable you to explicitly mark your meta-analyses as public or private, and perhaps to grant access to other specific users in the system. For now, if you don't want others to see your analysis, we recommend that you don't share the analysis ID with anyone (though, in the spirit of open science, we would hope that you <em>want</em> other people to see your creation!)."
+        },
+        {
+          "q": "Can other people edit my custom analysis?",
+          "a": "No. Once you've created a custom analysis, only you can modify the original analysis. However, other users can create a copy of your analysis and edit that. This means that someone else can easily explore the effects of adding or removing studies from the set you created, but they cannot in any way modify the analysis you created, or the resulting images."
+        },
+        {
+          "q": "Can I share my analysis with others? How about including it in a paper?",
+          "a": "Absolutely! You can share your results with anyone you like. Every analysis has a unique and permanent URL. You're welcome to include a link in manuscripts, or reference it anywhere else you like. Do remember that, at the moment, there is no ability to make analyses private (though you can delete them entirely). So once you share a link to an analysis, anyone who visits that URL will be able to view your analysis and download the resulting images."
+        },
+        {
+          "q": "I have a question you haven't answered here!",
+          "a": "The best place to ask questions is on the <a href='https://groups.google.com/d/forum/neurosynthlist'>Neurosynth Google Groups list</a>. If you're pretty sure you've discovered a bug, or have a specific feature request, you can also open a new issue in the <a href='http://github.com/neurosynth/neurosynth-web'>Neurosynth.org GitHub repository</a>."
+        }
+      ]
+    }
+  ]
+}

@@ -3,47 +3,28 @@
 # You can use CoffeeScript in this file: http://jashkenas.github.com/coffee-script/
 $(document).ready ->
 
-  return if not $('#page-study').length
-
   # Load the table layers
-  study = document.URL.split('/').slice(-2)[0]
-  url = '/studies/' + study  + '/tables'
-  $.get(url, (result) -> window.loadImages(result.data))
+  if study?
+    url = '/studies/' + study  + '/tables'
+    $.get(url, (result) -> window.loadImages(result.data))
 
-  tbl=$('#studies_table').dataTable
-    # "sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
-    paginationType: "full_numbers"
-    displayLength: 10
-    processing: true
-    serverSide: true
-    ajaxSource: '/api/studies/'
-    deferRender: true
-    stateSave: true
-    orderClasses: false
-  tbl.fnSetFilteringDelay(iDelay=400)
+  createDataTable('#studies_table', { ajax: '/api/studies/', serverSide: true })
 
   url_id=document.URL.split('/')
   url_id=url_id[url_id.length-2]
-  
-  $('#study_features_table').dataTable
-    paginationType: "full_numbers"
-    displayLength: 10
-    processing: true
-    ajaxSource: '/api/studies/features/'+url_id+'/'
-    deferRender: true
-    stateSave: true
-    order: [[1, 'desc']]
-    orderClasses: false
 
-  $('#study_peaks_table').dataTable
-    paginationType: "full_numbers"
-    displayLength: 10
-    processing: true
-    ajaxSource: '/api/studies/peaks/'+url_id+'/'
-    deferRender: true
-    stateSave: true
+  createDataTable('#study_analyses_table', {
+    pageLength: 10
+    ajax: '/api/studies/analyses/'+url_id+'/'
+    order: [[1, 'desc']]
+      })
+
+  createDataTable('#study_peaks_table', {
+    pageLength: 10
+    ajax: '/api/studies/peaks/'+url_id+'/'
     order: [[0, 'asc'], [2, 'asc']]
-    orderClasses: false
+      })
+
 
   $('#study_peaks_table').on('click', 'tr', (e) =>
     row = $(e.target).closest('tr')[0]
@@ -51,5 +32,7 @@ $(document).ready ->
     data = (parseInt(i) for i in data[1..])
     viewer.moveToAtlasCoords(data)
   )
+
+
 
   # window.loadImages() if viewer?
