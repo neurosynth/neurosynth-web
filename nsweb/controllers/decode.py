@@ -210,7 +210,7 @@ def get_data(uuid):
     data = open(join(settings.DECODING_RESULTS_DIR,
                      dec.uuid + '.txt')).read().splitlines()
     data = [x.split('\t') for x in data]
-    data = [{'analysis': f, 'r': round(float(v), 3)} for (f, v) in data]
+    data = [{'analysis': f, 'r': round(float(v), 3)} for (f, v) in data if v.strip()]
     return jsonify(data=data)
 
 
