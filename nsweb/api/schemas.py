@@ -61,7 +61,7 @@ class DecodingSchema(mm.Schema):
         data = open(join(settings.DECODING_RESULTS_DIR,
                          dec.uuid + '.txt')).read().splitlines()
         data = [x.split('\t') for x in data]
-        return dict([(f, round(float(v), 3)) for (f, v) in data])
+        return dict([(f, round(float(v), 3)) for (f, v) in data if v.strip()])
 
     image = mm.Nested('ImageSchema', allow_null=True)
     reference = mm.Function(lambda obj: obj.decoding_set.name)
