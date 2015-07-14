@@ -188,7 +188,8 @@ class DatabaseBuilder:
         if image_dir is None:
             image_dir = join(settings.IMAGE_DIR, 'analyses')
 
-        # Image class depends on Analysis class
+        # Image class depends on Analysis class. TopicAnalysis objects have
+        # a terms field that cross-links to top-loading terms.
         if hasattr(analysis, 'terms'):
             image_class = TopicAnalysisImage
         else:
@@ -425,6 +426,8 @@ class DatabaseBuilder:
             for t in TopicAnalysis.query.all():
                 self.db.session.delete(t)
 
+        self.db.session.commit()
+
         topic_sets = glob(join(settings.TOPIC_DIR, '*.json'))
 
         # Temporarily store the existing AnalysisTable so we don't overwrite it
@@ -439,10 +442,9 @@ class DatabaseBuilder:
             data = json.load(open(ts))
             n = int(data['n_topics'])
 
-            ts = AnalysisSet(name=data['name'],
-                             description=data['description'], n_analyses=n,
-                             type='topics')
-            self.db.session.add(ts)
+            topic_set_image_dir = join(topic_image_dir, data['name'])
+            if not exists(topic_set_image_dir):
+                os.makedirs(topic_set_image_dir)
 
             self.dataset.add_features(
                 join(settings.TOPIC_DIR, 'analyses',
@@ -450,33 +452,37 @@ class DatabaseBuilder:
             key_data = open(join(settings.TOPIC_DIR, 'keys', data['name'] +
                                  '.txt')).read().splitlines()
 
-            topic_set_image_dir = join(topic_image_dir, data['name'])
-            if not exists(topic_set_image_dir):
-                os.makedirs(topic_set_image_dir)
-
             # Generate full set of topic images
             if generate_images:
                 meta.analyze_features(
                     self.dataset, self.dataset.get_feature_names(),
                     output_dir=topic_set_image_dir, threshold=0.05, q=0.01,
-                    prefix=ts.name)
+                    prefix=data['name'])
+
+            ts = AnalysisSet(name=data['name'],
+                             description=data['description'], n_analyses=n,
+                             type='topics')
+            self.db.session.add(ts)
 
             feature_data = self.dataset.feature_table.data
-            feature_names = dataset.get_feature_names()
+            feature_names = self.dataset.get_feature_names()
 
-            for i in range(n):
+            for i, fn in enumerate(feature_names):
+
+                number = int(fn.split('_')[0])
+                name = '%s_%s' % (ts.name, fn)
 
                 # Disable autoflush temporarily because it causes problems
                 with self.db.session.no_autoflush:
-                    terms = ', '.join(key_data.pop(0).split()[2:][:top_n])
-                    name = ts.name + '_' + feature_names[i]
-                    topic = TopicAnalysis(name=name, terms=terms, number=i)
+                    terms = ', '.join(key_data[number].split()[2:][:top_n])
+                    # Topics are not always in natsort order; get correct number
+                    topic = TopicAnalysis(name=name, terms=terms, number=number)
 
                     self.db.session.add(topic)
                     self.db.session.commit()
 
                     # Map onto studies
-                    freqs = feature_data['topic%d' % i]
+                    freqs = feature_data[fn]
                     above_thresh = freqs[freqs >= 0.05]
                     srsly = 0
                     for s_id, f in above_thresh.iteritems():
@@ -541,7 +547,7 @@ class DatabaseBuilder:
 
         # Get mask
         masker = Masker(join(settings.IMAGE_DIR, 'anatomical.nii.gz'))
-        mask_voxels = np.sum(masker.get_current_mask())
+        mask_voxels = np.sum(masker.current_mask)
 
         def save_memmap(name, analysis_set, images, labels, voxels=None):
 
@@ -570,7 +576,6 @@ class DatabaseBuilder:
             # Initialize memmap
             n_images = len(images)
             mm_file = join(mm_dir, '%s_images.dat' % name)
-            print len(sampled_vox), n_images, mm_file
             mm = np.memmap(mm_file, dtype='float32', mode='w+',
                            shape=(len(sampled_vox), n_images))
 
@@ -639,7 +644,7 @@ class DatabaseBuilder:
             print "\tCreating memmap of topic image data..."
 
             analysis_set = AnalysisSet.query \
-                .filter_by(name='v3-topics-200').first()
+                .filter_by(name='v4-topics-200').first()
 
             # Get all images and save labels
             images = [a.images[1].image_file for a in analysis_set.analyses]
@@ -663,7 +668,7 @@ class DatabaseBuilder:
             # Get all images and save labels
             genes = Gene.query.all()
             images = [g.images[0].image_file for g in genes]
-            labels = [g.name for g in genes]
+            labels = [g.symbol for g in genes]
 
             # save only voxels where there were originally microarrays
             sample_img = join(settings.IMAGE_DIR, 'sample_locations.nii.gz')
