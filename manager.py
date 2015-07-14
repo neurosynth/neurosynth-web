@@ -23,5 +23,13 @@ def list_routes():
     for line in sorted(output):
         print(line)
 
+@manager.command
+def reset_locations():
+    from nsweb.models.locations import Location
+    for l in Location.query.all():
+        db.session.delete(l)
+    # db.session.query(Location).delete()
+    db.session.commit()
+
 if __name__ == '__main__':
     manager.run()
