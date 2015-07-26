@@ -21,6 +21,7 @@ from glob import glob
 import json
 import re
 import shutil
+import urllib
 
 
 class DatabaseBuilder:
@@ -86,17 +87,31 @@ class DatabaseBuilder:
             settings.IMAGE_DIR,
             join(settings.IMAGE_DIR, 'analyses'),
             join(settings.IMAGE_DIR, 'coactivation'),
+            join(settings.IMAGE_DIR, 'custom'),
             settings.DECODING_RESULTS_DIR,
             settings.DECODING_SCATTERPLOTS_DIR,
             settings.DECODED_IMAGE_DIR,
             settings.MASK_DIR,
             settings.TOPIC_DIR,
-            settings.GENE_IMAGE_DIR,
             settings.MEMMAP_DIR
         ]
         for d in check_dirs:
             if not exists(d):
                 os.makedirs(d)
+
+        # Retrieve remote assets
+        def retrieve_file(url, filename):
+            try:
+                if not exists(filename) or settings.RESET_ASSETS:
+                    urllib.urlretrieve(url, filename)
+            except:
+                raise ValueError("Could not save remote URL %s to local path %s. ")
+
+        for u, f in {
+            'ftp://ftp.ebi.ac.uk/pub/databases/genenames/hgnc_complete_set.txt.gz':
+            join(settings.ASSET_DIR, 'hgnc_complete_set.txt.gz')
+        }.items():
+            retrieve_file(u, f)
 
         # Copy anatomical image
         anat = join(settings.ROOT_DIR, 'data', 'images', 'anatomical.nii.gz')
@@ -104,6 +119,36 @@ class DatabaseBuilder:
 
         if download:
             ns.dataset.download(path=settings.ASSET_DIR, unpack=True)
+
+        # Raise warnings for missing resources we can't retrieve from web
+        assets = [
+            (join(settings.ASSET_DIR, 'misc'), "The misc directory contains "
+                "various support files--e.g., stopword lists for topic "
+                "modeling."),
+            (join(settings.ASSET_DIR, 'abstracts.txt'), "This file is required "
+                "for topic modeling of article abstracts. Without it, the "
+                "topic-based analyses will not appear on the website."),
+            (settings.GENE_IMAGE_DIR, "This directory contains all gene images "
+                "from the Allen Institute for Brain Science's gene expression "
+                "database. Without it, the /genes functionality will not work."),
+            (join(settings.IMAGE_DIR, 'fcmri'), "This directory contains 300 "
+                "GB of functional connectivity images from the Brain "
+                "SuperStruct project, provided courtesy of Thomas Yeo and "
+                "Randy Buckner. These images must be obtained directly. "
+                "Without them, no functional connectivity images will be "
+                "displayed on the website.")
+        ]
+        for (asset, desc) in assets:
+            if not exists(asset):
+                raise RuntimeWarning("Asset %s doesn't seem to exist, and "
+                    "can't be retrieved automatically. %s" % (asset, desc))
+
+        from nsweb.tasks import MASK_FILES
+        for k, v in MASK_FILES.items():
+            if not exists(join(settings.MASK_DIR, v)):
+                raise RuntimeWarning("The image file for the '%s' mask "
+                    "cannot be found at %s. This mask will be gracefully "
+                    "ignored in all decoder scatterplots.")
 
     def reset_database(self):
         ''' Drop and re-create all tables. '''
