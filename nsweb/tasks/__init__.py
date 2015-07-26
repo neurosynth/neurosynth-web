@@ -20,6 +20,15 @@ import re
 import json
 from collections import OrderedDict
 
+MASK_FILES = {
+    'cortex': 'cortex.nii.gz',
+    'subcortex': 'subcortex_drewUpdated.nii.gz',
+    'hippocampus': 'FSL_BHipp_thr0.nii.gz',
+    'accumbens': 'FSL_BNAcc_thr0.nii.gz',
+    'amygdala': 'FSL_BAmyg_thr0.nii.gz',
+    'putamen': 'FSL_BPut_thr0.nii.gz',
+    'min4': 'voxel_counts_r6.nii.gz'
+}
 
 def load_image(masker, filename, save_resampled=True):
     """ Load an image, resampling into MNI space if needed. """
@@ -93,16 +102,12 @@ class NeurosynthTask(Task):
     @cached_property
     def masks(self):
         """ Return a dict of predefined region masks. """
-        maps = {
-            'cortex': join(settings.MASK_DIR, 'cortex.nii.gz'),
-            'subcortex': join(settings.MASK_DIR,
-                              'subcortex_drewUpdated.nii.gz'),
-            'hippocampus': join(settings.MASK_DIR, 'FSL_BHipp_thr0.nii.gz'),
-            'accumbens': join(settings.MASK_DIR, 'FSL_BNAcc_thr0.nii.gz'),
-            'amygdala': join(settings.MASK_DIR, 'FSL_BAmyg_thr0.nii.gz'),
-            'putamen': join(settings.MASK_DIR, 'FSL_BPut_thr0.nii.gz'),
-            'min4': join(settings.MASK_DIR, 'voxel_counts_r6.nii.gz')
-        }
+        maps = {}
+        for m, v in MASK_FILES.items():
+            path = join(settings.MASK_DIR, v)
+            if exists(path):
+                maps[m] = path
+
         for m, img in maps.items():
             maps[m] = load_image(self.masker, img)
         return maps
