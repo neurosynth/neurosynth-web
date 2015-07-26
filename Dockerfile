@@ -16,6 +16,9 @@ RUN apt-get install -y --no-install-recommends tar git curl nano wget dialog net
 # install other non-Python packages: redis, node, MySQL, nginx
 RUN apt-get -y --no-install-recommends install redis-server node npm mysql-server nginx
 
+# Dependencies for the various python libs
+RUN apt-get install -y gfortran libopenblas-dev liblapack-dev mysql-devel pkg-config libjpeg-8-dev freetype* libfreetype6-dev libpng-dev
+
 # install coffeescript with Node
 RUN npm install -g coffee-script
 
