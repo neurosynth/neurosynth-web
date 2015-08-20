@@ -75,7 +75,7 @@ def get_study_analyses(val):
     data = [['<a href={0}>{1}</a>'.format(
         url_for('analyses.show_analysis', id=f.analysis_id), f.analysis.name),
         round(f.frequency, 3),
-    ] for f in data.frequencies]
+    ] for f in data.frequencies if f.analysis.type != 'custom']
     data = jsonify(data=data)
     return data
 

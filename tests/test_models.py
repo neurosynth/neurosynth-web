@@ -10,3 +10,5 @@ def test_studies(db):
     study.peaks = [Peak(x=-12, y=14, z=40), Peak(x=22, y=22, z=22)]
     db.session.add(study)
     db.session.commit()
+    assert Peak.query.count() == 2
+    assert Study.query.count() == 1

@@ -111,6 +111,7 @@ def compare_location(val=None, decimals=2):
     x, y, z, radius = get_params(val)
     print [x, y, z, radius]
     location = get_params(val, location=True) or make_location(x, y, z)
+    print location
     ma = zip(*get_decoding_data(location.images[0].id, get_json=False))
     fc = zip(*get_decoding_data(location.images[1].id, get_json=False))
     ma = pd.Series(ma[1], index=ma[0], name='ma')
@@ -218,8 +219,8 @@ def make_location(x, y, z):
     db.session.commit()
 
     # Decode both images
-    decode_analysis_image(ma_image.id)
-    decode_analysis_image(fc_image.id)
+    for img in location.images:
+        decode_analysis_image(img.id)
 
     return location
 

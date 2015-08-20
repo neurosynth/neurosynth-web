@@ -13,18 +13,21 @@ from os.path import join, basename, exists
 from neurosynth import Masker
 from neurosynth.base.dataset import Dataset
 from neurosynth.analysis import meta
+import neurosynth as ns
 import numpy as np
 import pandas as pd
 import random
 from glob import glob
 import json
 import re
+import shutil
+import urllib
 
 
 class DatabaseBuilder:
 
     def __init__(self, db, dataset=None, studies=None, features=None,
-                 reset_db=False, reset_dataset=False):
+                 reset_db=False, reset_dataset=False, download_data=True):
         """
         Initialize instance from a pickled Neurosynth Dataset instance or a
         pair of study and analysis .txt files.
@@ -43,9 +46,14 @@ class DatabaseBuilder:
                 incrementally.
             reset_dataset: if True, will regenerate the pickled Neurosynth
                 dataset.
+            download_data: if True, ignores any existing files and downloads the
+                latest Neurosynth data files from GitHub.
         """
-        if reset_db:
-            print "WARNING: RESETTING DATABASE!!!"
+
+        if (studies is not None and not os.path.exists(studies)) \
+                or settings.RESET_ASSETS:
+            print "WARNING: RESETTING ALL NEUROSYNTH ASSETS!"
+            self.reset_assets(download_data)
 
         # Load or create Neurosynth Dataset instance
         if dataset is None or reset_dataset or (isinstance(dataset, basestring)
@@ -69,7 +77,78 @@ class DatabaseBuilder:
         self.db = db
 
         if reset_db:
+            print "WARNING: RESETTING DATABASE!!!"
             self.reset_database()
+
+    def reset_assets(self, download=True):
+        # Create data directories if needed
+        check_dirs = [
+            settings.ASSET_DIR,
+            settings.IMAGE_DIR,
+            join(settings.IMAGE_DIR, 'analyses'),
+            join(settings.IMAGE_DIR, 'coactivation'),
+            join(settings.IMAGE_DIR, 'custom'),
+            settings.DECODING_RESULTS_DIR,
+            settings.DECODING_SCATTERPLOTS_DIR,
+            settings.DECODED_IMAGE_DIR,
+            settings.MASK_DIR,
+            settings.TOPIC_DIR,
+            settings.MEMMAP_DIR
+        ]
+        for d in check_dirs:
+            if not exists(d):
+                os.makedirs(d)
+
+        # Retrieve remote assets
+        def retrieve_file(url, filename):
+            try:
+                if not exists(filename) or settings.RESET_ASSETS:
+                    urllib.urlretrieve(url, filename)
+            except:
+                raise ValueError("Could not save remote URL %s to local path %s. ")
+
+        for u, f in {
+            'ftp://ftp.ebi.ac.uk/pub/databases/genenames/hgnc_complete_set.txt.gz':
+            join(settings.ASSET_DIR, 'hgnc_complete_set.txt.gz')
+        }.items():
+            retrieve_file(u, f)
+
+        # Copy anatomical image
+        anat = join(settings.ROOT_DIR, 'data', 'images', 'anatomical.nii.gz')
+        shutil.copy(anat, join(settings.IMAGE_DIR))
+
+        if download:
+            ns.dataset.download(path=settings.ASSET_DIR, unpack=True)
+
+        # Raise warnings for missing resources we can't retrieve from web
+        assets = [
+            (join(settings.ASSET_DIR, 'misc'), "The misc directory contains "
+                "various support files--e.g., stopword lists for topic "
+                "modeling."),
+            (join(settings.ASSET_DIR, 'abstracts.txt'), "This file is required "
+                "for topic modeling of article abstracts. Without it, the "
+                "topic-based analyses will not appear on the website."),
+            (settings.GENE_IMAGE_DIR, "This directory contains all gene images "
+                "from the Allen Institute for Brain Science's gene expression "
+                "database. Without it, the /genes functionality will not work."),
+            (join(settings.IMAGE_DIR, 'fcmri'), "This directory contains 300 "
+                "GB of functional connectivity images from the Brain "
+                "SuperStruct project, provided courtesy of Thomas Yeo and "
+                "Randy Buckner. These images must be obtained directly. "
+                "Without them, no functional connectivity images will be "
+                "displayed on the website.")
+        ]
+        for (asset, desc) in assets:
+            if not exists(asset):
+                raise RuntimeWarning("Asset %s doesn't seem to exist, and "
+                    "can't be retrieved automatically. %s" % (asset, desc))
+
+        from nsweb.tasks import MASK_FILES
+        for k, v in MASK_FILES.items():
+            if not exists(join(settings.MASK_DIR, v)):
+                raise RuntimeWarning("The image file for the '%s' mask "
+                    "cannot be found at %s. This mask will be gracefully "
+                    "ignored in all decoder scatterplots.")
 
     def reset_database(self):
         ''' Drop and re-create all tables. '''
@@ -154,7 +233,8 @@ class DatabaseBuilder:
         if image_dir is None:
             image_dir = join(settings.IMAGE_DIR, 'analyses')
 
-        # Image class depends on Analysis class
+        # Image class depends on Analysis class. TopicAnalysis objects have
+        # a terms field that cross-links to top-loading terms.
         if hasattr(analysis, 'terms'):
             image_class = TopicAnalysisImage
         else:
@@ -321,7 +401,6 @@ class DatabaseBuilder:
 
             self.db.session.commit()
 
-
     def add_genes(self, gene_dir=None, reset=True, update_images=True):
         """ Add records for genes, working from a directory containing gene
         images. """
@@ -352,8 +431,9 @@ class DatabaseBuilder:
                 gene = Gene(symbol=symbol)
             # Update with metadata from HGNC file
             if symbol in gene_data.index:
-                name, locus_type, synonyms = list(gene_data.loc[symbol,
-                    ['Approved Name', 'Locus Type', 'Synonyms']])
+                name, locus_type, synonyms = list(
+                    gene_data.loc[symbol,
+                                  ['Approved Name', 'Locus Type', 'Synonyms']])
                 gene.name = name
                 gene.locus_type = locus_type
                 gene.synonyms = synonyms
@@ -391,6 +471,8 @@ class DatabaseBuilder:
             for t in TopicAnalysis.query.all():
                 self.db.session.delete(t)
 
+        self.db.session.commit()
+
         topic_sets = glob(join(settings.TOPIC_DIR, '*.json'))
 
         # Temporarily store the existing AnalysisTable so we don't overwrite it
@@ -398,14 +480,16 @@ class DatabaseBuilder:
 
         topic_image_dir = join(settings.IMAGE_DIR, 'topics')
 
+        # Get all valid Study ids for speed
+        study_ids = [x[0] for x in set(self.db.session.query(Study.pmid).all())]
+
         for ts in topic_sets:
             data = json.load(open(ts))
             n = int(data['n_topics'])
 
-            ts = AnalysisSet(name=data['name'],
-                             description=data['description'], n_analyses=n,
-                             type='topics')
-            self.db.session.add(ts)
+            topic_set_image_dir = join(topic_image_dir, data['name'])
+            if not exists(topic_set_image_dir):
+                os.makedirs(topic_set_image_dir)
 
             self.dataset.add_features(
                 join(settings.TOPIC_DIR, 'analyses',
@@ -413,36 +497,37 @@ class DatabaseBuilder:
             key_data = open(join(settings.TOPIC_DIR, 'keys', data['name'] +
                                  '.txt')).read().splitlines()
 
-            topic_set_image_dir = join(topic_image_dir, data['name'])
-            if not exists(topic_set_image_dir):
-                os.makedirs(topic_set_image_dir)
-
             # Generate full set of topic images
             if generate_images:
                 meta.analyze_features(
                     self.dataset, self.dataset.get_feature_names(),
                     output_dir=topic_set_image_dir, threshold=0.05, q=0.01,
-                    prefix=ts.name)
+                    prefix=data['name'])
+
+            ts = AnalysisSet(name=data['name'],
+                             description=data['description'], n_analyses=n,
+                             type='topics')
+            self.db.session.add(ts)
 
             feature_data = self.dataset.feature_table.data
+            feature_names = self.dataset.get_feature_names()
 
-            # Get all valid Study ids for speed
-            study_ids = [x[0]
-                         for x in set(self.db.session.query(Study.pmid).all())]
+            for i, fn in enumerate(feature_names):
 
-            for i in range(n):
+                number = int(fn.split('_')[0])
+                name = '%s_%s' % (ts.name, fn)
 
                 # Disable autoflush temporarily because it causes problems
                 with self.db.session.no_autoflush:
-                    terms = ', '.join(key_data.pop(0).split()[2:][:top_n])
-                    topic = TopicAnalysis(name=ts.name + '_topic%d' % i,
-                                          terms=terms, number=i)
+                    terms = ', '.join(key_data[number].split()[2:][:top_n])
+                    # Topics are not always in natsort order; get correct number
+                    topic = TopicAnalysis(name=name, terms=terms, number=number)
 
                     self.db.session.add(topic)
                     self.db.session.commit()
 
                     # Map onto studies
-                    freqs = feature_data['topic%d' % i]
+                    freqs = feature_data[fn]
                     above_thresh = freqs[freqs >= 0.05]
                     srsly = 0
                     for s_id, f in above_thresh.iteritems():
@@ -507,7 +592,7 @@ class DatabaseBuilder:
 
         # Get mask
         masker = Masker(join(settings.IMAGE_DIR, 'anatomical.nii.gz'))
-        mask_voxels = np.sum(masker.get_current_mask())
+        mask_voxels = np.sum(masker.current_mask)
 
         def save_memmap(name, analysis_set, images, labels, voxels=None):
 
@@ -604,7 +689,7 @@ class DatabaseBuilder:
             print "\tCreating memmap of topic image data..."
 
             analysis_set = AnalysisSet.query \
-                .filter_by(name='v3-topics-200').first()
+                .filter_by(name='v4-topics-200').first()
 
             # Get all images and save labels
             images = [a.images[1].image_file for a in analysis_set.analyses]
@@ -628,7 +713,7 @@ class DatabaseBuilder:
             # Get all images and save labels
             genes = Gene.query.all()
             images = [g.images[0].image_file for g in genes]
-            labels = [g.name for g in genes]
+            labels = [g.symbol for g in genes]
 
             # save only voxels where there were originally microarrays
             sample_img = join(settings.IMAGE_DIR, 'sample_locations.nii.gz')

@@ -21,20 +21,9 @@ class User(db.Model, UserMixin):
                        server_default='0')
     first_name = db.Column(db.String(100), nullable=False, server_default='')
     last_name = db.Column(db.String(100), nullable=False, server_default='')
-#    role = db.Column(db.SmallInteger, default = ROLE_USER)
-#    posts = db.relationship('comments', backref = 'images', lazy = 'dynamic')
 
-    # def is_authenticated(self):
-    #     return True
 
-    # def is_active(self):
-    #     return True
 
-    # def is_anonymous(self):
-    #     return False
 
-    # def get_id(self):
-    #     return unicode(self.id)
 
-    # def __repr__(self):
-    #     return '<User %r>' % (self.nickname)
+

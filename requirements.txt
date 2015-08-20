@@ -1,6 +1,7 @@
 blinker
 celery
 cssmin
+fig
 Flask>=0.10.1
 Flask-Assets
 Flask-Babel
@@ -18,18 +19,23 @@ Flask-User==0.6.1
 Flask-WTF
 jinja2
 marshmallow
-neurosynth
--e git+https://github.com/nilearn/nilearn.git#egg=nilearn
+marshmallow-sqlalchemy
 matplotlib
 MySQL-Python
+neurosynth
+nibabel
+nilearn
 numpy>=1.8
 opbeat
 pandas>=0.13
-pyscss
+ply
+pyscss==1.2.0
 pytest
+redis
 seaborn
 selenium
 simplejson
+scikit-learn
 slimish-jinja
 SQLAlchemy
 uwsgi
