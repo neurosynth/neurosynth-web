@@ -65,7 +65,11 @@ def _get_decoding(**kwargs):
 def _run_decoder(**kwargs):
 
     kwargs['uuid'] = kwargs.get('uuid', uuid.uuid4().hex)
+    # Default to reduced term reference set. Also allow
+    # 'terms' or 'topics' shorthand.
     ds_name = request.args.get('set', 'terms_20k')
+    if ds_name in ['terms', 'topics']:
+        ds_name += '_20k'
     reference = DecodingSet.query.filter_by(name=ds_name).first()
     dec = Decoding(display=1, download=0, ip=request.remote_addr,
                    decoding_set=reference, **kwargs)
@@ -210,7 +214,8 @@ def get_data(uuid):
     data = open(join(settings.DECODING_RESULTS_DIR,
                      dec.uuid + '.txt')).read().splitlines()
     data = [x.split('\t') for x in data]
-    data = [{'analysis': f, 'r': round(float(v), 3)} for (f, v) in data if v.strip()]
+    data = [{'analysis': f, 'r': round(float(v), 3)}
+            for (f, v) in data if v.strip()]
     return jsonify(data=data)
 
 
@@ -246,6 +251,8 @@ def get_scatter(uuid, analysis):
         outfile, as_attachment=False, attachment_filename=basename(outfile))
 
 ### API ROUTES ###
+
+
 @bp.route('/data/')
 def get_data_api():
     if 'url' in request.args:
