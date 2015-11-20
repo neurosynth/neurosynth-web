@@ -69,7 +69,7 @@ class DecodingSchema(mm.Schema):
 
     class Meta:
 
-        fields = ('id', 'url', 'neurovault_id', 'uuid', 'comments', 'image',
+        fields = ('id', 'url', 'neurovault_id', 'comments', 'image',
                   'reference', 'values')
 
 
