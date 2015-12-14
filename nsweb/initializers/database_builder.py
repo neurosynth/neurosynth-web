@@ -242,15 +242,27 @@ class DatabaseBuilder:
 
         analysis.images.extend([
             image_class(image_file=join(image_dir, name +
-                                        '_pAgF_z_FDR_0.01.nii.gz'),
-                        label='%s: forward inference' % name,
+                                        '_consistency_z_FDR_0.01.nii.gz'),
+                        label='%s: consistency' % name,
                         stat='z-score',
                         display=1,
                         download=1),
             image_class(image_file=join(image_dir, name +
-                                        '_pFgA_z_FDR_0.01.nii.gz'),
-                        label='%s: reverse inference' % name,
+                                        '_specificity_z_FDR_0.01.nii.gz'),
+                        label='%s: specificity' % name,
                         stat='z-score',
+                        display=1,
+                        download=1)
+            image_class(image_file=join(image_dir, name +
+                                        '_pFgA__pf=0.50_FDR_0.01.nii.gz'),
+                        label='%s: reverse inference (unif. prior)' % name,
+                        stat='prob.',
+                        display=1,
+                        download=1)
+            image_class(image_file=join(image_dir, name +
+                                        '_pFgA_emp_prior_FDR_0.01.nii.gz'),
+                        label='%s: reverse inference (emp. prior)' % name,
+                        stat='prob.',
                         display=1,
                         download=1)
         ])
