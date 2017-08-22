@@ -206,7 +206,7 @@ def make_coactivation_map(x, y, z, r=6, min_studies=0.01):
         outdir = join(settings.IMAGE_DIR, 'coactivation')
         prefix = 'metaanalytic_coactivation_%s_%s_%s' % (
             str(x), str(y), str(z))
-        ma.save_results(outdir, prefix, image_list=['pFgA_z_FDR_0.01'])
+        ma.save_results(outdir, prefix, image_list=['specificity_z_FDR_0.01'])
         return True
     except Exception, e:
         print traceback.format_exc()
@@ -290,8 +290,8 @@ def run_metaanalysis(ids, name):
     try:
         ma = meta.MetaAnalysis(run_metaanalysis.dataset, ids)
         outdir = join(settings.IMAGE_DIR, 'custom')
-        ma.save_results(outdir, name, image_list=['pFgA_z_FDR_0.01',
-                                                  'pAgF_z_FDR_0.01'])
+        ma.save_results(outdir, name, image_list=['specificity_z_FDR_0.01',
+                                                  'consistency_z_FDR_0.01'])
         return True
     except Exception, e:
         print traceback.format_exc()

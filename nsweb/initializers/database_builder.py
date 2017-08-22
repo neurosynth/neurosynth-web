@@ -242,15 +242,27 @@ class DatabaseBuilder:
 
         analysis.images.extend([
             image_class(image_file=join(image_dir, name +
-                                        '_pAgF_z_FDR_0.01.nii.gz'),
-                        label='%s: forward inference' % name,
+                                        '_consistency_z_FDR_0.01.nii.gz'),
+                        label='%s: consistency' % name,
                         stat='z-score',
                         display=1,
                         download=1),
             image_class(image_file=join(image_dir, name +
-                                        '_pFgA_z_FDR_0.01.nii.gz'),
-                        label='%s: reverse inference' % name,
+                                        '_specificity_z_FDR_0.01.nii.gz'),
+                        label='%s: specificity' % name,
                         stat='z-score',
+                        display=1,
+                        download=1)
+            image_class(image_file=join(image_dir, name +
+                                        '_pFgA__pf=0.50_FDR_0.01.nii.gz'),
+                        label='%s: reverse inference (unif. prior)' % name,
+                        stat='prob.',
+                        display=1,
+                        download=1)
+            image_class(image_file=join(image_dir, name +
+                                        '_pFgA_emp_prior_FDR_0.01.nii.gz'),
+                        label='%s: reverse inference (emp. prior)' % name,
+                        stat='prob.',
                         display=1,
                         download=1)
         ])
@@ -386,7 +398,7 @@ class DatabaseBuilder:
         # Remove analyses that already exist
         if not overwrite:
             files = glob(
-                join(settings.IMAGE_DIR, 'analyses', '*_pFgA_z.nii.gz'))
+                join(settings.IMAGE_DIR, 'analyses', '*_specificity_z.nii.gz'))
             existing = [basename(f).split('_')[0] for f in files]
             analyses = list(set(analyses) - set(existing))
 
@@ -679,9 +691,12 @@ class DatabaseBuilder:
             save_memmap('terms_full', analysis_set, images, labels)
             save_memmap('terms_20k', analysis_set, images, labels, 20000)
             # also save posterior probability images
-            images = [img.replace('_pFgA_z_FDR_0.01', '_pFgA_given_pF=0.50')
+            images = [img.replace('_specificity_z_FDR_0.01', '_pFgA_pF=0.50')
                       for img in images]
-            save_memmap('terms_pp', analysis_set, images, labels)
+            save_memmap('terms_pp_unif', analysis_set, images, labels)
+            images = [img.replace('_specificity_z_FDR_0.01', '_pFgA_emp_prior')
+                      for img in images]
+            save_memmap('terms_pp_emp', analysis_set, images, labels)
 
         ### TOPICS ###
         if 'topics' in include:
@@ -701,9 +716,12 @@ class DatabaseBuilder:
             save_memmap('topics_full', analysis_set, images, labels)
             save_memmap('topics_20k', analysis_set, images, labels, 20000)
             # also save posterior probability images
-            images = [img.replace('_pFgA_z_FDR_0.01', '_pFgA_given_pF=0.50')
+            images = [img.replace('_specificity_z_FDR_0.01', '_pFgA_pF=0.50')
                       for img in images]
-            save_memmap('topics_pp', analysis_set, images, labels)
+            save_memmap('topics_pp_unif', analysis_set, images, labels)
+            images = [img.replace('_specificity_z_FDR_0.01', '_pFgA_emp_prior')
+                      for img in images]
+            save_memmap('topics_pp_emp', analysis_set, images, labels)
 
         ### GENES ###
         if 'genes' in include:

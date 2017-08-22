@@ -215,24 +215,24 @@ def run_custom_analysis(uid):
         ids = [s.pmid for s in custom.studies]
         if tasks.run_metaanalysis.delay(ids, custom.uuid).wait():
             # Update analysis record
-            rev_inf = '%s_pFgA_z_FDR_0.01.nii.gz' % custom.uuid
+            rev_inf = '%s_specificity_z_FDR_0.01.nii.gz' % custom.uuid
             rev_inf = join(settings.IMAGE_DIR, 'custom', rev_inf)
-            fwd_inf = '%s_pAgF_z_FDR_0.01.nii.gz' % custom.uuid
+            fwd_inf = '%s_consistency_FDR_0.01.nii.gz' % custom.uuid
             fwd_inf = join(settings.IMAGE_DIR, 'custom', fwd_inf)
             if exists(rev_inf):
                 images = [
                     CustomAnalysisImage(
-                        name='%s (forward inference)' % custom.name,
+                        name='%s (consistency)' % custom.name,
                         image_file=fwd_inf,
-                        label='%s (forward inference)' % custom.name,
+                        label='%s (consistency)' % custom.name,
                         stat='z-score',
                         display=1,
                         download=1
                     ),
                     CustomAnalysisImage(
-                        name='%s (reverse inference)' % custom.name,
+                        name='%s (specificity)' % custom.name,
                         image_file=rev_inf,
-                        label='%s (reverse inference)' % custom.name,
+                        label='%s (specificity)' % custom.name,
                         stat='z-score',
                         display=1,
                         download=1
