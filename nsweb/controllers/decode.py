@@ -117,7 +117,7 @@ def decode_analysis_image(image):
 def decode_url(url, metadata={}, render=True):
 
     # Basic URL validation
-    f not re.search('^https?\:\/\/', url):
+    if not re.search('^https?\:\/\/', url):
         url = 'http://' + url
     ext = re.search('\.nii(\.gz)?$', url)
 
