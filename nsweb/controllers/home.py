@@ -20,16 +20,18 @@ bp = Blueprint('home', __name__)
 def index():
     """ Returns the homepage. """
     stats = {
-        'n_analyses': TermAnalysis.query.count(),
-        'n_studies': Study.query.count(),
-        'n_peaks': Peak.query.count(),
-        'n_locations': Location.query.count(),
-        'n_decodings': Decoding.query.count(),
-        'n_downloads': Download.query.count(),
-        'n_journals': db.session.query(
-            func.count(distinct(Study.journal))).first()[0]
+        'n_analyses': db.session.query(func.count(TermAnalysis.id)).first()[0],
+        'n_studies': db.session.query(func.count(Study.pmid)).first()[0],
+        'n_peaks': db.session.query(func.count(Peak.id)).first()[0],
+        # 'n_analyses': TermAnalysis.query.count(),
+        # 'n_studies': Study.query.count(),
+        # 'n_peaks': Peak.query.count(),
+        # 'n_locations': Location.query.count(),
+        # 'n_decodings': Decoding.query.count(),
+        # 'n_downloads': Download.query.count(),
+        # 'n_journals': db.session.query(
+        #     func.count(distinct(Study.journal))).first()[0]
     }
-
     analysis = random.choice(
         ['reward', 'language', 'emotion', 'pain', 'working memory'])
     analysis = TermAnalysis.query.filter_by(name=analysis).first()

@@ -15,8 +15,8 @@
             a href="#maps" data-toggle="tab" Map
           li
             a href="#scatter" data-toggle="tab" Plot
-          / li
-          /   a href="#info" data-toggle="tab" Info
+          li
+            a href="#help" data-toggle="tab" Help
         #decode-tab-content.tab-content.top-space20
           #maps.tab-pane.active
             script type="text/javascript"
@@ -32,8 +32,28 @@
               p That's probably because you haven't selected a Neurosynth term to compare this image against. To replace this annoying message with a pretty scatter plot, select one of the terms over there in the table on the right.
 
               p Note that most images will usually take 1 - 2 seconds to show up--we're computing them fresh, just for you!
-          / #info.tab-pane
-          /   h4 About this image
+          #help.tab-pane
+            h3 About the Neurosynth decoder
+            p
+              |The Neurosynth decoder compares arbitrary images uploaded to <a href="http://neurovault.org">NeuroVault</a> or found elsewhere on the web with images in the Neurosyth database.
+
+            h4.help How are the values in the decoder table of results computed?
+            p At present, the values displayed in the decoding table simply represent the Pearson correlation between the two vectorized maps. I.e., the r values reflect the correlation across all voxels between the two maps. This approach has the virtue of being agnostic with respect to the scale of the inputs, very fast, and produces standardized coefficients. Other approaches (e.g., application of classifiers trained on the entire Neurosynth datasets) typically run afoul of one of these constraints--e.g., many classifiers will produce insensible results if given different kinds of inputs (e.g., p-values versus z-scores versus binary thresholded masks). 
+
+            h4.help How are voxels with missing values handled?
+            p Currently, voxels with a value of zero are included in the analysis. For example, if an uploaded map contains 190,000 zeroes and 10,000 non-zero values, all 200,000 voxels will be included in the spatial correlation. This is important to keep in mind, because it means that attempting to decode maps with relatively few non-zero values (e.g., those conservatively corrected for multiple comparisons) will produce biased results (i.e., many coefficients very close to zero). Note that the deliberate introduction of bias is not necessarily a bad thing here, because the alternative is to produce highly variable estimates that will often provide a misleading sense of the robustness of an association. In the near future, we plan to provide a user option for handling of zero values. In general, however, we recommend decoding unthresholded, uncorrected, whole-brain maps whenever possible.
+
+            h4.help How should I interpret the values I see? Is 0.6 a large correlation? How about 0.12?
+            p We don't know.
+
+            h4.help Can you provide p-values for the correlations produced by the decoder? I need to know whether the association between my map and a Neurosynth meta-analysis map is statistically significant!
+            p No we don't, and no you don't.
+            p Less flippantly, computing valid and meaningful p-values is not trivial in this case. Because there's a good deal of spatial structure in the images being correlated--and that structure cannot be known in advance of each image--it's virtually impossible to determine the appropriate degrees of freedom to use in an inferential test. Using the nominal degrees of freedom (i.e., the number of voxels) is also a non-starter, because with over 200,000 voxels, even very small correlations of negligible size would be statistically significant.
+
+            h4.help The decoder gives me strange results!
+            p Assuming you're attempting to decode whole-brain, unthresholded maps (if not, see the previous question), there are two plausible explanations for this. First ???
+
+            if the sample size of the associated study is small, the effects of sampling error on activation patterns are likely to be large--and hence your map may fail to resemble (m)any canonical meta-analysis images in Neurosynth. The question that then arises is whether this reflects ???
             
       .analysis-list style="width: 200px; margin-left: 20px; margin-top: 50px;"
         h4 Term similarity
