@@ -77,7 +77,7 @@
           h4.help What are all the different association metrics, and why are there so many of them?
           p The Associations table provides information about the relationship between activation at the current voxel and other types of information available in Neurosynth. Currently, the metrics displayed include (in order):
           ul
-            li <strong>z-score</strong>: This is the z-score value obtained at the current voxel in the reverse inference meta-analysis map for the corresponding term.
+            li <strong>z-score</strong>: This is the z-score value obtained at the current voxel in the "association test" meta-analysis map for the corresponding term.
             li
               p
                 |<b>Posterior probability</b>: This is the conditional probability of a term being used in a study conditional on activation being present at this voxel. For example, a posterior probability of 0.8 for 'emotion' would mean that 80% of studies that report activation at the current voxel also use the term 'emotion' in their abstracts. <b>However</b>, it's important to note two things about this metric. First, the estimate reflects an assumed uniform prior. That is, it's the probability that we would get if we naively assumed that absent any information about brain activity, a study was equally like to use or to not use the target term. (We make this assumption because otherwise, the probabilities are completely dominated by the empirical distribution of terms--that is, if a term is very rare, then its probability conditional on activation being present will also be very rare. In effect, the uniform prior is a means of normalizing terms and making them directly comparable to one another.)
