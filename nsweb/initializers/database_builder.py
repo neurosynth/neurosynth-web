@@ -242,14 +242,14 @@ class DatabaseBuilder:
 
         analysis.images.extend([
             image_class(image_file=join(image_dir, name +
-                                        '_consistency_z_FDR_0.01.nii.gz'),
-                        label='%s: consistency' % name,
+                                        '_uniformity-test_z_FDR_0.01.nii.gz'),
+                        label='%s: uniformity test' % name,
                         stat='z-score',
                         display=1,
                         download=1),
             image_class(image_file=join(image_dir, name +
-                                        '_specificity_z_FDR_0.01.nii.gz'),
-                        label='%s: specificity' % name,
+                                        '_association-test_z_FDR_0.01.nii.gz'),
+                        label='%s: association test' % name,
                         stat='z-score',
                         display=1,
                         download=1)
@@ -398,7 +398,7 @@ class DatabaseBuilder:
         # Remove analyses that already exist
         if not overwrite:
             files = glob(
-                join(settings.IMAGE_DIR, 'analyses', '*_specificity_z.nii.gz'))
+                join(settings.IMAGE_DIR, 'analyses', '*_association-test_z.nii.gz'))
             existing = [basename(f).split('_')[0] for f in files]
             analyses = list(set(analyses) - set(existing))
 
@@ -691,10 +691,10 @@ class DatabaseBuilder:
             save_memmap('terms_full', analysis_set, images, labels)
             save_memmap('terms_20k', analysis_set, images, labels, 20000)
             # also save posterior probability images
-            images = [img.replace('_specificity_z_FDR_0.01', '_pFgA_pF=0.50')
+            images = [img.replace('_association-test_z_FDR_0.01', '_pFgA_pF=0.50')
                       for img in images]
             save_memmap('terms_pp_unif', analysis_set, images, labels)
-            images = [img.replace('_specificity_z_FDR_0.01', '_pFgA_emp_prior')
+            images = [img.replace('_association-test_z_FDR_0.01', '_pFgA_emp_prior')
                       for img in images]
             save_memmap('terms_pp_emp', analysis_set, images, labels)
 
@@ -716,10 +716,10 @@ class DatabaseBuilder:
             save_memmap('topics_full', analysis_set, images, labels)
             save_memmap('topics_20k', analysis_set, images, labels, 20000)
             # also save posterior probability images
-            images = [img.replace('_specificity_z_FDR_0.01', '_pFgA_pF=0.50')
+            images = [img.replace('_association-test_z_FDR_0.01', '_pFgA_pF=0.50')
                       for img in images]
             save_memmap('topics_pp_unif', analysis_set, images, labels)
-            images = [img.replace('_specificity_z_FDR_0.01', '_pFgA_emp_prior')
+            images = [img.replace('_association-test_z_FDR_0.01', '_pFgA_emp_prior')
                       for img in images]
             save_memmap('topics_pp_emp', analysis_set, images, labels)
 
