@@ -169,7 +169,7 @@ def make_location(x, y, z):
     location = Location(x, y, z)
 
     # Add Neurosynth coactivation image if it exists
-    filename = 'metaanalytic_coactivation_%d_%d_%d_specificity_z_FDR_0.01.nii.gz' % (
+    filename = 'metaanalytic_coactivation_%d_%d_%d_association-test_z_FDR_0.01.nii.gz' % (
         x, y, z)
     filename = join(settings.IMAGE_DIR, 'coactivation', filename)
     if not exists(filename):
