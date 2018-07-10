@@ -1,34 +1,33 @@
 # Set the base image to Ubuntu
-FROM ubuntu:14.04
+FROM ubuntu:18.04
 
 # File Author / Maintainer
 MAINTAINER Tal Yarkoni
-
-# Add the application resources URL
-RUN echo "deb http://archive.ubuntu.com/ubuntu/ $(lsb_release -sc) main universe" >> /etc/apt/sources.list
 
 # Update the sources list
 RUN apt-get update
 
 # Install basic applications
-RUN apt-get install -y --no-install-recommends tar git curl nano wget dialog net-tools build-essential
+RUN apt-get install -y --no-install-recommends tar git curl nano wget dialog net-tools build-essential sudo
 
-# install other non-Python packages: redis, node, MySQL, nginx
-RUN apt-get -y --no-install-recommends install redis-server node npm mysql-server nginx
+# install other non-Python packages: node, MySQL, nginx
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y --no-install-recommends install tzdata
+RUN apt-get -y --no-install-recommends install redis-server nodejs npm libmysqld-dev libmysqlclient-dev nginx
 
 # Dependencies for the various python libs
-RUN apt-get install -y gfortran libopenblas-dev liblapack-dev mysql-devel pkg-config libjpeg-8-dev freetype* libfreetype6-dev libpng-dev
+RUN apt-get install -y gfortran libopenblas-dev liblapack-dev pkg-config libjpeg8-dev freetype* libfreetype6-dev libpng-dev
 
 # install coffeescript with Node
-RUN npm install -g coffee-script
+RUN npm config set registry http://registry.npmjs.org/
+RUN npm install -g coffeescript
 
 # Install Python and various packages
-RUN apt-get -y --no-install-recommends install python python-dev python-distribute python-pip python-numpy python-scipy python-matplotlib ipython ipython-notebook python-pandas python-sympy python-nose python-mysqldb python-tk
+RUN apt-get -y --no-install-recommends install python3 python3-dev python3-pip python3-numpy python3-scipy python3-matplotlib python3-pandas python3-mysqldb python3-tk python3-setuptools
 
 # Add code
-ADD . /code
+COPY . /code
 
 WORKDIR /code
 
-# Get pip to download and install requirements:
-RUN pip install -r requirements.txt
+# Install all Python packages with pip
+RUN pip3 install -r requirements.txt
