@@ -5,16 +5,14 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 # from flask_restless import APIManager
-from flask.ext.babel import Babel
-from flask.ext.user import UserManager, SQLAlchemyAdapter
-from slimish_jinja import SlimishExtension
-from flask.ext.cache import Cache
-from flask.ext.marshmallow import Marshmallow
+from flask_babelex import Babel
+from flask_user import UserManager
+from flask_caching import Cache
+from flask_marshmallow import Marshmallow
 from flask_mail import Mail
 from nsweb.initializers import settings
 from nsweb.initializers.assets import init_assets
 from nsweb.initializers import make_celery
-from opbeat.contrib.flask import Opbeat
 from wtforms.validators import ValidationError
 
 app = Flask('NSWeb', static_folder=settings.STATIC_FOLDER,
@@ -50,12 +48,6 @@ def setup_logging(logging_path, level):
         logger.addHandler(file_handler)
 
 
-def password_validator(form, field):
-    password = field.data
-    if len(password) < 4:
-        raise ValidationError('Password must have at least 4 characters')
-
-
 def create_app(debug=True, test=False):
     '''creates app instance, db instance, and apimanager instance'''
 
@@ -79,9 +71,6 @@ def create_app(debug=True, test=False):
 
     app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
     app.secret_key = "very_sekret"  # move this out of here eventually
-
-    # Add slim support
-    Flask.jinja_options['extensions'].append(SlimishExtension)
 
     # Initialize assets
     init_assets(app)
@@ -108,18 +97,18 @@ def create_app(debug=True, test=False):
     marshmallow.init_app(app)
 
     # Set up mail stuff
+    params = ['USER_EMAIL_SENDER_NAME', 'USER_EMAIL_SENDER_EMAIL']
     if settings.MAIL_ENABLE:
-        params = ['MAIL_USERNAME', 'MAIL_PASSWORD', 'MAIL_DEFAULT_SENDER',
-                  'MAIL_SERVER', 'MAIL_PORT', 'MAIL_USE_SSL']
-        app.config.update({(p, getattr(settings, p)) for p in params})
-        mail.init_app(app)
+        params += ['MAIL_USERNAME', 'MAIL_PASSWORD', 'MAIL_SERVER',
+                   'MAIL_PORT', 'MAIL_USE_SSL']
+    app.config.update({(p, getattr(settings, p)) for p in params})
+    mail.init_app(app)
 
     # Set up user management
     app.config['CSRF_ENABLED'] = True
     app.config['USER_ENABLE_FORGOT_PASSWORD'] = True
     from nsweb.models.users import User
-    db_adapter = SQLAlchemyAdapter(db, User)
-    UserManager(db_adapter, app, password_validator=password_validator)
+    UserManager(app, db, User)
 
     # load blueprints
     register_blueprints()

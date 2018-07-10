@@ -158,8 +158,8 @@ def decode_image(filename, reference, uuid, mask=None, drop_zeros=False,
         labels = ref.labels.keys()
         pd.Series(r, index=labels).to_csv(outfile, sep='\t')
         return True
-    except Exception, e:
-        print traceback.format_exc()
+    except Exception as e:
+        print(traceback.format_exc())
         return False
 
 
@@ -190,7 +190,7 @@ def get_voxel_data(reference, x, y, z, get_pp=True):
         return result.to_json()
 
     except Exception:
-        print traceback.format_exc()
+        print(traceback.format_exc())
         return False
 
 
@@ -208,8 +208,8 @@ def make_coactivation_map(x, y, z, r=6, min_studies=0.01):
             str(x), str(y), str(z))
         ma.save_results(outdir, prefix, image_list=['association-test_z_FDR_0.01'])
         return True
-    except Exception, e:
-        print traceback.format_exc()
+    except Exception as e:
+        print(traceback.format_exc())
         return False
 
 
@@ -274,8 +274,8 @@ def make_scatterplot(filename, analysis, base_id, reference='terms_full',
                 palette='Set1', x_lab=x_lab, y_lab=y_lab, savefile=outfile,
                 spatial_masks=spatial_masks, voxel_count_mask=voxel_count_mask)
 
-    except Exception, e:
-        print traceback.format_exc()
+    except Exception as e:
+        print(traceback.format_exc())
         return False
 
 
@@ -293,8 +293,8 @@ def run_metaanalysis(ids, name):
         ma.save_results(outdir, name, image_list=['association-test_z_FDR_0.01',
                                                   'uniformity-test_z_FDR_0.01'])
         return True
-    except Exception, e:
-        print traceback.format_exc()
+    except Exception as e:
+        print(traceback.format_exc())
         return False
 
 
@@ -309,5 +309,5 @@ def get_studies_by_expression(expression):
         return get_studies_by_expression.dataset.get_studies(
             expression=expression)
     except:
-        print traceback.format_exc()
+        print(traceback.format_exc())
         return False

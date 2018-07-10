@@ -152,7 +152,7 @@ def decode_url(url, metadata={}, render=True):
         with open(filename, 'wb') as outfile:
             outfile.write(f.content)
         # Make sure celery worker has permission to overwrite
-        os.chmod(filename, 0666)
+        os.chmod(filename, 666)
 
         # Named args to pass to Decoding initializer
         modified = headers.get('last-modified', None)

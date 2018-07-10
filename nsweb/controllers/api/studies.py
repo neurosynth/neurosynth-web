@@ -3,7 +3,7 @@ import urllib
 from nsweb.controllers.api import bp
 from flask import request, jsonify, url_for
 from nsweb.models.studies import Study
-from flask.ext.user import login_required
+from flask_user import login_required
 from nsweb import tasks
 from nsweb.core import cache
 import re

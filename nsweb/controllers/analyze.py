@@ -6,7 +6,7 @@ from nsweb.tasks import run_metaanalysis
 from nsweb.controllers.images import send_nifti
 from flask.helpers import url_for
 import simplejson as json
-from flask.ext.user import login_required, current_user
+from flask_user import login_required, current_user
 import re
 import uuid
 import requests
@@ -39,7 +39,7 @@ def run():
         uid = uuid.uuid4().hex
         name = request.args.get('name', None)
         description = request.args.get('description', None)
-        analysis = Analysis(name=request.args['name'], description=description, 
+        analysis = Analysis(name=request.args['name'], description=description,
             uuid=uid, ip=request.remote_addr, user=current_user)
 
         # Add images

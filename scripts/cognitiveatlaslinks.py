@@ -10,7 +10,6 @@ import os
 from neurosynth import Masker
 # from neurosynth.analysis.stats import pearson
 import tempfile
-from scipy.stats import ss
 import sys
 
 import numpy as np
@@ -18,8 +17,9 @@ import numpy as np
 # Code from http://stackoverflow.com/questions/20983882/efficient-dot-products-of-large-memory-mapped-arrays
 import numpy as np
 
+
 def _block_slices(dim_size, block_size):
-    """Generator that yields slice objects for indexing into 
+    """Generator that yields slice objects for indexing into
     sequential blocks of an array along a particular axis
     """
     count = 0
@@ -29,10 +29,11 @@ def _block_slices(dim_size, block_size):
         if count > dim_size:
             raise StopIteration
 
+
 def blockwise_dot(A, B, max_elements=int(2**20), out=None):
     """
-    Computes the dot product of two matrices in a block-wise fashion. 
-    Only blocks of `A` with a maximum size of `max_elements` will be 
+    Computes the dot product of two matrices in a block-wise fashion.
+    Only blocks of `A` with a maximum size of `max_elements` will be
     processed simultaneously.
     """
 
@@ -46,12 +47,12 @@ def blockwise_dot(A, B, max_elements=int(2**20), out=None):
     if A.flags.f_contiguous:
         # prioritize processing as many columns of A as possible
         max_cols = max(1, max_elements / m)
-        max_rows =  max_elements / max_cols
+        max_rows = max_elements / max_cols
 
     else:
         # prioritize processing as many rows of A as possible
         max_rows = max(1, max_elements / n)
-        max_cols =  max_elements / max_rows
+        max_cols = max_elements / max_rows
 
     if out is None:
         out = np.empty((m, o), dtype=np.result_type(A, B))
@@ -67,15 +68,21 @@ def blockwise_dot(A, B, max_elements=int(2**20), out=None):
 
     return out
 
+
 def pearson(x, y):
     """ Correlates row vector x with each row vector in 2D array y. """
     data = np.vstack((x, y))
     ms = data.mean(axis=1)[(slice(None, None, None), None)]
     datam = data - ms
+
+    def ss(arr, axis=None):
+        return np.sum(arr**2, axis=axis)
+
     datass = np.sqrt(ss(datam, axis=1))
     temp = np.dot(datam[1:], datam[0].T)
     rs = temp / (datass[1:] * datass[0])
     return rs
+
 
 f = '/tmp/memmap_small.dat'
 # Get mask
@@ -97,6 +104,7 @@ for z in z_maps:
 n_maps = len(z_maps)
 n_sampled = 20000
 
+
 def make_memmap():
 
     # Randomly draw N voxels and save indices to drive
@@ -113,6 +121,7 @@ def make_memmap():
     t1 = time.time()
     print "Time to load all images: %.2f seconds" % (t1 - t0)
     del res
+
 
 def time_corr(term):
     sample = np.load('sample_indices.npy')
@@ -131,7 +140,7 @@ def time_corr(term):
         raise ValueError("No term %s found!" % term)
     # for (i, img) in enumerate(to_compare):
     for (i, img) in enumerate([target]):
-    # for (i, img) in enumerate(z_maps[300:301]):
+        # for (i, img) in enumerate(z_maps[300:301]):
         data = masker.mask(z_maps[img])[sample]
         data = (data - data.mean())/data.std()
         coefs = np.zeros(n_maps)
@@ -144,6 +153,7 @@ def time_corr(term):
     print results.order(ascending=False)[:50]
     print "Time to correlate %d images with rest: %.2f seconds" % (n_files, t1 - t0)
     # os.unlink(f)
+
 
 # make_memmap()
 time_corr(sys.argv[1])

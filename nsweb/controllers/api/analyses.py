@@ -5,8 +5,8 @@ from nsweb.models.analyses import (TermAnalysis, AnalysisSet, CustomAnalysis,
 from nsweb.models.studies import Study
 from nsweb.models.frequencies import Frequency
 from nsweb.core import db
-from flask.ext.login import current_user
-from flask.ext.user import login_required
+from flask_login import current_user
+from flask_user import login_required
 import datetime as dt
 import json
 import uuid
@@ -75,7 +75,7 @@ def list_topics(topic_set):
 @bp.route('/analyses/<string:name>/')
 def find_api_analysis(name):
     """ If the passed val isn't numeric, assume it's a analysis name,
-    and retrieve the corresponding numeric ID. 
+    and retrieve the corresponding numeric ID.
     """
     val = Analysis.query.filter_by(name=name).first().id
     return redirect(url_for('analyses.api', id=val))

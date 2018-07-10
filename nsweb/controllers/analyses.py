@@ -7,7 +7,7 @@ from nsweb.core import db, add_blueprint
 from nsweb.controllers import images
 import json
 import re
-from flask.ext.user import login_required, current_user
+from flask_user import login_required, current_user
 from nsweb import tasks
 from nsweb.initializers import settings
 from nsweb.controllers import error_page
@@ -161,7 +161,6 @@ def show_topic(topic_set, number):
 @bp.route('/custom/<string:uid>/')
 def show_custom_analysis(uid):
     custom = CustomAnalysis.query.filter_by(uuid=uid).first()
-    print custom.user, current_user
     if custom is None or (custom.private and custom.user != current_user):
         return render_template('analyses/missing.html.slim', analysis=uid)
     return render_template('analyses/custom/show.html.slim', analysis=custom)

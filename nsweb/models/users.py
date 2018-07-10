@@ -1,5 +1,5 @@
 from nsweb.core import db
-from flask.ext.user import UserMixin
+from flask_user import UserMixin
 import datetime
 
 

@@ -1,7 +1,7 @@
 from nsweb.core import add_blueprint, cache
 from flask import (Blueprint, render_template, url_for, request, jsonify,
                    redirect)
-from flask.ext.user import current_user
+from flask_user import current_user
 from nsweb.models.locations import Location
 from nsweb.models.images import LocationImage
 from nsweb.models.peaks import Peak
@@ -109,9 +109,7 @@ def compare_location(val=None, decimals=2):
     plus activation data at this location.
     """
     x, y, z, radius = get_params(val)
-    print [x, y, z, radius]
     location = get_params(val, location=True) or make_location(x, y, z)
-    print location
     ma = zip(*get_decoding_data(location.images[0].id, get_json=False))
     fc = zip(*get_decoding_data(location.images[1].id, get_json=False))
     ma = pd.Series(ma[1], index=ma[0], name='ma')
