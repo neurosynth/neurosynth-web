@@ -14,6 +14,7 @@ from nsweb.controllers.decode import decode_analysis_image, get_voxel_data
 from nsweb.controllers.images import get_decoding_data
 import pandas as pd
 import numpy as np
+from collections import defaultdict
 
 
 bp = Blueprint('locations', __name__, url_prefix='/locations')
@@ -135,23 +136,30 @@ def compare_location(val=None, decimals=2):
 def get_studies(val=None):
     x, y, z, radius = get_params(val)
     points = Peak.closestPeaks(radius, x, y, z)
-    # prevents duplicate studies
-    points = points.group_by(Peak.pmid)
-    # counts duplicate peaks
-    points = points.add_columns(sqlalchemy.func.count(Peak.id))
+
+    # Track number of peaks and study details for each found study,
+    # keeping only peaks that haven't been previously seen for current
+    # study/x/y/z combination.
+    seen = {}
+    study_counts = defaultdict(list)
+    for p in points:
+        key = hash((p.pmid, round(p.x, 2), round(p.y, 2), round(p.z, 2)))
+        if key in seen:
+            next
+        study_counts[p.pmid].append(p)
+        seen[key] = 1
 
     if 'dt' in request.args:
         data = []
-        for p in points:
-            s = p[0].study
+        for pmid, peaks in study_counts.items():
+            s = peaks[0].study
             link = '<a href={0}>{1}</a>'.format(url_for('studies.show',
-                                                        val=s.pmid), s.title)
-            data.append([link, s.authors, s.journal, p[1]])
-        data = jsonify(data=data)
+                                                        val=pmid), s.title)
+            data.append([link, s.authors, s.journal, len(peaks)])
     else:
-        data = [{'pmid': p[0].study.pmid, 'peaks':p[1]} for p in points]
-        data = jsonify(data=data)
-    return data
+        data = [{'pmid': pmid, 'peaks': len(peaks)}
+                for pmid, peaks in study_counts.items()]
+    return jsonify(data=data)
 
 
 @bp.route('/')
