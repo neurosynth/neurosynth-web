@@ -1,0 +1,16 @@
+{% macro viewer(scale=1) %}
+  <div class="viewer top-space20">
+    <div id="view-axial" class="view" style="width: {{270*scale}}px; height: {{264*scale}}px">
+      <canvas height="{{264*scale}}" width="{{220*scale}}"></canvas>
+      <div id="nav-zaxis" class="slider nav-slider-vertical"></div>
+    </div>
+    <div id="view-sagittal" class="view" style="width: {{264*scale}}px; height: {{300*scale}}px">
+      <canvas height="{{220*scale}}" width="{{264*scale}}"></canvas>
+      <div id="nav-xaxis" class="slider nav-slider-horizontal"></div>
+    </div>
+    <div id="view-coronal" class="view" style="width: {{270*scale}}px; height: {{220*scale}}px;">
+      <canvas height="{{220*scale}}" width="{{220*scale}}"></canvas>
+      <div id="nav-yaxis" class="slider nav-slider-vertical"></div>
+    </div>
+  </div>
+{% endmacro %}

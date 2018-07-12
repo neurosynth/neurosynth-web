@@ -1,8 +1,8 @@
 - set page_title = 'Neurosynth: ' + parcellation.name
 - extends "layout/base.html"
 - block content
-  - import "macros/_analysis_viewer.html.slim" as viewers
-  - import "macros/_datatables.html.slim" as datatables
+  - import "macros/_analysis_viewer.html" as viewers
+  - import "macros/_datatables.html" as datatables
   script type="text/javascript"
     |var analysis = "{{analysis.id}}";
     var rev_inf = {{analysis.reverse_inference_image.id}};

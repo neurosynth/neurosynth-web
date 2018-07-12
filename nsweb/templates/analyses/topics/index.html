@@ -1,0 +1,20 @@
+{% set page_title = 'Neurosynth|Topic-based meta-analyses' %}
+{% extends "layout/base.html" %}
+{% block content %}
+  <div class="row" id="page-analysis">
+    <div class="col-md-12.content">
+      <h1>Topic-based meta-analyses</h1>
+      <p>The topic sets listed in the table below were created by applying a standard topic modeling approach (<a href="http://en.wikipedia.org/wiki/Latent_Dirichlet_allocation">Latent Dirichlet allocation</a>) to the abstracts or text of articles in the database. To facilitate use in a variety of applications, we have created topic sets that vary in resolution (i.e., that contain different numbers of topics).</p>
+      <p>A detailed description of the procedures used to generate these topics can be found in <a href="http://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1002707">Poldrack et al (2012)</a>. Note that the topic sets available on this site are updated versions of the set reported in Poldrack et al (reflecting the continued expansion of the database).</p>
+      <table class="table-striped table-hover table table-condensed" id="topic-set-list-table">
+        <thead>
+          <tr>
+            <th style='width: 160px;'>Name</th>
+            <th style='width: 200px;'>Description</th>
+            <th style='width: 60px;'>Num. topics</th>
+          </tr>
+        </thead>
+      </table>
+    </div>
+  </div>
+{% endblock %}

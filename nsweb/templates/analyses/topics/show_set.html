@@ -1,0 +1,22 @@
+{% set page_title = 'Neurosynth Topics: ' + topic_set.name %}
+{% extends "layout/base.html" %}
+{% block content %}
+  <script type="text/javascript">
+    var topic_set = "{{topic_set.name}}";
+  </script>
+  <div class="row" id="page-analysis">
+    <div class="col-md-12 content">
+      <h1>{{topic_set.name}}</h1>
+      <div class="lead">{{topic_set.description}}</div>
+      <table class="table-striped table-hover table table-condensed" id="topic-set-table">
+        <thead>
+          <tr>
+            <th style='width: 60px;'>Topic number</th>
+            <th style='width: 300px;'>Top terms</th>
+            <th style='width: 60px;'>Num. studies</th>
+          </tr>
+        </thead>
+      </table>
+    </div>
+  </div>
+{% endblock %}

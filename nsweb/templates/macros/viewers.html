@@ -1,0 +1,91 @@
+{% macro viewer(layers=True, planes=['axial', 'coronal', 'sagittal']) %}
+  <div class="viewer">
+    <div class="viewer-left-col">
+      {% if 'coronal' in planes %}
+        <div id="view-coronal class="view">
+          <canvas height="220" width="220"></canvas>
+          <div id="nav-yaxis" class="slider nav-slider-vertical"></div>
+        </div>
+      {% endif %}
+      {% if 'axial' in planes %}
+        <div id="view-axial class="view">
+          <canvas height="264" width="220"></canvas>
+          <div id="nav-zaxis" class="slider nav-slider-vertical"></div>
+        </div>
+      {% endif %}
+    </div>
+    <div class="viewer-middle-col">
+      {% if 'sagittal' in planes %}
+        <div id="view-sagittal" class="view">
+          <canvas height="220" width="264"></canvas>
+          <div id="nav-xaxis" class="slider.nav-slider-horizontal"></div>
+        </div>
+      {% endif %}
+      <div class="layer-data-panel">
+        <div class="coordinate-info">
+          <div class="coordinate-head">
+            <div class="intensity-info data-row">
+              <div class="intensity-label"> </div>
+              <div id="data-current-value" class="data-value intensity-value"> </div>
+            </div>
+            <div class="whats-here-box">
+              <button id="load-location" class="btn btn-success">What's here?</button>
+            </div>
+          </div>
+          <div class="plane-pos-box">
+            <div class="plane-pos-label">X:</div>
+            <input  name="current-x" min="-90" max="90" value="0" class="plane-pos" type="number" id="current-x" />
+          </div>
+          <div class="plane-pos-box">
+            <div class="plane-pos-label">Y:</div>
+            <input  name="current-y" min="-72" max="108" value="0" class="plane-pos" type="number" id="current-y" />
+          </div>
+          <div class="plane-pos-box">
+            <div class="plane-pos-label">Z:</div>
+            <input  name="current-z" min="-106" max="90" value="0" class="plane-pos" type="number" id="current-z" />
+          </div>
+        </div>
+        <div id="description" class="data-row">
+          <h5>Description</h5>
+          <div id="image-description"> </div>
+        </div>
+      </div>
+    </div>
+
+  {% if layers %}
+    <div class="viewer-right-col">
+      <div id="layer-panel">
+        <span>Layers</span>
+        <div id="layer-list-panel">
+          <div id="layer_visible_list"> </div>
+          <ul id="layer-list" class="layer-settings"> </ul>
+        </div>
+        <div id="layer-settings-panel">
+          <div class="layer-container-half-width">
+            <span>Color palette:</span>
+            <select id="select-color" class="layer-settings form-control"> </select>
+            <span>Positive/Negative:</span>
+            <select id="select-sign" class="layer-settings form-control"> </select>
+          </div>
+          <div id="checkbox-list"> </div>
+          <div class="layer-container-full-width">
+            <div class="top-space20"> </div>
+            <div class="layer-settings-row">
+              <div class="row-label">Thresholds:</div>
+              <input id="neg-threshold-text" class="slider-text" />
+              <div id="neg-threshold" class="slider layer-settings layer-settings-slider"> </div>
+              <div id="threshold-zero"> </div>
+              <div id="pos-threshold" class="slider layer-settings layer-settings-slider"> </div>
+              <input id="pos-threshold-text" class="slider-text" />
+            </div>
+            <div class="layer-settings-row">
+              <div class="row-label">Opacity:</div>
+              <input id="opacity-text" class="slider-text" />
+              <div id="opacity" class="slider layer-settings layer-settings-slider"> </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+{% endmacro %}

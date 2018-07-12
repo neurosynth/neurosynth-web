@@ -1,0 +1,86 @@
+{% set page_title = 'Neurosynth -- online image decoder' %}
+{% extends "layout/base.html" %}
+{% block content %}
+  {% import "macros/_decode_viewer.html" as viewers %}
+  {% import "macros/_scatterplot.html" as scatterplot %}
+  <div class="row" id="page-decode-show">
+    <div class="col-md-12">
+      <h2>
+        <span>Decoding results</span>
+        {% if decoding.neurovault_id %}
+          for image <a href="http://neurovault.org/images/{{decoding.neurovault_id}}">{{decoding.name}}</a>
+        {% endif %}
+      </h2>
+      <div class="decode-viewer" style="width: 580px; float: left;">
+        <ul id="decode-menu" class="nav nav-pills">
+          <li class="active">
+            <a href="#maps" data-toggle="tab">Map</a>
+          </li>
+          <li>
+            <a href="#scatter" data-toggle="tab">Plot</a>
+          </li>
+          <li>
+            <a href="#faq" data-toggle="tab">FAQs</a>
+          </li>
+        </ul>
+        <div id="decode-tab-content" class="tab-content top-space20">
+          <div id="maps" class="tab-pane active">
+            <script type="text/javascript">
+              var options = {"panzoomEnabled":false};
+              var settings = ['no-zoom', 'layers','nav','checkboxes'];
+              var images = {{images|safe}};
+              var image_id = '{{image_id}}';
+            </script>
+            <p>{{viewers.viewer()|safe}}</p>
+          </div>
+          <div id="scatter" class="tab-pane">
+            <div id="loading-message">Loading image...</div>
+            <div id="scatterplot" style="width: 500px; float: left; position: relative;">
+              <h4>There's nothing here yet!</h4>
+              <p>That's probably because you haven't selected a Neurosynth term to compare this image against. To replace this annoying message with a pretty scatter plot, select one of the terms over there in the table on the right.</p>
+
+              <p>Note that most images will usually take 1 - 2 seconds to show up--we're computing them fresh, just for you!</p>
+            </div>
+          </div>
+          <div id="faq" class="tab-pane">
+            <h3>About the Neurosynth decoder</h3>
+            <p>The Neurosynth decoder compares arbitrary images uploaded to <a href="http://neurovault.org">NeuroVault</a> or found elsewhere on the web with images in the Neurosyth database.</p>
+
+            <h4 class="help">How are the values in the decoder table of results computed?</h4>
+            <p>At present, the values displayed in the decoding table simply represent the Pearson correlation between the two vectorized maps. I.e., the r values reflect the correlation across all voxels between the two maps. This approach has the virtue of being agnostic with respect to the scale of the inputs, is very fast, and produces standardized coefficients. Other approaches (e.g., application of classifiers trained on the entire Neurosynth datasets) typically run afoul of one of these constraints--e.g., many classifiers will produce insensible results if given different kinds of inputs (e.g., p-values versus z-scores versus binary thresholded masks).</p>
+
+            <h4 class="help">How are voxels with missing values handled?</h4>
+            <p>Currently, voxels with a value of zero are included in the analysis. For example, if an uploaded map contains 190,000 zeroes and 10,000 non-zero values, all 200,000 voxels will be included in the spatial correlation. This is important to keep in mind, because it means that attempting to decode maps with relatively few non-zero values (e.g., those conservatively corrected for multiple comparisons) will produce biased results (i.e., many coefficients very close to zero). Note that the deliberate introduction of bias is not necessarily a bad thing here, because the alternative is to produce highly variable estimates that will often provide a misleading sense of the robustness of an association. In future, we ,ay provide a user option for handling of zero values. In general, however, we recommend decoding unthresholded, uncorrected, whole-brain maps whenever possible.</p>
+
+            <h4 class="help">How should I interpret the values I see? Is 0.6 a large correlation? How about 0.12?</h4>
+            <p>We don't know. We suggest exercising great caution when interpreting these numbers.</p>
+
+            <h4 class="help">Can you provide p-values for the correlations produced by the decoder? I need to know whether the association between my map and a Neurosynth meta-analysis map is statistically significant!</h4>
+            <p>No we can't, and no you don't.</p>
+            <p>Less flippantly, computing valid and meaningful p-values is not trivial in this case. Because there's a good deal of spatial structure in the images being correlated--and that structure cannot be known in advance of each image--it's virtually impossible to determine the appropriate degrees of freedom to use in an inferential test. Using the nominal degrees of freedom (i.e., the number of voxels) is also a non-starter, because with over 200,000 voxels, even very small correlations of negligible size would be statistically significant.</p>
+            <p>More generally, we think relying on p-values in this context (and almost all other contexts) is a very bad idea. It's exceedingly unlikely that any two patterns of brain activity reflecting nominally interesting things could be completely uncorrelated in the population. Put differently, you don't need a test to reject the null--you can just assume that the null is false, and proceed accordingly with your life.</p>
+
+            <h4 class="help">The decoder gives me strange results!</h4>
+            <p>Assuming you're attempting to decode whole-brain, unthresholded maps (if not, see the previous question), there are two broad explanations for this. First, your map may be noisier than you think. If your sample size is small and/or there are other problems with the analysis pipeline, you may be looking at results that are largely noise. This can be true even in cases where there are isolated clusters that survive conventional correction procedures.</p>
+
+            <p>Alternatively, it is of course possible that you've identified a highly reliable pattern of whole-brain activity that just hasn't been previously reported in the literature. We would urge you to carefully consider the first explanation suggested above before you run towards the latter.</p>
+          </div>
+        </div>
+      </div>
+            
+      <div class="analysis-list" style="width: 200px; margin-left: 20px; margin-top: 50px;">
+        <h4>Term similarity</h4>
+        <p>To compare the decoded image against a Neurosynth term, click on an arrow below.</p>
+        <table id="decoding_results_table" class="table table-striped table-hover table-condensed">
+          <thead>
+            <tr>
+              <th></th>
+              <th>analysis</th>
+              <th>corr.</th>
+            </tr>
+          </thead>
+        </table>
+      </div>
+    </div>
+  </div>
+{% endblock %}

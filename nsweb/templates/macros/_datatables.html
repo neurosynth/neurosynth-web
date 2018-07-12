@@ -1,0 +1,23 @@
+{% macro studies_table(title, current_user, elem_id='analysis-studies-table') %}
+  {% if title %}
+    <h3>Studies associated with {{title}}</h3>
+    {% if current_user.is_authenticated %}
+      <button class="bt btn-primary" id="select-all-btn">Select all studies on this page</button>
+      <button class="bt btn-primary" id="deselect-all-btn">Deselect all studies on this page</button>
+      <br /><br />
+
+        <table class="table-striped table-hover table table-condensed selectable-table" id="{{elem_id}}">
+    {% else %}
+      <table class="table-striped table-hover table table-condensed" id="{{elem_id}}">
+    {% endif %}
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Authors</th>
+          <th>Journal</th>
+          <th>{{ 'Loading' if title else 'Activations' }}</th>
+        </tr>
+      </thead>
+    </table>
+  {% endif %}
+{% endmacro %}
