@@ -3,7 +3,6 @@ from flask import (Blueprint, render_template, redirect, url_for, request,
 from nsweb.models.analyses import (Analysis, AnalysisSet, TopicAnalysis,
                                    TermAnalysis, CustomAnalysis)
 from nsweb.models.images import CustomAnalysisImage
-from nsweb.core import db, add_blueprint
 from nsweb.controllers import images
 import json
 import re
@@ -21,7 +20,7 @@ bp = Blueprint('analyses', __name__, url_prefix='/analyses')
 @bp.route('/')
 def list_analyses():
     n_terms = TermAnalysis.query.count()
-    return render_template('analyses/index.html.slim', n_terms=n_terms)
+    return render_template('analyses/index.html', n_terms=n_terms)
 
 
 ### ROUTES COMMON TO ALL ANALYSES ###
@@ -41,13 +40,13 @@ def get_images(val):
     images = [{
         'id': img.id,
         'name': img.label,
-        'colorPalette': 'red' if 'reverse' in img.label else 'blue',
+        'colorPalette': 'red' if 'association' in img.label else 'blue',
         # "intent": (img.stat + ':').capitalize(),
         'url': '/images/%s' % img.id,
-        'visible': 1 if 'reverse' in img.label else 0,
+        'visible': 1 if 'association' in img.label else 0,
         'download': '/images/%s' % img.id,
         'intent': 'z-score'
-    } for img in analysis.images if img.display]
+    } for img in analysis.images if img.display and 'reverse' not in img.label]
     return jsonify(data=images)
 
 
@@ -55,7 +54,7 @@ def get_images(val):
 def get_image_file(analysis, image):
     if not isinstance(analysis, Analysis):
         analysis = find_analysis(analysis)
-    unthresholded = ('unthresholded' in request.args.keys())
+    unthresholded = ('unthresholded' in list(request.args.keys()))
     if re.match('\d+$', image):
         img = analysis.images[int(image)]
     elif image in ['reverse', 'forward']:
@@ -83,7 +82,7 @@ def get_studies(val):
 def show_analysis(id):
     analysis = find_analysis(id)
     if analysis is None:
-        return render_template('analyses/missing.html.slim', analysis=id)
+        return render_template('analyses/missing.html', analysis=id)
     if analysis.type == 'term':
         return redirect(url_for('analyses.show_term', term=analysis.name))
     elif analysis.type == 'topic':
@@ -101,15 +100,15 @@ def get_term_names():
 
 @bp.route('/terms/')
 def list_terms():
-    return render_template('analyses/terms/index.html.slim')
+    return render_template('analyses/terms/index.html')
 
 
 @bp.route('/terms/<string:term>/')
 def show_term(term):
     analysis = find_analysis(term, type='term')
     if analysis is None:
-        return render_template('analyses/missing.html.slim', analysis=term)
-    return render_template('analyses/terms/show.html.slim',
+        return render_template('analyses/missing.html', analysis=term)
+    return render_template('analyses/terms/show.html',
                            analysis=analysis,
                            cog_atlas=json.loads(analysis.cog_atlas or '{}'))
 
@@ -125,14 +124,14 @@ def get_term_image_file(type, name, image):
 @bp.route('/topics/')
 def list_topic_sets():
     topic_sets = AnalysisSet.query.filter_by(type='topics')
-    return render_template('analyses/topics/index.html.slim',
+    return render_template('analyses/topics/index.html',
                            topic_sets=topic_sets)
 
 
 @bp.route('/topics/<string:topic_set>/')
 def show_topic_set(topic_set):
     topic_set = AnalysisSet.query.filter_by(name=topic_set).first()
-    return render_template('analyses/topics/show_set.html.slim',
+    return render_template('analyses/topics/show_set.html',
                            topic_set=topic_set)
 
 
@@ -141,7 +140,7 @@ def show_topic(topic_set, number):
     topic = TopicAnalysis.query.join(AnalysisSet).filter(
         TopicAnalysis.number == number, AnalysisSet.name == topic_set).first()
     if topic is None:
-        return render_template('analyses/missing.html.slim', analysis=None)
+        return render_template('analyses/missing.html', analysis=None)
     terms = [t[0] for t in TermAnalysis.query.with_entities(
         TermAnalysis.name).all()]
     top = topic.terms.split(', ')
@@ -152,7 +151,7 @@ def show_topic(topic_set, number):
                                                     term=x), x)
         return x
     topic.terms = ', '.join(map(map_url, top))
-    return render_template('analyses/topics/show.html.slim',
+    return render_template('analyses/topics/show.html',
                            analysis_set=topic.analysis_set, analysis=topic)
 
 ### CUSTOM ANALYSIS ROUTES ###
@@ -162,8 +161,8 @@ def show_topic(topic_set, number):
 def show_custom_analysis(uid):
     custom = CustomAnalysis.query.filter_by(uuid=uid).first()
     if custom is None or (custom.private and custom.user != current_user):
-        return render_template('analyses/missing.html.slim', analysis=uid)
-    return render_template('analyses/custom/show.html.slim', analysis=custom)
+        return render_template('analyses/missing.html', analysis=uid)
+    return render_template('analyses/custom/show.html', analysis=custom)
 
 
 @bp.route('/topics/<string:topic_set>/<string:number>/images/<string:image>/')
@@ -176,7 +175,7 @@ def get_topic_image_file(topic_set, number, image):
 
 @bp.route('/custom/')
 def list_custom_analyses():
-    return render_template('analyses/custom/index.html.slim')
+    return render_template('analyses/custom/index.html')
 
 
 @bp.route('/browse/')
@@ -191,7 +190,7 @@ def browse_public_analyses():
 def faq_custom_analyses():
     data = json.load(open(join(settings.ROOT_DIR, 'data', 'json',
                                'faq_custom_analyses.json')))
-    return render_template('home/faq_custom_analyses.html.slim', data=data)
+    return render_template('home/faq_custom_analyses.html', data=data)
 
 
 @bp.route('/custom/run/<string:uid>/', methods=['GET', 'POST'])
@@ -248,6 +247,3 @@ def run_custom_analysis(uid):
                           "again.")
 
     return redirect(url_for('analyses.show_custom_analysis', uid=uid))
-
-
-add_blueprint(bp)

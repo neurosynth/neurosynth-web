@@ -1,6 +1,5 @@
 from flask import Blueprint, render_template, jsonify
 from nsweb.models.studies import Study
-from nsweb.core import add_blueprint
 
 bp = Blueprint('studies', __name__, url_prefix='/studies')
 
@@ -15,7 +14,7 @@ def index():
 @bp.route('/<int:val>/')
 def show(val):
     study = Study.query.get_or_404(val)
-    return render_template('studies/show.html.slim', study=study)
+    return render_template('studies/show.html', study=study)
 
 
 @bp.route('/<int:val>/tables')
@@ -33,7 +32,6 @@ def get_tables(val):
                     'peaks': [],
                 }
             }
-        tables[p.table]['data']['peaks'].append({"x": p.x, "y": p.y, "z": p.z})
-    return jsonify(data=tables.values())
-
-add_blueprint(bp)
+        x, y, z = int(p.x), int(p.y), int(p.z)
+        tables[p.table]['data']['peaks'].append({"x": x, "y": y, "z": z})
+    return jsonify(data=list(tables.values()))

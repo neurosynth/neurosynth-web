@@ -1,11 +1,10 @@
 from flask import (Blueprint, render_template, abort, send_file)
 from nsweb.models.genes import Gene
-from nsweb.core import add_blueprint
 from nsweb.tasks import make_scatterplot
 from nsweb.initializers import settings
 from nsweb.controllers import error_page
 from nsweb.controllers.decode import decode_analysis_image
-import simplejson as json
+import json
 from os.path import join, basename, exists
 
 bp = Blueprint('genes', __name__, url_prefix='/genes')
@@ -13,7 +12,7 @@ bp = Blueprint('genes', __name__, url_prefix='/genes')
 
 @bp.route('/')
 def index():
-    return render_template('genes/index.html.slim')
+    return render_template('genes/index.html')
 
 
 @bp.route('/<string:symbol>/')
@@ -33,7 +32,7 @@ def show(symbol):
         'download': url,
         'sign': 'both'
     }]
-    return render_template('genes/show.html.slim', gene=gene,
+    return render_template('genes/show.html', gene=gene,
                            images=json.dumps(images), image_id=dec.uuid)
 
 
@@ -53,5 +52,3 @@ def get_scatter(val, analysis):
             gene_masks=True).wait()
     return send_file(outfile, as_attachment=False,
                      attachment_filename=basename(outfile))
-
-add_blueprint(bp)

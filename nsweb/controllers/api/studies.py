@@ -1,12 +1,10 @@
 import urllib
-
 from nsweb.controllers.api import bp
 from flask import request, jsonify, url_for
 from nsweb.models.studies import Study
 from flask_user import login_required
 from nsweb import tasks
 from nsweb.core import cache
-import re
 
 # Begin server side APIs
 
@@ -14,7 +12,7 @@ import re
 def make_cache_key():
     ''' Replace default cache key prefix with a string that also includes
     query arguments. '''
-    return request.path + request.query_string
+    return request.path + request.query_string.decode('utf-8')
 
 
 @bp.route('/studies/')

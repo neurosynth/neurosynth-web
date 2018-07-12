@@ -1,4 +1,4 @@
-from nsweb.core import add_blueprint, cache
+from nsweb.core import cache
 from flask import (Blueprint, render_template, url_for, request, jsonify,
                    redirect)
 from flask_user import current_user
@@ -37,7 +37,8 @@ def handle_redirected_location(error):
 def make_cache_key():
     ''' Replace default cache key prefix with a string that also includes
     query arguments. '''
-    return request.path + request.query_string + unicode(current_user.is_authenticated())
+    return request.path + request.query_string.decode('utf-8') + \
+        str(current_user.is_authenticated)
 
 
 def get_params(val=None, location=False):
@@ -110,8 +111,8 @@ def compare_location(val=None, decimals=2):
     """
     x, y, z, radius = get_params(val)
     location = get_params(val, location=True) or make_location(x, y, z)
-    ma = zip(*get_decoding_data(location.images[0].id, get_json=False))
-    fc = zip(*get_decoding_data(location.images[1].id, get_json=False))
+    ma = list(zip(*get_decoding_data(location.images[0].id, get_json=False)))
+    fc = list(zip(*get_decoding_data(location.images[1].id, get_json=False)))
     ma = pd.Series(ma[1], index=ma[0], name='ma')
     fc = pd.Series(fc[1], index=fc[0], name='fc')
     # too many gene maps to slice into, so return NAs
@@ -158,7 +159,7 @@ def get_studies(val=None):
 @cache.cached(timeout=3600, key_prefix=make_cache_key)
 def show(val=None):
     x, y, z, radius = get_params(val)
-    return render_template('locations/index.html.slim', radius=radius, x=x,
+    return render_template('locations/index.html', radius=radius, x=x,
                            y=y, z=z)
 
 
@@ -221,5 +222,3 @@ def make_location(x, y, z):
         decode_analysis_image(img.id)
 
     return location
-
-add_blueprint(bp)

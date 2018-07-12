@@ -136,7 +136,7 @@ def save_custom_analysis():
         custom_analysis.private = private
     else:
         # create new custom analysis
-        uid = unicode(uuid.uuid4())[:18]
+        uid = str(uuid.uuid4())[:18]
         custom_analysis = CustomAnalysis(
             uuid=uid, name=name, description=description,
             user_id=current_user.id, private=private)
@@ -202,7 +202,7 @@ def copy_custom_analysis(uid):
     if not custom:
         abort(404)
 
-    uid = unicode(uuid.uuid4())[:18]
+    uid = str(uuid.uuid4())[:18]
     new_custom = CustomAnalysis(
         uuid=uid, user_id=current_user.id, name=custom.name)
     db.session.add(new_custom)

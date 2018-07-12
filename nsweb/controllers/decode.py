@@ -2,11 +2,11 @@ from flask import (Blueprint, render_template, request, abort, send_file,
                    jsonify)
 from nsweb.models.decodings import Decoding, DecodingSet
 from nsweb.models.images import Image
-from nsweb.core import add_blueprint, db, cache
+from nsweb.core import db, cache
 from nsweb.initializers import settings
 from nsweb import tasks
 from nsweb.controllers.helpers import send_nifti
-import simplejson as json
+import json
 import re
 import uuid
 import requests
@@ -31,7 +31,7 @@ def index():
     elif 'image' in request.args:
         return decode_analysis_image(request.args['image'])
 
-    return render_template('decode/index.html.slim')
+    return render_template('decode/index.html')
 
 
 @cache.memoize(timeout=3600)
@@ -52,6 +52,7 @@ def get_voxel_data(x, y, z, reference='terms', get_json=True, get_pp=True):
         reference = valid_references[0]
     result = tasks.get_voxel_data.delay(
         reference, x, y, z, get_pp).wait()
+    print("RESULT: ", result)
     return result if get_json else pd.read_json(result)
 
 
@@ -180,7 +181,7 @@ def decode_neurovault(id, render=True):
                         % str(id))
     metadata = json.loads(resp.content)
     if 'file' not in metadata:
-        return render_template('decode/missing.html.slim')
+        return render_template('decode/missing.html')
     metadata['nv_id'] = id
     return decode_url(metadata['file'], metadata, render=render)
 
@@ -201,7 +202,7 @@ def show(decoding=None, uuid=None):
         'url': '/decode/%s/image' % decoding.uuid,
         'download': '/decode/%s/image' % decoding.uuid
     }]
-    return render_template('decode/show.html.slim', image_id=decoding.uuid,
+    return render_template('decode/show.html', image_id=decoding.uuid,
                            images=json.dumps(images),
                            decoding=decoding)
 
@@ -260,5 +261,3 @@ def get_data_api():
     elif 'neurovault' in request.args:
         id = decode_neurovault(request.args['neurovault'], render=False)
     return get_data(id)
-
-add_blueprint(bp)

@@ -3,7 +3,7 @@ from nsweb.models.images import Image
 from nsweb.models.downloads import Download
 from nsweb.initializers import settings
 from nsweb.initializers.settings import IMAGE_DIR
-from nsweb.core import add_blueprint, db
+from nsweb.core import db
 from nsweb.controllers import error_page
 from nsweb.controllers.decode import decode_analysis_image
 from nsweb.controllers.helpers import send_nifti
@@ -47,5 +47,3 @@ def get_decoding_data(image, get_json=True):
 def anatomical_underlay():
     return send_nifti(os.path.join(IMAGE_DIR, 'anatomical.nii.gz'),
                       'anatomical.nii.gz')
-
-add_blueprint(bp)

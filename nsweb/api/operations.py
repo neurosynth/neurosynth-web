@@ -7,7 +7,6 @@ from nsweb.models.analyses import (Analysis, TermAnalysis, TopicAnalysis,
                                    CustomAnalysis)
 from nsweb.models.locations import Location
 from nsweb.models.studies import Study
-from nsweb.models.frequencies import Frequency
 from nsweb.models.peaks import Peak
 from nsweb.models.decodings import Decoding
 from nsweb.models.genes import Gene
@@ -15,14 +14,13 @@ from nsweb.controllers import decode
 from nsweb.controllers.locations import check_xyz
 from nsweb.core import cache
 from sqlalchemy import func
-from sqlalchemy.orm import with_polymorphic
 import re
 
 
 def make_cache_key():
     ''' Replace default cache key prefix with a string that also includes
     query arguments. '''
-    return request.path + request.query_string
+    return request.path + request.query_string.decode('utf-8')
 
 
 @bp.route('/analyses/')
@@ -87,7 +85,7 @@ def get_analyses():
         'topic': TopicAnalysis,
         'custom': CustomAnalysis
     }
-    if type in valid_types.keys():
+    if type in list(valid_types.keys()):
         analyses = analyses.with_polymorphic(valid_types[type])
         analyses = analyses.filter_by(type=type)
     if type == 'custom':

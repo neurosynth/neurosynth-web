@@ -25,7 +25,7 @@ def datatable_genes():
                            Gene.symbol.like(search) |
                            Gene.synonyms.like(search))
     data = data.order_by(order_by)
-    data = data.paginate(page=(offset/results_per_page)+1,
+    data = data.paginate(page=(offset / results_per_page) + 1,
                          per_page=results_per_page, error_out=False)
     result = {}
     result['draw'] = int(request.args['draw'])  # for security
@@ -34,8 +34,8 @@ def datatable_genes():
     result['data'] = [
         ['<a href={0}>{1}</a>'.format(
             url_for('genes.show', symbol=d.symbol), d.symbol),
-                            d.name,
-                            d.synonyms,
-                            d.locus_type
-                            ] for d in data.items]
+         d.name,
+         d.synonyms,
+         d.locus_type
+         ] for d in data.items]
     return jsonify(**result)
