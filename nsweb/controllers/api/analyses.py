@@ -27,9 +27,7 @@ def list_terms():
     data = TermAnalysis.query
     if search:  # No empty search on my watch
         search = '%{}%'.format(search)
-        data = data.filter(TermAnalysis.name.like(search) |
-                           TermAnalysis.n_studies.like(search) |
-                           TermAnalysis.n_activations.like(search))
+        data = data.filter(TermAnalysis.name.like(search))
     data = data.order_by(order_by)
     data = data.paginate(page=(offset / results_per_page) + 1,
                          per_page=results_per_page, error_out=False)
