@@ -23,13 +23,13 @@ jinja2
 marshmallow
 marshmallow-sqlalchemy
 matplotlib
-mysqlclient
 neurosynth
 nibabel
 nilearn
 numpy>=1.8
 pandas>=0.13
 ply
+psycopg2
 pyscss
 pytest
 redis

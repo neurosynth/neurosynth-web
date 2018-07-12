@@ -7,8 +7,9 @@ services:
       - "8000"
     volumes:
       - .:/code
-      - ${ROOT}/data:/data
-      - ${ROOT}/logs:/logs
+      - ${ROOT}/data:/data:rw
+      - ${ROOT}/logs:/logs:rw
+    working_dir: /code
     command: /code/scripts/docker_startup.sh
     depends_on:
       - db
@@ -20,8 +21,9 @@ services:
     expose:
       - '5432'
     volumes:
-      - ${ROOT}/postgres:/var/lib/postgresql/data
-
+      - postgres-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=nsweb_development
   nginx:
     restart: always
     image: nginx
@@ -48,3 +50,6 @@ services:
     depends_on:
       - db
       - redis
+
+volumes:
+  postgres-data:
