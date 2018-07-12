@@ -7,18 +7,16 @@ from celery.utils import cached_property
 import numpy as np
 import pandas as pd
 import nibabel as nb
-import matplotlib.pyplot as plt
-import seaborn as sns
 from nilearn.image import resample_img
 from nsweb.core import celery
 from os import unlink
-from os.path import join, basename, exists
+from os.path import join, exists
 from nsweb.tasks.scatterplot import scatter
 import traceback
 from glob import glob
-import re
 import json
 from collections import OrderedDict
+
 
 MASK_FILES = {
     'cortex': 'cortex.nii.gz',
@@ -29,6 +27,7 @@ MASK_FILES = {
     'putamen': 'FSL_BPut_thr0.nii.gz',
     'min4': 'voxel_counts_r6.nii.gz'
 }
+
 
 def load_image(masker, filename, save_resampled=True):
     """ Load an image, resampling into MNI space if needed. """
@@ -155,7 +154,7 @@ def decode_image(filename, reference, uuid, mask=None, drop_zeros=False,
         data = (data - data.mean()) / data.std()
         r = np.dot(ref.data[voxels].T, data) / ref.n_voxels
         outfile = join(settings.DECODING_RESULTS_DIR, uuid + '.txt')
-        labels = ref.labels.keys()
+        labels = list(ref.labels.keys())
         pd.Series(r, index=labels).to_csv(outfile, sep='\t')
         return True
     except Exception as e:
@@ -177,13 +176,13 @@ def get_voxel_data(reference, x, y, z, get_pp=True):
         ind = np.nonzero(get_voxel_data.masker.mask(space))[0]
 
         ref = get_voxel_data.references[reference + '_full']
-        labels = ref.labels.keys()
+        labels = list(ref.labels.keys())
         result = pd.Series(ref.data[ind, :].ravel(), index=labels, name='z')
         result = result * ref.stats['std'].values + ref.stats['mean'].values
 
         # Can get posterior probs as well
         if get_pp:
-            ref = get_voxel_data.references[reference + '_pp']
+            ref = get_voxel_data.references[reference + '_pp_unif']
             _pp = pd.Series(ref.data[ind, :].ravel(), index=labels, name='pp')
             _pp = _pp * ref.stats['std'].values + ref.stats['mean'].values
             result = pd.concat([result, _pp], axis=1)
