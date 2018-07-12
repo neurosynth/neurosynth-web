@@ -1,6 +1,6 @@
 import os
-from os.path import join, dirname
-import sys
+from os.path import join
+
 
 ### SETTINGS THAT SHOULD ALWAYS BE UPDATED ###
 # Root path for generated data
@@ -11,7 +11,7 @@ DATA_DIR = '/data'
 
 # Path to main assets (pickled Dataset, study files, etc.)
 ASSET_DIR = join(DATA_DIR, 'assets')
-RESET_ASSETS = False
+RESET_ASSETS = True
 
 # Path to pickled Neurosynth Dataset instance
 PICKLE_DATABASE = join(ASSET_DIR, 'neurosynth_dataset.pkl')
@@ -32,6 +32,13 @@ STATIC_FOLDER = join(ROOT_DIR, 'nsweb', 'static')
 # Templates
 TEMPLATE_FOLDER = join(ROOT_DIR, 'nsweb', 'templates')
 
+### SETUP INSTRUCTIONS AND APP BEHAVIOR ####
+
+# A list of analysis names can be provided at database setup time. If a file is
+# passed, it must be a tab-delimited file with term names in the first column
+# and a binary indicator of whether or not to retain the term in the second
+# column (named 'keep'). If None, all analyses are loaded into the DB.
+ANALYSIS_FILTER_FILE = None
 
 ### DECODER-RELATED PATHS ###
 # Path to decoded images
@@ -65,18 +72,19 @@ GENE_IMAGE_DIR = join(IMAGE_DIR, 'genes')
 
 
 ### DATABASE CONFIGURATION ###
-# Adapter to use--either 'mysql' or 'sqlite'
+# Adapter to use--either 'postgres' or 'sqlite'
 SQL_ADAPTER = 'sqlite'
 
 # SQLite pat
-SQLALCHEMY_SQLITE_URI = 'sqlite:///' + join(DATA_DIR, 'prod.db')
+SQLALCHEMY_SQLITE_URI = 'sqlite:///' + join(DATA_DIR, 'neurosynth.db')
 
-# MySQL configuration
-MYSQL_USER = 'nsweb'
-MYSQL_PASSWORD = 'changeme'
-MYSQL_PRODUCTION_DB = 'nsweb'
-MYSQL_DEVELOPMENT_DB = 'nsweb_development'
-MYSQL_TEST_DB = 'nsweb_test'
+# SQL configuration
+SQL_HOST = 'postgres'
+SQL_USER = 'nsweb'
+SQL_PASSWORD = 'changeme'
+SQL_PRODUCTION_DB = 'nsweb'
+SQL_DEVELOPMENT_DB = 'nsweb_development'
+SQL_TEST_DB = 'nsweb_test'
 TEST_URL = 'http://test.neurosynth.org'
 
 ### Logging ###
@@ -84,8 +92,8 @@ LOGGING_PATH = join(DATA_DIR, 'log.txt')
 LOGGING_LEVEL = 'DEBUG'
 
 ### Celery settings for background tasks ###
-CELERY_BROKER_URL = 'redis://localhost:6379'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379'
+CELERY_BROKER_URL = 'redis://redis:6379/0'
+CELERY_RESULT_BACKEND = 'redis://redis:6379/0'
 
 # Error logging with Opbeat
 OPBEAT_ENABLED = False
@@ -95,9 +103,10 @@ OPBEAT_SECRET_TOKEN = "..."
 OPBEAT_DEBUG = True
 
 ### Flask-Mail settings ###
-MAIL_ENABLE = False
+MAIL_ENABLE = True
 MAIL_USERNAME = os.getenv('MAIL_USERNAME', 'email@example.com')
 MAIL_PASSWORD = os.getenv('MAIL_PASSWORD', 'password')
+MAIL_DEBUG = False
 USER_EMAIL_SENDER_NAME = os.getenv("USER_EMAIL_SENDER_NAME", "My App")
 USER_EMAIL_SENDER_EMAIL = os.getenv("USER_EMAIL_SENDER_EMAIL",
                                     "noreply@example.com")

@@ -13,12 +13,16 @@ from flask_mail import Mail
 from nsweb.initializers import settings
 from nsweb.initializers.assets import init_assets
 from nsweb.initializers import make_celery
-from wtforms.validators import ValidationError
+from importlib import import_module
+
+# Do this before anything else to ensure the MPL backend isn't implicitly
+# set to something else, which could break everything if running in a container
+import matplotlib
+matplotlib.use('agg')
+
 
 app = Flask('NSWeb', static_folder=settings.STATIC_FOLDER,
             template_folder=settings.TEMPLATE_FOLDER)
-app.config['SQLALCHEMY_POOL_RECYCLE'] = 1800
-# manager = Manager(app)
 
 # Caching
 cache = Cache(config={'CACHE_TYPE': 'simple'})
@@ -28,7 +32,7 @@ celery = make_celery(app)
 from nsweb import tasks
 
 db = SQLAlchemy()
-_blueprints = []
+from nsweb.models.users import User
 
 # API-related stuff
 marshmallow = Marshmallow()
@@ -56,20 +60,22 @@ def create_app(debug=True, test=False):
     # Generate DB URI
     if settings.SQL_ADAPTER == 'sqlite':
         db_uri = settings.SQLALCHEMY_SQLITE_URI
-    elif settings.SQL_ADAPTER == 'mysql':
+    elif settings.SQL_ADAPTER.startswith('post'):
         if test:
-            db_to_use = settings.MYSQL_TEST_DB
+            db_to_use = settings.SQL_TEST_DB
         elif settings.DEBUG:
-            db_to_use = settings.MYSQL_DEVELOPMENT_DB
+            db_to_use = settings.SQL_DEVELOPMENT_DB
         else:
-            db_to_use = settings.MYSQL_PRODUCTION_DB
-        db_uri = 'mysql://%s:%s@localhost/%s' % (
-            settings.MYSQL_USER, settings.MYSQL_PASSWORD, db_to_use)
+            db_to_use = settings.SQL_PRODUCTION_DB
+        db_uri = 'postgres://postgres@%s:5432/%s' % (
+            settings.SQL_HOST,
+            db_to_use)
     else:
         raise ValueError("Value of SQL_ADAPTER in settings must be either"
-                         "'sqlite' or 'mysql'")
+                         "'sqlite' or 'postgres'")
 
     app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.secret_key = "very_sekret"  # move this out of here eventually
 
     # Initialize assets
@@ -100,35 +106,35 @@ def create_app(debug=True, test=False):
     params = ['USER_EMAIL_SENDER_NAME', 'USER_EMAIL_SENDER_EMAIL']
     if settings.MAIL_ENABLE:
         params += ['MAIL_USERNAME', 'MAIL_PASSWORD', 'MAIL_SERVER',
-                   'MAIL_PORT', 'MAIL_USE_SSL']
+                   'MAIL_PORT', 'MAIL_USE_SSL', 'MAIL_DEBUG']
+        app.config['USER_ENABLE_FORGOT_PASSWORD'] = True
     app.config.update({(p, getattr(settings, p)) for p in params})
     mail.init_app(app)
 
     # Set up user management
     app.config['CSRF_ENABLED'] = True
-    app.config['USER_ENABLE_FORGOT_PASSWORD'] = True
-    from nsweb.models.users import User
+
     UserManager(app, db, User)
 
     # load blueprints
     register_blueprints()
 
-
-def add_blueprint(blueprint):
-    _blueprints.append(blueprint)
+    # set up logging
+    setup_logging(logging_path=settings.LOGGING_PATH,
+                  level=settings.LOGGING_LEVEL)
 
 
 def register_blueprints():
-    # creates and registers blueprints in nsweb.blueprints
-    import nsweb.controllers.home
-    import nsweb.controllers.studies
-    import nsweb.controllers.analyses
-    import nsweb.controllers.locations
-    import nsweb.controllers.api
-    import nsweb.api
-    import nsweb.controllers.images
-    import nsweb.controllers.decode
-    import nsweb.controllers.genes
-
-    for blueprint in _blueprints:
-        app.register_blueprint(blueprint)
+    blueprint_locations = [
+        'nsweb.controllers.home',
+        'nsweb.controllers.analyses',
+        'nsweb.controllers.locations',
+        'nsweb.controllers.api',
+        'nsweb.api',
+        'nsweb.controllers.images',
+        'nsweb.controllers.decode',
+        'nsweb.controllers.genes'
+    ]
+    for loc in blueprint_locations:
+        mod = import_module(loc)
+        app.register_blueprint(getattr(mod, 'bp'))
