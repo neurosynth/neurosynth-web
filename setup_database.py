@@ -21,15 +21,15 @@ def main():
         reset_db=True, reset_dataset=False)
         # reset_db=False, reset_dataset=False)
 
-
     print("Adding analyses...")
     if settings.PROTOTYPE:
         analyses = ['emotion', 'language', 'memory', 'pain', 'visual',
                     'attention', 'sensory']
     elif settings.ANALYSIS_FILTER_FILE is not None:
-       filt = pd.read_csv(settings.ANALYSIS_FILTER_FILE, sep='\t', index_col=0)
-       analyses = filt[filt['keep'] == 1].index.tolist()
-       print("Keeping %d analysis terms." % len(analyses))
+        filt = pd.read_csv(settings.ANALYSIS_FILTER_FILE, sep='\t',
+                           index_col=0)
+        analyses = filt[filt['keep'] == 1].index.tolist()
+        print("Keeping %d analysis terms." % len(analyses))
     else:
         analyses = None
 
