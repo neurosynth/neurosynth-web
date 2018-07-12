@@ -295,7 +295,6 @@ class DatabaseBuilder:
             analyses = self._get_feature_names()
 
         feature_data = self.dataset.get_feature_data(features=analyses)
-        analysis_names = list(feature_data.columns)
 
         study_inds = self.dataset.activations['id'].unique()
 
@@ -321,6 +320,10 @@ class DatabaseBuilder:
                 peaks = [Peak(x=p['x'], y=p['y'], z=p['z'],
                               table=p['table_num'])
                          for (ind, p) in activ.iterrows()]
+
+                # Track in Python to avoid issuing SQL count() queries
+                n_peaks = len(peaks)
+
                 data = activ.iloc[0, :]
                 study = Study(
                     pmid=int(pmid),
@@ -336,26 +339,21 @@ class DatabaseBuilder:
             # Map analyses onto studies via a Frequency join table that also
             # stores frequency info
             pmid_frequencies = feature_data.loc[pmid, :]
+            to_keep = pmid_frequencies[pmid_frequencies >= threshold]
+            for analysis_name, freq in to_keep.iteritems():
+                freq_inst = Frequency(
+                    study=study, analysis=self.analyses[analysis_name][0],
+                    frequency=freq)
+                self.db.session.add(freq_inst)
 
-            for analysis_name in analysis_names:
-                freq = pmid_frequencies[analysis_name]
-                if freq >= threshold:
-                    freq_inst = Frequency(
-                        study=study, analysis=self.analyses[analysis_name][0],
-                        frequency=freq)
-                    self.db.session.add(freq_inst)
+                # Track number of studies and peaks so we can update
+                # Analysis table more efficiently later
+                self.analyses[analysis_name][1] += 1
+                self.analyses[analysis_name][2] += n_peaks
 
-                    # Track number of studies and peaks so we can update
-                    # Analysis table more efficiently later
-                    self.analyses[analysis_name][1] += 1
-                    self.analyses[analysis_name][2] += study.peaks.count()
-
-        # Commit records in batches to conserve memory.
-        # This is very slow because we're relying on the declarative base.
-        # Ideally should replace this with use of SQLAlchemy core, but probably
-        # not worth the trouble considering we only re-create the DB once in a
-        # blue moon.
+        # Commit records in batches to conserve memory and speed up querying.
             if (i + 1) % 100 == 0:
+                print("Saving study %d..." % i)
                 self.db.session.commit()
 
         self.db.session.commit()  # Commit any remaining studies
