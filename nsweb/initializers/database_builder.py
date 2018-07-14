@@ -625,7 +625,7 @@ class DatabaseBuilder:
             is_subsampled = (voxels is not None)
             if voxels is not None:
                 # Either randomly select voxels, or use what was passed
-                # TODO: sample uniformly from a 3D grid instead of randomly
+                # TODO: downsample image instead of randomly selecting voxels
                 if isinstance(voxels, int):
                     sampled_vox = np.random.choice(sampled_vox, voxels,
                                                    replace=False)
@@ -636,19 +636,20 @@ class DatabaseBuilder:
             # Initialize memmap
             n_images = len(images)
             mm_file = join(mm_dir, '%s_images.dat' % name)
-            mm = np.memmap(mm_file, dtype='float32', mode='w+',
-                           shape=(len(sampled_vox), n_images))
+            temp_map = np.zeros((len(sampled_vox), n_images), dtype='float32')
 
             # Save key image stats--will need these to reconstruct raw values
             stats = np.zeros((n_images, 4))
 
             # Populate with standardized image data
             for i, img in enumerate(images):
+                if not i % 100:
+                    print("Processing image %i..." % i)
                 # Use unthresholded maps when possible
                 img_file = re.sub('_FDR_*nii.gz', '.nii.gz', img)
                 data = masker.mask(img_file)[sampled_vox]
                 std, mean = data.std(), data.mean()
-                mm[:, i] = (data - mean) / std
+                temp_map[:, i] = (data - mean) / std
                 stats[i, :] = [data.min(), data.max(), mean, std]
 
             stats = pd.DataFrame(stats, index=labels,
@@ -665,7 +666,13 @@ class DatabaseBuilder:
             md_file = join(mm_dir, '%s_metadata.json' % name)
             open(md_file, 'w').write(json.dumps(metadata))
 
-            # Flush
+            # Copy to memmap
+            print("Initializing memmap...")
+            mm = np.memmap(mm_file, dtype='float32', mode='w+',
+                           shape=(len(sampled_vox), n_images))
+            print("Storing data...")
+            mm[:] = temp_map[:]
+            print("Flushing...")
             del mm
 
             # Create DB record
