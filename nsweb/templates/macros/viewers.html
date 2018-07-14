@@ -2,13 +2,13 @@
   <div class="viewer">
     <div class="viewer-left-col">
       {% if 'coronal' in planes %}
-        <div id="view-coronal class="view">
+        <div id="view-coronal" class="view home">
           <canvas height="220" width="220"></canvas>
           <div id="nav-yaxis" class="slider nav-slider-vertical"></div>
         </div>
       {% endif %}
       {% if 'axial' in planes %}
-        <div id="view-axial class="view">
+        <div id="view-axial" class="view home">
           <canvas height="264" width="220"></canvas>
           <div id="nav-zaxis" class="slider nav-slider-vertical"></div>
         </div>
@@ -16,9 +16,9 @@
     </div>
     <div class="viewer-middle-col">
       {% if 'sagittal' in planes %}
-        <div id="view-sagittal" class="view">
+        <div id="view-sagittal" class="view home">
           <canvas height="220" width="264"></canvas>
-          <div id="nav-xaxis" class="slider.nav-slider-horizontal"></div>
+          <div id="nav-xaxis" class="slider nav-slider-horizontal"></div>
         </div>
       {% endif %}
       <div class="layer-data-panel">
@@ -51,41 +51,41 @@
         </div>
       </div>
     </div>
-
-  {% if layers %}
-    <div class="viewer-right-col">
-      <div id="layer-panel">
-        <span>Layers</span>
-        <div id="layer-list-panel">
-          <div id="layer_visible_list"> </div>
-          <ul id="layer-list" class="layer-settings"> </ul>
-        </div>
-        <div id="layer-settings-panel">
-          <div class="layer-container-half-width">
-            <span>Color palette:</span>
-            <select id="select-color" class="layer-settings form-control"> </select>
-            <span>Positive/Negative:</span>
-            <select id="select-sign" class="layer-settings form-control"> </select>
+    {% if layers %}
+      <div class="viewer-right-col">
+        <div id="layer-panel">
+          <span>Layers</span>
+          <div id="layer-list-panel">
+            <div id="layer_visible_list"> </div>
+            <ul id="layer-list" class="layer-settings"> </ul>
           </div>
-          <div id="checkbox-list"> </div>
-          <div class="layer-container-full-width">
-            <div class="top-space20"> </div>
-            <div class="layer-settings-row">
-              <div class="row-label">Thresholds:</div>
-              <input id="neg-threshold-text" class="slider-text" />
-              <div id="neg-threshold" class="slider layer-settings layer-settings-slider"> </div>
-              <div id="threshold-zero"> </div>
-              <div id="pos-threshold" class="slider layer-settings layer-settings-slider"> </div>
-              <input id="pos-threshold-text" class="slider-text" />
+          <div id="layer-settings-panel">
+            <div class="layer-container-half-width">
+              <span>Color palette:</span>
+              <select id="select-color" class="layer-settings form-control"> </select>
+              <span>Positive/Negative:</span>
+              <select id="select-sign" class="layer-settings form-control"> </select>
             </div>
-            <div class="layer-settings-row">
-              <div class="row-label">Opacity:</div>
-              <input id="opacity-text" class="slider-text" />
-              <div id="opacity" class="slider layer-settings layer-settings-slider"> </div>
+            <div id="checkbox-list"> </div>
+            <div class="layer-container-full-width">
+              <div class="top-space20"> </div>
+              <div class="layer-settings-row">
+                <div class="row-label">Thresholds:</div>
+                <input id="neg-threshold-text" class="slider-text" />
+                <div id="neg-threshold" class="slider layer-settings layer-settings-slider"> </div>
+                <div id="threshold-zero"> </div>
+                <div id="pos-threshold" class="slider layer-settings layer-settings-slider"> </div>
+                <input id="pos-threshold-text" class="slider-text" />
+              </div>
+              <div class="layer-settings-row">
+                <div class="row-label">Opacity:</div>
+                <input id="opacity-text" class="slider-text" />
+                <div id="opacity" class="slider layer-settings layer-settings-slider"> </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-  {% endif %}
+    {% endif %}
+  </div>
 {% endmacro %}
