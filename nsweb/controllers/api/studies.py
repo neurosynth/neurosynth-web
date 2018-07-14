@@ -29,14 +29,18 @@ def get_study_list():
         ['title', 'authors', 'journal', 'year', 'pmid']
         [int(request.args['order[0][column]'])],
         str(request.args['order[0][dir]']))
-    search = str(request.args['search[value]']).strip()
-    if search:  # No empty search on my watch
-        search = '%{}%'.format(search)
-        data = data.filter(Study.title.like(search) |
-                           Study.authors.like(search) |
-                           Study.journal.like(search) |
-                           Study.year.like(search) |
-                           Study.pmid.like(search))
+    val = str(request.args['search[value]']).strip()
+    if val:
+        str_val = '%{}%'.format(val)
+        q = Study.title.ilike(str_val) | Study.authors.ilike(str_val) | \
+            Study.journal.ilike(str_val)
+        try:
+            int_val = int(val)
+            q = q | (Study.year == int_val) | (Study.pmid == int_val)
+        except Exception as e:
+            import traceback
+            print(traceback.format_exc())
+        data = data.filter(q)
     data = data.order_by(order_by)
     data = data.paginate(
         page=(offset / results_per_page) + 1, per_page=results_per_page,
