@@ -129,12 +129,12 @@ def register_blueprints():
         'nsweb.controllers.home',
         'nsweb.controllers.locations',
         'nsweb.controllers.studies',
-        'nsweb.controllers.api',
         'nsweb.controllers.analyses',
         'nsweb.api',
         'nsweb.api.analyses',
         'nsweb.api.images',
         'nsweb.api.locations',
+        'nsweb.api.studies',
         'nsweb.controllers.decode',
         'nsweb.controllers.genes'
     ]
