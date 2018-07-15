@@ -45,7 +45,7 @@ $(document).ready ->
     coords = { x: $('#x-in').val(), y: $('#y-in').val(), z: $('#z-in').val(), r: $('#rad-out').val()}
     xyz = [coords.x, coords.y, coords.z]
     study_info = 'Studies reporting activation within ' + coords.r + ' mm of (' + xyz.join(', ') + ')'
-    $('#current-location-studies') .text(study_info)
+    $('#current-location-studies').text(study_info)
     
     # TODO: IMPLEMENT ONPOPSTATE  
     # window.history.pushState(null, null, base + '?' + $.param(coords))
