@@ -26,7 +26,7 @@ $(document).ready ->
       minLength: 2
       delay: 0
       select: (e, ui) -> 
-        window.location.href = '/api/analyses/terms/' + ui.item.value
+        window.location.href = '/analyses/terms/' + ui.item.value
       # only match words that start with string, and limit to 10
       source: (request, response) ->
         re = $.ui.autocomplete.escapeRegex(request.term)
@@ -40,7 +40,7 @@ $(document).ready ->
     
   $('#term-analysis-search').keyup((e) ->
     text = $('#term-analysis-search').val()
-    window.location.href = ('/api/analyses/terms/' + text) if (e.keyCode == 13)
+    window.location.href = ('/analyses/terms/' + text) if (e.keyCode == 13)
   )
 
   loadAnalysisStudies = ->

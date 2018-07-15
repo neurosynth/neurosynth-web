@@ -54,7 +54,7 @@ createDataTable = (element, options) ->
   # Set defaults and overwrite with the passed object
   _opts = {
     pagingType: "full_numbers"
-    pageLength: 25
+    pageLength: 10
     stateSave: true
     orderClasses: true
     processing: true
