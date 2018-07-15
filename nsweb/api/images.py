@@ -6,11 +6,11 @@ from nsweb.core import cache
 from .utils import make_cache_key
 import re
 from nsweb.core import db
-from nsweb.controllers.helpers import send_nifti
+from .utils import send_nifti
 from nsweb.initializers import settings
 from nsweb.initializers.settings import IMAGE_DIR
 from nsweb.controllers import error_page
-from nsweb.controllers.decode import decode_analysis_image
+from nsweb.api.decode import decode_analysis_image
 import os
 
 

@@ -12,7 +12,7 @@ from nsweb.initializers import settings
 from os.path import join, exists
 from nsweb import tasks
 from nsweb.core import db, app
-from nsweb.controllers.decode import decode_analysis_image, get_voxel_data
+from nsweb.api.decode import decode_analysis_image, get_voxel_data
 import pandas as pd
 import numpy as np
 from collections import defaultdict
@@ -210,9 +210,9 @@ def get_images(val=None):
         'id': img.id,
         'name': img.label,
         'colorPalette': 'yellow' if 'coactivation' in img.label else 'red',
-        'url': '/api/images/%s/download' % img.id,
+        'url': url_for('api_images.download', val=img.id),
         'visible': 0 if 'coactivation' in img.label else 1,
-        'download': '/api/images/%s/download' % img.id,
+        'download': url_for('api_images.download', val=img.id),
         'description': img.description,
         'intent': img.stat,
         'positiveThreshold': 0 if 'coactivation' in img.label else 0.2,
@@ -297,7 +297,7 @@ def location_api(val):
     points = Peak.closestPeaks(radius, x, y, z)
     points = points.group_by(Peak.pmid)  # prevents duplicate studies
     # counts duplicate peaks
-    points = points.add_columns(sqlalchemy.func.count(Peak.id))
+    points = points.add_columns(func.count(Peak.id))
 
     ### IMAGES ###
     location = Location.query.filter_by(x=x, y=y, z=z).first()

@@ -126,18 +126,20 @@ def create_app(debug=True, test=False):
 
 def register_blueprints():
     blueprint_locations = [
-        'nsweb.controllers.home',
-        'nsweb.controllers.locations',
-        'nsweb.controllers.studies',
-        'nsweb.controllers.analyses',
         'nsweb.api',
         'nsweb.api.analyses',
         'nsweb.api.images',
         'nsweb.api.locations',
         'nsweb.api.studies',
+        'nsweb.api.decode',
+        'nsweb.controllers.home',
+        'nsweb.controllers.analyses',
+        'nsweb.controllers.locations',
+        'nsweb.controllers.studies',
         'nsweb.controllers.decode',
         'nsweb.controllers.genes'
     ]
+
     for loc in blueprint_locations:
         mod = import_module(loc)
         app.register_blueprint(getattr(mod, 'bp'))

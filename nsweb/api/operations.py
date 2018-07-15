@@ -1,8 +1,6 @@
 from nsweb.api import bp
 from flask import jsonify, request
-from nsweb.api.schemas import (StudySchema,
-                               DecodingSchema, GeneSchema)
-from nsweb.models.studies import Study
+from nsweb.api.schemas import (DecodingSchema, GeneSchema)
 from nsweb.models.decodings import Decoding
 from nsweb.models.genes import Gene
 from nsweb.controllers import decode

@@ -160,8 +160,7 @@ def get_study_analyses(val):
         url_for('analyses.show_analysis', id=f.analysis_id), f.analysis.name),
         round(f.frequency, 3),
     ] for f in data.frequencies if f.analysis.type != 'custom']
-    data = jsonify(data=data)
-    return data
+    return jsonify(data=data)
 
 
 @bp.route('/peaks/<int:val>/')
@@ -172,8 +171,7 @@ def get_study_peaks(val):
     data = [[p.table, p.x, p.y, p.z] for p in data.peaks]
 # data=Peak.query.filter_by(pmid=int(val)).with_entities(Peak.x,Peak.y,Peak.z).all()
 # attempted optimization.
-    data = jsonify(data=data)
-    return data
+    return jsonify(data=data)
 
 
 @bp.route('/all/')
