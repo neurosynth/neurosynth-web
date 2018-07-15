@@ -5,10 +5,10 @@ $(document).ready ->
 
   # Load the table layers
   if study?
-    url = '/studies/' + study  + '/tables'
+    url = '/api/studies/' + study  + '/tables'
     $.get(url, (result) -> window.loadImages(result.data))
 
-  createDataTable('#studies_table', { ajax: '/api/studies/', serverSide: true })
+  createDataTable('#studies_table', { ajax: '/api/studies/dt', serverSide: true })
 
   url_id=document.URL.split('/')
   url_id=url_id[url_id.length-2]
