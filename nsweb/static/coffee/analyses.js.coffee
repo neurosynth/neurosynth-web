@@ -20,13 +20,13 @@ $(document).ready ->
 
 
   # autocomplete
-  $.get('/analyses/term_names', (result) ->
+  $.get('/api/analyses/term_names', (result) ->
 
     $('#term-analysis-search').autocomplete( 
       minLength: 2
       delay: 0
       select: (e, ui) -> 
-        window.location.href = '/analyses/terms/' + ui.item.value
+        window.location.href = '/api/analyses/terms/' + ui.item.value
       # only match words that start with string, and limit to 10
       source: (request, response) ->
         re = $.ui.autocomplete.escapeRegex(request.term)
@@ -40,15 +40,15 @@ $(document).ready ->
     
   $('#term-analysis-search').keyup((e) ->
     text = $('#term-analysis-search').val()
-    window.location.href = ('/analyses/terms/' + text) if (e.keyCode == 13)
+    window.location.href = ('/api/analyses/terms/' + text) if (e.keyCode == 13)
   )
 
   loadAnalysisStudies = ->
-    url = '/analyses/' + analysis + '/studies?dt=1'
+    url = '/api/analyses/' + analysis + '/studies?dt=1'
     $('#analysis-studies-table').DataTable().ajax.url(url).load().order([3, 'desc'])
 
   loadAnalysisImages = ->
-    url = '/analyses/' + analysis  + '/images'
+    url = '/api/analyses/' + analysis  + '/images'
     $.get(url, (result) ->
       loadImages(result.data)
       )

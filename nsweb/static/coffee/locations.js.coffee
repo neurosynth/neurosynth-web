@@ -18,22 +18,22 @@ $(document).ready ->
     coords.join('_')
 
   loadLocationStudies = ->
-    url = '/locations/' + getLocationString() + '/studies?dt=1'
+    url = '/api/locations/' + getLocationString() + '/studies?dt=1'
     $('#location_studies_table').DataTable().ajax.url(url).load().order([3, 'desc'])
 
   loadLocationImages = ->
-    url = '/locations/' + getLocationString()  + '/images'
+    url = '/api/locations/' + getLocationString()  + '/images'
     $.get(url, (result) ->
       window.loadImages(result.data)
       loadLocationSimilarity(result.data[0].id)
       )
 
   loadLocationComparisons = ->
-    url = '/locations/' + getLocationString() + '/compare'
+    url = '/api/locations/' + getLocationString() + '/compare'
     $('#location_analyses_table').DataTable().ajax.url(url).load().order([1, 'desc'])
 
   loadLocationSimilarity = (id) ->
-    url = '/images/' + id + '/decode'
+    url = '/api/images/' + id + '/decode'
     $('#analysis-similarity-table').DataTable().ajax.url(url).load().order([1, 'desc'])
     #TODO: IMPLEMENT MOVE CURSOR TO SEED
 

@@ -10,11 +10,11 @@ window.loadImages = (imgs = null, clear = true) ->
       name:'anatomical', 
       colorPalette: 'grayscale', 
       cache: true,
-      download: '/images/anatomical',
-      url:'/images/anatomical' })
+      download: '/api/images/anatomical',
+      url:'/api/images/anatomical' })
   for img in imgs
     # img.json = true
-    img.url = '/images/' + img.id + '/' if img.id? and !img.url?
+    img.url = '/api/images/' + img.id + '/download' if img.id? and !img.url?
   viewer.loadImages(imgs)
 
 # Turn text into HTML to make sure links are displayed
