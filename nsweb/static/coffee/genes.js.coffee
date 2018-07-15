@@ -4,7 +4,7 @@ $(document).ready ->
   return if not $('#page-genes-list').length
 
   # Initialize DataTables
-  createDataTable('#gene-list-table', {ajax: '/api/v2/dt/genes', serverSide: true})
+  createDataTable('#gene-list-table', {ajax: '/api/genes/dt', serverSide: true})
   columns = [
     { width: '20%' }
     { width: '40%' }

@@ -156,9 +156,6 @@ def get_image(uuid):
     Neurosynth-generated images in order to prevent public access based on
     sequential IDs, as all access to uploads must be via UUIDs. """
     dec = Decoding.query.filter_by(uuid=uuid).first()
-    print("\n\n", dec, "\n\n")
-    print(join(settings.DECODED_IMAGE_DIR, dec.filename),
-          basename(dec.filename))
     if dec is None:
         abort(404)
     return send_nifti(join(settings.DECODED_IMAGE_DIR, dec.filename),

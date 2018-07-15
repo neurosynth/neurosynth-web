@@ -14,7 +14,7 @@ import uuid
 from os.path import join, exists
 
 
-bp = Blueprint('api_analyses', __name__, url_prefix='/api/analyses/custom')
+bp = Blueprint('api_custom', __name__, url_prefix='/api/analyses/custom')
 
 
 @bp.route('/save/', methods=['POST', 'GET'])

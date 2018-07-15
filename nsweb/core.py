@@ -128,10 +128,12 @@ def register_blueprints():
     blueprint_locations = [
         'nsweb.api',
         'nsweb.api.analyses',
+        'nsweb.api.custom',
         'nsweb.api.images',
         'nsweb.api.locations',
         'nsweb.api.studies',
         'nsweb.api.decode',
+        'nsweb.api.genes',
         'nsweb.controllers.home',
         'nsweb.controllers.analyses',
         'nsweb.controllers.locations',

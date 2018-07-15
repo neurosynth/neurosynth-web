@@ -119,8 +119,7 @@ def get_study_list():
             int_val = int(val)
             q = q | (Study.year == int_val) | (Study.pmid == int_val)
         except Exception as e:
-            import traceback
-            print(traceback.format_exc())
+            pass
         data = data.filter(q)
     data = data.order_by(order_by)
     data = data.paginate(
