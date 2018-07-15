@@ -14,17 +14,21 @@ bp = Blueprint('home', __name__)
 
 @bp.route('/')
 def index():
-    """ Returns the homepage. """
-    stats = {
-        'n_analyses': db.session.query(func.count(TermAnalysis.id)).first()[0],
-        'n_studies': db.session.query(func.count(Study.pmid)).first()[0],
-        'n_peaks': db.session.query(func.count(Peak.id)).first()[0],
-    }
-    analysis = random.choice(
-        ['reward', 'language', 'emotion', 'pain', 'working memory'])
-    analysis = TermAnalysis.query.filter_by(name=analysis).first()
-    return render_template('home/index.html', analysis=analysis,
-                           stats=stats)
+    return render_template('index.html')
+
+# @bp.route('/')
+# def index():
+#     """ Returns the homepage. """
+#     stats = {
+#         'n_analyses': db.session.query(func.count(TermAnalysis.id)).first()[0],
+#         'n_studies': db.session.query(func.count(Study.pmid)).first()[0],
+#         'n_peaks': db.session.query(func.count(Peak.id)).first()[0],
+#     }
+#     analysis = random.choice(
+#         ['reward', 'language', 'emotion', 'pain', 'working memory'])
+#     analysis = TermAnalysis.query.filter_by(name=analysis).first()
+#     return render_template('home/index.html', analysis=analysis,
+#                            stats=stats)
 
 
 @bp.route('/faq/')

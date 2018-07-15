@@ -127,12 +127,14 @@ def create_app(debug=True, test=False):
 def register_blueprints():
     blueprint_locations = [
         'nsweb.controllers.home',
-        'nsweb.controllers.analyses',
         'nsweb.controllers.locations',
         'nsweb.controllers.studies',
         'nsweb.controllers.api',
+        'nsweb.controllers.analyses',
         'nsweb.api',
-        'nsweb.controllers.images',
+        'nsweb.api.analyses',
+        'nsweb.api.images',
+        'nsweb.api.locations',
         'nsweb.controllers.decode',
         'nsweb.controllers.genes'
     ]

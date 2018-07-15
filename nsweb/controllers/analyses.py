@@ -1,9 +1,8 @@
-from flask import (Blueprint, render_template, redirect, url_for, request,
+from flask import (Blueprint, render_template, redirect, url_for,
                    jsonify, abort)
 from nsweb.models.analyses import (Analysis, AnalysisSet, TopicAnalysis,
                                    TermAnalysis, CustomAnalysis)
 from nsweb.models.images import CustomAnalysisImage
-from nsweb.controllers import images
 import json
 import re
 from flask_user import login_required, current_user
@@ -34,50 +33,6 @@ def find_analysis(name, type=None):
     return query.first()
 
 
-@bp.route('/<string:val>/images')
-def get_images(val):
-    analysis = find_analysis(val)
-    images = [{
-        'id': img.id,
-        'name': img.label,
-        'colorPalette': 'red' if 'association' in img.label else 'blue',
-        # "intent": (img.stat + ':').capitalize(),
-        'url': '/images/%s' % img.id,
-        'visible': 1 if 'association' in img.label else 0,
-        'download': '/images/%s' % img.id,
-        'intent': 'z-score'
-    } for img in analysis.images if img.display and 'reverse' not in img.label]
-    return jsonify(data=images)
-
-
-@bp.route('/<string:analysis>/images/<string:image>/')
-def get_image_file(analysis, image):
-    if not isinstance(analysis, Analysis):
-        analysis = find_analysis(analysis)
-    unthresholded = ('unthresholded' in list(request.args.keys()))
-    if re.match('\d+$', image):
-        img = analysis.images[int(image)]
-    elif image in ['reverse', 'forward']:
-        img = [i for i in analysis.images if image in i.label][0]
-    return images.download(img.id, unthresholded)
-
-
-@bp.route('/<string:val>/studies')
-def get_studies(val):
-    analysis = find_analysis(val)
-    if 'dt' in request.args:  # DataTables
-        data = []
-        for f in analysis.frequencies:
-            s = f.study
-            link = '<a href={0}>{1}</a>'.format(
-                url_for('studies.show', val=s.pmid), s.title)
-            data.append([link, s.authors, s.journal, round(f.frequency, 3)])
-        data = jsonify(data=data)
-    else:
-        data = jsonify(studies=[s.pmid for s in analysis.studies])
-    return data
-
-
 @bp.route('/<string:id>/')
 def show_analysis(id):
     analysis = find_analysis(id)
@@ -88,14 +43,6 @@ def show_analysis(id):
     elif analysis.type == 'topic':
         return redirect(url_for('analyses.show_topic', number=analysis.number,
                                 topic_set=analysis.analysis_set.name))
-
-
-### TERM-SPECIFIC ROUTES ###
-@bp.route('/term_names/')
-def get_term_names():
-    # optimize this later--select only names
-    names = [f.name for f in TermAnalysis.query.all()]
-    return jsonify(data=names)
 
 
 @bp.route('/terms/')
@@ -111,13 +58,6 @@ def show_term(term):
     return render_template('analyses/terms/show.html',
                            analysis=analysis,
                            cog_atlas=json.loads(analysis.cog_atlas or '{}'))
-
-
-@bp.route('/<string:type>/<string:name>/images/<string:image>/')
-def get_term_image_file(type, name, image):
-    type = type.strip('s')  # e.g., 'topics' => 'topic'
-    analysis = find_analysis(name, type=type)
-    return get_image_file(analysis, image)
 
 
 ### TOPIC-SPECIFIC ROUTES ###
@@ -165,14 +105,6 @@ def show_custom_analysis(uid):
     return render_template('analyses/custom/show.html', analysis=custom)
 
 
-@bp.route('/topics/<string:topic_set>/<string:number>/images/<string:image>/')
-def get_topic_image_file(topic_set, number, image):
-    analysis = TopicAnalysis.query.join(AnalysisSet).filter(
-        TopicAnalysis.number == int(number),
-        AnalysisSet.name == topic_set).first()
-    return get_image_file(analysis, image)
-
-
 @bp.route('/custom/')
 def list_custom_analyses():
     return render_template('analyses/custom/index.html')
@@ -180,10 +112,12 @@ def list_custom_analyses():
 
 @bp.route('/browse/')
 def browse_public_analyses():
-    executed_analyses = CustomAnalysis.query.filter(CustomAnalysis.last_run_at != None)
+    executed_analyses = CustomAnalysis.query.filter(
+        CustomAnalysis.last_run_at != None)
     analyses = executed_analyses.filter(CustomAnalysis.private == False).all()
     analyses += executed_analyses.filter(CustomAnalysis.private == None).all()
-    return render_template('analyses/custom/browse_public.html', analyses=analyses)
+    return render_template('analyses/custom/browse_public.html',
+                           analyses=analyses)
 
 
 @bp.route('/custom/faq/')

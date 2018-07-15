@@ -15,7 +15,7 @@ class ImageSchema(mm.Schema):
 
     analysis = mm.Nested('AnalysisSchema', only='id')
     location = mm.Nested('LocationSchema', only='id')
-    file = mm.Function(lambda obj: url_for('images.download', val=obj.id))
+    file = mm.Function(lambda obj: url_for('api_images.download', val=obj.id))
 
     class Meta:
 
