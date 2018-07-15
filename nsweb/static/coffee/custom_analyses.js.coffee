@@ -40,11 +40,11 @@ Router = Backbone.Router.extend
 
 app =
   props:
-    fetchAllAnalysesURL: '/api/custom/all/'
+    fetchAllAnalysesURL: '/api/analyses/custom/all/'
     fetchAllStudiesURL: '/api/studies/all/'
-    saveURL: '/api/custom/save/'
-    deleteURL: '/api/custom/'
-    getCustomAnalysis: '/api/custom/'  # /api/custom/<uid>
+    saveURL: '/api/analyses/custom/save/'
+    deleteURL: '/api/analyses/custom/'
+    getCustomAnalysis: '/api/analyses/custom/'  # /api/custom/<uid>
     getFullAnalysisURL: '/api/analyses/full/' # /api/analyses/full/
     runAnalysisURL: '/analyses/custom/run/'
     expressionQueryURL: '/api/studies/?expression='

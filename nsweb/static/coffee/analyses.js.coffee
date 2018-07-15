@@ -4,8 +4,8 @@ $(document).ready ->
   return if not $('#page-analysis').length
 
   # Initialize DataTables
-  createDataTable('#term-analyses-table', {ajax: '/api/terms', serverSide: true})
-  createDataTable('#topic-set-list-table', {ajax: '/api/topics', serverSide: true})
+  createDataTable('#term-analyses-table', {ajax: '/api/analyses/terms', serverSide: true})
+  createDataTable('#topic-set-list-table', {ajax: '/api/analyses/topics', serverSide: true})
   columns = [
     { width: '40%' }
     { width: '38%' }
@@ -16,7 +16,7 @@ $(document).ready ->
   createDataTable('#analysis-similarity-table')
 
   if topic_set?
-    createDataTable('#topic-set-table', {ajax: '/api/topics/' + topic_set})
+    createDataTable('#topic-set-table', {ajax: '/api/analyses/topics/' + topic_set})
 
 
   # autocomplete
