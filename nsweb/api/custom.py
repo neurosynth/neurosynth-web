@@ -1,7 +1,5 @@
-from nsweb.controllers.api import bp
-from flask import request, jsonify, url_for, abort, redirect
-from nsweb.models.analyses import (TermAnalysis, AnalysisSet, CustomAnalysis,
-                                   Analysis)
+from flask import Blueprint, request, jsonify, abort
+from nsweb.models.analyses import CustomAnalysis
 from nsweb.models.studies import Study
 from nsweb.models.frequencies import Frequency
 from nsweb.core import db
@@ -12,90 +10,10 @@ import json
 import uuid
 
 
-@bp.route('/terms/')
-def list_terms():
-
-    results_per_page = int(request.args['length'])
-    offset = int(request.args['start'])
-
-    order_by = '{0} {1}'.format(
-        ['name', 'n_studies', 'n_activations'][
-            int(request.args['order[0][column]'])],
-        str(request.args['order[0][dir]']))
-    search = str(request.args['search[value]']).strip()
-
-    data = TermAnalysis.query
-    if search:  # No empty search on my watch
-        search = '%{}%'.format(search)
-        data = data.filter(TermAnalysis.name.like(search))
-    data = data.order_by(order_by)
-    data = data.paginate(page=(offset / results_per_page) + 1,
-                         per_page=results_per_page, error_out=False)
-    result = {}
-    result['draw'] = int(request.args['draw'])  # for security
-    result['recordsTotal'] = TermAnalysis.query.count()
-    result['recordsFiltered'] = data.total
-    result['data'] = [
-        ['<a href={0}>{1}</a>'.format(
-            url_for('analyses.show_term', term=d.name), d.name),
-         d.n_studies,
-         d.n_activations,
-         ] for d in data.items]
-    result = jsonify(**result)
-    return result
+bp = Blueprint('api_analyses', __name__, url_prefix='/api/analyses/custom')
 
 
-@bp.route('/topics/')
-def list_topic_sets():
-    topic_sets = AnalysisSet.query.filter_by(type='topics').all()
-    data = [[
-        '<a href={0}>{1}</a>'.format(
-            url_for('analyses.show_topic_set', topic_set=ts.name),
-            ts.name),
-        ts.description,
-        ts.n_analyses] for ts in topic_sets]
-    return jsonify(data=data)
-
-
-@bp.route('/topics/<string:topic_set>/')
-def list_topics(topic_set):
-    ts = AnalysisSet.query.filter_by(name=topic_set).first()
-    data = [
-        ['<a href={0}>{1}</a>'.format(
-            url_for('analyses.show_topic', topic_set=ts.name,
-                    number=t.number), 'Topic ' + str(t.number).zfill(3)),
-         t.terms,
-         t.n_studies
-         ] for t in ts.analyses]
-    return jsonify(data=data)
-
-
-@bp.route('/analyses/<string:name>/')
-def find_api_analysis(name):
-    """ If the passed val isn't numeric, assume it's a analysis name,
-    and retrieve the corresponding numeric ID.
-    """
-    val = Analysis.query.filter_by(name=name).first().id
-    return redirect(url_for('analyses.api', id=val))
-
-
-@bp.route('/analyses/<int:val>/')
-def analyses_api(val):
-    data = Analysis.query.get(val)
-# data=Frequency.query.filter_by(analysis_id=int(val))#attempted
-# optimization. Join causes slower performance however
-    data = [['<a href={0}>{1}</a>'.format(url_for('studies.show', val=f.pmid),
-                                          f.study.title),
-             f.study.authors,
-             f.study.journal,
-             f.study.year,
-             round(f.frequency, 3),
-             ] for f in data.frequencies]
-    data = jsonify(aaData=data)
-    return data
-
-
-@bp.route('/custom/save/', methods=['POST', 'GET'])
+@bp.route('/save/', methods=['POST', 'GET'])
 @login_required
 def save_custom_analysis():
     """
@@ -157,7 +75,7 @@ def save_custom_analysis():
     return jsonify(dict(result='success', uuid=uid, id=custom_analysis.id))
 
 
-@bp.route('/custom/<string:uid>/', methods=['GET'])
+@bp.route('/<string:uid>/', methods=['GET'])
 def get_custom_analysis(uid):
     """
     Given a uuid return JSON blob representing the custom analysis information
@@ -170,11 +88,13 @@ def get_custom_analysis(uid):
     custom = CustomAnalysis.query.filter_by(uuid=uid).first()
     if not custom:
         abort(404)
-    if current_user.id != custom.user_id and (custom.private or not custom.last_run_at):
+    if current_user.id != custom.user_id and (custom.private or not
+                                              custom.last_run_at):
         abort(403)
     return jsonify(custom.serialize())
 
-@bp.route('/custom/all/', methods=['GET'])
+
+@bp.route('/all/', methods=['GET'])
 @login_required
 def get_custom_analyses():
     """
@@ -187,7 +107,7 @@ def get_custom_analyses():
     return jsonify(response)
 
 
-@bp.route('/custom/copy/<string:uid>/', methods=['POST'])
+@bp.route('/copy/<string:uid>/', methods=['POST'])
 @login_required
 def copy_custom_analysis(uid):
     """
@@ -215,7 +135,7 @@ def copy_custom_analysis(uid):
     return jsonify(response)
 
 
-@bp.route('/custom/<string:uid>/', methods=['DELETE'])
+@bp.route('/<string:uid>/', methods=['DELETE'])
 @login_required
 def delete_custom_analysis(uid):
     """
