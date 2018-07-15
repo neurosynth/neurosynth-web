@@ -1,16 +1,14 @@
-from flask import (Blueprint, render_template, redirect, url_for,
-                   jsonify, abort)
+from flask import Blueprint, render_template, redirect, url_for, abort
 from nsweb.models.analyses import (Analysis, AnalysisSet, TopicAnalysis,
                                    TermAnalysis, CustomAnalysis)
-from nsweb.models.images import CustomAnalysisImage
+from nsweb.api.custom import run_custom_analysis as api_run_custom
 import json
 import re
 from flask_user import login_required, current_user
-from nsweb import tasks
 from nsweb.initializers import settings
 from nsweb.controllers import error_page
-from os.path import join, exists
-import datetime as dt
+from os.path import join
+
 
 bp = Blueprint('analyses', __name__, url_prefix='/analyses')
 
@@ -94,9 +92,8 @@ def show_topic(topic_set, number):
     return render_template('analyses/topics/show.html',
                            analysis_set=topic.analysis_set, analysis=topic)
 
+
 ### CUSTOM ANALYSIS ROUTES ###
-
-
 @bp.route('/custom/<string:uid>/')
 def show_custom_analysis(uid):
     custom = CustomAnalysis.query.filter_by(uuid=uid).first()
@@ -139,43 +136,9 @@ def run_custom_analysis(uid):
     if not custom or not custom.studies:
         abort(404)
 
-    # Only generate images if the analysis has never been run, if changes have
-    # been made since the last run, or if images are missing.
-    if not custom.last_run_at or (custom.last_run_at < custom.updated_at) or \
-            not custom.images:
+    result = api_run_custom(uid)
 
-        ids = [s.pmid for s in custom.studies]
-        if tasks.run_metaanalysis.delay(ids, custom.uuid).wait():
-            # Update analysis record
-            rev_inf = '%s_association-test_z_FDR_0.01.nii.gz' % custom.uuid
-            rev_inf = join(settings.IMAGE_DIR, 'custom', rev_inf)
-            fwd_inf = '%s_uniformity-test_FDR_0.01.nii.gz' % custom.uuid
-            fwd_inf = join(settings.IMAGE_DIR, 'custom', fwd_inf)
-            if exists(rev_inf):
-                images = [
-                    CustomAnalysisImage(
-                        name='%s (uniformity test)' % custom.name,
-                        image_file=fwd_inf,
-                        label='%s (uniformity test)' % custom.name,
-                        stat='z-score',
-                        display=1,
-                        download=1
-                    ),
-                    CustomAnalysisImage(
-                        name='%s (association test)' % custom.name,
-                        image_file=rev_inf,
-                        label='%s (association test)' % custom.name,
-                        stat='z-score',
-                        display=1,
-                        download=1
-                    )
-                ]
-                custom.images = images
-                custom.last_run_at = dt.datetime.utcnow()
-                db.session.add(custom)
-                db.session.commit()
-                return redirect(url_for('analyses.show_custom_analysis',
-                                        uid=uid))
+    if result is None:
         return error_page("An unspecified error occurred while trying "
                           "to run the custom meta-analysis. Please try "
                           "again.")

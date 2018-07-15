@@ -1,13 +1,17 @@
 from flask import Blueprint, request, jsonify, abort
 from nsweb.models.analyses import CustomAnalysis
+from nsweb.models.images import CustomAnalysisImage
 from nsweb.models.studies import Study
 from nsweb.models.frequencies import Frequency
 from nsweb.core import db
+from nsweb.initializers import settings
+from nsweb import tasks
 from flask_login import current_user
 from flask_user import login_required
 import datetime as dt
 import json
 import uuid
+from os.path import join, exists
 
 
 bp = Blueprint('api_analyses', __name__, url_prefix='/api/analyses/custom')
@@ -153,3 +157,57 @@ def delete_custom_analysis(uid):
     db.session.delete(custom)
     db.session.commit()
     return jsonify(dict(result='success'))
+
+
+@bp.route('/run/<string:uid>/', methods=['GET', 'POST'])
+@login_required
+def run_custom_analysis(uid):
+    """
+    Given a uuid, kick off the analysis run and return the same id once
+    the run is complete.
+    """
+    custom = CustomAnalysis.query.filter_by(uuid=uid).first()
+
+    if not custom or not custom.studies:
+        abort(404)
+
+    # Only generate images if the analysis has never been run, if changes have
+    # been made since the last run, or if images are missing.
+    if not custom.last_run_at or (custom.last_run_at < custom.updated_at) or \
+            not custom.images:
+
+        ids = [s.pmid for s in custom.studies]
+        if tasks.run_metaanalysis.delay(ids, custom.uuid).wait():
+            # Update analysis record
+            rev_inf = '%s_association-test_z_FDR_0.01.nii.gz' % custom.uuid
+            rev_inf = join(settings.IMAGE_DIR, 'custom', rev_inf)
+            fwd_inf = '%s_uniformity-test_FDR_0.01.nii.gz' % custom.uuid
+            fwd_inf = join(settings.IMAGE_DIR, 'custom', fwd_inf)
+            if exists(rev_inf):
+                images = [
+                    CustomAnalysisImage(
+                        name='%s (uniformity test)' % custom.name,
+                        image_file=fwd_inf,
+                        label='%s (uniformity test)' % custom.name,
+                        stat='z-score',
+                        display=1,
+                        download=1
+                    ),
+                    CustomAnalysisImage(
+                        name='%s (association test)' % custom.name,
+                        image_file=rev_inf,
+                        label='%s (association test)' % custom.name,
+                        stat='z-score',
+                        display=1,
+                        download=1
+                    )
+                ]
+                custom.images = images
+                custom.last_run_at = dt.datetime.utcnow()
+                db.session.add(custom)
+                db.session.commit()
+                return uid
+
+        return None
+
+    return uid
