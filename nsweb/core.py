@@ -131,7 +131,7 @@ def register_blueprints():
     blueprint_locations = [
         'nsweb.api',
         'nsweb.api.analyses',
-        'nsweb.api.custom',
+        # 'nsweb.api.custom',
         'nsweb.api.images',
         'nsweb.api.locations',
         'nsweb.api.studies',
@@ -139,6 +139,7 @@ def register_blueprints():
         'nsweb.api.genes',
         'nsweb.controllers.home',
         'nsweb.controllers.analyses',
+        # 'nsweb.controllers.custom',
         'nsweb.controllers.locations',
         'nsweb.controllers.studies',
         'nsweb.controllers.decode',
