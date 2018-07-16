@@ -12,7 +12,7 @@ from nsweb import tasks
 bp = Blueprint('api_studies', __name__, url_prefix='/api/studies')
 
 
-@bp.route('/studies/')
+@bp.route('/')
 @cache.cached(timeout=3600, key_prefix=make_cache_key)
 def get_studies():
     """
@@ -76,7 +76,7 @@ def get_studies():
     return jsonify(data=schema.dump(studies).data)
 
 
-@bp.route('/<int:val>/tables')
+@bp.route('/<int:val>/tables/')
 def get_tables(val):
     study = Study.query.get_or_404(val)
     colors = ['blue', 'red', 'yellow', 'green', 'purple', 'brown']
@@ -151,7 +151,7 @@ def get_studies_by_expression(expression):
 
 
 # Begin client side APIs
-@bp.route('/analyses/<int:val>/analyses')
+@bp.route('/<int:val>/analyses/')
 def get_study_analyses(val):
     data = Study.query.get(val)
     data = [['<a href={0}>{1}</a>'.format(
@@ -161,7 +161,7 @@ def get_study_analyses(val):
     return jsonify(data=data)
 
 
-@bp.route('/<int:val>/peaks')
+@bp.route('/<int:val>/peaks/')
 def get_study_peaks(val):
     data = Study.query.get(val)
 # data=Peak.query.filter_by(pmid=int(val))#attempted optimization. Join

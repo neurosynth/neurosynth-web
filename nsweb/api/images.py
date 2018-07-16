@@ -85,7 +85,7 @@ def get_images():
     return jsonify(data=schema.dump(images).data)
 
 
-@bp.route('/<int:val>')
+@bp.route('/<int:val>/')
 def get_image(val, unthresholded=False):
     image = Image.query.get(val)
     if image is not None and image.display:
@@ -95,7 +95,7 @@ def get_image(val, unthresholded=False):
     return jsonify(data=data)
 
 
-@bp.route('/<int:val>/download')
+@bp.route('/<int:val>/download/')
 @bp.route('/<int:val>/download.nii.gz')
 def download(val, unthresholded=False):
     image = Image.query.get_or_404(val)

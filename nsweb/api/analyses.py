@@ -109,7 +109,7 @@ def get_analysis(val):
     return jsonify(data=AnalysisSchema().dump(analysis).data)
 
 
-@bp.route('/<string:val>/images')
+@bp.route('/<string:val>/images/')
 def get_images(val):
     analysis = find_analysis(val)
     images = [{
@@ -137,7 +137,7 @@ def get_image_file(analysis, image):
     return images.download(img.id, unthresholded)
 
 
-@bp.route('/<string:val>/studies')
+@bp.route('/<string:val>/studies/')
 def get_studies(val):
     analysis = find_analysis(val)
     if 'dt' in request.args:  # DataTables

@@ -137,7 +137,7 @@ def _run_decoder(**kwargs):
     return dec
 
 
-@bp.route('/<string:uuid>/data')
+@bp.route('/<string:uuid>/data/')
 def get_data(uuid):
     dec = Decoding.query.filter_by(uuid=uuid).first()
     if dec is None:
@@ -150,7 +150,7 @@ def get_data(uuid):
     return jsonify(data=data)
 
 
-@bp.route('/<string:uuid>/image')
+@bp.route('/<string:uuid>/image/')
 def get_image(uuid):
     """ Return an uploaded image. These are handled separately from
     Neurosynth-generated images in order to prevent public access based on
@@ -163,7 +163,7 @@ def get_image(uuid):
 
 
 @bp.route('/<string:uuid>/scatter/<string:analysis>.png')
-@bp.route('/<string:uuid>/scatter/<string:analysis>')
+@bp.route('/<string:uuid>/scatter/<string:analysis>/')
 def get_scatter(uuid, analysis):
     outfile = join(settings.DECODING_SCATTERPLOTS_DIR,
                    uuid + '_' + analysis + '.png')
