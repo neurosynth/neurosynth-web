@@ -67,7 +67,10 @@ def create_app(debug=True, test=False):
             db_to_use = settings.SQL_DEVELOPMENT_DB
         else:
             db_to_use = settings.SQL_PRODUCTION_DB
-        db_uri = 'postgres://postgres@%s:5432/%s' % (
+        # db_uri = 'postgres://postgres@%s:5432/%s' % (
+        db_uri = 'postgres://%s:%s@%s:5432/%s' % (
+            settings.SQL_USER,
+            settings.SQL_PASSWORD,
             settings.SQL_HOST,
             db_to_use)
     else:
