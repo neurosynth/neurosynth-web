@@ -137,8 +137,7 @@ def get_study_list():
         d.year,
         '<a href=http://www.ncbi.nlm.nih.gov/pubmed/{0}>{0}</a>'.format(
             d.pmid)] for d in data.items]
-    result = jsonify(**result)
-    return result
+    return jsonify(**result)
 
 
 @login_required
@@ -152,7 +151,7 @@ def get_studies_by_expression(expression):
 
 
 # Begin client side APIs
-@bp.route('/analyses/<int:val>/')
+@bp.route('/analyses/<int:val>/analyses')
 def get_study_analyses(val):
     data = Study.query.get(val)
     data = [['<a href={0}>{1}</a>'.format(
@@ -162,7 +161,7 @@ def get_study_analyses(val):
     return jsonify(data=data)
 
 
-@bp.route('/peaks/<int:val>/')
+@bp.route('/<int:val>/peaks')
 def get_study_peaks(val):
     data = Study.query.get(val)
 # data=Peak.query.filter_by(pmid=int(val))#attempted optimization. Join

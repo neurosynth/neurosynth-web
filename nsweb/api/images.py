@@ -96,6 +96,7 @@ def get_image(val, unthresholded=False):
 
 
 @bp.route('/<int:val>/download')
+@bp.route('/<int:val>/download.nii.gz')
 def download(val, unthresholded=False):
     image = Image.query.get_or_404(val)
     if not image.download:

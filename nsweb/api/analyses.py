@@ -103,6 +103,12 @@ def find_analysis(name, type=None):
     return query.first()
 
 
+@bp.route('/<int:val>/')
+def get_analysis(val):
+    analysis = Analysis.query.get(val)
+    return jsonify(data=AnalysisSchema().dump(analysis).data)
+
+
 @bp.route('/<string:val>/images')
 def get_images(val):
     analysis = find_analysis(val)
@@ -247,5 +253,4 @@ def analyses_api(val):
              f.study.year,
              round(f.frequency, 3),
              ] for f in data.frequencies]
-    data = jsonify(aaData=data)
-    return data
+    return jsonify(aaData=data)

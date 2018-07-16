@@ -15,13 +15,13 @@ $(document).ready ->
 
   createDataTable('#study_analyses_table', {
     pageLength: 10
-    ajax: '/api/studies/analyses/'+url_id+'/'
+    ajax: '/api/studies/'+url_id+'/analyses/'
     order: [[1, 'desc']]
       })
 
   createDataTable('#study_peaks_table', {
     pageLength: 10
-    ajax: '/api/studies/peaks/'+url_id+'/'
+    ajax: '/api/studies/'+url_id+'/peaks/'
     order: [[0, 'asc'], [2, 'asc']]
       })
 
