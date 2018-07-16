@@ -16,6 +16,9 @@ import json
 # Path to Mallet binary on local system
 MALLET_PATH = '/usr/local/mallet/bin/mallet'
 # Path to file containing all abstracts
+
+settings.ASSET_DIR = '/data/neurosynth/new/data/assets'
+settings.TOPIC_DIR = '/data/neurosynth/new/data/topics'
 ABSTRACT_PATH = os.path.join(settings.ASSET_DIR, 'abstracts.txt')
 # Path to extra stopword list (set to None to disable)
 STOPWORDS = os.path.join(settings.ASSET_DIR, 'misc', 'stopwords.txt')
@@ -69,11 +72,11 @@ class Mallet:
 
         docs = open(self.doc_topics).readlines()[1::]
 
-        n_topics = len(docs[0].strip().split('\t'))/2 - 1
+        n_topics = int(len(docs[0].strip().split('\t'))/2 - 1)
         n_docs = len(docs)
         labels = []
 
-        print "Found %d documents and %d topics. Reordering weights..." % (n_docs, n_topics)
+        print("Found %d documents and %d topics. Reordering weights..." % (n_docs, n_topics))
 
         weights = np.zeros((n_docs, n_topics))
 
@@ -131,7 +134,7 @@ class TopicFactory(object):
 
         for n in n_topics:
 
-            name = 'v4-topics-%d' % int(n)
+            name = 'v5-topics-%d' % int(n)
 
             key_file = os.path.join(key_dir, name + '.txt')
             self.mallet.train_topics(
@@ -148,7 +151,7 @@ class TopicFactory(object):
                 'name': name,
                 'description': 'A set of %d topics extracted with LDA from '
                 'the abstracts of all articles in the Neurosynth database as of'
-                ' July 2015 (11,406 articles).' % n,
+                ' July 2018 (14,371 articles).' % n,
                 'n_topics': n
             }
             json_file = os.path.join(settings.TOPIC_DIR, name + '.json')
