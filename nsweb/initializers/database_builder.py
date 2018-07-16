@@ -144,10 +144,11 @@ class DatabaseBuilder:
 
         from nsweb.tasks import MASK_FILES
         for k, v in MASK_FILES.items():
-            if not exists(join(settings.MASK_DIR, v)):
+            mask_file = join(settings.MASK_DIR, v)
+            if not exists(mask_file):
                 raise RuntimeWarning("The image file for the '%s' mask "
                     "cannot be found at %s. This mask will be gracefully "
-                    "ignored in all decoder scatterplots.")
+                    "ignored in all decoder scatterplots." % (k, mask_file))
 
     def reset_database(self):
         ''' Drop and re-create all tables. '''
