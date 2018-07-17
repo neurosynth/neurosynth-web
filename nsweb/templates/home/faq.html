@@ -26,7 +26,7 @@
             {% set _ = count.append(count.pop()+1) %}
             <a name="q{{count[0]|string}}"></a>
             <div class="faq-q">{{ item['q'] }}</div>
-            <div class="faq-a">{{ item['a'] }}</div>
+            <div class="faq-a">{{ item['a']|safe }}</div>
           {% endfor %}
         {% endfor %}
       </div>
