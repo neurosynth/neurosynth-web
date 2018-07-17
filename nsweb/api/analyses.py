@@ -132,7 +132,7 @@ def get_image_file(analysis, image):
     unthresholded = ('unthresholded' in list(request.args.keys()))
     if re.match('\d+$', image):
         img = analysis.images[int(image)]
-    elif image in ['reverse', 'forward']:
+    elif image in ['uniformity', 'association']:
         img = [i for i in analysis.images if image in i.label][0]
     return images.download(img.id, unthresholded)
 
