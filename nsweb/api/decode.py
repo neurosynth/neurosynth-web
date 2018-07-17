@@ -122,7 +122,7 @@ def _run_decoder(**kwargs):
     if ds_name in ['terms', 'topics']:
         ds_name += '_20k'
     reference = DecodingSet.query.filter_by(name=ds_name).first()
-    dec = Decoding(display=1, download=0, ip=request.remote_addr,
+    dec = Decoding(display=True, download=False, ip=request.remote_addr,
                    decoding_set=reference, **kwargs)
 
     # run decoder and wait for it to terminate

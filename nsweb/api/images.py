@@ -66,7 +66,7 @@ def get_images():
     limit = min(limit, MAX_LIMIT)
     page = int(request.args.get('page', 1))
 
-    images = Image.query.filter_by(display=1, download=1)
+    images = Image.query.filter_by(display=True, download=True)
 
     if 'type' in request.args:
         images = images.filter_by(type=request.args['type'])
