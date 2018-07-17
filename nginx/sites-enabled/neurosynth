@@ -1,6 +1,6 @@
 server {
 
-    listen 80;
+    listen 32800;
     server_name neurosynth.org;
     charset utf-8;
 
