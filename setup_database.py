@@ -45,19 +45,18 @@ def main():
     builder.generate_analysis_images(
         analyses=analyses, add_to_db=False, overwrite=True)
 
-    # print "Adding topic sets..."
-    # builder.add_topics(generate_images=True, add_images=True, top_n=40)
+    print("Adding topic sets...")
+    builder.add_topics(generate_images=False, add_images=True, reset=True, top_n=40)
 
     # print "Adding cognitive atlas information for available terms..."
     # builder.add_cognitive_atlas_nodes()
 
+    print("Adding genes...")
+    builder.add_genes()
+
     print("Memory-mapping key image sets...")
-    builder.memory_map_images(include=['terms'], reset=True)
+    builder.memory_map_images(include=['terms', 'topics', 'genes'], reset=True)
 
-    # print "Adding genes..."
-    # builder.add_genes()
-
-    #builder.memory_map_images(include=['terms', 'topics', 'genes'])
 
 
 if __name__ == '__main__':
