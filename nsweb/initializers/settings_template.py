@@ -80,11 +80,11 @@ SQLALCHEMY_SQLITE_URI = 'sqlite:///' + join(DATA_DIR, 'neurosynth.db')
 
 # SQL configuration
 SQL_HOST = 'postgres'
-SQL_USER = 'nsweb'
-SQL_PASSWORD = 'changeme'
-SQL_PRODUCTION_DB = 'nsweb'
-SQL_DEVELOPMENT_DB = 'nsweb_development'
-SQL_TEST_DB = 'nsweb_test'
+SQL_USER = 'db_user'
+SQL_PASSWORD = 'db_pass'
+SQL_PRODUCTION_DB = 'neurosynth'
+SQL_DEVELOPMENT_DB = 'neurosynth_development'
+SQL_TEST_DB = 'neurosynth_test'
 TEST_URL = 'http://test.neurosynth.org'
 
 ### Logging ###
@@ -94,13 +94,6 @@ LOGGING_LEVEL = 'DEBUG'
 ### Celery settings for background tasks ###
 CELERY_BROKER_URL = 'redis://redis:6379/0'
 CELERY_RESULT_BACKEND = 'redis://redis:6379/0'
-
-# Error logging with Opbeat
-OPBEAT_ENABLED = False
-OPBEAT_ORGANIZATION_ID = "..."
-OPBEAT_APP_ID = "..."
-OPBEAT_SECRET_TOKEN = "..."
-OPBEAT_DEBUG = True
 
 ### Flask-Mail settings ###
 MAIL_ENABLE = True

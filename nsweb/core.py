@@ -91,17 +91,6 @@ def create_app(debug=True, test=False):
     # i18n support
     Babel(app)
 
-    # Opbeat error logging
-    if settings.OPBEAT_ENABLED:
-        app.config['OPBEAT'] = {
-            'ORGANIZATION_ID': settings.OPBEAT_ORGANIZATION_ID,
-            'APP_ID': settings.OPBEAT_APP_ID,
-            'SECRET_TOKEN': settings.OPBEAT_SECRET_TOKEN,
-            'INCLUDE_PATHS': ['nsweb'],
-            'DEBUG': settings.DEBUG or settings.OPBEAT_DEBUG
-        }
-        Opbeat(app)
-
     # API
     marshmallow.init_app(app)
 
