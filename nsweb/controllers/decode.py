@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, abort, url_for, request
 from nsweb.api.decode import _get_decoding_object
 from nsweb.models.decodings import Decoding
 import json
+from nsweb.controllers import error_page
 
 
 bp = Blueprint('decode', __name__, url_prefix='/decode')
@@ -10,17 +11,16 @@ bp = Blueprint('decode', __name__, url_prefix='/decode')
 @bp.route('/', methods=['GET'])
 def index():
     # Call API to do the decoding
-    dec = _get_decoding_object()
+    status, dec = _get_decoding_object()
 
-    if dec is None:
-        targets = {'neurovault', 'url', 'uuid', 'image'}
-        if targets & set(request.args.keys()):
-            template = 'missing'
-        else:
-            template = 'index'
-        return render_template('decode/%s.html' % template)
+    if status == 200:
+        return show(dec, dec.uuid)
 
-    return show(dec, dec.uuid)
+    elif status == 99:
+        return render_template('decode/index.html')
+
+    else:
+        return error_page(dec)
 
 
 @bp.route('/<string:uuid>/')
