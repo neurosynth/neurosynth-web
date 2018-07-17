@@ -75,10 +75,10 @@ urlToParams = () ->
 window.urlToParams = urlToParams
 
 loadReverseInferenceImage = (analysis, fdr=false) ->
-  url = '/analyses/' + analysis + '/images/reverse'
+  url = '/api/analyses/' + analysis + '/images/association'
   url += '?unthresholded' if not fdr
   [{
-    name: analysis + ' (reverse inference)'
+    name: analysis + ' (association test)'
     url: url
     colorPalette: 'yellow'
     download: true
