@@ -90,3 +90,9 @@ def show_topic(topic_set, number):
     topic.terms = ', '.join(map(map_url, top))
     return render_template('analyses/topics/show.html',
                            analysis_set=topic.analysis_set, analysis=topic)
+
+
+# Show custom analysis page for explanation
+@bp.route('/custom/')
+def list_custom_analyses():
+    return render_template('analyses/custom/index.html')
