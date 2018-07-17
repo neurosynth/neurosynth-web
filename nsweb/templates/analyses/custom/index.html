@@ -3,33 +3,14 @@
 {% block content %}
   <div class="row">
     <div class="col-md-8">
-      <h3>Custom Analyses</h3>
-    </div>
-    <div class="col-md-4">
-      <a target="_blank" href="/analyses/custom/faq/">New to custom analyses? Read the Custom Analyses FAQ</a>
+      <h3>These are not the tools you're looking for.</h3>
     </div>
   </div>
   <div class="row">
-    {% if current_user.is_authenticated %}
-      <div class="col-md-3">
-        <h4>Your Saved Analyses</h4>
-        <hr />
-        <div id="custom-list-container">
-          <p>Loading your saved analyses...</p>
-        </div>
-      <div class="col-md-9 bordered" id="active-analysis-container">
-        <br />
-      </div>
-    {% else %}
-      <div class="col-md-12">
-        <p>You must be signed in to be able to create and save custom analyses.</p>
-        <span>
-          <a class="btn btn-primary" href="/user/sign-in">Sign In</a>
-          <span>or</span>
-          <a class="btn btn-primary" href="/user/register">Register</a>
-        </span>
-      </div>
-    {% endif %}
+    <div class="col-md-12">
+      <p>Custom online analyses are no longer supported on neurosynth.org. This functionality was experimental, and we've decided to take it off-line for now. The precipitating reasons for this were that (a) the interface was buggy, (b) the results were insensible much (most?) of the time, and (c) what was intended to be purely an exploratory, experimental tool was being used to generate questionable results that users were in our view reading far too much into (and in some cases, reporting in publications).</p>
+      <p>We're continuing to develop a more comprehensive and robust suite of tools for online meta-analysis, but for the time being, if you want to conduct custom analyses using Neurosynth data, you'll have to use the <a href="https://github.com/neurosynth/neurosynth">Python core tools</a>.</p>
+    </div>
   </div>
 
   <div id="modal-container">

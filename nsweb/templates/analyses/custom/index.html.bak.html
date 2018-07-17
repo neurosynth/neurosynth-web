@@ -1,0 +1,38 @@
+{% set page_title = 'Neurosynth|Custom Analyses' %}
+{% extends "layout/base.html" %}
+{% block content %}
+  <div class="row">
+    <div class="col-md-8">
+      <h3>Custom Analyses</h3>
+    </div>
+    <div class="col-md-4">
+      <a target="_blank" href="/analyses/custom/faq/">New to custom analyses? Read the Custom Analyses FAQ</a>
+    </div>
+  </div>
+  <div class="row">
+    {% if current_user.is_authenticated %}
+      <div class="col-md-3">
+        <h4>Your Saved Analyses</h4>
+        <hr />
+        <div id="custom-list-container">
+          <p>Loading your saved analyses...</p>
+        </div>
+      <div class="col-md-9 bordered" id="active-analysis-container">
+        <br />
+      </div>
+    {% else %}
+      <div class="col-md-12">
+        <p>You must be signed in to be able to create and save custom analyses.</p>
+        <span>
+          <a class="btn btn-primary" href="/user/sign-in">Sign In</a>
+          <span>or</span>
+          <a class="btn btn-primary" href="/user/register">Register</a>
+        </span>
+      </div>
+    {% endif %}
+  </div>
+
+  <div id="modal-container">
+    <br />
+  </div>
+{% endblock %}
