@@ -9,10 +9,19 @@
       <p>The Neurosynth website is essentially just a glorified wrapper around a set of open-source Python and JavaScript packages. In practice, this means you can use the tools we've made available to easily reproduce just about any images or data you find on this website. Most of the tools are hosted in our <a href="http://github.com/neurosynth">GitHub repository</a>. There are several key components:</p>
 
       <div class="code-group">
+        <h3>Neurosynth web application</h3>
+        <div class="github-buttons">
+          <iframe src="http://ghbtns.com/github-btn.html?user=neurosynth&repo=neurosynth-web&type=fork&count=true" allowtransparency="true" frameborder="0" scrolling="0" width="90" height="20"></iframe><iframe src="http://ghbtns.com/github-btn.html?user=neurosynth&repo=neurosynth-web&type=watch&count=true" allowtransparency="true" frameborder="0" scrolling="0" width="90" height="20"></iframe>
+        </div>
+      </div>
+      <p>The <a href="http://github.com/neurosynth/neurosynth-web">neurosynth-web</a> repository contains all of the code for this web application. The backend is built in Flask; the front-end is an ungodly mix of CoffeeScript, vanilla JS, jQuery, Jinja2, and a bunch of other mostly outdated technologies. A major rewrite in React.js is planned for late 2018. The Neurosynth web application is fully containerized with Docker, making local installation for development purposes mostly straightforward (with the exception of some major datasets required to enable some of the functionality on the site--e.g., functional connectivity maps from Yeo and Buckner; processed gene maps from the Allen Institute, etc.).</p>
+
+      <div class="code-group">
         <h3>Core Neurosynth Tools</h3>
         <div class="github-buttons">
           <iframe src="http://ghbtns.com/github-btn.html?user=neurosynth&repo=neurosynth&type=fork&count=true" allowtransparency="true" frameborder="0" scrolling="0" width="90" height="20"></iframe><iframe src="http://ghbtns.com/github-btn.html?user=neurosynth&repo=neurosynth&type=watch&count=true" allowtransparency="true" frameborder="0" scrolling="0" width="90" height="20"></iframe>
         </div>
+      </div>
       <p>The <a href="http://github.com/neurosynth/neurosynth">core Neurosynth package</a> is a lightweight set of Python modules that support large-scale automated synthesis and manipulation of functional MRI activations. The emphasis is on ease of use and utility rather than computational sophistication or efficiency. Virtually all of the images found on this website were generated using the core package and just a few lines of code. But the code also allows you to do things that aren't yet available through the web interface. For example, you can conduct dynamic meta-analyses based on structured queries (e.g., an automated meta-analysis of all studies that include the terms EPISODIC and MEMORY but do NOT include the terms SEMANTIC or RETRIEVAL); retrieve all studies that report activation within a certain brain mask; and 'decode' your own images by assessing their similarity to the various meta-analyses produced by Neurosynth.</p>
 
       <div class="code-group">
