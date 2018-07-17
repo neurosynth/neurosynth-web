@@ -1,112 +1,58 @@
-- set page_title = 'Neurosynth Gene Atlas -- ' + gene.symbol
-- extends "layout/base.html"
-- block content
-  - import "macros/_decode_viewer.html" as viewers
-  - import "macros/_scatterplot.html" as scatterplot
-  .row#page-genes-show
-    .col-md-10
-      h2 {{gene.symbol}} gene expression
-      .lead
-        |Brain-wide gene expression levels for the gene {{gene.symbol}} ({{gene.name}}), as made available in the <a href="http://human.brain-map.org/">Allen Human Brain Atlas</a>. Detailed information is available from the <a href="http://human.brain-map.org/microarray/search/show?exact_match=false&search_term={{gene.symbol}}&search_type=gene">Allen Brain Atlas data portal</a>.
-      .decode-viewer style="width: 580px; float: left;"
-        ul#decode-menu.nav.nav-pills
-          li.active
-            a href="#maps" data-toggle="tab" Map
-          li
-            a href="#scatter" data-toggle="tab" Plot
-          / li
-          /   a href="#info" data-toggle="tab" Info
-        #decode-tab-content.tab-content.top-space20
-          #maps.tab-pane.active
-            script type="text/javascript"
-              |var options = {"panzoomEnabled":false};
+{% set page_title = 'Neurosynth Gene Atlas -- ' + gene.symbol %}
+{% extends "layout/base.html" %}
+{% block content %}
+  {% import "macros/_decode_viewer.html" as viewers %}
+  {% import "macros/_scatterplot.html" as scatterplot %}
+  <div class="row" id="page-genes-show">
+    <div class="col-md-10">
+      <h2>{{gene.symbol}} gene expression</h2>
+      <div class="lead">
+        Brain-wide gene expression levels for the gene {{gene.symbol}} ({{gene.name}}), as made available in the <a href="http://human.brain-map.org/">Allen Human Brain Atlas</a>. Detailed information is available from the <a href="http://human.brain-map.org/microarray/search/show?exact_match=false&search_term={{gene.symbol}}&search_type=gene">Allen Brain Atlas data portal</a>.
+      </div>
+      <div class="decode-viewer" style="width: 580px; float: left;">
+        <ul id="decode-menu" class="nav nav-pills">
+          <li class="active">
+            <a href="#maps" data-toggle="tab">Map</a>
+          </li>
+          <li>
+            <a href="#scatter" data-toggle="tab">Plot</a>
+          </li>
+        </ul>
+        <div id="decode-tab-content" class="tab-content top-space20">
+          <div id="maps" class="tab-pane active">
+            <script type="text/javascript">
+              var options = {"panzoomEnabled":false};
               var settings = ['no-zoom', 'layers','nav','checkboxes'];
-              var images = {{images}};
+              var images = {{images|safe}};
               var image_id = '{{image_id}}';
-            p {{viewers.viewer()|safe}}
-          #scatter.tab-pane
-            #loading-message Loading image...
-            #scatterplot style="width: 500px; float: left; position: relative;"
-              h4 There's nothing here yet!
-              p That's probably because you haven't selected a Neurosynth term to compare this gene map against. To replace this annoying message with a pretty scatter plot, select one of the terms over there in the table on the right.
+            </script>
+            <p>{{viewers.viewer()|safe}}</p>
+          </div>
+          <div id="scatter" class="tab-pane">
+            <div id="loading-message">Loading image...</div>
+            <div id="scatterplot" style="width: 500px; float: left; position: relative;">
+              <h4>There's nothing here yet!</h4>
+              <p>That's probably because you haven't selected a Neurosynth term to compare this gene map against. To replace this annoying message with a pretty scatter plot, select one of the terms over there in the table on the right.</p>
 
-              p Note that most images will usually take 1 - 2 seconds to show up--we're computing them fresh, just for you!
-          / #info.tab-pane
-          /   h4 About this image
+              <p>Note that most images will usually take 1 - 2 seconds to show up--we're computing them fresh, just for you!</p>
+            </div>
+          </div>
+        </div>
+      </div>
             
-      .analysis-list style="width: 200px; margin-left: 20px; margin-top: 50px;"
-        h4 Term similarity
-        p To compare the {{gene.symbol}} map against a Neurosynth term, click on an arrow below.
-        table#decoding_results_table.table.table-striped.table-hover.table-condensed
-          thead
-            tr
-              %th
-              th analysis
-              th corr.
-
-
-
-/ - block content
-/   - set scale = 0.9
-/   h2 {{gene}} Gene Expression
-/   .row#page-genes
-/     .col-md-3
-/       script type="text/javascript"
-/         |var options = {"panzoomEnabled":false};
-/         var settings = ['no-zoom', 'layers','nav','checkboxes'];
-/         var images = {{images}};
-/       #view-sagittal.view style="width: {{264*scale}}px; height: {{240*scale}}px"
-/         %canvas height="{{220*scale}}" width="{{264*scale}}"
-/         %#nav-xaxis.slider.nav-slider-horizontal
-/       #value.data-row
-/         %#image-intent.data-label Intensity:
-/         %#data-current-value.data-value
-/       #layer-panel
-/         span Layers
-/         #layer-list-panel
-/           %#layer_visible_list
-/           %ul#layer-list.layer-settings
-/         #layer-settings-panel
-/           .layer-container-half-width
-/             span Color palette:
-/             %select#select-color.layer-settings.form-control
-/             span Positive/Negative:
-/             %select#select-sign.layer-settings.form-control
-/           %#checkbox-list
-/           .layer-container-full-width
-/             %.top-space20
-/             .layer-settings-row
-/               .row-label Thresholds:
-/               input#neg-threshold-text.slider-text
-/               %#neg-threshold.slider.layer-settings.layer-settings-slider
-/               %#threshold-zero -/+
-/               %#pos-threshold.slider.layer-settings.layer-settings-slider
-/               input#pos-threshold-text.slider-text
-/             .layer-settings-row
-/               .row-label Opacity:
-/               input#opacity-text.slider-text
-/               %#opacity.slider.layer-settings.layer-settings-slider
-/     .col-md-6
-/       .row
-/         .col-md-5
-/           #view-coronal.view style="width: {{270*scale}}px; height: {{220*scale}}px;"
-/             %canvas height="{{220*scale}}" width="{{220*scale}}"
-/             %#nav-yaxis.slider.nav-slider-vertical
-/           #coordinates.data-row
-/             input type="number" class="plane-pos" id="x-in" min="-90" max="90" value="{{x}}"
-/             input type="number" class="plane-pos" id="y-in" min="-72" max="108" value="{{y}}"
-/             input type="number" class="plane-pos" id="z-in" min="-106" max="90" value="{{z}}"
-/         .col-md-7
-/           #view-axial.view style="width: {{270*scale}}px; height: {{264*scale}}px"
-/             %canvas height="{{264*scale}}" width="{{220*scale}}"
-/             %#nav-zaxis.slider.nav-slider-vertical
-/       .row
-/         %.col-md-12.scatterplot
-/     .col-md-2
-/       %h3 Top analyses
-/       table#decoding_results_table.table.table-striped.table-hover.table-condensed
-/         thead
-/           tr
-/             %th
-/             th analysis
-/             th correlation
+      <div class="analysis-list" style="width: 200px; margin-left: 20px; margin-top: 50px;">
+        <h4>Term similarity</h4>
+        <p>To compare the {{gene.symbol}} map against a Neurosynth term, click on an arrow below.</p>
+        <table id="decoding_results_table" class="table table-striped table-hover table-condensed">
+          <thead>
+            <tr>
+              <th></th>
+              <th>analysis</th>
+              <th>corr.</th>
+            </tr>
+          </thead>
+        </table>
+      </div>
+    </div>
+  </div>
+{% endblock %}
