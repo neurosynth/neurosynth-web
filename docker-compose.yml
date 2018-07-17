@@ -1,14 +1,18 @@
-version: '2'
+version: '2.1'
+
 services:
+
   neurosynth:
     build: .
     restart: always
     ports:
-      - "8000"
+      - "32800:8000"
     volumes:
       - .:/code
       - ${ROOT}/data:/data:rw
       - ${ROOT}/logs:/logs:rw
+      - /Volumes/data/AllenSynth/Data/Maps/GeneMapsRadius6/:/data/images/genes
+      - /data/neurosynth/data/images/fcmri:/data/images/fcmri
     working_dir: /code
     command: /code/scripts/docker_startup.sh
     depends_on:
@@ -23,12 +27,15 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data
     environment:
-      - POSTGRES_DB=nsweb_development
+      - POSTGRES_DB=nsweb
+      - POSTGRES_USER=synthy
+      - POSTGRES_PASSWORD=ifyougottoask
+
   nginx:
     restart: always
     image: nginx
     ports:
-      - "80:80"
+      - "30000:30000"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./nginx/sites-enabled:/etc/nginx/sites-enabled:ro
@@ -39,12 +46,15 @@ services:
 
   redis:
     restart: always
-    image: redis
+    image: redis:latest
+    sysctls:
+      net.core.somaxconn: '511'
 
   worker:
     image: nsweb_neurosynth:latest
     restart: always
-    command: celery worker --app=nsweb.core:celery -c 1 --workdir=/code --logfile=/logs/celery/dev.log
+    working_dir: /code
+    command: /code/scripts/run_celery.sh
     volumes_from:
       - neurosynth
     depends_on:
@@ -53,3 +63,4 @@ services:
 
 volumes:
   postgres-data:
+  redis-data:
