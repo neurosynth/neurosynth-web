@@ -8,7 +8,13 @@
       <h2>
         <span>Decoding results</span>
         {% if decoding.neurovault_id %}
-          for image <a href="http://neurovault.org/images/{{decoding.neurovault_id}}">{{decoding.name}}</a>
+          {% if '-' in decoding.neurovault_id %}
+            {% set comps = decoding.neurovault_id.split('-') %}
+            {% set url = 'collections/%s/images/%s' % (comps[0], comps[1]) %}
+          {% else %}
+            {% set url = 'images/%s' % decoding.neurovault_id %}
+          {% endif %}
+          <a href="http://neurovault.org/{{url}}">{{decoding.name}}</a>
         {% endif %}
       </h2>
       <div class="decode-viewer" style="width: 580px; float: left;">
