@@ -3,7 +3,6 @@ from nsweb.initializers import settings
 from .settings import STATIC_FOLDER
 from os.path import join
 
-#sweetness: http://webassets.readthedocs.org/en/latest/builtin_filters.html
 
 # application css bundle
 css_nsweb = Bundle('scss/home.css.scss',

@@ -65,7 +65,7 @@ class DatabaseBuilder:
             dataset.add_features(features)
             dataset.save(settings.PICKLE_DATABASE)
         else:
-            print("\tLoading existing Dataset...")
+            print("Loading existing Dataset...")
             dataset = Dataset.load(dataset)
             if features is not None:
                 dataset.add_features(features)
