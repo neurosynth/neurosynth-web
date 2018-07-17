@@ -1,0 +1,12 @@
+{% set page_title = 'Neurosynth: analysis not found!' %}
+{% extends "layout/base.html" %}
+{% block content %}
+  <div class="row" id="#page-analysis">
+    <div class="col-md-8">
+      <h1 class="top-space0">Woops...</h1>
+      <div class="lead">Sorry, but we couldn't find an analysis for "{{analysis}}!"</div>
+      <p>The number of available analyses in Neurosynth is limited. It's possible we don't have enough studies yet to support a meta-analysis of this term or variable. It's also possible your fingers are too big for your keyboard and you need to type more carefully.</p>
+      <p>Please try again:</p>
+      <input type="text" id="term-analysis-search" />
+  </div>
+{% endblock %}

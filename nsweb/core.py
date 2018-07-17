@@ -5,22 +5,24 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 # from flask_restless import APIManager
-from flask.ext.babel import Babel
-from flask.ext.user import UserManager, SQLAlchemyAdapter
-from slimish_jinja import SlimishExtension
-from flask.ext.cache import Cache
-from flask.ext.marshmallow import Marshmallow
+from flask_babelex import Babel
+from flask_user import UserManager
+from flask_caching import Cache
+from flask_marshmallow import Marshmallow
 from flask_mail import Mail
 from nsweb.initializers import settings
 from nsweb.initializers.assets import init_assets
 from nsweb.initializers import make_celery
-from opbeat.contrib.flask import Opbeat
-from wtforms.validators import ValidationError
+from importlib import import_module
+
+# Do this before anything else to ensure the MPL backend isn't implicitly
+# set to something else, which could break everything if running in a container
+import matplotlib
+matplotlib.use('agg')
+
 
 app = Flask('NSWeb', static_folder=settings.STATIC_FOLDER,
             template_folder=settings.TEMPLATE_FOLDER)
-app.config['SQLALCHEMY_POOL_RECYCLE'] = 1800
-# manager = Manager(app)
 
 # Caching
 cache = Cache(config={'CACHE_TYPE': 'simple'})
@@ -30,7 +32,7 @@ celery = make_celery(app)
 from nsweb import tasks
 
 db = SQLAlchemy()
-_blueprints = []
+from nsweb.models.users import User
 
 # API-related stuff
 marshmallow = Marshmallow()
@@ -50,12 +52,6 @@ def setup_logging(logging_path, level):
         logger.addHandler(file_handler)
 
 
-def password_validator(form, field):
-    password = field.data
-    if len(password) < 4:
-        raise ValidationError('Password must have at least 4 characters')
-
-
 def create_app(debug=True, test=False):
     '''creates app instance, db instance, and apimanager instance'''
 
@@ -64,24 +60,26 @@ def create_app(debug=True, test=False):
     # Generate DB URI
     if settings.SQL_ADAPTER == 'sqlite':
         db_uri = settings.SQLALCHEMY_SQLITE_URI
-    elif settings.SQL_ADAPTER == 'mysql':
+    elif settings.SQL_ADAPTER.startswith('post'):
         if test:
-            db_to_use = settings.MYSQL_TEST_DB
+            db_to_use = settings.SQL_TEST_DB
         elif settings.DEBUG:
-            db_to_use = settings.MYSQL_DEVELOPMENT_DB
+            db_to_use = settings.SQL_DEVELOPMENT_DB
         else:
-            db_to_use = settings.MYSQL_PRODUCTION_DB
-        db_uri = 'mysql://%s:%s@localhost/%s' % (
-            settings.MYSQL_USER, settings.MYSQL_PASSWORD, db_to_use)
+            db_to_use = settings.SQL_PRODUCTION_DB
+        # db_uri = 'postgres://postgres@%s:5432/%s' % (
+        db_uri = 'postgres://%s:%s@%s:5432/%s' % (
+            settings.SQL_USER,
+            settings.SQL_PASSWORD,
+            settings.SQL_HOST,
+            db_to_use)
     else:
         raise ValueError("Value of SQL_ADAPTER in settings must be either"
-                         "'sqlite' or 'mysql'")
+                         "'sqlite' or 'postgres'")
 
     app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.secret_key = "very_sekret"  # move this out of here eventually
-
-    # Add slim support
-    Flask.jinja_options['extensions'].append(SlimishExtension)
 
     # Initialize assets
     init_assets(app)
@@ -93,53 +91,50 @@ def create_app(debug=True, test=False):
     # i18n support
     Babel(app)
 
-    # Opbeat error logging
-    if settings.OPBEAT_ENABLED:
-        app.config['OPBEAT'] = {
-            'ORGANIZATION_ID': settings.OPBEAT_ORGANIZATION_ID,
-            'APP_ID': settings.OPBEAT_APP_ID,
-            'SECRET_TOKEN': settings.OPBEAT_SECRET_TOKEN,
-            'INCLUDE_PATHS': ['nsweb'],
-            'DEBUG': settings.DEBUG or settings.OPBEAT_DEBUG
-        }
-        Opbeat(app)
-
     # API
     marshmallow.init_app(app)
 
     # Set up mail stuff
+    params = ['USER_EMAIL_SENDER_NAME', 'USER_EMAIL_SENDER_EMAIL']
     if settings.MAIL_ENABLE:
-        params = ['MAIL_USERNAME', 'MAIL_PASSWORD', 'MAIL_DEFAULT_SENDER',
-                  'MAIL_SERVER', 'MAIL_PORT', 'MAIL_USE_SSL']
-        app.config.update({(p, getattr(settings, p)) for p in params})
-        mail.init_app(app)
+        params += ['MAIL_USERNAME', 'MAIL_PASSWORD', 'MAIL_SERVER',
+                   'MAIL_PORT', 'MAIL_USE_SSL', 'MAIL_DEBUG']
+        app.config['USER_ENABLE_FORGOT_PASSWORD'] = True
+    app.config.update({(p, getattr(settings, p)) for p in params})
+    mail.init_app(app)
 
     # Set up user management
     app.config['CSRF_ENABLED'] = True
-    app.config['USER_ENABLE_FORGOT_PASSWORD'] = True
-    from nsweb.models.users import User
-    db_adapter = SQLAlchemyAdapter(db, User)
-    UserManager(db_adapter, app, password_validator=password_validator)
+
+    UserManager(app, db, User)
 
     # load blueprints
     register_blueprints()
 
-
-def add_blueprint(blueprint):
-    _blueprints.append(blueprint)
+    # set up logging
+    setup_logging(logging_path=settings.LOGGING_PATH,
+                  level=settings.LOGGING_LEVEL)
 
 
 def register_blueprints():
-    # creates and registers blueprints in nsweb.blueprints
-    import nsweb.controllers.home
-    import nsweb.controllers.studies
-    import nsweb.controllers.analyses
-    import nsweb.controllers.locations
-    import nsweb.controllers.api
-    import nsweb.api
-    import nsweb.controllers.images
-    import nsweb.controllers.decode
-    import nsweb.controllers.genes
+    blueprint_locations = [
+        'nsweb.api',
+        'nsweb.api.analyses',
+        # 'nsweb.api.custom',
+        'nsweb.api.images',
+        'nsweb.api.locations',
+        'nsweb.api.studies',
+        'nsweb.api.decode',
+        'nsweb.api.genes',
+        'nsweb.controllers.home',
+        'nsweb.controllers.analyses',
+        # 'nsweb.controllers.custom',
+        'nsweb.controllers.locations',
+        'nsweb.controllers.studies',
+        'nsweb.controllers.decode',
+        'nsweb.controllers.genes'
+    ]
 
-    for blueprint in _blueprints:
-        app.register_blueprint(blueprint)
+    for loc in blueprint_locations:
+        mod = import_module(loc)
+        app.register_blueprint(getattr(mod, 'bp'))

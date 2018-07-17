@@ -1,10 +1,66 @@
-web:
+version: '2.1'
+
+services:
+
+  neurosynth:
     build: .
+    restart: always
     ports:
-        - "5001:5001"
+      - "32800:8000"
     volumes:
-        - .:/code
-        - /CHANGEME:/data
-    environment:
-        - INSTANCE_TYPE=web-server
+      - .:/code
+      - ${ROOT}/data:/data:rw
+      - ${ROOT}/logs:/logs:rw
+      - /Volumes/data/AllenSynth/Data/Maps/GeneMapsRadius6/:/data/images/genes
+      - /data/neurosynth/data/images/fcmri:/data/images/fcmri
+    working_dir: /code
     command: /code/scripts/docker_startup.sh
+    depends_on:
+      - db
+      - redis
+
+  db:
+    restart: always
+    image: postgres:10.4
+    expose:
+      - '5432'
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=nsweb
+      - POSTGRES_USER=synthy
+      - POSTGRES_PASSWORD=ifyougottoask
+
+  nginx:
+    restart: always
+    image: nginx
+    ports:
+      - "30000:30000"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/sites-enabled:/etc/nginx/sites-enabled:ro
+    volumes_from:
+      - neurosynth
+    depends_on:
+      - neurosynth
+
+  redis:
+    restart: always
+    image: redis:latest
+    sysctls:
+      net.core.somaxconn: '511'
+
+  worker:
+    image: nsweb_neurosynth:latest
+    restart: always
+    working_dir: /code
+    command: /code/scripts/run_celery.sh
+    volumes_from:
+      - neurosynth
+    depends_on:
+      - db
+      - redis
+
+volumes:
+  postgres-data:
+  redis-data:

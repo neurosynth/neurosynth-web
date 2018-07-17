@@ -1,7 +1,7 @@
 from nsweb.core import app, db, create_app
 from flask.ext.script import Manager
 from flask import url_for
-from flask.ext.migrate import Migrate, MigrateCommand
+from flask_migrate import Migrate, MigrateCommand
 from nsweb.models import *
 
 create_app()

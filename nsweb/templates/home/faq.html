@@ -1,0 +1,36 @@
+{% set page_title = 'Neurosynth: FAQs' %}
+{% extends "layout/base.html" %}
+{% block content %}
+
+  <div id="page-faq" class="row">
+    <div class="col-md-10 col-md-offset-1">
+      <h1>Neurosynth: Frequently Asked Questions</h1>
+      {% set count = [0] %}
+      <div class="faq-toc">
+        {% for s in data['sections'] %}
+          <h3>{{ s['name'] }}</h3>
+          <ul>
+            {% for item in s['questions'] %}
+              {% set _ = count.append(count.pop()+1) %}
+              <li><a href="#q{{count[0]|string}}">{{ item['q'] }}</a></li>
+            {% endfor %}
+          </ul>
+        {% endfor %}
+      </div>
+      <hr>
+      {% set count = [0] %}
+      <div class="faq-contents">
+        {% for s in data['sections'] %}
+          <h3 class="top-space40">{{ s['name'] }}</h3>
+          {% for item in s['questions'] %}
+            {% set _ = count.append(count.pop()+1) %}
+            <a name="q{{count[0]|string}}"></a>
+            <div class="faq-q">{{ item['q'] }}</div>
+            <div class="faq-a">{{ item['a']|safe }}</div>
+          {% endfor %}
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

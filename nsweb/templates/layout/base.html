@@ -29,7 +29,7 @@
 	<header class="navbar navbar-static-top navbar-inverse" id="top" role="banner">
 	    <div class="container">
 	        <div class="navbar-header">
-	            <a href="../" class="navbar-brand">Neurosynth.org (beta)</a>
+	            <a href="../" class="navbar-brand">Neurosynth.org</a>
 	        </div>
 	        <nav class="collapse navbar-collapse" role="navigation">
 		        <ul class="nav navbar-nav">
@@ -40,19 +40,16 @@
                             <li><a href="{{url_for('analyses.list_terms')}}">Terms</a></li>
                             <li class="divider"></li>
                             <li><a href="{{url_for('analyses.list_topic_sets')}}">Topics</a></li>
-                            <li class="divider"></li>
-                            <li><a href="{{url_for('analyses.list_custom_analyses')}}">Custom</a></li>
-                            <!-- <li class="divider"></li> -->
-                            <!-- <li><a href="{{url_for('analyses.browse_public_analyses')}}">Browse</a></li> -->
                         </ul>
                     </li>
 					<!-- <li class=""><a href="/analyses/">Analyses</a></li> -->
 					<li class=""><a href="/studies/">Studies</a></li>
                     <li class=""><a href="/locations/">Locations</a></li>
+                    <li class=""><a href="/genes/">Genes</a></li>
                     <li class=""><a href="/decode/">Decoder</a></li>
                     <li class=""><a href="/code/">Code</a></li>
 			        <li class=""><a href="/faq/">FAQs</a></li>
-                    {% if current_user.is_authenticated() %}
+<!--                     {% if current_user.is_authenticated %}
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Signed in as {{ current_user.username }}<span class="caret"></span></a>
                         <ul class="dropdown-menu" role="menu">
@@ -61,7 +58,7 @@
                     </li>
                     {% else %}
                         <li class=""><a href="{{ config.USER_LOGIN_URL }}">Sign in</a></li>
-                    {% endif %}
+                    {% endif %} -->
 		        </ul>
 		        <ul class="nav navbar-nav navbar-right">
 		        </ul>

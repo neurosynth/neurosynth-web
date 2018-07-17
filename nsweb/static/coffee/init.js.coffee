@@ -54,7 +54,7 @@ createDataTable = (element, options) ->
   # Set defaults and overwrite with the passed object
   _opts = {
     pagingType: "full_numbers"
-    pageLength: 25
+    pageLength: 10
     stateSave: true
     orderClasses: true
     processing: true
@@ -75,10 +75,10 @@ urlToParams = () ->
 window.urlToParams = urlToParams
 
 loadReverseInferenceImage = (analysis, fdr=false) ->
-  url = '/analyses/' + analysis + '/images/reverse'
+  url = '/api/analyses/' + analysis + '/images/association'
   url += '?unthresholded' if not fdr
   [{
-    name: analysis + ' (reverse inference)'
+    name: analysis + ' (association test)'
     url: url
     colorPalette: 'yellow'
     download: true

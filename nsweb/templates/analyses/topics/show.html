@@ -1,0 +1,69 @@
+{% set topic_n = (analysis.number|string) %}
+{% set page_title = 'Neurosynth: topic ' + topic_n %}
+{% extends "layout/base.html" %}
+{% block content %}
+  {% import "macros/_analysis_viewer.html" as viewers %}
+  {% import "macros/_datatables.html" as datatables %}
+  <script type="text/javascript">
+    var analysis = "{{analysis.id}}";
+  </script>
+  <div class="row">
+    <div class="col-md-8">
+      <h1 class="top-space0">Topic {{topic_n}}</h1>
+      <div class="lead">An automated meta-analysis of {{analysis.n_studies}} studies</div>
+    <div class="col-md-2">
+    </div>
+  </div>
+  <div class="row" id="page-analysis">
+    <div class="col-md-10 content">
+      <h4>Top-loading terms for this topic:</h4>
+      <h5>{{analysis.terms|safe}}</h5>
+      <hr />
+      <ul id="analysis-menu" class="nav nav-pills">
+        <li class="active">
+          <a  data-toggle="tab" href="#maps">Maps</a>
+        </li>
+        <li>
+          <a  data-toggle="tab" href="#studies">Studies</a>
+        </li>
+        <li>
+          <a  data-toggle="tab" href="#faq">FAQs</a>
+        </li>
+      </ul>
+      <div id="analysis-tab-content" class="tab-content">
+        <div id="maps" class="tab-pane active">
+          <h3>Meta-analytic tests of uniformity and association</h3>
+          <script  type="text/javascript">
+            var options = {"panzoomEnabled":false}
+            var settings = ['no-zoom', 'layers','nav','checkboxes']
+          </script>
+          <p>{{viewers.viewer()|safe}}</p>
+        </div>
+        <div id="studies" class="tab-pane">
+          {{datatables.studies_table('Topic ' + topic_n, current_user)}}
+        </div>
+
+        <div id="faq" class="tab-pane">
+          <h3>Topic-based meta-analyses: Frequently Asked Questions</h3>
+          <h4 class="help">What is a "topic" in Neurosynth?</h4>
+          <p>
+            Topics reflect an effort to move beyond individual term-based analyses by modeling the covariance between different terms in article abstracts. Instead of generating separate maps for, say, "working memory" and "cognitive control", a topic modeling approach might extract a single topic that assigns a large weight to each of these closely-related terms (as well as many others). You can effectively think of a Neurosynth topic is a cluster of semantically-related words that tend to occur together in article abstracts. A meta-analysis is then performed to identify the neural correlates of each topic by searching for brain regions that are consistently more activated in articles that load highly on each topic than in articles that do not load highly on a topic. For further details, please see <a href="http://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1002707">Poldrack et al (2012)</a>.
+          </p>
+
+          <h4 class="help">What do the "uniformity test" and "association test" maps mean?</h4>
+          <p>For a detailed explanation, please see our <a href="http://pilab.psy.utexas.edu/publications/Yarkoni_NatureMethods_2011.pdf">Nature Methods paper</a>. In brief, the <u>association test</u> map (formerly known as the reverse inference map, although it should have never been titled as such) displays brain regions that show a statistically significant association with the topic in question. A positive value at a given voxel means that studies tagged with Topic  are also more likely to report activation at that voxel; a negative value means that studies tagged with Topic {{analysis.number}} are _less_ likely to report activation that voxel. The underlying statistical test is a simple 2-way chi-square on a 2 x 2 contingency table of topic presence (mentioned or not mentioned in a study) crossed with voxel activation (active or not active in a study). The values are z-scores corresponding to p-values from the chi-squared test. Note that no probabilistic statement is licensed by the association test maps--one cannot conclude, for instance, that if one observes activity at a voxel with a particularly large z-score, it must be very likely that the topic in question is used in a study. The latter is a claim about effect sizes that requires inspection of probability maps (which are not available on this website, but can be generated using the <a href="http://github.com/neurosynth/neurosynth">Python code available here</a>).</p>
+          
+          <p>The <u>uniformity test</u> map (formerly known as the forward inference map) displays brain regions that are more consistently activated for Topic {{analysis.number}} than one would expect if activation were distributed uniformly throughout the brain. One can think of this as a kind of consistency test: are there brain regions where activation tends to cluster relative to a null of no structure at all? Note that this is typically not very interesting, because it turns out that some brain regions are consistently reported in a lot of different kinds of studies (again, see <a href="http://pilab.psy.utexas.edu/publications/Yarkoni_NatureMethods_2011.pdf">our paper</a>). So as a general rule of thumb, we don't recommend paying much attention to uniformity test maps.</p>
+
+          <h4 class="help">How do you determine which studies to include in an analysis?</h4>
+          <p>We use a predefined binary cut-off. For all topic-based meta-analyses, we treat all studies with a loading > 0.05 as "active" for a given topic, and all other studies as inactive. Although the choice of threshold is relatively arbitrary, in practice, varying it within a fairly broad range of values has minimal influence on the results. Adopting a continuous approach instead of dichotomizing the dataset also has a negligible effect.</p>
+
+          <h4 class="help">Are these maps corrected for multiple comparisons?</h4>
+          <p>Yes and no. We use a false discovery rate (FDR) approach to threshold for multiple comparison, with an expected FDR of 0.01. In other words, all values you see in these maps have been corrected for multiple comparisons in the sense that the nominal false positive rate over the long run is being controlled. However, note that we have not actually transformed the values at all. In other words, you are seeing voxels that survive multiple comparisons correction, but the actual z-scores displayed correspond to the original, uncorrected p-values.</p>
+          
+          <p>If you want to know exactly how things work, we encourage you to clone the Neurosynth python tools from the <a href="http://github.com/neurosynth/neurosynth">github repository</a> and work through some of the examples and code provided in the package. Everything you see on this page was generated using the default processing stream, so you should be able to easily generate the exact same images (unless the underlying database has grown or changed) for yourself.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

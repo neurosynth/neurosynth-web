@@ -4,8 +4,8 @@ $(document).ready ->
   return if not $('#page-analysis').length
 
   # Initialize DataTables
-  createDataTable('#term-analyses-table', {ajax: '/api/terms', serverSide: true})
-  createDataTable('#topic-set-list-table', {ajax: '/api/topics', serverSide: true})
+  createDataTable('#term-analyses-table', {ajax: '/api/analyses/terms', serverSide: true})
+  createDataTable('#topic-set-list-table', {ajax: '/api/analyses/topics', serverSide: true})
   columns = [
     { width: '40%' }
     { width: '38%' }
@@ -16,11 +16,11 @@ $(document).ready ->
   createDataTable('#analysis-similarity-table')
 
   if topic_set?
-    createDataTable('#topic-set-table', {ajax: '/api/topics/' + topic_set})
+    createDataTable('#topic-set-table', {ajax: '/api/analyses/topics/' + topic_set})
 
 
   # autocomplete
-  $.get('/analyses/term_names', (result) ->
+  $.get('/api/analyses/term_names', (result) ->
 
     $('#term-analysis-search').autocomplete( 
       minLength: 2
@@ -44,11 +44,11 @@ $(document).ready ->
   )
 
   loadAnalysisStudies = ->
-    url = '/analyses/' + analysis + '/studies?dt=1'
+    url = '/api/analyses/' + analysis + '/studies?dt=1'
     $('#analysis-studies-table').DataTable().ajax.url(url).load().order([3, 'desc'])
 
   loadAnalysisImages = ->
-    url = '/analyses/' + analysis  + '/images'
+    url = '/api/analyses/' + analysis  + '/images'
     $.get(url, (result) ->
       loadImages(result.data)
       )

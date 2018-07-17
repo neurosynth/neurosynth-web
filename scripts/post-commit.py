@@ -11,6 +11,6 @@ command = "curl https://opbeat.com/api/v1/organizations/%s/" \
                               settings.OPBEAT_APP_ID,
                               settings.OPBEAT_SECRET_TOKEN)
 
-print command
+print(command)
 # subprocess.call(command.split(' '))
 subprocess.Popen(command, stdout=subprocess.PIPE, shell=True).communicate()

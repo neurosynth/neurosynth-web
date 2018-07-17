@@ -5,23 +5,23 @@ $(document).ready ->
 
   # Load the table layers
   if study?
-    url = '/studies/' + study  + '/tables'
+    url = '/api/studies/' + study  + '/tables'
     $.get(url, (result) -> window.loadImages(result.data))
 
-  createDataTable('#studies_table', { ajax: '/api/studies/', serverSide: true })
+  createDataTable('#studies_table', { ajax: '/api/studies/dt', serverSide: true })
 
   url_id=document.URL.split('/')
   url_id=url_id[url_id.length-2]
 
   createDataTable('#study_analyses_table', {
     pageLength: 10
-    ajax: '/api/studies/analyses/'+url_id+'/'
+    ajax: '/api/studies/'+url_id+'/analyses/'
     order: [[1, 'desc']]
       })
 
   createDataTable('#study_peaks_table', {
     pageLength: 10
-    ajax: '/api/studies/peaks/'+url_id+'/'
+    ajax: '/api/studies/'+url_id+'/peaks/'
     order: [[0, 'asc'], [2, 'asc']]
       })
 

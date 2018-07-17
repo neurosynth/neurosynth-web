@@ -18,22 +18,22 @@ $(document).ready ->
     coords.join('_')
 
   loadLocationStudies = ->
-    url = '/locations/' + getLocationString() + '/studies?dt=1'
+    url = '/api/locations/' + getLocationString() + '/studies?dt=1'
     $('#location_studies_table').DataTable().ajax.url(url).load().order([3, 'desc'])
 
   loadLocationImages = ->
-    url = '/locations/' + getLocationString()  + '/images'
+    url = '/api/locations/' + getLocationString()  + '/images'
     $.get(url, (result) ->
       window.loadImages(result.data)
       loadLocationSimilarity(result.data[0].id)
       )
 
   loadLocationComparisons = ->
-    url = '/locations/' + getLocationString() + '/compare'
+    url = '/api/locations/' + getLocationString() + '/compare'
     $('#location_analyses_table').DataTable().ajax.url(url).load().order([1, 'desc'])
 
   loadLocationSimilarity = (id) ->
-    url = '/images/' + id + '/decode'
+    url = '/api/images/' + id + '/decode'
     $('#analysis-similarity-table').DataTable().ajax.url(url).load().order([1, 'desc'])
     #TODO: IMPLEMENT MOVE CURSOR TO SEED
 
@@ -45,7 +45,7 @@ $(document).ready ->
     coords = { x: $('#x-in').val(), y: $('#y-in').val(), z: $('#z-in').val(), r: $('#rad-out').val()}
     xyz = [coords.x, coords.y, coords.z]
     study_info = 'Studies reporting activation within ' + coords.r + ' mm of (' + xyz.join(', ') + ')'
-    $('#current-location-studies') .text(study_info)
+    $('#current-location-studies').text(study_info)
     
     # TODO: IMPLEMENT ONPOPSTATE  
     # window.history.pushState(null, null, base + '?' + $.param(coords))

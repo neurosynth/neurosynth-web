@@ -1,0 +1,53 @@
+- set page_title = 'Neurosynth: ' + parcellation.name
+- extends "layout/base.html"
+- block content
+  - import "macros/_analysis_viewer.html" as viewers
+  - import "macros/_datatables.html" as datatables
+  script type="text/javascript"
+    |var analysis = "{{analysis.id}}";
+    var rev_inf = {{analysis.reverse_inference_image.id}};
+  .row
+    .col-md-8
+      h1.top-space0 {{analysis.name}}
+      .lead An automated meta-analysis of {{analysis.n_studies}} studies
+    .col-md-2
+      .analysis-search
+        span Search for another term:
+        input type="text" id="term-analysis-search"
+  .row#page-analysis
+    .col-md-10.content
+      hr
+      ul#analysis-menu.nav.nav-pills
+        li.active
+          a href="#maps" data-toggle="tab" Maps
+        li
+          a href="#studies" data-toggle="tab" Studies
+        / li
+        /   a href="#similarity" data-toggle="tab" Similarity
+        - if cog_atlas
+          li
+            a href="#resources" data-toggle="tab" Resources
+        li
+          a href="#faq" data-toggle="tab" FAQs
+      #analysis-tab-content.tab-content
+        #maps.tab-pane.active
+          script type="text/javascript"
+            |var options = {"panzoomEnabled":false}
+            var settings = ['no-zoom', 'layers','nav','checkboxes']
+          p {{viewers.viewer()|safe}}
+        #studies.tab-pane
+          {{datatables.studies_table(analysis.name, current_user)}}
+        / #similarity.tab-pane
+        /   h4 Most similar terms
+        /   table#analysis-similarity-table.table-striped.table-hover.table.table-condensed
+        /     thead
+        /       tr
+        /         th Term
+        /         th r
+
+
+        #faq.tab-pane
+          h3 Parcellations: Frequently Asked Questions
+          p This page displays information for ...
+
+          h4.help What do the "forward inference" and "reverse inference" maps mean?

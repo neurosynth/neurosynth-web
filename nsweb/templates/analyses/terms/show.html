@@ -1,0 +1,88 @@
+{% set page_title = 'Neurosynth: ' + analysis.name %}
+{% extends "layout/base.html" %}
+{% block content %}
+  {% import "macros/_analysis_viewer.html" as viewers %}
+  {% import "macros/_datatables.html" as datatables %}
+  <script type="text/javascript">
+    var analysis = "{{analysis.id}}";
+    var rev_inf = {{analysis.reverse_inference_image.id}};
+  </script>
+  <div class="row">
+    <div class="col-md-8">
+      <h1 class="top-space0">{{analysis.name}}</h1>
+      <div class="lead">An automated meta-analysis of {{analysis.n_studies}} studies</div>
+    </div>
+    <div class="col-md-2">
+      <div class="analysis-search">
+        <span>Search for another term:</span>
+        <input  type="text" id="term-analysis-search" />
+      </div>
+    </div>
+  </div>
+  <div id="page-analysis" class="row">
+    <div class="col-md-10 content">
+      <hr />
+      <ul id="analysis-menu" class="nav nav-pills">
+        <li class="active">
+          <a  data-toggle="tab" href="#maps">Maps</a>
+        </li>
+        <li>
+          <a  data-toggle="tab" href="#studies">Studies</a>
+        </li>
+        <li>
+          <a  data-toggle="tab" href="#faq">FAQs</a>
+        </li>
+      </ul>
+      <div id="analysis-tab-content" class="tab-content">
+        <div id="maps" class="tab-pane active">
+          <script  type="text/javascript">
+            var options = {"panzoomEnabled":false}
+            var settings = ['no-zoom', 'layers','nav','checkboxes']
+          </script>
+          <p>{{viewers.viewer()|safe}}</p>
+        </div>
+        <div id="studies" class="tab-pane">
+          {{datatables.studies_table(analysis.name, current_user)}}
+        </div>
+<!-- {#         / #similarity.tab-pane
+        /   h4 Most similar terms
+        /   table#analysis-similarity-table.table-striped.table-hover.table.table-condensed
+        /     thead
+        /       tr
+        /         th Term
+        /         th r #} -->
+        {% if cog_atlas %}
+          <div id="resources" class="tab-pane">
+            <h3>External resources</h3>
+            <a href="http://cognitiveatlas.org">
+              <img src="/static/images/cogatlas.png" height="80">
+            </a>
+            <h4>The <a href="http://cognitiveatlas.org">Cognitive Atlas</a> is a collaborative knowledge building project led that aims to develop a knowledge base (or ontology) that characterizes the state of current thought in cognitive science.</h4>
+            <h4>The Cognitive Atlas defines <a href="{{cog_atlas['url']}}" style="font-size: 1.4em;">{{analysis.name}}</a> as:</h4>
+            <blockquote>{{cog_atlas['definition']}}</blockquote>
+            <h4>For further information, including a specification of formal relations to other tasks and concepts, visit the <a href="{{cog_atlas['url']}}">{{analysis.name}}</a> node on the Cognitive Atlas website.</h4>
+          </div>
+        {% endif %}
+
+        <div id="faq" class="tab-pane">
+          <h3>Term-based meta-analyses: Frequently Asked Questions</h3>
+          <p>This page displays information for an automated Neurosynth meta-analysis of the term {{analysis.name}}. The meta-analysis was performed by automatically identifying all studies in the Neurosynth database that loaded highly on the term, and then performing meta-analyses to identify brain regions that were consistently or preferentially reported in the tables of those studies.</p>
+          <h4 class="help">What do the "uniformity test" and "association test" maps mean?</h4>
+          <p>
+            For a detailed explanation, please see our <a href="http://pilab.psy.utexas.edu/publications/Yarkoni_NatureMethods_2011.pdf">Yarkoni et al (2011)</a>. In brief, the <u>uniformity test map</u> displays brain regions that are <em>consistently</em> active in studies that load highly on the term {{analysis.name}}. Voxels with large z-scores are reported more often in studies whose abstracts use the term {{analysis.name}} than one would expect them to be if activation everywhere in the brain was equally likely. Note that this is typically not so interesting, because it turns out that some brain regions are consistently reported in a lot of different kinds of studies (again, see <a href="http://pilab.psy.utexas.edu/publications/Yarkoni_NatureMethods_2011.pdf">our paper</a>). So as a general rule of thumb, we don't recommend paying much attention to uniformity test maps.
+          </p>
+          <p><u>association test maps</u> are, roughly, maps displaying brain regions that are <em>preferentially</em> related to the term {{analysis.name}}. The association test map for {{analysis.name}} displays voxels that are reported more often in articles that include the term {{analysis.name}} in their abstracts than articles that do not. Most of the time this a more useful way of thinking about things, since association test maps tell you whether or not there's a non-zero association between activation of the voxel in question and the use of a particular term in a study.</p>
+          <p>Note that these two maps were previously referred to as forward and reverse inference maps, respectively, which was a mistake. We don't show true forward and reverse inference maps on the website (for reasons explained in the <a href="{{url_for('home.faq')}}">FAQs</a>), but you can generate them via the <a href="https://github.com/neurosynth/neurosynth">Python core tools</a>.</p>
+          <h4 class="help">How do you determine which studies to include in an analysis?</h4>
+          <p>For all term-based meta-analyses visible on this website, we consider a study to load on a given term if the term is used at least once anywhere in the article abstract. We have applied various other modeling approaches in the past (e.g., increasing the cut-off, using continuous-valued weights, and using the full-text of articles rather than just the abstract), but there is generally surprisingly little effect on results within a fairly broad range of parameter variation.</p>
+          <h4 class="help">Are these maps corrected for multiple comparisons?</h4>
+          <p>Yes, they're corrected using a false discovery rate (FDR) approach, with an expected FDR of 0.01.</p>
+          <h4 class="help">I need more details! How exactly were these maps and data generated?</h4>
+          <p>
+            If you want to know exactly how things work, we encourage you to clone the Neurosynth python tools from the <a href="http://github.com/neurosynth/neurosynth">github repository</a> and work through some of the examples and code provided in the package. Everything you see on this page was generated using the default processing stream, so you should be able to easily generate the exact same images (unless the underlying database has grown or changed) for yourself.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

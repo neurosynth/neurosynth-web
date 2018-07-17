@@ -22,12 +22,13 @@ import json
 import re
 import shutil
 import urllib
+import traceback
 
 
 class DatabaseBuilder:
 
     def __init__(self, db, dataset=None, studies=None, features=None,
-                 reset_db=False, reset_dataset=False, download_data=True):
+                 reset_db=False, reset_dataset=False, download_data=False):
         """
         Initialize instance from a pickled Neurosynth Dataset instance or a
         pair of study and analysis .txt files.
@@ -35,9 +36,6 @@ class DatabaseBuilder:
             db: the SQLAlchemy database connection to use.
             dataset: an optional filename of a pickled neurosynth Dataset
                 instance.
-                Note that the Dataset must contain the list of Mappables (i.e.,
-                    save() must have been called with keep_mappables set to
-                    True).
             studies: name of file containing activation data. If passed, a new
                 Dataset instance will be constructed.
             features: name of file containing feature data.
@@ -46,29 +44,28 @@ class DatabaseBuilder:
                 incrementally.
             reset_dataset: if True, will regenerate the pickled Neurosynth
                 dataset.
-            download_data: if True, ignores any existing files and downloads the
-                latest Neurosynth data files from GitHub.
+            download_data: if True, ignores any existing files and downloads
+                the latest Neurosynth data files from GitHub.
         """
 
         if (studies is not None and not os.path.exists(studies)) \
                 or settings.RESET_ASSETS:
-            print "WARNING: RESETTING ALL NEUROSYNTH ASSETS!"
+            print("WARNING: RESETTING ALL NEUROSYNTH ASSETS!")
             self.reset_assets(download_data)
 
         # Load or create Neurosynth Dataset instance
-        if dataset is None or reset_dataset or (isinstance(dataset, basestring)
-                                                and not os.path.exists(dataset)
-                                                ):
-            print "\tInitializing a new Dataset..."
+        if dataset is None or reset_dataset or (isinstance(dataset, str) and
+                                                not os.path.exists(dataset)):
+            print("\tInitializing a new Dataset...")
             if (studies is None) or (features is None):
                 raise ValueError(
                     "To generate a new Dataset instance, both studies and "
                     "analyses must be provided.")
             dataset = Dataset(studies)
             dataset.add_features(features)
-            dataset.save(settings.PICKLE_DATABASE, keep_mappables=True)
+            dataset.save(settings.PICKLE_DATABASE)
         else:
-            print "\tLoading existing Dataset..."
+            print("Loading existing Dataset...")
             dataset = Dataset.load(dataset)
             if features is not None:
                 dataset.add_features(features)
@@ -77,7 +74,7 @@ class DatabaseBuilder:
         self.db = db
 
         if reset_db:
-            print "WARNING: RESETTING DATABASE!!!"
+            print("WARNING: RESETTING DATABASE!!!")
             self.reset_database()
 
     def reset_assets(self, download=True):
@@ -103,9 +100,11 @@ class DatabaseBuilder:
         def retrieve_file(url, filename):
             try:
                 if not exists(filename) or settings.RESET_ASSETS:
-                    urllib.urlretrieve(url, filename)
+                    urllib.request.urlretrieve(url, filename)
             except:
-                raise ValueError("Could not save remote URL %s to local path %s. ")
+                print(traceback.format_exc())
+                raise ValueError("Could not save remote URL %s to local path "
+                                 " %s. " % (url, filename))
 
         for u, f in {
             'ftp://ftp.ebi.ac.uk/pub/databases/genenames/hgnc_complete_set.txt.gz':
@@ -145,10 +144,11 @@ class DatabaseBuilder:
 
         from nsweb.tasks import MASK_FILES
         for k, v in MASK_FILES.items():
-            if not exists(join(settings.MASK_DIR, v)):
+            mask_file = join(settings.MASK_DIR, v)
+            if not exists(mask_file):
                 raise RuntimeWarning("The image file for the '%s' mask "
                     "cannot be found at %s. This mask will be gracefully "
-                    "ignored in all decoder scatterplots.")
+                    "ignored in all decoder scatterplots." % (k, mask_file))
 
     def reset_database(self):
         ''' Drop and re-create all tables. '''
@@ -212,11 +212,11 @@ class DatabaseBuilder:
                 new ones
         """
 
-        if isinstance(analysis, basestring):
+        if isinstance(analysis, str):
             if hasattr(self, 'analyses') and analysis in self.analyses:
                 analysis = self.analyses[analysis][0]
             else:
-                analyses = TermAnalysis.query.filter_by(name=analyses).all()
+                analyses = TermAnalysis.query.filter_by(name=analysis).all()
                 if len(analyses) > 1:
                     raise ValueError("More than 1 analysis has the name %s! "
                                      "Please resolve the conflict and try "
@@ -252,13 +252,13 @@ class DatabaseBuilder:
                         label='%s: association test' % name,
                         stat='z-score',
                         display=1,
-                        download=1)
+                        download=1),
             image_class(image_file=join(image_dir, name +
-                                        '_pFgA__pf=0.50_FDR_0.01.nii.gz'),
+                                        '_pFgA_pf=0.50_FDR_0.01.nii.gz'),
                         label='%s: reverse inference (unif. prior)' % name,
                         stat='prob.',
                         display=1,
-                        download=1)
+                        download=1),
             image_class(image_file=join(image_dir, name +
                                         '_pFgA_emp_prior_FDR_0.01.nii.gz'),
                         label='%s: reverse inference (emp. prior)' % name,
@@ -296,61 +296,65 @@ class DatabaseBuilder:
             analyses = self._get_feature_names()
 
         feature_data = self.dataset.get_feature_data(features=analyses)
-        analysis_names = list(feature_data.columns)
 
-        study_inds = range(len(self.dataset.mappables))
+        study_inds = self.dataset.activations['id'].unique()
+
         if limit is not None:
             random.shuffle(study_inds)
             study_inds = study_inds[:limit]
 
+        # SQL DBs generally don't like numpy dtypes
+        study_inds = [int(ind) for ind in study_inds]
+
+        all_rows = self.dataset.activations.query('id in @study_inds')
+        all_rows[['doi', 'table_num']] = all_rows[['doi', 'table_num']] \
+                                            .astype(str).replace('nan', '')
+
         # Create Study records
-        for i in study_inds:
+        for i, pmid in enumerate(study_inds):
 
-            m = self.dataset.mappables[i]
-            id = int(m.id)
+            activ = all_rows.query('id == @pmid')
 
-            study = Study.query.get(id)
+            study = Study.query.get(pmid)
+
             if study is None:
-                peaks = [Peak(x=float(p.x),
-                              y=float(p.y),
-                              z=float(p.z),
-                              table=str(p.table_num).replace('nan', '')
-                              ) for (ind, p) in m.data.iterrows()]
-                data = m.data.iloc[0]
+                peaks = [Peak(x=p['x'], y=p['y'], z=p['z'],
+                              table=p['table_num'])
+                         for (ind, p) in activ.iterrows()]
+
+                # Track in Python to avoid issuing SQL count() queries
+                n_peaks = len(peaks)
+
+                data = activ.iloc[0, :]
                 study = Study(
-                    pmid=id,
+                    pmid=int(pmid),
                     space=data['space'],
-                    doi=str(data['doi']).replace('nan', ''),
+                    doi=data['doi'],
                     title=data['title'],
                     journal=data['journal'],
                     authors=data['authors'],
-                    year=data['year'])
+                    year=int(data['year']))
                 study.peaks.extend(peaks)
                 self.db.session.add(study)
 
             # Map analyses onto studies via a Frequency join table that also
             # stores frequency info
-            pmid_frequencies = list(feature_data.ix[m.id, :])
+            pmid_frequencies = feature_data.loc[pmid, :]
+            to_keep = pmid_frequencies[pmid_frequencies >= threshold]
+            for analysis_name, freq in to_keep.iteritems():
+                freq_inst = Frequency(
+                    study=study, analysis=self.analyses[analysis_name][0],
+                    frequency=freq)
+                self.db.session.add(freq_inst)
 
-            for (y, analysis_name) in enumerate(analysis_names):
-                freq = pmid_frequencies[y]
-                if pmid_frequencies[y] >= threshold:
-                    freq_inst = Frequency(
-                        study=study, analysis=self.analyses[analysis_name][0],
-                        frequency=freq)
-                    self.db.session.add(freq_inst)
+                # Track number of studies and peaks so we can update
+                # Analysis table more efficiently later
+                self.analyses[analysis_name][1] += 1
+                self.analyses[analysis_name][2] += n_peaks
 
-                    # Track number of studies and peaks so we can update
-                    # Analysis table more efficiently later
-                    self.analyses[analysis_name][1] += 1
-                    self.analyses[analysis_name][2] += study.peaks.count()
-
-        # Commit records in batches to conserve memory.
-        # This is very slow because we're relying on the declarative base.
-        # Ideally should replace this with use of SQLAlchemy core, but probably
-        # not worth the trouble considering we only re-create the DB once in a
-        # blue moon.
+        # Commit records in batches to conserve memory and speed up querying.
             if (i + 1) % 100 == 0:
+                print("Saving study %d..." % i)
                 self.db.session.commit()
 
         self.db.session.commit()  # Commit any remaining studies
@@ -430,7 +434,7 @@ class DatabaseBuilder:
         gene_data = gene_data.fillna('')
 
         genes = glob(join(gene_dir, "*.nii.gz"))
-        print "Adding %d genes..." % len(genes)
+        print("Adding %d genes..." % len(genes))
         found = {}
         for (i, g) in enumerate(genes):
             symbol = basename(g).split('_')[2]
@@ -622,7 +626,7 @@ class DatabaseBuilder:
             is_subsampled = (voxels is not None)
             if voxels is not None:
                 # Either randomly select voxels, or use what was passed
-                # TODO: sample uniformly from a 3D grid instead of randomly
+                # TODO: downsample image instead of randomly selecting voxels
                 if isinstance(voxels, int):
                     sampled_vox = np.random.choice(sampled_vox, voxels,
                                                    replace=False)
@@ -633,19 +637,20 @@ class DatabaseBuilder:
             # Initialize memmap
             n_images = len(images)
             mm_file = join(mm_dir, '%s_images.dat' % name)
-            mm = np.memmap(mm_file, dtype='float32', mode='w+',
-                           shape=(len(sampled_vox), n_images))
+            temp_map = np.zeros((len(sampled_vox), n_images), dtype='float32')
 
             # Save key image stats--will need these to reconstruct raw values
             stats = np.zeros((n_images, 4))
 
             # Populate with standardized image data
             for i, img in enumerate(images):
+                if not i % 100:
+                    print("Processing image %i..." % i)
                 # Use unthresholded maps when possible
                 img_file = re.sub('_FDR_*nii.gz', '.nii.gz', img)
                 data = masker.mask(img_file)[sampled_vox]
                 std, mean = data.std(), data.mean()
-                mm[:, i] = (data - mean) / std
+                temp_map[:, i] = (data - mean) / std
                 stats[i, :] = [data.min(), data.max(), mean, std]
 
             stats = pd.DataFrame(stats, index=labels,
@@ -662,7 +667,13 @@ class DatabaseBuilder:
             md_file = join(mm_dir, '%s_metadata.json' % name)
             open(md_file, 'w').write(json.dumps(metadata))
 
-            # Flush
+            # Copy to memmap
+            print("Initializing memmap...")
+            mm = np.memmap(mm_file, dtype='float32', mode='w+',
+                           shape=(len(sampled_vox), n_images))
+            print("Storing data...")
+            mm[:] = temp_map[:]
+            print("Flushing...")
             del mm
 
             # Create DB record
@@ -676,7 +687,7 @@ class DatabaseBuilder:
         ### TERMS ###
         if 'terms' in include:
 
-            print "\tCreating memmap of term image data..."
+            print("\tCreating memmap of term image data...")
 
             analysis_set = AnalysisSet.query \
                 .filter_by(type='terms').first()
@@ -685,23 +696,24 @@ class DatabaseBuilder:
             images = [a.images[1].image_file for a in analysis_set.analyses]
             labels = [a.name for a in analysis_set.analyses]
 
-            print "\t\tFound %d images." % len(images)
+            print("\t\tFound %d images." % len(images))
 
             # save both full and 20k voxel arrays
             save_memmap('terms_full', analysis_set, images, labels)
             save_memmap('terms_20k', analysis_set, images, labels, 20000)
             # also save posterior probability images
-            images = [img.replace('_association-test_z_FDR_0.01', '_pFgA_pF=0.50')
+            images = [img.replace('_association-test_z_FDR_0.01',
+                                  '_pFgA_given_pF=0.50')
                       for img in images]
             save_memmap('terms_pp_unif', analysis_set, images, labels)
-            images = [img.replace('_association-test_z_FDR_0.01', '_pFgA_emp_prior')
+            images = [img.replace('_association-test_z_FDR_0.01', '_pFgA')
                       for img in images]
             save_memmap('terms_pp_emp', analysis_set, images, labels)
 
         ### TOPICS ###
         if 'topics' in include:
 
-            print "\tCreating memmap of topic image data..."
+            print("\tCreating memmap of topic image data...")
 
             analysis_set = AnalysisSet.query \
                 .filter_by(name='v4-topics-200').first()
@@ -710,23 +722,24 @@ class DatabaseBuilder:
             images = [a.images[1].image_file for a in analysis_set.analyses]
             labels = [a.name for a in analysis_set.analyses]
 
-            print "\t\tFound %d images." % len(images)
+            print("\t\tFound %d images." % len(images))
 
             # save both full and 20k voxel arrays
             save_memmap('topics_full', analysis_set, images, labels)
             save_memmap('topics_20k', analysis_set, images, labels, 20000)
             # also save posterior probability images
-            images = [img.replace('_association-test_z_FDR_0.01', '_pFgA_pF=0.50')
+            images = [img.replace('_association-test_z_FDR_0.01',
+                                  '_pFgA_given_pF=0.50')
                       for img in images]
             save_memmap('topics_pp_unif', analysis_set, images, labels)
-            images = [img.replace('_association-test_z_FDR_0.01', '_pFgA_emp_prior')
+            images = [img.replace('_association-test_z_FDR_0.01', '_pFgA')
                       for img in images]
             save_memmap('topics_pp_emp', analysis_set, images, labels)
 
         ### GENES ###
         if 'genes' in include:
 
-            print "\tCreating memmap of gene image data..."
+            print("\tCreating memmap of gene image data...")
 
             # Get all images and save labels
             genes = Gene.query.all()

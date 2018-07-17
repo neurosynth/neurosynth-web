@@ -7,18 +7,16 @@ from celery.utils import cached_property
 import numpy as np
 import pandas as pd
 import nibabel as nb
-import matplotlib.pyplot as plt
-import seaborn as sns
 from nilearn.image import resample_img
 from nsweb.core import celery
 from os import unlink
-from os.path import join, basename, exists
+from os.path import join, exists
 from nsweb.tasks.scatterplot import scatter
 import traceback
 from glob import glob
-import re
 import json
 from collections import OrderedDict
+
 
 MASK_FILES = {
     'cortex': 'cortex.nii.gz',
@@ -29,6 +27,7 @@ MASK_FILES = {
     'putamen': 'FSL_BPut_thr0.nii.gz',
     'min4': 'voxel_counts_r6.nii.gz'
 }
+
 
 def load_image(masker, filename, save_resampled=True):
     """ Load an image, resampling into MNI space if needed. """
@@ -155,11 +154,11 @@ def decode_image(filename, reference, uuid, mask=None, drop_zeros=False,
         data = (data - data.mean()) / data.std()
         r = np.dot(ref.data[voxels].T, data) / ref.n_voxels
         outfile = join(settings.DECODING_RESULTS_DIR, uuid + '.txt')
-        labels = ref.labels.keys()
+        labels = list(ref.labels.keys())
         pd.Series(r, index=labels).to_csv(outfile, sep='\t')
         return True
-    except Exception, e:
-        print traceback.format_exc()
+    except Exception as e:
+        print(traceback.format_exc())
         return False
 
 
@@ -177,20 +176,20 @@ def get_voxel_data(reference, x, y, z, get_pp=True):
         ind = np.nonzero(get_voxel_data.masker.mask(space))[0]
 
         ref = get_voxel_data.references[reference + '_full']
-        labels = ref.labels.keys()
+        labels = list(ref.labels.keys())
         result = pd.Series(ref.data[ind, :].ravel(), index=labels, name='z')
         result = result * ref.stats['std'].values + ref.stats['mean'].values
 
         # Can get posterior probs as well
         if get_pp:
-            ref = get_voxel_data.references[reference + '_pp']
+            ref = get_voxel_data.references[reference + '_pp_unif']
             _pp = pd.Series(ref.data[ind, :].ravel(), index=labels, name='pp')
             _pp = _pp * ref.stats['std'].values + ref.stats['mean'].values
             result = pd.concat([result, _pp], axis=1)
         return result.to_json()
 
     except Exception:
-        print traceback.format_exc()
+        print(traceback.format_exc())
         return False
 
 
@@ -208,8 +207,8 @@ def make_coactivation_map(x, y, z, r=6, min_studies=0.01):
             str(x), str(y), str(z))
         ma.save_results(outdir, prefix, image_list=['association-test_z_FDR_0.01'])
         return True
-    except Exception, e:
-        print traceback.format_exc()
+    except Exception as e:
+        print(traceback.format_exc())
         return False
 
 
@@ -274,8 +273,8 @@ def make_scatterplot(filename, analysis, base_id, reference='terms_full',
                 palette='Set1', x_lab=x_lab, y_lab=y_lab, savefile=outfile,
                 spatial_masks=spatial_masks, voxel_count_mask=voxel_count_mask)
 
-    except Exception, e:
-        print traceback.format_exc()
+    except Exception as e:
+        print(traceback.format_exc())
         return False
 
 
@@ -293,8 +292,8 @@ def run_metaanalysis(ids, name):
         ma.save_results(outdir, name, image_list=['association-test_z_FDR_0.01',
                                                   'uniformity-test_z_FDR_0.01'])
         return True
-    except Exception, e:
-        print traceback.format_exc()
+    except Exception as e:
+        print(traceback.format_exc())
         return False
 
 
@@ -309,5 +308,5 @@ def get_studies_by_expression(expression):
         return get_studies_by_expression.dataset.get_studies(
             expression=expression)
     except:
-        print traceback.format_exc()
+        print(traceback.format_exc())
         return False

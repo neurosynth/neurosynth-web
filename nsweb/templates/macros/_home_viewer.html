@@ -1,0 +1,24 @@
+{% macro viewer(analysis) %}
+
+  <div class="row">
+    <div class="md-col-8 md-offset-1 viewer">
+      <div class="home-viewer-left-two">
+        <div id="view-coronal" class="view home">
+          <canvas height="220" width="220"></canvas>
+          <div id="nav-yaxis" class="slider nav-slider-vertical"></div>
+        </div>
+        <div id="view-sagittal" class="view home">
+          <canvas height="220" width="264"></canvas>
+          <div id="nav-xaxis" class="slider nav-slider-horizontal"> </div>
+        </div>
+        <div class="home-viewer-caption">An automated meta-analysis of {{ analysis.n_studies }} studies of <a href="{{ url_for('analyses.show_term', term=analysis.name) }}" style="font-size: 1.2em;">{{ analysis.name }}</a></div>
+      </div>
+      <div class="home-viewer-right">
+        <div id="view-axial" class="view home">
+          <canvas  width="220" height="264"> </canvas>
+          <div id="nav-zaxis" class="slider nav-slider-vertical"> </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endmacro %}

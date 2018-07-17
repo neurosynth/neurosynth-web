@@ -15,18 +15,6 @@
   float: left;
 }
 
-// #viewer-left {
-//   width: 260px;
-//   float: left;
-//   // border: 1px solid black
-// }
-
-// #viewer-right {
-//   width: 280px;
-//   float: left;
-//   // border: 1px solid black
-// }
-
 #view-axial {
   width: 260px;
   height: 260px;
@@ -117,7 +105,7 @@ select.layer-settings {
 
 li.layer_list_item {
   line-height: 1.2em;
-  height: 30px;
+  max-height: 80px;
 }
 
 #layer_visible_list {

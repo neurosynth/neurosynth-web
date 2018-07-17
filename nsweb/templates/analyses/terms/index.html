@@ -1,0 +1,19 @@
+{% set page_title = 'Neurosynth|Term-based meta-analyses' %}
+{% extends "layout/base.html" %}
+{% block content %}
+  <div id="page-analysis" class="row">
+    <div class="col-md-12 content">
+      <h1>Term-based meta-analyses</h1>
+      <p>Each term-based meta-analyis linked in the table below reports the results of an automated meta-analysis of all studies in the Neurosynth database whose abstracts include the term in question at least once. For further details, see the "FAQ" tab on each analysis page.</p>
+      <table id="term-analyses-table" class="table-striped table-hover table table-condensed">
+        <thead>
+          <tr>
+            <th  style="width: 220px;">Name</th>
+            <th  style="width: 60px;">Num. studies</th>
+            <th  style="width: 80px;">Num. activations</th>
+          </tr>
+        </thead>
+      </table>
+    </div>
+  </div>
+{% endblock %}

@@ -1,5 +1,5 @@
 from nsweb.core import db
-from flask.ext.user import UserMixin
+from flask_user import UserMixin
 import datetime
 
 
@@ -21,9 +21,3 @@ class User(db.Model, UserMixin):
                        server_default='0')
     first_name = db.Column(db.String(100), nullable=False, server_default='')
     last_name = db.Column(db.String(100), nullable=False, server_default='')
-
-
-
-
-
-

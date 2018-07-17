@@ -1,0 +1,26 @@
+{% set page_title = 'Neurosynth -- online image decoder' %}
+{% extends "layout/base.html" %}
+{% block content %}
+  <div class="row" id="page-decode-index">
+    <div class="col-md-12 content">
+      <h2>Neurosynth Image Decoder</h2>
+      <div class="decoder-description">
+        <p>The Neurosynth Image Decoder allows you to quantitatively and interactively compare any Nifti-format brain volume to selected images in the Neurosynth database. You can see an example of the decoder in action <a href="/decode?neurovault=308">here</a>.</p>
+
+        <p>To use the decoder, either upload your image to NeuroVault (recommended), or paste a link to it below.</p>
+
+      <div class="decoder-options">
+        <div class="button-box">
+          <button class="btn btn-primary btn-giant" id="neurovault-button">Upload an Image</button>
+        </div>
+        <div class="decoder-or">...or paste a link:</div>
+        <div class="decoder-form">
+          <form method="GET" action="" enctype="multipart/form-data">
+            <input type="text" name="url">
+            <input type="submit" value="Decode!" class="btn btn-primary">
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

@@ -9,7 +9,7 @@ $(document).ready ->
     loadImages()
 
     tbl = $('#decoding_results_table').DataTable()
-    tbl.ajax.url('/decode/' + image_id + '/data').load()
+    tbl.ajax.url('/api/decode/' + image_id + '/data').load()
 
     last_row_selected = null
     $('#decoding_results_table').on('click', 'button', (e) =>
@@ -26,7 +26,7 @@ $(document).ready ->
       )
       # Load scatterplot
       $('#loading-message').show()
-      $('#scatterplot').html('<img src="/decode/' + image_id + '/scatter/' + analysis + '.png" width="500px" style="display:none;">')
+      $('#scatterplot').html('<img src="/api/decode/' + image_id + '/scatter/' + analysis + '.png" width="500px" style="display:none;">')
       $('#scatterplot>img').load( ->
         $('#scatterplot>img').show()
         $('#loading-message').hide()

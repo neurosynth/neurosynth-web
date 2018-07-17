@@ -5,7 +5,7 @@ import requests
 import re
 
 root_url = settings.TEST_URL
-api_url = root_url + '/api/v2'
+api_url = root_url + '/api/'
 
 
 def get_json(url):
@@ -28,11 +28,11 @@ def test_images_api():
     first7 = get_json(url + '?limit=7')
     assert len(first7) == 7
     img = first7[0]
-    try:
-        float(img['id'])
-        float(img['analysis'])
-    except:
-        pass
+    for key in ['analysis', 'description', 'file', 'id', 'label', 'stat', 'type']:
+            assert hasattr(img, key)
+    assert float(img['id'])
+    assert float(img['analysis'])
+
 
     # Test pagination
     next7 = get_json(url + '?limit=7&page=2')
@@ -43,7 +43,8 @@ def test_images_api():
     lang_imgs = get_json(url + '?limit=100&search=language&type=term')
     labels = [l['label'] for l in lang_imgs]
     assert len(lang_imgs) >= 2
-    assert "language: forward inference" in labels
+    assert "language: association test" in labels
+    assert "language: uniformity test" in labels
 
     # Test file retrieval
     url = root_url + lang_imgs[-1]['file']
@@ -56,11 +57,8 @@ def test_locations_api():
     region = get_json(url + '?x=0&y=14&z=42&r=4')
     assert len(region['images']) == 2
     assert len(region['studies']) > 50  # Some reasonable number
-    try:
-        float(region['images'][0])
-        float(region['studies'][10])
-    except:
-        pass
+    assert float(region['images'][0])
+    assert float(region['studies'][10])
     assert region['x'] == 0 and region['z'] == 42
 
     # Make sure the radius parameter is working
@@ -81,9 +79,7 @@ def test_decode_api():
     assert dec['url'].startswith('http://neurovault.org')
     assert len(dec['values']) > 100
     assert 'reward' in dec['values']
-    try:
-        float(dec['values']['reward'])
-        float(dec['id'])
-        float(dec['neurovault_id'])
-    except:
-        pass
+    assert float(dec['values']['reward'])
+    assert float(dec['id'])
+    assert float(dec['neurovault_id'])
+

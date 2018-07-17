@@ -1,0 +1,22 @@
+{% set page_title = 'Neurosynth-Gene' %}
+{% extends "layout/base.html" %}
+{% block content %}
+  <div class="row" id="page-genes-list">
+    <div class="col-md-12 content">
+      <h1>Neurosynth-Gene: all genes</h1>
+      <div class="lead">
+        The searchable table below contains all human genes contained in the <a href="http://human.brain-map.org/">Allen Human Brain Atlas</a> microarray dataset. Click on any gene symbol to view a whole-brain map of gene expression levels and maximally-related Neurosynth <a href="{{url_for('analyses.list_terms')}}">term-based meta-analysis maps</a>.
+      </div>
+      <table class="table-striped table-hover table table-condensed" id="gene-list-table">
+        <thead>
+          <tr>
+            <th style='width: 220px;'>Gene Symbol</th>
+            <th style='width: 60px;'>Gene Name</th>
+            <th style='width: 80px;'>Synonyms</th>
+            <th style='width: 80px;'>Locus Type</th>
+          </tr>
+        </thead>
+      </table>
+    </div>
+  </div>
+{% endblock %}

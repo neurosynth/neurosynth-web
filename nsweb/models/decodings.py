@@ -4,7 +4,7 @@ from nsweb.models.users import User
 from nsweb.models.analyses import AnalysisSet
 from nsweb.models.images import Image
 from sqlalchemy.ext.hybrid import hybrid_property
-import simplejson as json
+import json
 
 
 class DecodingSet(db.Model):
