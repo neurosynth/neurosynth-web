@@ -10,7 +10,7 @@ services:
     volumes:
       - .:/code
       - ./data:/data:rw
-      - ${ROOT}/logs:/logs:rw
+      - ./logs:/logs:rw
     working_dir: /code
     command: /code/scripts/docker_startup.sh
     depends_on:
