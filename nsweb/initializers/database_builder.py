@@ -114,7 +114,10 @@ class DatabaseBuilder:
 
         # Copy anatomical image
         anat = join(settings.ROOT_DIR, 'data', 'images', 'anatomical.nii.gz')
-        shutil.copy(anat, join(settings.IMAGE_DIR))
+        try:
+            shutil.copy(anat, join(settings.IMAGE_DIR))
+        except Exception as e:
+            pass
 
         if download:
             ns.dataset.download(path=settings.ASSET_DIR, unpack=True)

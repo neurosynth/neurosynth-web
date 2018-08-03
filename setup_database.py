@@ -18,7 +18,7 @@ def main():
         db, dataset=dataset,
         studies=os.path.join(settings.ASSET_DIR, 'database.txt'),
         features=os.path.join(settings.ASSET_DIR, 'features.txt'),
-        reset_db=True, reset_dataset=False)
+        reset_db=True, reset_dataset=True, download_data=True)
         # reset_db=False, reset_dataset=False)
 
     print("Adding analyses...")

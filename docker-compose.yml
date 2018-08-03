@@ -6,13 +6,11 @@ services:
     build: .
     restart: always
     ports:
-      - "32800:8000"
+      - "8000"
     volumes:
       - .:/code
-      - ${ROOT}/data:/data:rw
+      - ./data:/data:rw
       - ${ROOT}/logs:/logs:rw
-      - /Volumes/data/AllenSynth/Data/Maps/GeneMapsRadius6/:/data/images/genes
-      - /data/neurosynth/data/images/fcmri:/data/images/fcmri
     working_dir: /code
     command: /code/scripts/docker_startup.sh
     depends_on:
@@ -27,9 +25,8 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data
     environment:
-      - POSTGRES_DB=nsweb
-      - POSTGRES_USER=synthy
-      - POSTGRES_PASSWORD=ifyougottoask
+      - POSTGRES_DB=neurosynth
+      - POSTGRES_USER=neurosynth
 
   nginx:
     restart: always
