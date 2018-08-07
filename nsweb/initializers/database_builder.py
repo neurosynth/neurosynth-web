@@ -127,9 +127,9 @@ class DatabaseBuilder:
             (join(settings.ASSET_DIR, 'misc'), "The misc directory contains "
                 "various support files--e.g., stopword lists for topic "
                 "modeling."),
-            (join(settings.ASSET_DIR, 'abstracts.txt'), "This file is required "
-                "for topic modeling of article abstracts. Without it, the "
-                "topic-based analyses will not appear on the website."),
+            # (join(settings.ASSET_DIR, 'abstracts.txt'), "This file is required "
+            #     "for topic modeling of article abstracts. Without it, the "
+            #     "topic-based analyses will not appear on the website."),
             (settings.GENE_IMAGE_DIR, "This directory contains all gene images "
                 "from the Allen Institute for Brain Science's gene expression "
                 "database. Without it, the /genes functionality will not work."),
