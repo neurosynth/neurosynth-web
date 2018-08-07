@@ -2,9 +2,13 @@ import os
 from os.path import join
 
 
+# The root location of the app. Should not need to be changed.
+ROOT_DIR = os.path.realpath(
+    join(join(os.path.dirname(__file__), os.path.pardir), os.path.pardir))
+
 ### SETTINGS THAT SHOULD ALWAYS BE UPDATED ###
 # Root path for generated data
-DATA_DIR = '/data'
+DATA_DIR = join(ROOT_DIR, 'data')
 
 
 ### SHOULD NOT NEED TO BE UPDATED ###
@@ -21,10 +25,6 @@ IMAGE_DIR = join(DATA_DIR, 'images')
 
 # Path to analysis/location flat filies
 LOCATION_ANALYSIS_DIR = join(DATA_DIR, 'locations', 'analyses')
-
-# The root location of the app. Should not need to be changed.
-ROOT_DIR = os.path.realpath(
-    join(join(os.path.dirname(__file__), os.path.pardir), os.path.pardir))
 
 # Static content
 STATIC_FOLDER = join(ROOT_DIR, 'nsweb', 'static')
@@ -79,11 +79,11 @@ SQL_ADAPTER = 'sqlite'
 SQLALCHEMY_SQLITE_URI = 'sqlite:///' + join(DATA_DIR, 'neurosynth.db')
 
 # SQL configuration
-SQL_HOST = 'postgres'
-SQL_USER = 'db_user'
-SQL_PASSWORD = 'db_pass'
+SQL_HOST = 'db'
+SQL_USER = 'neurosynth'
+SQL_PASSWORD = 'neurosynth'
 SQL_PRODUCTION_DB = 'neurosynth'
-SQL_DEVELOPMENT_DB = 'neurosynth_development'
+SQL_DEVELOPMENT_DB = 'neurosynth'
 SQL_TEST_DB = 'neurosynth_test'
 TEST_URL = 'http://test.neurosynth.org'
 

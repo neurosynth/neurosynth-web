@@ -114,7 +114,10 @@ class DatabaseBuilder:
 
         # Copy anatomical image
         anat = join(settings.ROOT_DIR, 'data', 'images', 'anatomical.nii.gz')
-        shutil.copy(anat, join(settings.IMAGE_DIR))
+        try:
+            shutil.copy(anat, join(settings.IMAGE_DIR))
+        except Exception as e:
+            pass
 
         if download:
             ns.dataset.download(path=settings.ASSET_DIR, unpack=True)
@@ -124,9 +127,9 @@ class DatabaseBuilder:
             (join(settings.ASSET_DIR, 'misc'), "The misc directory contains "
                 "various support files--e.g., stopword lists for topic "
                 "modeling."),
-            (join(settings.ASSET_DIR, 'abstracts.txt'), "This file is required "
-                "for topic modeling of article abstracts. Without it, the "
-                "topic-based analyses will not appear on the website."),
+            # (join(settings.ASSET_DIR, 'abstracts.txt'), "This file is required "
+            #     "for topic modeling of article abstracts. Without it, the "
+            #     "topic-based analyses will not appear on the website."),
             (settings.GENE_IMAGE_DIR, "This directory contains all gene images "
                 "from the Allen Institute for Brain Science's gene expression "
                 "database. Without it, the /genes functionality will not work."),
@@ -716,7 +719,7 @@ class DatabaseBuilder:
             print("\tCreating memmap of topic image data...")
 
             analysis_set = AnalysisSet.query \
-                .filter_by(name='v4-topics-200').first()
+                .filter_by(name='v4-topics-100').first()
 
             # Get all images and save labels
             images = [a.images[1].image_file for a in analysis_set.analyses]

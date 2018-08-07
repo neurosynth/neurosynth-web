@@ -18,7 +18,7 @@ def main():
         db, dataset=dataset,
         studies=os.path.join(settings.ASSET_DIR, 'database.txt'),
         features=os.path.join(settings.ASSET_DIR, 'features.txt'),
-        reset_db=True, reset_dataset=False)
+        reset_db=True, reset_dataset=True, download_data=True)
         # reset_db=False, reset_dataset=False)
 
     print("Adding analyses...")
@@ -46,7 +46,7 @@ def main():
         analyses=analyses, add_to_db=False, overwrite=True)
 
     print("Adding topic sets...")
-    builder.add_topics(generate_images=False, add_images=True, reset=True, top_n=40)
+    builder.add_topics(generate_images=True, add_images=True, reset=True, top_n=40)
 
     # print "Adding cognitive atlas information for available terms..."
     # builder.add_cognitive_atlas_nodes()
