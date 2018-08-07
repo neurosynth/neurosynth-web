@@ -46,7 +46,7 @@ def main():
         analyses=analyses, add_to_db=False, overwrite=True)
 
     print("Adding topic sets...")
-    builder.add_topics(generate_images=False, add_images=True, reset=True, top_n=40)
+    builder.add_topics(generate_images=True, add_images=True, reset=True, top_n=40)
 
     # print "Adding cognitive atlas information for available terms..."
     # builder.add_cognitive_atlas_nodes()
