@@ -27,3 +27,5 @@ The easiest way to get a dev environment up and running is using Docker. Instruc
     docker-compose up -d
 
 That's it! You should now be able to point your browser to `http://localhost` and view a local version of Neurosynth.org. Be aware that some functionality will be crippled, as some of the data served by the production Neurosynth website are too large to include in this distribution (e.g., there are 300 GB of functional connectivity maps, so we only include maps for a few coordinates as fixtures in this repository).
+
+Note that it can take a while (on a modern machine, perhaps 10 - 30 minutes) to fully create the Neurosynth database and various support files the first time you run `docker-compose up`. So if you get errors in your browser, you may need to wait a while (you can keep retrying).
