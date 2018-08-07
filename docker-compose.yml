@@ -48,8 +48,10 @@ services:
       net.core.somaxconn: '511'
 
   worker:
-    image: nsweb_neurosynth:latest
+    build: .
     restart: always
+    ports:
+      - "8000"
     working_dir: /code
     command: /code/scripts/run_celery.sh
     volumes_from:
