@@ -719,7 +719,7 @@ class DatabaseBuilder:
             print("\tCreating memmap of topic image data...")
 
             analysis_set = AnalysisSet.query \
-                .filter_by(name='v4-topics-200').first()
+                .filter_by(name='v4-topics-100').first()
 
             # Get all images and save labels
             images = [a.images[1].image_file for a in analysis_set.analyses]
