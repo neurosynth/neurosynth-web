@@ -16,6 +16,7 @@ RUN apt-get -y --no-install-recommends install redis-server nodejs npm nginx
 
 # Dependencies for the various python libs
 RUN apt-get install -y gfortran libopenblas-dev liblapack-dev pkg-config libjpeg8-dev freetype* libfreetype6-dev libpng-dev
+RUN apt-get install libpq-dev python-dev
 
 # install coffeescript with Node
 RUN npm config set registry http://registry.npmjs.org/
