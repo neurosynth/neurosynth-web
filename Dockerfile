@@ -15,8 +15,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -y --no-install-recommends install tz
 RUN apt-get -y --no-install-recommends install redis-server nodejs npm nginx
 
 # Dependencies for the various python libs
-RUN apt-get install -y gfortran libopenblas-dev liblapack-dev pkg-config libjpeg8-dev freetype* libfreetype6-dev libpng-dev
-RUN apt-get install libpq-dev python3-dev 
+RUN apt-get install -y gfortran libopenblas-dev liblapack-dev pkg-config libjpeg8-dev freetype* libfreetype6-dev libpng-dev libpq-dev python3-dev
 
 # install coffeescript with Node
 RUN npm config set registry http://registry.npmjs.org/
