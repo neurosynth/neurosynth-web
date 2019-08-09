@@ -41,4 +41,9 @@ server {
         rewrite ^/api/v2\/*(.*)$ /api/$1  break;
     }
 
+    location ^~ /.well-known {
+        allow all;
+        root  /data/letsencrypt/;
+    }
+
 }
