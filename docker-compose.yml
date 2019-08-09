@@ -66,3 +66,5 @@ services:
 volumes:
   postgres-data:
   redis-data:
+  certs:
+  certs-data:
