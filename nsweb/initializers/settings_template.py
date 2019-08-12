@@ -85,7 +85,7 @@ SQL_PASSWORD = 'neurosynth'
 SQL_PRODUCTION_DB = 'neurosynth'
 SQL_DEVELOPMENT_DB = 'neurosynth'
 SQL_TEST_DB = 'neurosynth_test'
-TEST_URL = 'http://test.neurosynth.org'
+TEST_URL = 'https://test.neurosynth.org'
 
 ### Logging ###
 LOGGING_PATH = join(DATA_DIR, 'log.txt')
