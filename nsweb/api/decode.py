@@ -14,9 +14,8 @@ from os.path import join, basename, exists
 import os
 from datetime import datetime
 from email.utils import parsedate
-from nsweb.controllers import error_page
 import pandas as pd
-from .utils import make_cache_key
+from .utils import make_cache_key, json_with_status
 
 
 bp = Blueprint('api_decode', __name__, url_prefix='/api/decode')
@@ -57,9 +56,13 @@ def get_decoding():
           type: string
           required: false
     """
-    dec = _get_decoding_object()
-    schema = DecodingSchema()
-    return jsonify(data=schema.dump(dec).data)
+    status, dec = _get_decoding_object()
+
+    if status == 200:
+        schema = DecodingSchema()
+        return jsonify(data=schema.dump(dec).data)
+
+    return json_with_status(status, dec)
 
 
 def _get_decoding_object(filter_display=True):
@@ -78,11 +81,30 @@ def _get_decoding_object(filter_display=True):
     elif 'url' in request.args:
         dec = decode_url(request.args['url'])
 
-    # Make sure we don't return non-displayable images
-    if filter_display and dec is not None and not dec.display:
-        dec = None
+    else:
+        dec = 99 # No search params provided
 
-    return dec
+    if isinstance(dec, int):
+        if dec == 415:
+            msg = ("Invalid image extension; currently the decoder "
+                   "only accepts images in nifti format.")
+
+        elif dec == 404:
+            msg = "No image was found at the provided URL."
+
+        elif dec== 413:
+            msg = ("The requested Nifti image is too large. "
+                   "Files must be under 4 MB in size.")
+        else:
+            msg = ("An unspecified decoding error occurred.")
+        return dec, msg
+
+    # Make sure we don't return non-displayable images
+    if filter_display and dec is not None and not \
+            getattr(dec, 'display', False):
+        return 404, "No image was found at the provided URL."
+
+    return 200, dec
 
 
 @cache.memoize(timeout=3600)
@@ -199,18 +221,16 @@ def decode_url(url, metadata={}):
     ext = re.search('\.nii(\.gz)?$', url)
 
     if ext is None:
-        return error_page("Invalid image extension; currently the decoder only"
-                          " accepts images in nifti format.")
+        return 415
 
     # Check that an image exists at the URL
     head = requests.head(url)
     if head.status_code not in [200, 301, 302]:
-        return error_page("No image was found at the provided URL.")
+        return 404
     headers = head.headers
     if 'content-length' in headers and \
             int(headers['content-length']) > 4000000:
-        return error_page("The requested Nifti image is too large. Files must "
-                          "be under 4 MB in size.")
+        return 413
 
     dec = _get_decoding(url=url)
 

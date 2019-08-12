@@ -191,8 +191,8 @@ def check_xyz(x, y, z):
     # Round all x/y/z values to nearest even number
     _x, _y, _z = map(lambda v: int(round(v / 2.) * 2), [x, y, z])
     if (x, y, z) != (_x, _y, _z):
-        new_args = dict(request.args.items() +
-                        {'x': _x, 'y': _y, 'z': _z}.items())
+        new_args = dict(request.args.items())
+        new_args.update({'x': _x, 'y': _y, 'z': _z}.items())
         url = url_for(request.url_rule.endpoint, **new_args)
         raise RedirectedLocation(url)
 
