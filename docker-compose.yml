@@ -30,15 +30,15 @@ services:
 
   nginx:
     restart: always
-    build: ./nginx
+    image: nginx:latest
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - certs:/etc/letsencrypt
-      - certs-data:/data/letsencrypt
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./nginx/sites-enabled:/etc/nginx/sites-enabled:ro
+      - ./nginx/data/certbot/conf:/etc/letsencrypt
+      - ./nginx/data/certbot/www:/var/www/certbot
     volumes_from:
       - neurosynth
     depends_on:
@@ -62,6 +62,12 @@ services:
     depends_on:
       - db
       - redis
+
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - ./nginx/data/certbot/conf:/etc/letsencrypt
+      - ./nginx/data/certbot/www:/var/www/certbot
 
 volumes:
   postgres-data:
