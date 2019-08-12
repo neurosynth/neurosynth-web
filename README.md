@@ -1,7 +1,7 @@
 
 # neurosynth-web
 
-This is the stuff that runs [neurosynth.org](http://neurosynth.org).
+This is the stuff that runs [neurosynth.org](https://neurosynth.org).
 
 ## Installation
 
