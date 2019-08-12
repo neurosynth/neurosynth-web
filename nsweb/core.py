@@ -14,6 +14,7 @@ from nsweb.initializers import settings
 from nsweb.initializers.assets import init_assets
 from nsweb.initializers import make_celery
 from importlib import import_module
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 # Do this before anything else to ensure the MPL backend isn't implicitly
 # set to something else, which could break everything if running in a container
@@ -23,6 +24,9 @@ matplotlib.use('agg')
 
 app = Flask('NSWeb', static_folder=settings.STATIC_FOLDER,
             template_folder=settings.TEMPLATE_FOLDER)
+
+# Set protocol and host correctly from X-Forwarded headers
+app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
 # Caching
 cache = Cache(config={'CACHE_TYPE': 'simple'})
