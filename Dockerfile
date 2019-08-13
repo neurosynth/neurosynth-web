@@ -22,7 +22,7 @@ RUN npm config set registry http://registry.npmjs.org/
 RUN npm install -g coffeescript
 
 # Install Python and various packages
-RUN apt-get -y --no-install-recommends install python3 python3-dev python3-pip python3-numpy python3-scipy python3-matplotlib python3-pandas python3-tk python3-setuptools
+RUN apt-get -y --no-install-recommends install python3 python3-dev python3-pip python3-numpy python3-scipy python3-matplotlib python3-pandas python3-tk python3-setuptools python3-psycopg2
 
 RUN pip3 install --upgrade pip
 
