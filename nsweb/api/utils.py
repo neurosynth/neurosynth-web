@@ -1,7 +1,8 @@
-from flask import send_file, abort, request
+from flask import send_file, abort, request, Response
 from nsweb.initializers.settings import IMAGE_DIR
 import datetime as dt
 import os
+import json
 
 
 def make_cache_key():
@@ -25,3 +26,13 @@ def send_nifti(filename, attachment_filename=None):
     resp.last_modified = dt.datetime.fromtimestamp(os.path.getmtime(filename))
     resp.make_conditional(request)
     return resp
+
+
+def json_with_status(status, msg=''):
+    js = json.dumps({
+        'data': {
+            "error": msg
+        },
+        'status': status
+    })
+    return Response(js, status=status, mimetype='application/json')

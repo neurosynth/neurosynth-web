@@ -7,4 +7,4 @@
 [ ! -e /data/assets/neurosynth_dataset.pkl ] && python3 /code/setup_database.py
 
 # Start up gunicorn
-/usr/local/bin/gunicorn -w 2 -b :8000 runserver:app --reload --log-level debug
+/usr/local/bin/gunicorn -w 2 -b :8000 runserver:app --reload --log-level debug --log-file /logs/gunicorn.log

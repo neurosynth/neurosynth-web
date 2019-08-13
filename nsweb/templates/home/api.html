@@ -9,7 +9,7 @@
     {% endassets %}
     <script type="text/javascript">
       window.swaggerUi = new SwaggerUi({
-        url:"/api/swagger.json",
+        url:"/api/v2/swagger.json",
         dom_id:"swagger-ui-container"
       });
       window.swaggerUi.load();
@@ -18,7 +18,7 @@
   <body class="swagger-section">
 {#     / #header
     /   .swagger-ui-wrap
-    /     a#logo href="http://neurosynth.org" neurosynth.org
+    /     a#logo href="https://neurosynth.org" neurosynth.org
     /     form#api_selector
     /       .input
     /         input placeholder="http://example.com/api" id="input_baseUrl" name="baseUrl" type="text"
