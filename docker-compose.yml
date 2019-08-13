@@ -9,8 +9,8 @@ services:
       - "8000"
     volumes:
       - .:/code
-      - ./data:/data:rw
-      - ./logs:/logs:rw
+      - /data:/data:rw
+      - /logs:/logs:rw
     working_dir: /code
     command: /code/scripts/docker_startup.sh
     depends_on:
@@ -72,5 +72,3 @@ services:
 volumes:
   postgres-data:
   redis-data:
-  certs:
-  certs-data:
