@@ -6,6 +6,7 @@ from nsweb.api import images
 from nsweb.core import cache
 from .utils import make_cache_key
 import re
+from sqlalchemy import asc, desc
 
 
 bp = Blueprint('api_analyses', __name__, url_prefix='/api/analyses')
@@ -181,17 +182,19 @@ def list_terms():
     results_per_page = int(request.args['length'])
     offset = int(request.args['start'])
 
-    order_by = '{0} {1}'.format(
-        ['name', 'n_studies', 'n_activations'][
-            int(request.args['order[0][column]'])],
-        str(request.args['order[0][dir]']))
-    search = str(request.args['search[value]']).strip()
-
     data = TermAnalysis.query
+
+    search = str(request.args['search[value]']).strip()
     if search:  # No empty search on my watch
         search = '%{}%'.format(search)
         data = data.filter(TermAnalysis.name.like(search))
-    data = data.order_by(order_by)
+
+    direction = str(request.args['order[0][dir]'])
+    ord_col = ['name', 'n_studies', 'n_activations'][
+        int(request.args['order[0][column]'])]
+    dir_func = asc if direction == 'asc' else desc
+    data = data.order_by(dir_func(ord_col))
+
     data = data.paginate(page=(offset / results_per_page) + 1,
                          per_page=results_per_page, error_out=False)
     result = {}
