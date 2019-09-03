@@ -1,11 +1,13 @@
-from .utils import make_cache_key
+import urllib
+import re
+
 from flask import jsonify, request, Blueprint, url_for
-from flask_user import login_required
+# from flask_user import login_required
+
+from .utils import make_cache_key
 from nsweb.api.schemas import StudySchema
 from nsweb.models.studies import Study
 from nsweb.core import cache
-import urllib
-import re
 from nsweb import tasks
 
 
@@ -140,14 +142,14 @@ def get_study_list():
     return jsonify(**result)
 
 
-@login_required
-def get_studies_by_expression(expression):
-    decoded_expr = urllib.unquote(expression).lower().strip('"')
-    expr_ids = tasks.get_studies_by_expression.delay(decoded_expr).wait()
-    ids = []
-    if expr_ids:
-        ids = list(expr_ids)
-    return jsonify(ids=ids)
+# @login_required
+# def get_studies_by_expression(expression):
+#     decoded_expr = urllib.unquote(expression).lower().strip('"')
+#     expr_ids = tasks.get_studies_by_expression.delay(decoded_expr).wait()
+#     ids = []
+#     if expr_ids:
+#         ids = list(expr_ids)
+#     return jsonify(ids=ids)
 
 
 # Begin client side APIs
