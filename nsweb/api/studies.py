@@ -2,6 +2,7 @@ import urllib
 import re
 
 from flask import jsonify, request, Blueprint, url_for
+from sqlalchemy import asc, desc
 # from flask_user import login_required
 
 from .utils import make_cache_key
@@ -102,16 +103,11 @@ def get_tables(val):
 @cache.cached(timeout=3600, key_prefix=make_cache_key)
 def get_study_list():
 
-    if 'expression' in request.args:
-        return get_studies_by_expression(request.args['expression'])
+    # if 'expression' in request.args:
+    #     return get_studies_by_expression(request.args['expression'])
 
     data = Study.query
-    results_per_page = int(request.args['length'])
-    offset = int(request.args['start'])
-    order_by = '{0} {1}'.format(
-        ['title', 'authors', 'journal', 'year', 'pmid']
-        [int(request.args['order[0][column]'])],
-        str(request.args['order[0][dir]']))
+
     val = str(request.args['search[value]']).strip()
     if val:
         str_val = '%{}%'.format(val)
@@ -123,10 +119,21 @@ def get_study_list():
         except Exception as e:
             pass
         data = data.filter(q)
-    data = data.order_by(order_by)
+
+    # Sorting
+    direction = str(request.args['order[0][dir]'])
+    ord_col = ['title', 'authors', 'journal', 'year', 'pmid'][
+        int(request.args['order[0][column]'])]
+    dir_func = asc if direction == 'asc' else desc
+    data = data.order_by(dir_func(ord_col))
+
+    # Pagination
+    results_per_page = int(request.args['length'])
+    offset = int(request.args['start'])
     data = data.paginate(
         page=(offset / results_per_page) + 1, per_page=results_per_page,
         error_out=False)
+
     result = {}
     result['draw'] = int(request.args['draw'])  # for security
     result['recordsTotal'] = Study.query.count()
