@@ -1,11 +1,14 @@
-from .utils import make_cache_key
+import urllib
+import re
+
 from flask import jsonify, request, Blueprint, url_for
-from flask_user import login_required
+from sqlalchemy import asc, desc
+# from flask_user import login_required
+
+from .utils import make_cache_key
 from nsweb.api.schemas import StudySchema
 from nsweb.models.studies import Study
 from nsweb.core import cache
-import urllib
-import re
 from nsweb import tasks
 
 
@@ -100,16 +103,11 @@ def get_tables(val):
 @cache.cached(timeout=3600, key_prefix=make_cache_key)
 def get_study_list():
 
-    if 'expression' in request.args:
-        return get_studies_by_expression(request.args['expression'])
+    # if 'expression' in request.args:
+    #     return get_studies_by_expression(request.args['expression'])
 
     data = Study.query
-    results_per_page = int(request.args['length'])
-    offset = int(request.args['start'])
-    order_by = '{0} {1}'.format(
-        ['title', 'authors', 'journal', 'year', 'pmid']
-        [int(request.args['order[0][column]'])],
-        str(request.args['order[0][dir]']))
+
     val = str(request.args['search[value]']).strip()
     if val:
         str_val = '%{}%'.format(val)
@@ -121,10 +119,21 @@ def get_study_list():
         except Exception as e:
             pass
         data = data.filter(q)
-    data = data.order_by(order_by)
+
+    # Sorting
+    direction = str(request.args['order[0][dir]'])
+    ord_col = ['title', 'authors', 'journal', 'year', 'pmid'][
+        int(request.args['order[0][column]'])]
+    dir_func = asc if direction == 'asc' else desc
+    data = data.order_by(dir_func(ord_col))
+
+    # Pagination
+    results_per_page = int(request.args['length'])
+    offset = int(request.args['start'])
     data = data.paginate(
         page=(offset / results_per_page) + 1, per_page=results_per_page,
         error_out=False)
+
     result = {}
     result['draw'] = int(request.args['draw'])  # for security
     result['recordsTotal'] = Study.query.count()
@@ -140,14 +149,14 @@ def get_study_list():
     return jsonify(**result)
 
 
-@login_required
-def get_studies_by_expression(expression):
-    decoded_expr = urllib.unquote(expression).lower().strip('"')
-    expr_ids = tasks.get_studies_by_expression.delay(decoded_expr).wait()
-    ids = []
-    if expr_ids:
-        ids = list(expr_ids)
-    return jsonify(ids=ids)
+# @login_required
+# def get_studies_by_expression(expression):
+#     decoded_expr = urllib.unquote(expression).lower().strip('"')
+#     expr_ids = tasks.get_studies_by_expression.delay(decoded_expr).wait()
+#     ids = []
+#     if expr_ids:
+#         ids = list(expr_ids)
+#     return jsonify(ids=ids)
 
 
 # Begin client side APIs
