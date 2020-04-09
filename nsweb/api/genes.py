@@ -89,9 +89,9 @@ def datatable_genes():
 
     if search:
         search = '%{}%'.format(search)
-        data = data.filter(Gene.name.like(search) |
-                           Gene.symbol.like(search) |
-                           Gene.synonyms.like(search))
+        data = data.filter(Gene.name.ilike(search) |
+                           Gene.symbol.ilike(search) |
+                           Gene.synonyms.ilike(search))
 
     direction = str(request.args['order[0][dir]'])
     ord_col = ['symbol', 'name', 'synonyms', 'locus_type'][

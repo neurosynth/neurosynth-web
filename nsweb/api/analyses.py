@@ -187,7 +187,7 @@ def list_terms():
     search = str(request.args['search[value]']).strip()
     if search:  # No empty search on my watch
         search = '%{}%'.format(search)
-        data = data.filter(TermAnalysis.name.like(search))
+        data = data.filter(TermAnalysis.name.ilike(search))
 
     direction = str(request.args['order[0][dir]'])
     ord_col = ['name', 'n_studies', 'n_activations'][

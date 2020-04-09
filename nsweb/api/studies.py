@@ -69,9 +69,9 @@ def get_studies():
 
     if 'search' in request.args and len(request.args['search']) > 1:
         search = '%{}%'.format(request.args['search'])
-        studies = studies.filter(Study.title.like(search) |
-                                 Study.authors.like(search) |
-                                 Study.journal.like(search) |
+        studies = studies.filter(Study.title.ilike(search) |
+                                 Study.authors.ilike(search) |
+                                 Study.journal.ilike(search) |
                                  Study.year.like(search))
 
     studies = studies.paginate(page, limit, False).items

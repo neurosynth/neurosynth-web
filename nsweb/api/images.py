@@ -77,8 +77,8 @@ def get_images():
 
     if 'search' in request.args and len(request.args['search']) > 1:
         search = '%{}%'.format(request.args['search'])
-        images = images.filter(Image.label.like(search) |
-                               Image.description.like(search))
+        images = images.filter(Image.label.ilike(search) |
+                               Image.description.ilike(search))
 
     images = images.paginate(page, limit, False).items
     schema = ImageSchema(many=True)
