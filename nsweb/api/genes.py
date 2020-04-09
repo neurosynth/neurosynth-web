@@ -1,10 +1,13 @@
+import re
+from os.path import exists, join, basename
+
 from flask import jsonify, request, Blueprint, abort, send_file, url_for
+from sqlalchemy import asc, desc
+
 from .utils import make_cache_key
 from nsweb.api.schemas import GeneSchema
 from nsweb.models.genes import Gene
 from nsweb.core import cache
-import re
-from os.path import exists, join, basename
 from nsweb.tasks import make_scatterplot
 from nsweb.initializers import settings
 
@@ -80,19 +83,22 @@ def datatable_genes():
     results_per_page = int(request.args['length'])
     offset = int(request.args['start'])
 
-    order_by = '{0} {1}'.format(
-        ['symbol', 'name', 'synonyms', 'locus_type']
-        [int(request.args['order[0][column]'])],
-        str(request.args['order[0][dir]']))
+    data = Gene.query
+
     search = str(request.args['search[value]']).strip()
 
-    data = Gene.query
     if search:
         search = '%{}%'.format(search)
         data = data.filter(Gene.name.like(search) |
                            Gene.symbol.like(search) |
                            Gene.synonyms.like(search))
-    data = data.order_by(order_by)
+
+    direction = str(request.args['order[0][dir]'])
+    ord_col = ['symbol', 'name', 'synonyms', 'locus_type'][
+        int(request.args['order[0][column]'])]
+    dir_func = asc if direction == 'asc' else desc
+    data = data.order_by(dir_func(ord_col))
+
     data = data.paginate(page=(offset / results_per_page) + 1,
                          per_page=results_per_page, error_out=False)
     result = {}
