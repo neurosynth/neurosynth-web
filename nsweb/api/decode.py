@@ -234,8 +234,8 @@ def decode_url(url, metadata={}):
 
     dec = _get_decoding(url=url)
 
-    # Delete old record
-    if not settings.CACHE_DECODINGS and dec is not None:
+    # Delete old record if caching is disabled or the file can't be found
+    if dec is not None and (not exists(dec.filename) or not settings.CACHE_DECODINGS):
         db.session.delete(dec)
         db.session.commit()
         dec = None
