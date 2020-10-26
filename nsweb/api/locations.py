@@ -21,6 +21,19 @@ from collections import defaultdict
 bp = Blueprint('api_locations', __name__, url_prefix='/api/locations')
 
 
+def _group_peaks(peaks):
+    # takes list of peaks and returns a new list where redundant peaks (i.e.,
+    # those associated with the same study) are removed, and with a count of
+    # peaks found for each study added.
+    studies = {}
+    for p in peaks:
+        if p.pmid not in studies:
+            studies[p.pmid] = [p, 1]
+        else:
+            studies[p.pmid][1] += 1
+    return list(studies.values())
+
+
 @bp.route('/')
 @cache.cached(timeout=3600, key_prefix=make_cache_key)
 def get_location():
@@ -71,8 +84,7 @@ def get_location():
         loc = make_location(x, y, z)
 
     peaks = Peak.closestPeaks(r, x, y, z)
-    peaks = peaks.group_by(Peak.pmid)
-    peaks = peaks.add_columns(func.count(Peak.id))
+    peaks = _group_peaks(peaks)
 
     loc.studies = [p[0].study for p in peaks]
 
@@ -266,7 +278,7 @@ def get_studies(val=None):
     for p in points:
         key = hash((p.pmid, round(p.x, 2), round(p.y, 2), round(p.z, 2)))
         if key in seen:
-            next
+            continue
         study_counts[p.pmid].append(p)
         seen[key] = 1
 
@@ -294,10 +306,8 @@ def location_api(val):
     # Limit search to 20 mm to keep things fast
     if radius > 20:
         radius = 20
-    points = Peak.closestPeaks(radius, x, y, z)
-    points = points.group_by(Peak.pmid)  # prevents duplicate studies
-    # counts duplicate peaks
-    points = points.add_columns(func.count(Peak.id))
+    points = Peak.closestPeaks(radius, x, y, z).all()
+    points = _group_peaks(points)
 
     ### IMAGES ###
     location = Location.query.filter_by(x=x, y=y, z=z).first()
