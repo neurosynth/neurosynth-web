@@ -43,12 +43,12 @@ def main():
 
     print("Adding feature-based meta-analysis images...")
     builder.generate_analysis_images(
-        analyses=analyses, add_to_db=False, overwrite=True)
+        analyses=analyses, add_to_db=False, overwrite=False)
 
     print("Adding topic sets...")
-    builder.add_topics(generate_images=True, add_images=True, reset=True, top_n=40)
+    builder.add_topics(generate_images=False, add_images=True, reset=True, top_n=40)
 
-    # print "Adding cognitive atlas information for available terms..."
+    # print("Adding cognitive atlas information for available terms...")
     # builder.add_cognitive_atlas_nodes()
 
     print("Adding genes...")

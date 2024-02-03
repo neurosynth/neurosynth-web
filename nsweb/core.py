@@ -2,7 +2,7 @@
 # apimanager(apimanager). Also we're keeping functions that modify the
 # core app globally and configuration here.
 
-from flask import Flask
+from flask import Flask, send_from_directory, request
 from flask_sqlalchemy import SQLAlchemy
 # from flask_restless import APIManager
 from flask_babelex import Babel
@@ -10,6 +10,7 @@ from flask_user import UserManager
 from flask_caching import Cache
 from flask_marshmallow import Marshmallow
 from flask_mail import Mail
+from flask_cors import CORS
 from nsweb.initializers import settings
 from nsweb.initializers.assets import init_assets
 from nsweb.initializers import make_celery
@@ -24,6 +25,7 @@ matplotlib.use('agg')
 
 app = Flask('NSWeb', static_folder=settings.STATIC_FOLDER,
             template_folder=settings.TEMPLATE_FOLDER)
+CORS(app)
 
 # Set protocol and host correctly from X-Forwarded headers
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
@@ -119,6 +121,9 @@ def create_app(debug=True, test=False):
     setup_logging(logging_path=settings.LOGGING_PATH,
                   level=settings.LOGGING_LEVEL)
 
+    @app.route('/robots.txt')
+    def static_from_root():
+         return send_from_directory(app.static_folder, request.path[1:])
 
 def register_blueprints():
     blueprint_locations = [
