@@ -125,8 +125,8 @@ class DatabaseBuilder:
             print("Unable to copy anatomical image.")
 
         # Copy gene images
-        gene_dir = join(settings.ROOT_DIR, 'data', 'genes')
-        copy_tree(gene_dir, join(settings.DATA_DIR, 'genes'))
+        gene_dir = join(settings.ROOT_DIR, 'data', 'images', 'genes')
+        copy_tree(gene_dir, join(settings.DATA_DIR, 'images', 'genes'))
 
 
         if download:
