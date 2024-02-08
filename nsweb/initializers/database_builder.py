@@ -125,7 +125,8 @@ class DatabaseBuilder:
             print("Unable to copy anatomical image.")
 
         if download:
-            ns.dataset.download(path=settings.ASSET_DIR, unpack=True)
+            ns.dataset.download(path=settings.ASSET_DIR, unpack=Truem
+                                url='https://github.com/neurosynth/neurosynth-data/blob/e8f27c4/current_data.tar.gz?raw=true')
 
         # Raise warnings for missing resources we can't retrieve from web
         assets = [
