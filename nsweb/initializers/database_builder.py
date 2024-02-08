@@ -153,14 +153,14 @@ class DatabaseBuilder:
         ]
         for (asset, desc) in assets:
             if not exists(asset):
-                raise warnings.warn("Asset %s doesn't seem to exist, and "
+                warnings.warn("Asset %s doesn't seem to exist, and "
                     "can't be retrieved automatically. %s" % (asset, desc))
 
         from nsweb.tasks import MASK_FILES
         for k, v in MASK_FILES.items():
             mask_file = join(settings.MASK_DIR, v)
             if not exists(mask_file):
-                raise warnings.warn("The image file for the '%s' mask "
+                warnings.warn("The image file for the '%s' mask "
                     "cannot be found at %s. This mask will be gracefully "
                     "ignored in all decoder scatterplots." % (k, mask_file))
 
