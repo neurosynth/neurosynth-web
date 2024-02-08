@@ -25,7 +25,7 @@ import re
 import shutil
 import urllib
 import traceback
-
+import warnings
 
 class DatabaseBuilder:
 
@@ -124,6 +124,11 @@ class DatabaseBuilder:
         except Exception as e:
             print("Unable to copy anatomical image.")
 
+        # Copy gene images
+        gene_dir = join(settings.ROOT_DIR, 'data', 'genes')
+        copy_tree(gene_dir, join(settings.DATA_DIR, 'genes'))
+
+
         if download:
             ns.dataset.download(path=settings.ASSET_DIR, unpack=True,
                                 url='https://github.com/neurosynth/neurosynth-data/blob/e8f27c4/current_data.tar.gz?raw=true')
@@ -148,14 +153,14 @@ class DatabaseBuilder:
         ]
         for (asset, desc) in assets:
             if not exists(asset):
-                raise RuntimeWarning("Asset %s doesn't seem to exist, and "
+                raise warnings.warn("Asset %s doesn't seem to exist, and "
                     "can't be retrieved automatically. %s" % (asset, desc))
 
         from nsweb.tasks import MASK_FILES
         for k, v in MASK_FILES.items():
             mask_file = join(settings.MASK_DIR, v)
             if not exists(mask_file):
-                raise RuntimeWarning("The image file for the '%s' mask "
+                raise warnings.warn("The image file for the '%s' mask "
                     "cannot be found at %s. This mask will be gracefully "
                     "ignored in all decoder scatterplots." % (k, mask_file))
 
