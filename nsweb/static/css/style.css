@@ -103,86 +103,24 @@ th[colspan="2"] {
     width: 430px;
 }
 
-@media only screen and (min-width: 346px) {
 .announcement {
-	top: -306px;
-}
-
-.content {
-	top: -306px;
-}
-
-.open {
-	top: 0;
-}
-}
-
-@media only screen and (min-width: 385px) {
-.announcement {
-	top: -283px;
-}
-
-.content {
-	top: -283px;
-}
-
-.open {
-	top: 0;
-}
-}
-
-@media only screen and (min-width: 434px) {
-.announcement {
-	top: -260px;
-}
-
-.content {
-	top: -260px;
-}
-
-.open {
-	top: 0;
-}
-}
-
-@media only screen and (min-width: 525px) {
-.announcement {
-	top: -237px;
-}
-
-.content {
-	top: -237px;
-}
-
-.open {
-	top: 0;
-}
-}
-
-@media only screen and (min-width: 646px) {
-.announcement {
-	top: -214px;
-}
-
-.content {
-	top: -214px;
-}
-
-.open {
-	top: 0;
-}
-}
-
-@media only screen and (min-width: 821px) {
-.announcement {
-	top: -247px;
-}
-
-.content {
-	top: -191px;
-}
-
-.open {
-	top: 0;
-}
-}
+	display: inline-block;
+	height: 100%;
+	text-align: center;
+	width: 100%;
+	background: black;
+	color: white;
+	font-family: Arial, sans;
+	margin: 0;
+	padding: 0;
+	vertical-align: middle;
+	font-size: 0.8em;
+  }
+  
+  .announcement a { 
+	color: #ccc; 
+  }
+  
+  .announcement a:hover {
+	color: red;
+  }

@@ -3,7 +3,7 @@ version: '2.1'
 services:
 
   neurosynth:
-    build: .
+    image: ghcr.io/adelavega/neurosynth-web:prod
     restart: always
     expose:
       - 8000
@@ -17,8 +17,8 @@ services:
       - db
       - broker
     environment:
-      - VIRTUAL_HOST=neurosynth.org,www.neurosynth.org,beta.neurosynth.org
-      - LETSENCRYPT_HOST=neurosynth.org,www.neurosynth.org,beta.neurosynth.org
+      - VIRTUAL_HOST=deepdream.psy.utexas.edu
+      - LETSENCRYPT_HOST=deepdream.psy.utexas.edu
 
   db:
     restart: always
@@ -26,7 +26,7 @@ services:
     expose:
       - '5432'
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - /var/www/neurosynth-db/var/lib/postgresql/data:/var/lib/postgresql/data
     environment:
       - POSTGRES_DB=neurosynth
       - POSTGRES_USER=neurosynth
