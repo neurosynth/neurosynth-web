@@ -103,13 +103,86 @@ th[colspan="2"] {
     width: 430px;
 }
 
-.announcement-banner {
-	background-color: #063363; /* Set the background color as per your design */
-	color: #fff; /* Set the text color */
-	padding: 10px 0; /* Adjust the padding as needed */
-  }
-  
-  .announcement-text {
-	margin-bottom: 0; /* Remove default margin */
-  }
-  
+@media only screen and (min-width: 346px) {
+.announcement {
+	top: -306px;
+}
+
+.content {
+	top: -306px;
+}
+
+.open {
+	top: 0;
+}
+}
+
+@media only screen and (min-width: 385px) {
+.announcement {
+	top: -283px;
+}
+
+.content {
+	top: -283px;
+}
+
+.open {
+	top: 0;
+}
+}
+
+@media only screen and (min-width: 434px) {
+.announcement {
+	top: -260px;
+}
+
+.content {
+	top: -260px;
+}
+
+.open {
+	top: 0;
+}
+}
+
+@media only screen and (min-width: 525px) {
+.announcement {
+	top: -237px;
+}
+
+.content {
+	top: -237px;
+}
+
+.open {
+	top: 0;
+}
+}
+
+@media only screen and (min-width: 646px) {
+.announcement {
+	top: -214px;
+}
+
+.content {
+	top: -214px;
+}
+
+.open {
+	top: 0;
+}
+}
+
+@media only screen and (min-width: 821px) {
+.announcement {
+	top: -247px;
+}
+
+.content {
+	top: -191px;
+}
+
+.open {
+	top: 0;
+}
+}
