@@ -10,8 +10,6 @@ from nsweb.models.genes import Gene
 from nsweb.initializers import settings
 import os
 from os.path import join, basename, exists
-from distutils.dir_util import copy_tree
-
 from neurosynth import Masker
 from neurosynth.base.dataset import Dataset
 from neurosynth.analysis import meta
@@ -114,15 +112,14 @@ class DatabaseBuilder:
 #        }.items():
 #            retrieve_file(u, f)
         asset_dir = join(settings.ROOT_DIR, 'data', 'assets')
-        copy_tree(asset_dir, settings.ASSET_DIR)
+        shutil.copytree(asset_dir, settings.ASSET_DIR, dirs_exist_ok=True)
 
         # Copy anatomical image
         anat = join(settings.ROOT_DIR, 'data', 'images', 'anatomical.nii.gz')
         try:
-            print("Copying anatomical:", anat, settings.IMAGE_DIR, "\n\n\n")
             shutil.copy(anat, join(settings.IMAGE_DIR))
         except Exception as e:
-            print("Unable to copy anatomical image.")
+            pass
 
         if download:
             ns.dataset.download(path=settings.ASSET_DIR, unpack=True)

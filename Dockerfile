@@ -4,6 +4,9 @@ FROM ubuntu:18.04
 # File Author / Maintainer
 MAINTAINER Tal Yarkoni
 
+ENV LC_ALL=C.UTF-8
+ENV LANG=C.UTF-8
+
 # Update the sources list
 RUN apt-get update
 
@@ -33,4 +36,5 @@ COPY . /tmp/code
 WORKDIR /tmp/code
 
 # Install all Python packages with pip
+RUN pip3 install markupsafe
 RUN pip3 install -r requirements.txt
