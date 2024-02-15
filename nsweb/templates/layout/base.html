@@ -25,7 +25,20 @@
     {% endassets %}
 </head>
 <body>
-	<!-- Docs master nav -->    
+	<!-- Docs master nav --> 
+    {% if request.path == '/' %}
+    <div style="background-color: #0077B6;color: white; padding: 10px">
+        <div class="container" style="display: flex">
+            <div>
+                <h6 style="font-size: 2rem">✨ 
+                    <a style="color: orange; text-decoration: underline" href="https://compose.neurosynth.org" target="_blank">Try out Neurosynth Compose</a>, the new free and open platform for custom neuroimaging meta-analysis!
+                    <a style="color: orange;" href="https://neurostuff.github.io/compose-docs/blog/announcing-ns-compose" target="_blank">Learn more</a>
+                  ✨</h6>
+            </div>
+            <div style="display: flex; align-items: center; font-size: 2.5rem; margin-left: 50px" onclick="document.getElementById('notification').style.display='none'">x</div>
+        </div>
+      </div>
+    {% endif %}         
 	<header class="navbar navbar-static-top navbar-inverse" id="top" role="banner">
 	    <div class="container">
 	        <div class="navbar-header">
