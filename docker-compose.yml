@@ -3,7 +3,7 @@ version: '2.1'
 services:
 
   neurosynth:
-    build: .
+    image: ghcr.io/neurosynth/neurosynth-web:prod
     restart: always
     expose:
       - 8000

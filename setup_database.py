@@ -13,6 +13,10 @@ def main():
     # Create a new builder from a pickled Dataset instance and populate the DB
     # pass reset_dataset=False after first run to avoid rebuilding dataset
     dataset = settings.PICKLE_DATABASE
+
+    if not os.path.exists(settings.DATA_DIR):
+        os.makedirs(settings.DATA_DIR)
+
     db.app = app  # Set context on DB
     builder = database_builder.DatabaseBuilder(
         db, dataset=dataset,
