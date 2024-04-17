@@ -3,7 +3,7 @@ version: '2.1'
 services:
 
   neurosynth:
-    build: .
+    image: ghcr.io/neurosynth/neurosynth-web:prod
     restart: always
     expose:
       - 8000
@@ -12,6 +12,7 @@ services:
       - /media/data-drive/neurosynth:/data:rw
       - /logs/synth:/logs:rw
     working_dir: /code
+    command: /code/scripts/docker_startup.sh
     depends_on:
       - db
       - broker
