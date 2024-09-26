@@ -51,6 +51,10 @@
         {
           "q": "How do you decide which terms to keep?",
           "a": "<p>We're not very principled about this. Every time the database expands, we generate a list of all possible terms that meet some minimum cut-off for number of studies. Then, we manually go through the list of several thousand terms and keep only the ones that seem to us to carry psychological or anatomical content (e.g., 'emotion' and 'language' would make the cut; 'activation' and 'necessary' wouldn't. It's entirely possible (likely, in fact) that we miss some terms that other people would include, or include some terms that don't have any interesting content.</p>"
+        },
+        {
+          "q": "What is the latent representation of a coordinated-based meta-analysis?",
+          "a": "<img src=\"https://media.giphy.com/media/14kqI3Y4urS3rG/giphy.gif\"/>"
         }
       ]
     },
