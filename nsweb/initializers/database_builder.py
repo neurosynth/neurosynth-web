@@ -309,7 +309,7 @@ class DatabaseBuilder:
         if analyses is None:
             analyses = self._get_feature_names()
 
-        feature_data = self.dataset.get_feature_data(features=analyses)
+        feature_data = self.dataset.get_feature_data(features=analyses, dense=False)
 
         study_inds = self.dataset.activations['id'].unique()
 
