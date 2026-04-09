@@ -1,15 +1,8 @@
-''' UI tests via selenium. '''
-from selenium import webdriver
-from nsweb.initializers import settings
-from pytest import fixture
+"""UI smoke tests using Flask's test client."""
 
 
-@fixture
-def driver():
-    return webdriver.Chrome()
-
-
-def test_front_page_loads(driver):
-    driver.get(settings.TEST_URL)
-    assert "Neurosynth" in driver.title
-    driver.close()
+def test_front_page_loads(client, dummy_data):
+    response = client.get("/")
+    assert response.status_code == 200
+    assert b"<title>Neurosynth</title>" in response.data
+    assert b"neurosynth.org" in response.data

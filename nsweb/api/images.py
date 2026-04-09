@@ -118,6 +118,8 @@ def get_decoding_data(image, get_json=True):
                           " to make sure there is a valid image with id=%d." %
                           image)
     dec = decode_analysis_image(image)
+    if dec is None or isinstance(dec, int):
+        return error_page("An unspecified error occurred during decoding.")
     df = os.path.join(settings.DECODING_RESULTS_DIR, dec.uuid + '.txt')
     if not os.path.exists(df):
         return error_page("An unspecified error occurred during decoding.")

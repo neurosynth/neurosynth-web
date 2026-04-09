@@ -1,85 +1,125 @@
-''' Test the v2 swagger API. '''
-from nsweb.initializers import settings
-import json
-import requests
-import re
+"""Local API tests backed by dummy fixture data."""
 
-root_url = settings.TEST_URL
-api_url = root_url + '/api/'
+from pathlib import Path
 
 
-def get_json(url):
-    r = requests.get(url)
-    return r.json()['data']
+def _get_json(client, url):
+    response = client.get(url, follow_redirects=True)
+    assert response.status_code == 200
+    return response.get_json()["data"]
 
 
-def _test_image_file_retrieval(url):
-    r = requests.get(url)
-    assert 'octet-stream' in r.headers['content-type']
-    cd = r.headers['content-disposition']
-    assert re.search('attachment.*nii.gz', cd)
+def _assert_nifti_download(response):
+    assert response.status_code == 200
+    assert "octet-stream" in response.headers["Content-Type"]
+    assert "attachment" in response.headers["Content-Disposition"]
+    assert "nii.gz" in response.headers["Content-Disposition"]
 
 
-def test_images_api():
+def test_studies_api(client, dummy_data):
+    studies = _get_json(client, "/api/studies/?limit=2")
+    assert len(studies) == 2
+    assert studies[0]["pmid"] == 1001
+    assert studies[0]["title"] == "Language Study One"
+    assert len(studies[0]["peaks"]) == 2
 
-    url = api_url + '/images'
-
-    # Test basic object retrieval
-    first7 = get_json(url + '?limit=7')
-    assert len(first7) == 7
-    img = first7[0]
-    for key in ['analysis', 'description', 'file', 'id', 'label', 'stat', 'type']:
-            assert hasattr(img, key)
-    assert float(img['id'])
-    assert float(img['analysis'])
+    searched = _get_json(client, "/api/studies/?search=Study%20Two")
+    assert [study["pmid"] for study in searched] == [1002]
 
 
-    # Test pagination
-    next7 = get_json(url + '?limit=7&page=2')
-    first14 = get_json(url + '?limit=14')
-    assert next7[0] == first14[7]
+def test_images_api(client, dummy_data):
+    images = _get_json(client, "/api/images/?limit=10&type=term")
+    assert len(images) == 2
 
-    # Test search
-    lang_imgs = get_json(url + '?limit=100&search=language&type=term')
-    labels = [l['label'] for l in lang_imgs]
-    assert len(lang_imgs) >= 2
-    assert "language: association test" in labels
-    assert "language: uniformity test" in labels
+    image = images[0]
+    for key in ["analysis", "description", "file", "id", "label", "stat", "type"]:
+        assert key in image
+    assert image["analysis"] == dummy_data["analysis_id"]
+    assert image["type"] == "term"
 
-    # Test file retrieval
-    url = root_url + lang_imgs[-1]['file']
-    _test_image_file_retrieval(url)
+    searched = _get_json(client, "/api/images/?limit=10&search=language&type=term")
+    labels = [item["label"] for item in searched]
+    assert labels == ["language: association test", "language: uniformity test"]
 
-
-def test_locations_api():
-
-    url = api_url + '/locations'
-    region = get_json(url + '?x=0&y=14&z=42&r=4')
-    assert len(region['images']) == 2
-    assert len(region['studies']) > 50  # Some reasonable number
-    assert float(region['images'][0])
-    assert float(region['studies'][10])
-    assert region['x'] == 0 and region['z'] == 42
-
-    # Make sure the radius parameter is working
-    region2 = get_json(url + '?x=0&y=14&z=42&r=10')
-    assert len(region2['studies']) > len(region['studies'])
-
-    # Test that image retrieves correctly
-    img = region['images'][0]
-    _test_image_file_retrieval(root_url + '/images/%s' % img)
+    download = client.get(searched[-1]["file"], follow_redirects=True)
+    _assert_nifti_download(download)
 
 
-def test_decode_api():
+def test_locations_api(client, dummy_data):
+    region = _get_json(client, "/api/locations/?x=0&y=14&z=42&r=4")
+    assert region["x"] == 0
+    assert region["y"] == 14
+    assert region["z"] == 42
+    assert len(region["images"]) == 2
+    assert set(region["studies"]) == {1001, 1002}
 
-    url = api_url + '/decode'
+    wider_region = _get_json(client, "/api/locations/?x=0&y=14&z=42&r=10")
+    assert set(wider_region["studies"]) == {1001, 1002, 1003}
 
-    # Test NeuroVault decoding
-    dec = get_json(url + '?neurovault=4933')
-    assert dec['url'].startswith('http://neurovault.org')
-    assert len(dec['values']) > 100
-    assert 'reward' in dec['values']
-    assert float(dec['values']['reward'])
-    assert float(dec['id'])
-    assert float(dec['neurovault_id'])
+    location_images = _get_json(client, "/api/locations/images/?x=0&y=14&z=42")
+    assert len(location_images) == 2
+    assert location_images[0]["url"].startswith("/api/images/")
 
+    download = client.get(location_images[0]["download"], follow_redirects=True)
+    _assert_nifti_download(download)
+
+
+def test_decode_api(client, dummy_data):
+    decoding = _get_json(client, f"/api/decode/?image={dummy_data['image_id']}")
+    assert decoding["image"]["id"] == dummy_data["image_id"]
+    assert decoding["reference"] == "terms_20k"
+    assert decoding["values"]["reward"] == 0.812
+    assert decoding["values"]["language"] == 0.456
+
+
+def test_decode_api_dispatches_and_persists_result(client, app, db, dummy_data, monkeypatch):
+    from nsweb.api import decode as decode_api
+    from nsweb.models.decodings import Decoding
+    from nsweb.initializers import settings
+
+    with app.app_context():
+        Decoding.query.filter_by(image_id=dummy_data["image_id"]).delete()
+        db.session.commit()
+
+    class _Result:
+        def wait(self):
+            outfile = Path(settings.DECODING_RESULTS_DIR) / "taskdecodeuuid00000000000000000001.txt"
+            outfile.write_text("reward\t0.5\nlanguage\t0.25\n", encoding="utf-8")
+            return True
+
+    def fake_delay(filename, reference, uuid):
+        assert reference == "terms_20k"
+        assert filename.endswith(".nii.gz")
+        return _Result()
+
+    monkeypatch.setattr(decode_api.tasks.decode_image, "delay", fake_delay)
+    monkeypatch.setattr(decode_api.uuid, "uuid4", lambda: type("U", (), {"hex": "taskdecodeuuid00000000000000000001"})())
+
+    response = client.get(f"/api/decode/?image={dummy_data['image_id']}")
+    assert response.status_code == 200
+    payload = response.get_json()["data"]
+    assert payload["values"]["reward"] == 0.5
+    assert payload["values"]["language"] == 0.25
+
+    with app.app_context():
+        saved = Decoding.query.filter_by(uuid="taskdecodeuuid00000000000000000001").one()
+        assert saved.image_id == dummy_data["image_id"]
+
+
+def test_decode_api_returns_error_when_task_fails(client, app, db, dummy_data, monkeypatch):
+    from nsweb.api import decode as decode_api
+    from nsweb.models.decodings import Decoding
+
+    with app.app_context():
+        Decoding.query.filter_by(image_id=dummy_data["image_id"]).delete()
+        db.session.commit()
+
+    class _Result:
+        def wait(self):
+            return False
+
+    monkeypatch.setattr(decode_api.tasks.decode_image, "delay", lambda *args, **kwargs: _Result())
+
+    response = client.get(f"/api/decode/?image={dummy_data['image_id']}")
+    assert response.status_code == 500
+    assert response.get_json()["status"] == 500
