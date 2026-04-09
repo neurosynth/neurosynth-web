@@ -150,13 +150,14 @@ def _run_decoder(**kwargs):
     # run decoder and wait for it to terminate
     result = tasks.decode_image.delay(dec.filename, reference.name,
                                       dec.uuid).wait()
+    outfile = join(settings.DECODING_RESULTS_DIR, dec.uuid + '.txt')
 
-    if result:
+    if result and exists(outfile):
         dec.image_decoded_at = datetime.utcnow()
         db.session.add(dec)
         db.session.commit()
-
-    return dec
+        return dec
+    return 500
 
 
 @bp.route('/<string:uuid>/data/')

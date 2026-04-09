@@ -5,14 +5,16 @@ services:
   neurosynth:
     build: .
     restart: always
+    command: /code/scripts/docker_startup.sh
     expose:
       - 8000
+    ports:
+      - "8000:8000"
     volumes:
       - .:/code
       - /media/data-drive/neurosynth:/data:rw
       - /logs/synth:/logs:rw
     working_dir: /code
-    command: /code/scripts/docker_startup.sh
     depends_on:
       - db
       - broker
