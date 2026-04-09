@@ -1,0 +1,43 @@
+name: Run Neurosynth Tests
+
+on:
+  pull_request:
+    branches:
+      - main
+      - master
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build test image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          load: true
+          tags: neurosynth-web:test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Run test suite
+        run: docker run --rm neurosynth-web:test /bin/bash -lc 'pytest -q tests'
