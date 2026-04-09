@@ -42,7 +42,7 @@ Flask-User==1.0.1.5
 Flask-WTF==0.14.2
 gunicorn==19.9.0
 idna==2.8
-importlib-metadata==0.19
+importlib-metadata==4.13.0
 itsdangerous==1.1.0
 Jinja2==2.10.1
 joblib
