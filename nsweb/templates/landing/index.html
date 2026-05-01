@@ -1,0 +1,435 @@
+{% extends "layout/base.html" %} {% set page_title = 'Neurosynth' %}{% block
+css_style %}
+<style>
+  /* Landing only: minimal, neuroscience-adjacent palette (deep slate, cool cyan accent) */
+  .landing-page {
+    font-family:
+      -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
+      Helvetica, Arial, sans-serif;
+    color: #1f2933;
+    -webkit-font-smoothing: antialiased;
+  }
+  .landing-hero {
+    position: relative;
+    text-align: center;
+    padding: 4.25rem 1.75rem 4.5rem;
+    margin: 4rem -15px 0;
+    border-radius: 2px;
+    color: #1f2933;
+    color: #e8eef4;
+    overflow: hidden;
+  }
+  .landing-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+  .landing-hero-inner {
+    position: relative;
+    z-index: 1;
+    max-width: 70rem;
+    margin: 0 auto;
+  }
+  .landing-hero h1 {
+    font-size: 4rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    line-height: 1.15;
+    margin: 0 0 1.25rem;
+    color: #1f2933;
+  }
+  .landing-hero .tagline {
+    font-size: 2rem;
+    line-height: 1.55;
+    color: #86888a;
+    font-weight: 400;
+    margin-top: 2.25rem;
+    margin-bottom: 0px;
+  }
+  .landing-hero .btn-landing-primary {
+    display: inline-block;
+    padding: 0.95rem 2.35rem;
+    font-size: 1.05rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: #0c1018;
+    background: linear-gradient(180deg, #5eead4 0%, #2dd4bf 100%);
+    border: none;
+    border-radius: 3px;
+    text-decoration: none;
+    transition:
+      transform 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+  .landing-hero .btn-landing-primary:hover,
+  .landing-hero .btn-landing-primary:focus {
+    border: 2px solid #0a0f14;
+    text-decoration: none;
+    transform: translateY(-1px);
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.3) inset,
+      0 12px 28px rgba(15, 23, 42, 0.4);
+  }
+  .landing-hero .btn-landing-secondary {
+    display: inline-block;
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    color: rgba(148, 184, 210, 0.95);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .landing-hero .btn-landing-secondary:hover {
+    color: #e2e8f0;
+  }
+  .landing-about {
+    max-width: 70rem;
+    margin: 0 auto;
+    padding: 3.25rem 0.5rem 2rem;
+  }
+  .landing-about h2 {
+    font-size: 2.5rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #64748b;
+    margin: 0 0 1.25rem;
+  }
+  .landing-about p {
+    font-size: 2rem;
+    line-height: 1.75;
+    color: #334155;
+    margin: 0 0 1.25rem;
+  }
+  .landing-about .callout {
+    margin-top: 1.75rem;
+    padding: 1.25rem 3rem;
+    border-left: 3px solid #2dd4bf;
+    border-radius: 0 3px 3px 0;
+    font-size: 2rem;
+    line-height: 1.7;
+    color: #475569;
+  }
+  .landing-about .callout a:not(.btn):not(.compose-cta) {
+    color: #0e7490;
+    font-weight: 500;
+  }
+  .landing-about .callout a:not(.btn):not(.compose-cta):hover {
+    color: #0f766e;
+  }
+
+  /* Matches #notification banner in layout/base.html (#0077b6) */
+  .landing-about .callout .compose-cta {
+    display: inline-block;
+    margin-top: 0.35rem;
+    padding: 0.95rem 1.85rem;
+    font-size: 1.2rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: #fff;
+    background: #0077b6;
+    border: 1px solid #006499;
+    border-radius: 3px;
+    text-decoration: none;
+    transition:
+      background 0.15s ease,
+      border-color 0.15s ease;
+  }
+  .landing-about .callout .compose-cta:hover,
+  .landing-about .callout .compose-cta:focus {
+    color: #fff;
+    text-decoration: none;
+    background: #006499;
+    border-color: #005580;
+  }
+
+  /* Mock vertical roadmap (scoped; font size resets callout inheritance) */
+  .landing-about .callout .compose-roadmap {
+    margin: 1.35rem 0 0;
+    padding: 1rem 1rem 1.05rem 1.1rem;
+    font-size: 1rem;
+    line-height: 1.45;
+    color: #475569;
+  }
+  .landing-about .callout .compose-roadmap-steps {
+    position: relative;
+    margin: 0;
+    padding: 0 0 0 1.4rem;
+    list-style: none;
+    border-left: 2px solid #cbd5e1;
+  }
+  .landing-about .callout .compose-roadmap-steps > li {
+    position: relative;
+    margin: 0;
+    padding: 0 0 1.1rem 0.75rem;
+  }
+  .landing-about .callout .compose-roadmap-steps > li:last-child {
+    padding-bottom: 0;
+  }
+  .landing-about .callout .compose-roadmap-marker {
+    position: absolute;
+    left: calc(-1.4rem - 6px);
+    top: 0.32rem;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid #0077b6;
+    box-sizing: border-box;
+  }
+  .landing-about .callout .compose-roadmap-step-body {
+    display: block;
+  }
+  .landing-about .callout .compose-roadmap-status {
+    display: inline-block;
+    margin: 0 0 0.2rem;
+    padding: 0.12rem 0.45rem;
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    border-radius: 2px;
+    border: 1px solid transparent;
+    vertical-align: middle;
+  }
+  .landing-about .callout .compose-roadmap-status--complete {
+    color: #047857;
+    background: #ecfdf5;
+    border-color: #a7f3d0;
+  }
+  .landing-about .callout .compose-roadmap-status--progress {
+    color: #1e40af;
+    background: #eff6ff;
+    border-color: #bfdbfe;
+  }
+  .landing-about .callout .compose-roadmap-status--beta {
+    color: #b45309;
+    background: #fffbeb;
+    border-color: #fcd34d;
+  }
+  .landing-about .callout .compose-roadmap-status--planned {
+    color: #475569;
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+  }
+  .landing-about .callout .compose-roadmap-title {
+    display: block;
+    font-weight: 600;
+    color: #334155;
+    font-size: 1.5rem;
+  }
+  .landing-about .callout .compose-roadmap-desc {
+    display: block;
+    margin-top: 0.2rem;
+    font-size: 1.5rem;
+    color: #64748b;
+  }
+</style>
+{% endblock %} {% block content %}
+<div class="landing-page">
+  <div class="jumbotron landing-hero" role="banner">
+    <div class="landing-hero-inner">
+      <h1 class="landing-heading">Welcome to Neurosynth.org</h1>
+      <p class="tagline lead">
+        Large-scale automated synthesis of functional magnetic resonance imaging
+        (fMRI) data.
+      </p>
+    </div>
+  </div>
+
+  <section class="landing-about" aria-labelledby="about-heading">
+    <h2 id="about-heading">What is neurosynth?</h2>
+    <p>
+      Neurosynth is a platform for large-scale, automated synthesis of
+      functional magnetic resonance imaging (fMRI) data.
+    </p>
+
+    <div class="callout">
+      <strong
+        >Neurosynth.org is a legacy application and is no longer
+        maintained.</strong
+      >
+      <p style="margin: 1rem 0 0; font-size: inherit; line-height: inherit">
+        Active development is focused on
+        <strong>Neurosynth Compose</strong>, a new platform for running
+        <em>custom</em> neuroimaging meta-analyses with finer-grained control
+        over inputs, models, and reporting.
+      </p>
+      <p style="margin: 2rem 0; text-align: center">
+        <a
+          class="compose-cta"
+          href="https://compose.neurosynth.org"
+          target="_blank"
+          rel="noopener noreferrer"
+          >CHECK OUT NEUROSYNTH COMPOSE</a
+        >
+      </p>
+
+      <p style="margin: 1rem 0 0; font-size: inherit; line-height: inherit">
+        For more information, see the
+        <a
+          href="https://neurostuff.github.io/compose-docs/blog/announcing-ns-compose"
+          target="_blank"
+          rel="noopener noreferrer"
+          >Neurosynth Compose announcement</a
+        >.
+      </p>
+
+      <p style="margin: 1rem 0 0; font-size: inherit; line-height: inherit">
+        Below is a rough roadmap for the neurosynth-compose project.
+      </p>
+
+      <div class="compose-roadmap" role="group">
+        <ol class="compose-roadmap-steps">
+          <li>
+            <span class="compose-roadmap-marker" aria-hidden="true"></span>
+            <div class="compose-roadmap-step-body">
+              <span
+                class="compose-roadmap-status compose-roadmap-status--complete"
+                >complete</span
+              >
+              <span class="compose-roadmap-title">Initial Foundation</span>
+              <span class="compose-roadmap-desc"
+                >Users can explore the literature, curate studies, extract the
+                necessary coordinate data and run a meta-analysis using a
+                dedicated user interface that also supports PRISMA compliant
+                workflows</span
+              >
+            </div>
+          </li>
+          <li>
+            <span class="compose-roadmap-marker" aria-hidden="true"></span>
+            <div class="compose-roadmap-step-body">
+              <span
+                class="compose-roadmap-status compose-roadmap-status--complete"
+                >complete</span
+              >
+              <span class="compose-roadmap-title">MKDA Chi Squared tests</span>
+              <span class="compose-roadmap-desc"
+                >Perform large-scale association tests for your custom
+                meta-analyses in Neurosynth Compose</span
+              >
+            </div>
+          </li>
+          <li>
+            <span class="compose-roadmap-marker" aria-hidden="true"></span>
+            <div class="compose-roadmap-step-body">
+              <span
+                class="compose-roadmap-status compose-roadmap-status--complete"
+                >complete</span
+              >
+              <span class="compose-roadmap-title"
+                >Cloud Based Meta-analysis Workflow</span
+              >
+              <span class="compose-roadmap-desc"
+                >Aside from running meta-analyses locally, users can take
+                advantage of AWS and Jupyter notebooks to run analyses in the
+                cloud</span
+              >
+            </div>
+          </li>
+          <li>
+            <span class="compose-roadmap-marker" aria-hidden="true"></span>
+            <div class="compose-roadmap-step-body">
+              <span
+                class="compose-roadmap-status compose-roadmap-status--complete"
+                >complete</span
+              >
+              <span class="compose-roadmap-title"
+                >AI Assisted Study Curation</span
+              >
+              <span class="compose-roadmap-desc"
+                >Users can take advantage of artificial intelligence to extract
+                study features from the literature</span
+              >
+            </div>
+          </li>
+          <li>
+            <span class="compose-roadmap-marker" aria-hidden="true"></span>
+            <div class="compose-roadmap-step-body">
+              <span
+                class="compose-roadmap-status compose-roadmap-status--progress"
+                >In progress</span
+              >
+              <span class="compose-roadmap-title"
+                >Image Based Meta Analyses</span
+              >
+              <span class="compose-roadmap-desc"
+                >Users will be able to use a dedicated interface to complete
+                image based meta-analyses using images from NeuroVault, with
+                features indexed and extracted using Neurostore</span
+              >
+            </div>
+          </li>
+          <li>
+            <span class="compose-roadmap-marker" aria-hidden="true"></span>
+            <div class="compose-roadmap-step-body">
+              <span
+                class="compose-roadmap-status compose-roadmap-status--planned"
+                >Planned</span
+              >
+              <span class="compose-roadmap-title">Project Cloning</span>
+              <span class="compose-roadmap-desc"
+                >Users can clone existing projects and make changes or validate
+                findings</span
+              >
+            </div>
+          </li>
+          <li>
+            <span class="compose-roadmap-marker" aria-hidden="true"></span>
+            <div class="compose-roadmap-step-body">
+              <span
+                class="compose-roadmap-status compose-roadmap-status--planned"
+                >Planned</span
+              >
+              <span class="compose-roadmap-title"
+                >AI Assisted Study Search and other AI Assisted Features</span
+              >
+              <span class="compose-roadmap-desc"
+                >Users can take advantage of artificial intelligence to search
+                the literature for relevant studies. They will also be able to
+                get extracted features on an analysis (statistical contrast)
+                level</span
+              >
+            </div>
+          </li>
+          <li>
+            <span class="compose-roadmap-marker" aria-hidden="true"></span>
+            <div class="compose-roadmap-step-body">
+              <span
+                class="compose-roadmap-status compose-roadmap-status--planned"
+                >Planned</span
+              >
+              <span class="compose-roadmap-title"
+                >Pre-seeded Meta-analyses</span
+              >
+              <span class="compose-roadmap-desc"
+                >Users can take advantage of pre-seeded meta-analyses to get
+                started with their own analyses, including meta-analyses
+                currently available in Neurosynth</span
+              >
+            </div>
+          </li>
+          <li>
+            <span class="compose-roadmap-marker" aria-hidden="true"></span>
+            <div class="compose-roadmap-step-body">
+              <span
+                class="compose-roadmap-status compose-roadmap-status--planned"
+                >Planned</span
+              >
+              <span class="compose-roadmap-title"
+                >Add support for more Meta-Analysis Algorithms</span
+              >
+              <span class="compose-roadmap-desc"
+                >Users can select from a wider range of NiMARE algorithms to run
+                their meta-analyses</span
+              >
+            </div>
+          </li>
+        </ol>
+      </div>
+    </div>
+  </section>
+</div>
+{% endblock %}

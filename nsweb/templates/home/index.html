@@ -1,33 +1,86 @@
-{% set page_title = 'Neurosynth' %}
-{% extends "layout/base.html" %}
-{% block content %}
-  {% import "macros/_home_viewer.html" as viewers %}
-  <div class="row" id="page-home">
-    <div class="col-md-10">
-      <div class="huge-text">neurosynth.org</div>
-      <div class="lead">Neurosynth is a platform for large-scale, automated synthesis of functional magnetic resonance imaging (fMRI) data.</div>
-
-      <div class="lead">It takes thousands of published articles reporting the results of fMRI studies, chews on them for a bit, and then spits out images that look like this:</div>
-    </div>
+{% set page_title = 'Neurosynth' %} {% extends "layout/base.html" %} {% block
+content %} {% import "macros/_home_viewer.html" as viewers %}
+<div id="page-home">
+  <h2>Neurosynth Home</h2>
+</div>
+<div>
+  <p class="lead">
+    Neurosynth takes thousands of published articles reporting the results of
+    fMRI studies, chews on them for a bit, and then spits out images that look
+    like this:
+  </p>
+</div>
+<div class="row">
+  <div class="col-md-12">
+    <script type="text/javascript">
+      var options = { panzoomEnabled: false };
+      var settings = ["no-zoom", "nav"];
+      var analysis = "{{ analysis.id }}";
+    </script>
+    <p>{{ viewers.viewer(analysis) }}</p>
+    <hr class="top-space40" />
   </div>
-  <div class="row">
-    <div class="col-md-10">
-      <script type="text/javascript">
-        var options = {"panzoomEnabled":false}
-        var settings = ['no-zoom', 'nav']
-        var analysis = '{{ analysis.id }}'
-      </script>
-      <p>{{ viewers.viewer(analysis) }}</p>
-      <hr class="top-space40">
+</div>
 
-  <div class="row">
-    <div class="col-md-10">
-      <h3>Database Status</h3>
-      <div class="current-status style="font-size: 18px;">
-        <p>{{ stats['n_peaks'] }} activations reported in <a href="/studies" class="big-link">{{ stats['n_studies'] }} studies</a></p>
-        <p>Interactive, downloadable meta-analyses of <a href="/analyses/terms" class="big-link">{{ stats['n_analyses'] }} terms</a></p>
-        <p>Functional connectivity and coactivation maps for over <a href="/locations" class="big-link">150,000 brain locations</a></p>
+<div class="row top-space20">
+  <div class="col-md-12">
+    <div class="panel panel-default db-status-card">
+      <div class="panel-heading">
+        <h3 class="panel-title">Database Status</h3>
+      </div>
+      <div class="panel-body current-status" style="font-size: 18px">
+        <p>
+          {{ stats['n_peaks'] }} activations reported in
+          <a href="{{ url_for('studies.index') }}" class="big-link"
+            >{{ stats['n_studies'] }} studies</a
+          >
+        </p>
+        <p>
+          Interactive, downloadable meta-analyses of
+          <a href="{{ url_for('analyses.list_terms') }}" class="big-link"
+            >{{ stats['n_analyses'] }} terms</a
+          >
+        </p>
+        <p>
+          Functional connectivity and coactivation maps for over
+          <a href="{{ url_for('locations.show') }}" class="big-link"
+            >150,000 brain locations</a
+          >
+        </p>
       </div>
     </div>
   </div>
+</div>
+<hr />
+
+<div>
+  <div class="home-get-started">
+    <p class="lead" style="margin-bottom: 1.25rem">
+      Get started by exploring&hellip;
+    </p>
+    <div class="row">
+      <div class="col-sm-4" style="margin-bottom: 12px">
+        <a
+          href="{{ url_for('analyses.list_terms') }}"
+          class="btn btn-primary btn-lg btn-block"
+          >Terms</a
+        >
+      </div>
+      <div class="col-sm-4" style="margin-bottom: 12px">
+        <a
+          href="{{ url_for('studies.index') }}"
+          class="btn btn-primary btn-lg btn-block"
+          >Studies</a
+        >
+      </div>
+      <div class="col-sm-4" style="margin-bottom: 12px">
+        <a
+          href="{{ url_for('decode.index') }}"
+          class="btn btn-primary btn-lg btn-block"
+          >Decoding</a
+        >
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}

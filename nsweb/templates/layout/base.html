@@ -1,72 +1,123 @@
-<!DOCTYPE html>
+<!doctype html>
 <!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
 <!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
 <!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>{% block title %}{{ page_title|default(('Neurosynth')) }}{% endblock %}</title>
-    <meta name="description" content="">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!--[if gt IE 8]><!-->
+<html class="no-js">
+  <!--<![endif]-->
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <title>
+      {% block title %}{{ page_title|default(('Neurosynth')) }}{% endblock %}
+    </title>
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     {% assets "css" %}
-      <link rel="stylesheet" href="{{ ASSET_URL }}">
-    {% endassets %}
-    {% block css_style %}
-    {% endblock %}
+    <link rel="stylesheet" href="{{ ASSET_URL }}" />
+    {% endassets %} {% block css_style %} {% endblock %}
     <script>
-	    var _gaq=[['_setAccount','UA-39492382-1'],['_trackPageview']];
-	    (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
-	    g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
-	    s.parentNode.insertBefore(g,s)}(document,'script'));
+      var _gaq = [["_setAccount", "UA-39492382-1"], ["_trackPageview"]];
+      (function (d, t) {
+        var g = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+        g.src =
+          ("https:" == location.protocol ? "//ssl" : "//www") +
+          ".google-analytics.com/ga.js";
+        s.parentNode.insertBefore(g, s);
+      })(document, "script");
     </script>
     {% assets "js" -%}
-      <script src="{{ ASSET_URL }}"></script>
+    <script src="{{ ASSET_URL }}"></script>
     {% endassets %}
-</head>
-<body>
-	<!-- Docs master nav --> 
+  </head>
+  <body>
+    <!-- Docs master nav -->
     {% if request.path == '/' %}
-    <div id="notification" style="background-color: #0077B6;color: white; padding: 10px">
-        <div class="container" style="display: flex">
-            <div>
-                <h6 style="font-size: 2rem">✨ 
-                    <a style="color: orange; text-decoration: underline" href="https://compose.neurosynth.org" target="_blank">Try out Neurosynth Compose</a>, the new free and open platform for custom neuroimaging meta-analysis!
-                    <a style="color: orange;" href="https://neurostuff.github.io/compose-docs/blog/announcing-ns-compose" target="_blank">Learn more</a>
-                  ✨</h6>
-            </div>
-            <div style="display: flex; align-items: center; font-size: 2.5rem; margin-left: 50px; cursor: pointer" onclick="document.getElementById('notification').style.display='none'; sessionStorage.setItem('hideNotification', 'true')">x</div>
+    <div
+      id="notification"
+      style="background-color: #0077b6; color: white; padding: 10px"
+    >
+      <div class="container" style="display: flex">
+        <div>
+          <h6 style="font-size: 2rem">
+            ✨
+            <a
+              style="color: orange; text-decoration: underline"
+              href="https://compose.neurosynth.org"
+              target="_blank"
+              >Try out Neurosynth Compose</a
+            >, the new free and open platform for custom neuroimaging
+            meta-analysis!
+            <a
+              style="color: orange"
+              href="https://neurostuff.github.io/compose-docs/blog/announcing-ns-compose"
+              target="_blank"
+              >Learn more</a
+            >
+            ✨
+          </h6>
         </div>
+        <div
+          style="
+            display: flex;
+            align-items: center;
+            font-size: 2.5rem;
+            margin-left: 50px;
+            cursor: pointer;
+          "
+          onclick="
+            document.getElementById('notification').style.display = 'none';
+            sessionStorage.setItem('hideNotification', 'true');
+          "
+        >
+          x
+        </div>
+      </div>
     </div>
     <script>
-        if(sessionStorage.getItem('hideNotification') === 'true') {
-            document.getElementById('notification').style.display = 'none';
-        }
+      if (sessionStorage.getItem("hideNotification") === "true") {
+        document.getElementById("notification").style.display = "none";
+      }
     </script>
-    {% endif %}	<header class="navbar navbar-static-top navbar-inverse" id="top" role="banner">
-	    <div class="container">
-	        <div class="navbar-header">
-	            <a href="../" class="navbar-brand">Neurosynth.org</a>
-	        </div>
-	        <nav class="collapse navbar-collapse" role="navigation">
-		        <ul class="nav navbar-nav">
-					<li class=""><a href="/">Home</a></li>
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Meta-analyses<span class="caret"></span></a>
-                        <ul class="dropdown-menu" role="menu">
-                            <li><a href="{{url_for('analyses.list_terms')}}">Terms</a></li>
-                            <li class="divider"></li>
-                            <li><a href="{{url_for('analyses.list_topic_sets')}}">Topics</a></li>
-                        </ul>
-                    </li>
-					<!-- <li class=""><a href="/analyses/">Analyses</a></li> -->
-					<li class=""><a href="/studies/">Studies</a></li>
-                    <li class=""><a href="/locations/">Locations</a></li>
-                    <li class=""><a href="/genes/">Genes</a></li>
-                    <li class=""><a href="/decode/">Decoder</a></li>
-                    <li class=""><a href="/code/">Code</a></li>
-			        <li class=""><a href="/faq/">FAQs</a></li>
-<!--                     {% if current_user.is_authenticated %}
+    {% endif %}
+    <header
+      class="navbar navbar-static-top navbar-inverse"
+      id="top"
+      role="banner"
+    >
+      <div class="container">
+        <div class="navbar-header">
+          <a href="/" class="navbar-brand">Neurosynth.org</a>
+        </div>
+        <nav class="collapse navbar-collapse" role="navigation">
+          <ul class="nav navbar-nav">
+            <li class=""><a href="/home">Home</a></li>
+            <li class="dropdown">
+              <a
+                href="#"
+                class="dropdown-toggle"
+                data-toggle="dropdown"
+                role="button"
+                aria-expanded="false"
+                >Meta-analyses<span class="caret"></span
+              ></a>
+              <ul class="dropdown-menu" role="menu">
+                <li><a href="{{url_for('analyses.list_terms')}}">Terms</a></li>
+                <li class="divider"></li>
+                <li>
+                  <a href="{{url_for('analyses.list_topic_sets')}}">Topics</a>
+                </li>
+              </ul>
+            </li>
+            <!-- <li class=""><a href="/analyses/">Analyses</a></li> -->
+            <li class=""><a href="/studies/">Studies</a></li>
+            <li class=""><a href="/locations/">Locations</a></li>
+            <li class=""><a href="/genes/">Genes</a></li>
+            <li class=""><a href="/decode/">Decoder</a></li>
+            <li class=""><a href="/code/">Code</a></li>
+            <li class=""><a href="/faq/">FAQs</a></li>
+            <!--                     {% if current_user.is_authenticated %}
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Signed in as {{ current_user.username }}<span class="caret"></span></a>
                         <ul class="dropdown-menu" role="menu">
@@ -76,68 +127,121 @@
                     {% else %}
                         <li class=""><a href="{{ config.USER_LOGIN_URL }}">Sign in</a></li>
                     {% endif %} -->
-		        </ul>
-		        <ul class="nav navbar-nav navbar-right">
-		        </ul>
-	        </nav>
-	    </div>
-	</header>
-    {% block flash_message %}
-        {% with messages = get_flashed_messages(with_categories=True) %}
-            {% if messages %}
-            <div class="container">
-                <div id='flash_message_container'>
-                    {% for category, msg in messages %}
-                        <div class="alert alert-{{ category }}">
-                            <button type="button" class="close" data-dismiss="alert">x</button>
-                            {{ msg|safe }}
-                        </div>
-                    {% endfor %}
-                </div>
-            </div>
-            {% endif %}
-        {% endwith %}
-    {% endblock %}
+          </ul>
+          <ul class="nav navbar-nav navbar-right"></ul>
+        </nav>
+      </div>
+    </header>
+    {% block flash_message %} {% with messages =
+    get_flashed_messages(with_categories=True) %} {% if messages %}
+    <div class="container">
+      <div id="flash_message_container">
+        {% for category, msg in messages %}
+        <div class="alert alert-{{ category }}">
+          <button type="button" class="close" data-dismiss="alert">x</button>
+          {{ msg|safe }}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %} {% endwith %} {% endblock %}
 
     <div class="container">
-        <div id="content">
-            {% block content %}{% endblock %}
-        </div>
-        <div class="row" id="footer">
-            <div class="col-md-10">
-                <hr class="top-space40">
-                <div class="row">
-                    <div class="col-md-7 col-md-offset-2">
-                        <iframe src="https://ghbtns.com/github-btn.html?user=neurosynth&repo=neurosynth&type=fork&count=true" allowtransparency="true" frameborder="0" scrolling="0" width="90" height="20"></iframe><iframe src="https://ghbtns.com/github-btn.html?user=neurosynth&repo=neurosynth&type=watch&count=true" allowtransparency="true" frameborder="0" scrolling="0" width="90" height="20"></iframe>
-                        <a href="https://twitter.com/share" class="twitter-share-button" data-url="https://neurosynth.org" data-via="neurosynth">Tweet</a>
-                        <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
-                        <a href="https://twitter.com/neurosynth" class="twitter-follow-button" data-show-count="true">Follow @neurosynth</a>
-                        <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
-                    </div>
-                </div>
-                <div class="row footer-info">
-                    <div class="col-md-4 col-md-offset-3" style="padding-top: 20px;">Created and maintained by <a href="http://talyarkoni.org">Tal Yarkoni</a><br />Supported by NIH award R01MH096906<br />
-                    </div>
-                    <div class="col-md-2 support">
-                        <a href="http://nimh.nih.gov"><img src="{{ url_for('static', filename='images/nimh-logo.png')}}" width="100px"></a>
-                    </div>
-                </div>
-                <div class="row footer-links">
-                    <div class="col-md-6 col-md-offset-3">
-                    <ul>
-                        <li><a href="https://github.com/neurosynth/neurosynth">GitHub</a></li>
-                        <li>&middot;</li>
-                        <li><a href="/faq">FAQ</a></li>
-                        <li>&middot;</li>
-                        <li><a href="http://neurovault.org">NeuroVault</a></li>
-                        <li>&middot;</li>
-                        <li><a href="https://groups.google.com/d/forum/neurosynthlist">Mailing list</a></li>
-                    </ul>
-                </div>
+      <div id="content">{% block content %}{% endblock %}</div>
+      <div class="row" id="footer">
+        <div class="col-md-12">
+          <hr class="top-space40" />
+          <div class="col-md-10">
+            <div class="row">
+              <div class="col-md-7">
+                <iframe
+                  src="https://ghbtns.com/github-btn.html?user=neurosynth&repo=neurosynth&type=fork&count=true"
+                  allowtransparency="true"
+                  frameborder="0"
+                  scrolling="0"
+                  width="90"
+                  height="20"
+                ></iframe
+                ><iframe
+                  src="https://ghbtns.com/github-btn.html?user=neurosynth&repo=neurosynth&type=watch&count=true"
+                  allowtransparency="true"
+                  frameborder="0"
+                  scrolling="0"
+                  width="90"
+                  height="20"
+                ></iframe>
+                <a
+                  href="https://twitter.com/share"
+                  class="twitter-share-button"
+                  data-url="https://neurosynth.org"
+                  data-via="neurosynth"
+                  >Tweet</a
+                >
+                <script>
+                  !(function (d, s, id) {
+                    var js,
+                      fjs = d.getElementsByTagName(s)[0],
+                      p = /^http:/.test(d.location) ? "http" : "https";
+                    if (!d.getElementById(id)) {
+                      js = d.createElement(s);
+                      js.id = id;
+                      js.src = p + "://platform.twitter.com/widgets.js";
+                      fjs.parentNode.insertBefore(js, fjs);
+                    }
+                  })(document, "script", "twitter-wjs");
+                </script>
+                <a
+                  href="https://twitter.com/neurosynth"
+                  class="twitter-follow-button"
+                  data-show-count="true"
+                  >Follow @neurosynth</a
+                >
+                <script>
+                  !(function (d, s, id) {
+                    var js,
+                      fjs = d.getElementsByTagName(s)[0],
+                      p = /^http:/.test(d.location) ? "http" : "https";
+                    if (!d.getElementById(id)) {
+                      js = d.createElement(s);
+                      js.id = id;
+                      js.src = p + "://platform.twitter.com/widgets.js";
+                      fjs.parentNode.insertBefore(js, fjs);
+                    }
+                  })(document, "script", "twitter-wjs");
+                </script>
+              </div>
             </div>
+            <div class="row footer-info">
+              <div class="col-md-7">
+                Created and maintained by
+                <a href="http://talyarkoni.org">Tal Yarkoni</a><br />Supported
+                by NIH award R01MH096906<br />
+              </div>
+            </div>
+            <div class="row col-md-7 footer-links">
+              <a href="https://github.com/neurosynth/neurosynth">GitHub</a>
+              &middot;
+              <a href="/faq">FAQ</a>
+              &middot;
+              <a href="http://neurovault.org">NeuroVault</a>
+              &middot;
+              <a href="https://groups.google.com/d/forum/neurosynthlist"
+                >Mailing list</a
+              >
+            </div>
+          </div>
+          <div class="col-md-2">
+            <div class="support">
+              <a href="http://nimh.nih.gov"
+                ><img
+                  src="{{ url_for('static', filename='images/nimh-logo.png')}}"
+                  width="100px"
+              /></a>
+            </div>
+          </div>
         </div>
+      </div>
     </div>
-    </div>
-    <div class="top-space40"></div>
-</body>
+    <div class="top-space40" style="margin-bottom: 10rem"></div>
+  </body>
 </html>

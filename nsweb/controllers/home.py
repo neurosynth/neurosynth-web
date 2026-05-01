@@ -13,8 +13,14 @@ bp = Blueprint('home', __name__)
 
 
 @bp.route('/')
+def landing():
+    """Public landing page at site root."""
+    return render_template('landing/index.html')
+
+
+@bp.route('/home')
 def index():
-    """ Returns the homepage. """
+    """Main app home (stats + sample viewer)."""
     stats = {
         'n_analyses': db.session.query(func.count(TermAnalysis.id)).first()[0],
         'n_studies': db.session.query(func.count(Study.pmid)).first()[0],

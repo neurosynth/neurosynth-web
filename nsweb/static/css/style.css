@@ -37,17 +37,25 @@
 #footer {
 	font-family: 'Computer Modern';
 	font-size: 15px;
-	text-align: center;
+	display: flex;
+	justify-content: center;
+}
+
+.footer-links {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+}
+
+/* Space between items only — no leading offset before the first link */
+.footer-links > * + * {
+	margin-left: 10px;
 }
 
 .footer-info {
 	padding-top: 12px;
+	padding-bottom: 12px;
 	text-align: left;
-}
-
-.footer-links ul li {
-	display: inline;
-	text-decoration: none;
 }
 
 body, h1, h2, h3, h4, h5 {
