@@ -24,7 +24,28 @@ import json
 import re
 import shutil
 import urllib
+import urllib.request
+import tarfile
 import traceback
+
+
+def _download_neurosynth_bundle(path, url, unpack=True):
+    """Fetch neurosynth-data tarball into ``path``.
+
+    neurosynth==0.3.8's ``dataset.download()`` is broken on Python 3: it uses
+    ``int(headers['Content-Length'][0])``, so progress uses only the first digit
+    of the file size and the download never completes correctly.
+    """
+    if exists(path) and os.path.isdir(path):
+        basename = os.path.basename(url.split('?')[0])
+        filename = join(path, basename)
+    else:
+        filename = path
+    print("Downloading Neurosynth data from %s -> %s" % (url, filename))
+    urllib.request.urlretrieve(url, filename)
+    if unpack:
+        with tarfile.open(filename, 'r:gz') as tf:
+            tf.extractall(path=os.path.dirname(filename))
 
 
 class DatabaseBuilder:
@@ -125,7 +146,14 @@ class DatabaseBuilder:
             print("Unable to copy anatomical image.")
 
         if download:
-            ns.dataset.download(path=settings.ASSET_DIR, unpack=True)
+            # neurosynth==0.3.8 defaults to a dead URL and its download() is broken on Py3.
+            data_url = os.environ.get(
+                'NEUROSYNTH_DATA_URL',
+                'https://raw.githubusercontent.com/neurosynth/neurosynth-data/'
+                'e8f27c4/current_data.tar.gz',
+            )
+            _download_neurosynth_bundle(
+                settings.ASSET_DIR, data_url, unpack=True)
 
         # Raise warnings for missing resources we can't retrieve from web
         assets = [

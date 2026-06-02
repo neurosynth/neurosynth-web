@@ -1,5 +1,5 @@
-{% extends "layout/base.html" %} {% set page_title = 'Neurosynth' %}{% block
-css_style %}
+{% extends "layout/base.html" %} {% set page_title = 'Neurosynth' %} {% block
+header %}{% endblock %} {% block css_style %}
 <style>
   /* Landing only: minimal, neuroscience-adjacent palette (deep slate, cool cyan accent) */
   .landing-page {
@@ -8,15 +8,22 @@ css_style %}
       Helvetica, Arial, sans-serif;
     color: #1f2933;
     -webkit-font-smoothing: antialiased;
+    --landing-gutter: 10rem;
+    --landing-blue: #0077b6;
+    --landing-section-gap: 7.5rem;
+    --landing-body-size: 1.3rem;
+    --landing-body-size-sm: 0.975rem;
+    --landing-desc-size: 1.5rem;
+    --landing-desc-size-md: 1.8rem;
   }
   .landing-hero {
     position: relative;
     text-align: center;
-    padding: 4.25rem 1.75rem 4.5rem;
-    margin: 4rem -15px 0;
-    border-radius: 2px;
-    color: #1f2933;
+    padding: 4.25rem var(--landing-gutter) 4.5rem;
+    margin: 0;
+    border-radius: 0;
     color: #e8eef4;
+    background-color: #0077b6;
     overflow: hidden;
   }
   .landing-hero::before {
@@ -28,8 +35,14 @@ css_style %}
   .landing-hero-inner {
     position: relative;
     z-index: 1;
-    max-width: 70rem;
+    max-width: none;
     margin: 0 auto;
+  }
+  .landing-hero-logo {
+    display: block;
+    width: 8rem;
+    height: auto;
+    margin: 0 auto 1.75rem;
   }
   .landing-hero h1 {
     font-size: 4rem;
@@ -38,12 +51,10 @@ css_style %}
     text-transform: uppercase;
     line-height: 1.15;
     margin: 0 0 1.25rem;
-    color: #1f2933;
   }
   .landing-hero .tagline {
-    font-size: 2rem;
+    font-size: 1.75rem;
     line-height: 1.55;
-    color: #86888a;
     font-weight: 400;
     margin-top: 2.25rem;
     margin-bottom: 0px;
@@ -54,7 +65,6 @@ css_style %}
     font-size: 1.05rem;
     font-weight: 600;
     letter-spacing: 0.02em;
-    color: #0c1018;
     background: linear-gradient(180deg, #5eead4 0%, #2dd4bf 100%);
     border: none;
     border-radius: 3px;
@@ -84,30 +94,294 @@ css_style %}
     color: #e2e8f0;
   }
   .landing-about {
-    max-width: 70rem;
+    max-width: none;
     margin: 0 auto;
-    padding: 3.25rem 0.5rem 2rem;
+    padding: var(--landing-section-gap) var(--landing-gutter)
+      var(--landing-section-gap);
   }
   .landing-about h2 {
     font-size: 2.5rem;
     font-weight: 600;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: #64748b;
+    color: var(--landing-blue);
     margin: 0 0 1.25rem;
   }
   .landing-about p {
-    font-size: 2rem;
+    font-size: var(--landing-body-size);
     line-height: 1.75;
     color: #334155;
     margin: 0 0 1.25rem;
   }
+  .landing-about-split {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+    gap: 2.5rem 3rem;
+    align-items: start;
+    margin-bottom: 0;
+  }
+  .landing-about-intro {
+    max-width: 70%;
+  }
+  .landing-about-intro h2 {
+    margin-top: 0;
+  }
+  .landing-about-intro p {
+    font-size: var(--landing-desc-size-md);
+  }
+  .landing-about-intro p:last-child {
+    margin-bottom: 0;
+  }
+  .landing-features-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.25rem;
+    margin: 0;
+  }
+  .landing-feature-card {
+    padding: 1.75rem 1.5rem;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    transition:
+      box-shadow 0.15s ease,
+      border-color 0.15s ease;
+  }
+  .landing-feature-card:hover {
+    border-color: #cbd5e1;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
+  }
+  .landing-feature-header {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    margin-bottom: 0.75rem;
+  }
+  .landing-feature-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 2.75rem;
+    height: 2.75rem;
+    margin-bottom: 0;
+    border-radius: 50%;
+    background: #e0f2fe;
+    color: #0077b6;
+    font-size: 1.2rem;
+  }
+  .landing-feature-title {
+    font-size: 1.35rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--landing-blue);
+    margin: 0;
+  }
+  .landing-features-grid .landing-feature-desc {
+    font-size: var(--landing-desc-size);
+    line-height: 1.65;
+    color: #64748b;
+    margin: 0;
+  }
+  .landing-ecosystem-figure {
+    margin: 1.5rem 0 0;
+  }
+  .landing-ecosystem-image {
+    display: block;
+    width: 50%;
+    min-width: 700px;
+    height: auto;
+    border-radius: 4px;
+  }
+  .landing-ecosystem-tools {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.5rem;
+    margin-top: 4rem;
+    list-style: none;
+    padding: 0;
+  }
+  .landing-ecosystem-tool {
+    padding: 1.75rem 1.75rem 1.5rem;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    border-top: 3px solid var(--landing-blue);
+  }
+  .landing-ecosystem-tool-name {
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    color: var(--landing-blue);
+    margin: 0 0 1rem;
+  }
+  .landing-ecosystem-tool-summary {
+    font-size: var(--landing-body-size-md) !important;
+    line-height: 1.6;
+    color: #475569;
+    margin: 0 0 0.75rem;
+  }
+  .landing-ecosystem-tool-summary:last-child {
+    margin-bottom: 0;
+  }
+  @media (max-width: 992px) {
+    .landing-about-split {
+      grid-template-columns: 1fr;
+      gap: 2.5rem;
+    }
+    .landing-about-intro {
+      max-width: none;
+    }
+    .landing-features-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .landing-ecosystem-tools {
+      grid-template-columns: 1fr;
+    }
+    .landing-ecosystem-image {
+      width: 100%;
+      min-width: 0;
+    }
+  }
+  @media (max-width: 640px) {
+    .landing-page {
+      --landing-gutter: 1.25rem;
+    }
+    .landing-footer {
+      --landing-gutter: 1.25rem;
+    }
+    .landing-features-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  .landing-about > div + div {
+    margin-top: var(--landing-section-gap);
+  }
+  .landing-platform-section {
+    margin-left: calc(-1 * var(--landing-gutter));
+    margin-right: calc(-1 * var(--landing-gutter));
+    margin-top: var(--landing-section-gap);
+    margin-bottom: var(--landing-section-gap);
+    padding: 6rem var(--landing-gutter);
+    background: #f8fafc;
+    border: none;
+    border-radius: 0;
+  }
+  .landing-platform-section-heading {
+    text-align: center;
+    margin: 0 0 2rem;
+  }
+  .landing-platform-split {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+    gap: 1.5rem;
+    align-items: stretch;
+  }
+  .landing-platform-card {
+    padding: 2rem 2rem 1.75rem;
+    border-radius: 4px;
+    border: 1px solid #e2e8f0;
+  }
+  .landing-platform-card--legacy {
+    background: #fff;
+    border-color: #e2e8f0;
+    color: #94a3b8;
+  }
+  .landing-platform-card--legacy .landing-platform-name {
+    color: #64748b;
+  }
+  .landing-platform-card--legacy .landing-platform-desc {
+    color: #94a3b8;
+  }
+  .landing-platform-card--legacy .landing-platform-link {
+    color: #64748b;
+    font-weight: 500;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .landing-platform-card--legacy .landing-platform-link:hover,
+  .landing-platform-card--legacy .landing-platform-link:focus {
+    color: #475569;
+  }
+  .landing-platform-card--compose {
+    background: #fff;
+    border-color: #bae6fd;
+    box-shadow: none;
+    color: #334155;
+  }
+  .landing-platform-card--compose .landing-platform-name {
+    color: var(--landing-blue);
+  }
+  .landing-platform-card--compose .landing-platform-desc {
+    color: #334155;
+  }
+  .landing-platform-name {
+    font-size: var(--landing-desc-size-md);
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    margin: 0 0 1rem;
+  }
+  .landing-about .landing-platform-desc {
+    font-size: var(--landing-desc-size-md);
+    line-height: 1.7;
+    margin: 0 0 1.25rem;
+  }
+  .landing-platform-card .landing-platform-desc:last-child {
+    margin-bottom: 0;
+  }
+  .landing-platform-card--compose .landing-platform-cta {
+    display: inline-block;
+    width: auto;
+    margin: 1rem 0 1.5rem;
+    padding: 1.4rem 3rem;
+    font-size: 1.45rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-align: center;
+    color: #fff;
+    background: var(--landing-blue);
+    border: none;
+    border-radius: 5px;
+    text-decoration: none;
+    box-shadow: 0 4px 16px rgba(0, 119, 182, 0.35);
+    transition:
+      transform 0.15s ease,
+      box-shadow 0.15s ease,
+      background 0.15s ease;
+  }
+  .landing-platform-card--compose .landing-platform-cta:hover,
+  .landing-platform-card--compose .landing-platform-cta:focus {
+    color: #fff;
+    text-decoration: none;
+    background: #006499;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 119, 182, 0.45);
+  }
+  .landing-platform-card--compose .landing-platform-link {
+    color: #0e7490;
+    font-weight: 500;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .landing-platform-card--compose .landing-platform-link:hover,
+  .landing-platform-card--compose .landing-platform-link:focus {
+    color: #0f766e;
+  }
+  @media (max-width: 992px) {
+    .landing-platform-split {
+      grid-template-columns: 1fr;
+    }
+    .landing-platform-card--compose .landing-platform-cta {
+      display: block;
+      width: 100%;
+    }
+  }
   .landing-about .callout {
-    margin-top: 1.75rem;
     padding: 1.25rem 3rem;
-    border-left: 3px solid #2dd4bf;
-    border-radius: 0 3px 3px 0;
-    font-size: 2rem;
+    text-align: center;
+    font-size: var(--landing-body-size);
     line-height: 1.7;
     color: #475569;
   }
@@ -144,10 +418,18 @@ css_style %}
     border-color: #005580;
   }
 
+  .landing-about .callout h2 {
+    margin-bottom: 1rem;
+  }
+  .landing-roadmap-intro {
+    margin: 0;
+  }
   /* Mock vertical roadmap (scoped; font size resets callout inheritance) */
   .landing-about .callout .compose-roadmap {
-    margin: 1.35rem 0 0;
+    max-width: 80rem;
+    margin: 1.35rem auto 0;
     padding: 1rem 1rem 1.05rem 1.1rem;
+    text-align: left;
     font-size: 1rem;
     line-height: 1.45;
     color: #475569;
@@ -216,220 +498,633 @@ css_style %}
   .landing-about .callout .compose-roadmap-title {
     display: block;
     font-weight: 600;
-    color: #334155;
+    color: var(--landing-blue);
     font-size: 1.5rem;
   }
   .landing-about .callout .compose-roadmap-desc {
     display: block;
     margin-top: 0.2rem;
-    font-size: 1.5rem;
+    font-size: var(--landing-desc-size);
+    line-height: 1.65;
     color: #64748b;
   }
+  .landing-footer {
+    --landing-gutter: 10rem;
+    width: 100%;
+    padding: 0 var(--landing-gutter) 3.5rem;
+    background: #fff;
+  }
+  .landing-footer-divider {
+    border-top: 1px solid #cbd5e1;
+    margin: 0 0 2.5rem;
+    padding-top: var(--landing-section-gap);
+  }
+  .landing-footer #footer {
+    width: 100%;
+    max-width: none;
+    justify-content: flex-start;
+    padding-top: 0;
+  }
+  .landing-footer #footer > .col-md-12 {
+    width: 100%;
+    padding-left: 0;
+    padding-right: 0;
+  }
+  .landing-footer #footer .top-space40 {
+    display: none;
+    margin: 0;
+    padding: 0;
+  }
+  .landing-footer #footer .col-md-10,
+  .landing-footer #footer .col-md-2 {
+    float: none;
+  }
+  .landing-faq {
+    max-width: none;
+    margin: 0;
+    padding-bottom: var(--landing-section-gap);
+    text-align: left;
+  }
+  .landing-faq h2 {
+    margin-bottom: 2rem;
+    text-align: left;
+  }
+  .landing-faq-accordion {
+    margin: 0;
+    text-align: left;
+  }
+  .landing-faq-accordion .panel {
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    box-shadow: none;
+    margin-bottom: 0.75rem;
+  }
+  .landing-faq-accordion .panel:last-child {
+    margin-bottom: 0;
+  }
+  .landing-faq-accordion .panel-heading {
+    padding: 0;
+    background: #f8fafc;
+    border-radius: 4px 4px 0 0;
+  }
+  .landing-faq-accordion .panel-heading + .panel-collapse > .panel-body {
+    border-top: 1px solid #e2e8f0;
+  }
+  .landing-faq-accordion .panel-title {
+    font-size: var(--landing-desc-size);
+    font-weight: 600;
+    text-align: left;
+  }
+  .landing-faq-accordion .panel-title a {
+    display: block;
+    padding: 1.1rem 1.35rem;
+    color: var(--landing-blue);
+    text-decoration: none;
+  }
+  .landing-faq-accordion .panel-title a:hover,
+  .landing-faq-accordion .panel-title a:focus {
+    color: #006499;
+    text-decoration: none;
+    background: #f0f9ff;
+  }
+  .landing-faq-accordion .panel-title a.collapsed {
+    border-radius: 4px;
+  }
+  .landing-faq-accordion .panel-body {
+    padding: 1.25rem 1.35rem 1.35rem;
+    font-size: var(--landing-desc-size);
+    line-height: 1.65;
+    color: #475569;
+    border-radius: 0 0 4px 4px;
+    text-align: left;
+  }
 </style>
-{% endblock %} {% block content %}
-<div class="landing-page">
-  <div class="jumbotron landing-hero" role="banner">
-    <div class="landing-hero-inner">
-      <h1 class="landing-heading">Welcome to Neurosynth.org</h1>
-      <p class="tagline lead">
-        Large-scale automated synthesis of functional magnetic resonance imaging
-        (fMRI) data.
-      </p>
-    </div>
-  </div>
-
-  <section class="landing-about" aria-labelledby="about-heading">
-    <h2 id="about-heading">What is neurosynth?</h2>
-    <p>
-      Neurosynth is a platform for large-scale, automated synthesis of
-      functional magnetic resonance imaging (fMRI) data.
-    </p>
-
-    <div class="callout">
-      <strong
-        >Neurosynth.org is a legacy application and is no longer
-        maintained.</strong
-      >
-      <p style="margin: 1rem 0 0; font-size: inherit; line-height: inherit">
-        Active development is focused on
-        <strong>Neurosynth Compose</strong>, a new platform for running
-        <em>custom</em> neuroimaging meta-analyses with finer-grained control
-        over inputs, models, and reporting.
-      </p>
-      <p style="margin: 2rem 0; text-align: center">
-        <a
-          class="compose-cta"
-          href="https://compose.neurosynth.org"
-          target="_blank"
-          rel="noopener noreferrer"
-          >CHECK OUT NEUROSYNTH COMPOSE</a
-        >
-      </p>
-
-      <p style="margin: 1rem 0 0; font-size: inherit; line-height: inherit">
-        For more information, see the
-        <a
-          href="https://neurostuff.github.io/compose-docs/blog/announcing-ns-compose"
-          target="_blank"
-          rel="noopener noreferrer"
-          >Neurosynth Compose announcement</a
-        >.
-      </p>
-
-      <p style="margin: 1rem 0 0; font-size: inherit; line-height: inherit">
-        Below is a rough roadmap for the neurosynth-compose project.
-      </p>
-
-      <div class="compose-roadmap" role="group">
-        <ol class="compose-roadmap-steps">
-          <li>
-            <span class="compose-roadmap-marker" aria-hidden="true"></span>
-            <div class="compose-roadmap-step-body">
-              <span
-                class="compose-roadmap-status compose-roadmap-status--complete"
-                >complete</span
-              >
-              <span class="compose-roadmap-title">Initial Foundation</span>
-              <span class="compose-roadmap-desc"
-                >Users can explore the literature, curate studies, extract the
-                necessary coordinate data and run a meta-analysis using a
-                dedicated user interface that also supports PRISMA compliant
-                workflows</span
-              >
-            </div>
-          </li>
-          <li>
-            <span class="compose-roadmap-marker" aria-hidden="true"></span>
-            <div class="compose-roadmap-step-body">
-              <span
-                class="compose-roadmap-status compose-roadmap-status--complete"
-                >complete</span
-              >
-              <span class="compose-roadmap-title">MKDA Chi Squared tests</span>
-              <span class="compose-roadmap-desc"
-                >Perform large-scale association tests for your custom
-                meta-analyses in Neurosynth Compose</span
-              >
-            </div>
-          </li>
-          <li>
-            <span class="compose-roadmap-marker" aria-hidden="true"></span>
-            <div class="compose-roadmap-step-body">
-              <span
-                class="compose-roadmap-status compose-roadmap-status--complete"
-                >complete</span
-              >
-              <span class="compose-roadmap-title"
-                >Cloud Based Meta-analysis Workflow</span
-              >
-              <span class="compose-roadmap-desc"
-                >Aside from running meta-analyses locally, users can take
-                advantage of AWS and Jupyter notebooks to run analyses in the
-                cloud</span
-              >
-            </div>
-          </li>
-          <li>
-            <span class="compose-roadmap-marker" aria-hidden="true"></span>
-            <div class="compose-roadmap-step-body">
-              <span
-                class="compose-roadmap-status compose-roadmap-status--complete"
-                >complete</span
-              >
-              <span class="compose-roadmap-title"
-                >AI Assisted Study Curation</span
-              >
-              <span class="compose-roadmap-desc"
-                >Users can take advantage of artificial intelligence to extract
-                study features from the literature</span
-              >
-            </div>
-          </li>
-          <li>
-            <span class="compose-roadmap-marker" aria-hidden="true"></span>
-            <div class="compose-roadmap-step-body">
-              <span
-                class="compose-roadmap-status compose-roadmap-status--progress"
-                >In progress</span
-              >
-              <span class="compose-roadmap-title"
-                >Image Based Meta Analyses</span
-              >
-              <span class="compose-roadmap-desc"
-                >Users will be able to use a dedicated interface to complete
-                image based meta-analyses using images from NeuroVault, with
-                features indexed and extracted using Neurostore</span
-              >
-            </div>
-          </li>
-          <li>
-            <span class="compose-roadmap-marker" aria-hidden="true"></span>
-            <div class="compose-roadmap-step-body">
-              <span
-                class="compose-roadmap-status compose-roadmap-status--planned"
-                >Planned</span
-              >
-              <span class="compose-roadmap-title">Project Cloning</span>
-              <span class="compose-roadmap-desc"
-                >Users can clone existing projects and make changes or validate
-                findings</span
-              >
-            </div>
-          </li>
-          <li>
-            <span class="compose-roadmap-marker" aria-hidden="true"></span>
-            <div class="compose-roadmap-step-body">
-              <span
-                class="compose-roadmap-status compose-roadmap-status--planned"
-                >Planned</span
-              >
-              <span class="compose-roadmap-title"
-                >AI Assisted Study Search and other AI Assisted Features</span
-              >
-              <span class="compose-roadmap-desc"
-                >Users can take advantage of artificial intelligence to search
-                the literature for relevant studies. They will also be able to
-                get extracted features on an analysis (statistical contrast)
-                level</span
-              >
-            </div>
-          </li>
-          <li>
-            <span class="compose-roadmap-marker" aria-hidden="true"></span>
-            <div class="compose-roadmap-step-body">
-              <span
-                class="compose-roadmap-status compose-roadmap-status--planned"
-                >Planned</span
-              >
-              <span class="compose-roadmap-title"
-                >Pre-seeded Meta-analyses</span
-              >
-              <span class="compose-roadmap-desc"
-                >Users can take advantage of pre-seeded meta-analyses to get
-                started with their own analyses, including meta-analyses
-                currently available in Neurosynth</span
-              >
-            </div>
-          </li>
-          <li>
-            <span class="compose-roadmap-marker" aria-hidden="true"></span>
-            <div class="compose-roadmap-step-body">
-              <span
-                class="compose-roadmap-status compose-roadmap-status--planned"
-                >Planned</span
-              >
-              <span class="compose-roadmap-title"
-                >Add support for more Meta-Analysis Algorithms</span
-              >
-              <span class="compose-roadmap-desc"
-                >Users can select from a wider range of NiMARE algorithms to run
-                their meta-analyses</span
-              >
-            </div>
-          </li>
-        </ol>
+{% endblock %} {% block page %}
+<div id="content">
+  {% block content %}
+  <div class="landing-page">
+    <div class="jumbotron landing-hero" role="banner">
+      <div class="landing-hero-inner">
+        <img
+          class="landing-hero-logo"
+          src="{{ url_for('static', filename='images/synth.png') }}"
+          alt="Neurosynth logo"
+          width="128"
+          height="128"
+        />
+        <h1 class="landing-heading">
+          Welcome to
+          <span style="color: orange; font-weight: bold">Neurosynth</span>
+        </h1>
+        <p class="tagline lead">
+          Large-scale automated synthesis of functional magnetic resonance
+          imaging (fMRI) data.
+        </p>
       </div>
     </div>
-  </section>
+
+    <section class="landing-about" aria-labelledby="about-heading">
+      <div class="landing-about-split">
+        <div class="landing-about-intro">
+          <h2 id="about-heading">What is neurosynth?</h2>
+          <p>
+            Neurosynth is an ecosystem of tools that empower users to access and
+            conduct neuroimaging meta-analyses easier and faster.
+          </p>
+          <p>
+            Neurosynth offers a fully web-based platform that allows users to
+            conduct meta-analyses with no programming experience required.
+          </p>
+          <p>
+            <b>
+              Neurosynth aims to make meta-analyses so accessible and easy to
+              do, that they become a standard part of the research cycle.
+            </b>
+          </p>
+        </div>
+        <div class="landing-features-grid">
+          <article class="landing-feature-card">
+            <div class="landing-feature-header">
+              <div class="landing-feature-icon" aria-hidden="true">
+                <i class="fa fa-bolt"></i>
+              </div>
+              <h4 class="landing-feature-title">Efficient</h4>
+            </div>
+            <p class="landing-feature-desc">
+              Neurosynth utilizes automated heuristics and artificial
+              intelligence to streamline the meta-analysis process, allowing
+              users to focus on the science.
+            </p>
+          </article>
+          <article class="landing-feature-card">
+            <div class="landing-feature-header">
+              <div class="landing-feature-icon" aria-hidden="true">
+                <i class="fa fa-github"></i>
+              </div>
+              <h4 class="landing-feature-title">Open Source</h4>
+            </div>
+            <p class="landing-feature-desc">
+              All neurosynth code is open source and free to use.
+            </p>
+          </article>
+          <article class="landing-feature-card">
+            <div class="landing-feature-header">
+              <div class="landing-feature-icon" aria-hidden="true">
+                <i class="fa fa-files-o"></i>
+              </div>
+              <h4 class="landing-feature-title">Reproducible</h4>
+            </div>
+            <p class="landing-feature-desc">
+              Neurosynth strives to support reproducible and transparent
+              science, through the use of detailed provenance and clear
+              documentation.
+            </p>
+          </article>
+          <article class="landing-feature-card">
+            <div class="landing-feature-header">
+              <div class="landing-feature-icon" aria-hidden="true">
+                <i class="fa fa-unlock-alt"></i>
+              </div>
+              <h4 class="landing-feature-title">Accessible</h4>
+            </div>
+            <p class="landing-feature-desc">
+              Neurosynth is dedicated to making meta-analysis accessible to
+              everyone and lowering the technological barrier to science,
+              through the use of user friendly interfaces and clear
+              documentation.
+            </p>
+          </article>
+        </div>
+      </div>
+
+      <section
+        class="landing-platform-section"
+        aria-labelledby="platform-heading"
+      >
+        <h2 id="platform-heading" class="landing-platform-section-heading">
+          Neurosynth Platform options
+        </h2>
+
+        <div class="landing-platform-split">
+          <article class="landing-platform-card landing-platform-card--legacy">
+            <h3 class="landing-platform-name">neurosynth.org</h3>
+            <p class="landing-platform-desc">
+              Neurosynth.org is a well known platform that hosts a collection of
+              pre-executed meta-analyses that users can explore.
+            </p>
+            <p class="landing-platform-desc">
+              Neurosynth.org is a legacy application and is no longer
+              maintained.
+            </p>
+            <a class="landing-platform-link" href="{{ url_for('home.index') }}"
+              >Visit neurosynth.org</a
+            >
+          </article>
+
+          <article class="landing-platform-card landing-platform-card--compose">
+            <h3 class="landing-platform-name">neurosynth compose</h3>
+            <p class="landing-platform-desc">
+              Active development is focused on
+              <strong>Neurosynth Compose</strong>, a new platform for creating
+              <em>custom</em> neuroimaging meta-analyses with finer-grained
+              control over inputs, models, and reporting.
+            </p>
+            <p class="landing-platform-desc">
+              Neurosynth Compose is a new platform that is still in development.
+            </p>
+            <a
+              class="landing-platform-cta"
+              href="https://compose.neurosynth.org"
+              target="_blank"
+              rel="noopener noreferrer"
+              >Check Out Neurosynth Compose</a
+            >
+            <p class="landing-platform-desc">
+              For more information, see the
+              <a
+                class="landing-platform-link"
+                href="https://neurostuff.github.io/compose-docs/blog/announcing-ns-compose"
+                target="_blank"
+                rel="noopener noreferrer"
+                >Neurosynth Compose announcement</a
+              >.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section class="landing-faq" aria-labelledby="faq-heading">
+        <h2 id="faq-heading">FAQs</h2>
+
+        <div
+          class="panel-group landing-faq-accordion"
+          id="landing-faq-accordion"
+          role="tablist"
+          aria-multiselectable="true"
+        >
+          <div class="panel panel-default">
+            <div class="panel-heading" role="tab" id="faq-heading-1">
+              <h4 class="panel-title">
+                <a
+                  role="button"
+                  data-toggle="collapse"
+                  data-parent="#landing-faq-accordion"
+                  href="#faq-collapse-1"
+                  aria-expanded="true"
+                  aria-controls="faq-collapse-1"
+                >
+                  Does Neurosynth Compose have all the features of
+                  neurosynth.org?
+                </a>
+              </h4>
+            </div>
+            <div
+              id="faq-collapse-1"
+              class="panel-collapse collapse in"
+              role="tabpanel"
+              aria-labelledby="faq-heading-1"
+            >
+              <div class="panel-body">no but we are planning on...</div>
+            </div>
+          </div>
+
+          <div class="panel panel-default">
+            <div class="panel-heading" role="tab" id="faq-heading-2">
+              <h4 class="panel-title">
+                <a
+                  class="collapsed"
+                  role="button"
+                  data-toggle="collapse"
+                  data-parent="#landing-faq-accordion"
+                  href="#faq-collapse-2"
+                  aria-expanded="false"
+                  aria-controls="faq-collapse-2"
+                >
+                  How do I contact and get help?
+                </a>
+              </h4>
+            </div>
+            <div
+              id="faq-collapse-2"
+              class="panel-collapse collapse"
+              role="tabpanel"
+              aria-labelledby="faq-heading-2"
+            >
+              <div class="panel-body">...</div>
+            </div>
+          </div>
+
+          <div class="panel panel-default">
+            <div class="panel-heading" role="tab" id="faq-heading-3">
+              <h4 class="panel-title">
+                <a
+                  class="collapsed"
+                  role="button"
+                  data-toggle="collapse"
+                  data-parent="#landing-faq-accordion"
+                  href="#faq-collapse-3"
+                  aria-expanded="false"
+                  aria-controls="faq-collapse-3"
+                >
+                  Why use Neurosynth?
+                </a>
+              </h4>
+            </div>
+            <div
+              id="faq-collapse-3"
+              class="panel-collapse collapse"
+              role="tabpanel"
+              aria-labelledby="faq-heading-3"
+            >
+              <div class="panel-body">
+                we know the community still uses neurosynth, and a lot of the
+                links that are hosted by it. neurosynth compose involves time,
+                effort and intentionality , etc to do a meta analysis.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div>
+        <h2 id="ecosystem-heading">The neurosynth 2.0 ecosystem</h2>
+        <div class="landing-ecosystem-tools">
+          <article class="landing-ecosystem-tool">
+            <h3 class="landing-ecosystem-tool-name">NeuroStore</h3>
+            <p class="landing-ecosystem-tool-summary">
+              NeuroStore is the centralized repository for neuroimaging data
+              amenable to meta-analysis, including coordinates, images, and
+              metadata. NeuroStore serves as the data backend for Neurosynth
+              Compose, but is also designed to be a standalone interoperable
+              resource for the neuroimaging community.
+            </p>
+            <p class="landing-ecosystem-tool-summary">
+              NeuroStore ingests data from a number of sources, including
+              NeuroVault, NeuroQuery, and Neurosynth (ACE), and provides a
+              unified API for querying the database.
+            </p>
+            <p class="landing-ecosystem-tool-summary">
+              Importantly, data on NeuroStore can be curated the community,
+              allowing users to correct errors in coordinate extraction, and add
+              new studies and coordinates. By providing a centralized repository
+              for curated neuroimaging data, NeuroStore aims to facilitate the
+              development of new meta-analytic tools, and to provide a common
+              data format for the neuroimaging community.
+            </p>
+          </article>
+
+          <article class="landing-ecosystem-tool">
+            <h3 class="landing-ecosystem-tool-name">NiMARE</h3>
+            <p class="landing-ecosystem-tool-summary">
+              NiMARE (Neuroimaging Meta-Analysis Research Environment) is a
+              Python package for performing neuroimaging meta-analysis.
+            </p>
+            <p class="landing-ecosystem-tool-summary">
+              NiMARE is an open source, collaboratively-developed package that
+              implements a range of meta-analytic algorithms, including
+              coordinate- and image-based meta-analyses, automated annotation,
+              functional decoding, and meta-analytic coactivation modeling.
+            </p>
+            <p class="landing-ecosystem-tool-summary">
+              By consolidating meta-analytic methods under a common library and
+              syntax, NiMARE makes it straightforward for users to employ the
+              appropriate approach for a given analysis.
+            </p>
+            <p class="landing-ecosystem-tool-summary">
+              NeuroSynth Compose uses NiMARE to execute meta-analyses, by
+              exporting datasets in the common NIMADS format (see below), and
+              specifying reproducible NiMARE workflows for common meta-analytic
+              models.
+            </p>
+          </article>
+
+          <article class="landing-ecosystem-tool">
+            <h3 class="landing-ecosystem-tool-name">PyMARE</h3>
+            <p class="landing-ecosystem-tool-summary">
+              PyMARE is a Python library for effect-size meta-analysis. NiMARE
+              uses PyMARE for its image-based meta-analysis algorithms (with
+              some light wrapping to convert image objects to arrays compatible
+              with PyMARE functions).
+            </p>
+          </article>
+
+          <article class="landing-ecosystem-tool">
+            <h3 class="landing-ecosystem-tool-name">NIMADS</h3>
+            <p class="landing-ecosystem-tool-summary">
+              NIMADS is a new standard for organizing and representing
+              meta-analytic neuroimaging data. NIMADS is used as a common,
+              interoperable format by NeuroStore, pyNIMADS, and NiMARE.
+            </p>
+          </article>
+
+          <article class="landing-ecosystem-tool">
+            <h3 class="landing-ecosystem-tool-name">NeuroQuery</h3>
+            <p class="landing-ecosystem-tool-summary">
+              NeuroQuery is a web service, Python library, and coordinate
+              database built for large-scale, predictive meta-analysis.
+              Predictive meta-analysis generates non-statistical brain maps from
+              text, using a database of coordinates and associated texts.
+            </p>
+            <p class="landing-ecosystem-tool-summary">
+              The NeuroQuery dataset is accurate and maintainable than the
+              existing Neurosynth 1.0 database, this new database will
+              effectively replace the old one within the meta-analytic
+              ecosystem. NiMARE can ingest the NeuroQuery database and convert
+              it automatically to a NiMARE Dataset object for analysis.
+              Additionally, the NeuroQuery database will feed directly into
+              NeuroStore as a source of coordinates.
+            </p>
+          </article>
+
+          <article class="landing-ecosystem-tool">
+            <h3 class="landing-ecosystem-tool-name">NeuroVault</h3>
+            <p class="landing-ecosystem-tool-summary">
+              NeuroVault is a repository for unthresholded statistical maps from
+              neuroimaging studies.
+            </p>
+            <p class="landing-ecosystem-tool-summary">
+              As of early 2023, NeuroVault contains over 8,000 collections of
+              statistical images, with over 100,000 images in total. It is the
+              largest repository of unthresholded statistical maps in the world,
+              and is the primary source of data for image-based meta-analyses
+              using Neurosynth Compose.
+            </p>
+            <p class="landing-ecosystem-tool-summary">
+              Currently, NeuroVault supports some basic meta-analytic
+              functionality. However, as other tools in this ecosystem are
+              developed, it is planned that NeuroVault will focus exclusively on
+              image storage and sharing, and will rely on other tools for
+              meta-analysis.
+            </p>
+          </article>
+        </div>
+      </div>
+
+      <div class="callout">
+        <h2 id="roadmap-heading">Our roadmap</h2>
+        <p class="landing-roadmap-intro">
+          Below is a rough roadmap for the neurosynth-compose project.
+        </p>
+
+        <div class="compose-roadmap" role="group">
+          <ol class="compose-roadmap-steps">
+            <li>
+              <span class="compose-roadmap-marker" aria-hidden="true"></span>
+              <div class="compose-roadmap-step-body">
+                <span
+                  class="compose-roadmap-status compose-roadmap-status--complete"
+                  >complete</span
+                >
+                <span class="compose-roadmap-title">Initial Foundation</span>
+                <span class="compose-roadmap-desc"
+                  >Users can explore the literature, curate studies, extract the
+                  necessary coordinate data and run a meta-analysis using a
+                  dedicated user interface that also supports PRISMA compliant
+                  workflows</span
+                >
+              </div>
+            </li>
+            <li>
+              <span class="compose-roadmap-marker" aria-hidden="true"></span>
+              <div class="compose-roadmap-step-body">
+                <span
+                  class="compose-roadmap-status compose-roadmap-status--complete"
+                  >complete</span
+                >
+                <span class="compose-roadmap-title"
+                  >MKDA Chi Squared tests</span
+                >
+                <span class="compose-roadmap-desc"
+                  >Perform large-scale association tests for your custom
+                  meta-analyses in Neurosynth Compose</span
+                >
+              </div>
+            </li>
+            <li>
+              <span class="compose-roadmap-marker" aria-hidden="true"></span>
+              <div class="compose-roadmap-step-body">
+                <span
+                  class="compose-roadmap-status compose-roadmap-status--complete"
+                  >complete</span
+                >
+                <span class="compose-roadmap-title"
+                  >Cloud Based Meta-analysis Workflow</span
+                >
+                <span class="compose-roadmap-desc"
+                  >Aside from running meta-analyses locally, users can take
+                  advantage of AWS and Jupyter notebooks to run analyses in the
+                  cloud</span
+                >
+              </div>
+            </li>
+            <li>
+              <span class="compose-roadmap-marker" aria-hidden="true"></span>
+              <div class="compose-roadmap-step-body">
+                <span
+                  class="compose-roadmap-status compose-roadmap-status--complete"
+                  >complete</span
+                >
+                <span class="compose-roadmap-title"
+                  >AI Assisted Study Curation</span
+                >
+                <span class="compose-roadmap-desc"
+                  >Users can take advantage of artificial intelligence to
+                  extract study features from the literature</span
+                >
+              </div>
+            </li>
+            <li>
+              <span class="compose-roadmap-marker" aria-hidden="true"></span>
+              <div class="compose-roadmap-step-body">
+                <span
+                  class="compose-roadmap-status compose-roadmap-status--progress"
+                  >In progress</span
+                >
+                <span class="compose-roadmap-title"
+                  >Image Based Meta Analyses</span
+                >
+                <span class="compose-roadmap-desc"
+                  >Users will be able to use a dedicated interface to complete
+                  image based meta-analyses using images from NeuroVault, with
+                  features indexed and extracted using Neurostore</span
+                >
+              </div>
+            </li>
+            <li>
+              <span class="compose-roadmap-marker" aria-hidden="true"></span>
+              <div class="compose-roadmap-step-body">
+                <span
+                  class="compose-roadmap-status compose-roadmap-status--planned"
+                  >Planned</span
+                >
+                <span class="compose-roadmap-title">Project Cloning</span>
+                <span class="compose-roadmap-desc"
+                  >Users can clone existing projects and make changes or
+                  validate findings</span
+                >
+              </div>
+            </li>
+            <li>
+              <span class="compose-roadmap-marker" aria-hidden="true"></span>
+              <div class="compose-roadmap-step-body">
+                <span
+                  class="compose-roadmap-status compose-roadmap-status--planned"
+                  >Planned</span
+                >
+                <span class="compose-roadmap-title"
+                  >AI Assisted Study Search and other AI Assisted Features</span
+                >
+                <span class="compose-roadmap-desc"
+                  >Users can take advantage of artificial intelligence to search
+                  the literature for relevant studies. They will also be able to
+                  get extracted features on an analysis (statistical contrast)
+                  level</span
+                >
+              </div>
+            </li>
+            <li>
+              <span class="compose-roadmap-marker" aria-hidden="true"></span>
+              <div class="compose-roadmap-step-body">
+                <span
+                  class="compose-roadmap-status compose-roadmap-status--planned"
+                  >Planned</span
+                >
+                <span class="compose-roadmap-title"
+                  >Pre-seeded Meta-analyses</span
+                >
+                <span class="compose-roadmap-desc"
+                  >Users can take advantage of pre-seeded meta-analyses to get
+                  started with their own analyses, including meta-analyses
+                  currently available in Neurosynth</span
+                >
+              </div>
+            </li>
+            <li>
+              <span class="compose-roadmap-marker" aria-hidden="true"></span>
+              <div class="compose-roadmap-step-body">
+                <span
+                  class="compose-roadmap-status compose-roadmap-status--planned"
+                  >Planned</span
+                >
+                <span class="compose-roadmap-title"
+                  >Add support for more Meta-Analysis Algorithms</span
+                >
+                <span class="compose-roadmap-desc"
+                  >Users can select from a wider range of NiMARE algorithms to
+                  run their meta-analyses</span
+                >
+              </div>
+            </li>
+          </ol>
+        </div>
+      </div>
+    </section>
+  </div>
+  {% endblock %}
 </div>
+<div class="landing-footer">
+  <div class="landing-footer-divider" role="presentation"></div>
+  {% block footer %}{{ super() }}{% endblock %}
+</div>
+<div class="top-space40" style="margin-bottom: 10rem"></div>
 {% endblock %}

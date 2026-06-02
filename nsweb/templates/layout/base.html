@@ -32,55 +32,8 @@
     {% endassets %}
   </head>
   <body>
+    {% block header %}
     <!-- Docs master nav -->
-    {% if request.path == '/' %}
-    <div
-      id="notification"
-      style="background-color: #0077b6; color: white; padding: 10px"
-    >
-      <div class="container" style="display: flex">
-        <div>
-          <h6 style="font-size: 2rem">
-            ✨
-            <a
-              style="color: orange; text-decoration: underline"
-              href="https://compose.neurosynth.org"
-              target="_blank"
-              >Try out Neurosynth Compose</a
-            >, the new free and open platform for custom neuroimaging
-            meta-analysis!
-            <a
-              style="color: orange"
-              href="https://neurostuff.github.io/compose-docs/blog/announcing-ns-compose"
-              target="_blank"
-              >Learn more</a
-            >
-            ✨
-          </h6>
-        </div>
-        <div
-          style="
-            display: flex;
-            align-items: center;
-            font-size: 2.5rem;
-            margin-left: 50px;
-            cursor: pointer;
-          "
-          onclick="
-            document.getElementById('notification').style.display = 'none';
-            sessionStorage.setItem('hideNotification', 'true');
-          "
-        >
-          x
-        </div>
-      </div>
-    </div>
-    <script>
-      if (sessionStorage.getItem("hideNotification") === "true") {
-        document.getElementById("notification").style.display = "none";
-      }
-    </script>
-    {% endif %}
     <header
       class="navbar navbar-static-top navbar-inverse"
       id="top"
@@ -132,6 +85,7 @@
         </nav>
       </div>
     </header>
+    {% endblock %}
     {% block flash_message %} {% with messages =
     get_flashed_messages(with_categories=True) %} {% if messages %}
     <div class="container">
@@ -146,8 +100,10 @@
     </div>
     {% endif %} {% endwith %} {% endblock %}
 
+    {% block page %}
     <div class="container">
       <div id="content">{% block content %}{% endblock %}</div>
+      {% block footer %}
       <div class="row" id="footer">
         <div class="col-md-12">
           <hr class="top-space40" />
@@ -241,7 +197,9 @@
           </div>
         </div>
       </div>
+      {% endblock %}
     </div>
     <div class="top-space40" style="margin-bottom: 10rem"></div>
+    {% endblock %}
   </body>
 </html>
